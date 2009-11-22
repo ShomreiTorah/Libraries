@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1308A6E1-7787-49F6-A19C-8AF327DAF9B5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ShomreiTorah.Common</RootNamespace>
+    <AssemblyName>ShomreiTorah.Common</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Shul.pfx</AssemblyOriginatorKeyFile>
+    <SccProjectName>Perforce Project</SccProjectName>
+    <SccLocalPath>..\..</SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>MSSCCI:Perforce SCM</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DocumentationFile>bin\Debug\ShomreiTorah.Common.XML</DocumentationFile>
+    <CodeAnalysisRules>-Microsoft.Naming#CA1716</CodeAnalysisRules>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\ShomreiTorah.Common.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Extensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Calendar\CalendarExtensions.cs" />
+    <Compile Include="Calendar\DafYomi.cs" />
+    <Compile Include="Calendar\HebrewDate.cs" />
+    <Compile Include="Calendar\HebrewDayInfo.cs" />
+    <Compile Include="Calendar\Holidays\FourParshiyosEvent.cs" />
+    <Compile Include="Calendar\Holidays\HebrewDayOfYear.cs" />
+    <Compile Include="Calendar\Holidays\IHebrewEvent.cs" />
+    <Compile Include="Calendar\Holidays\Holiday.cs" />
+    <Compile Include="Calendar\Holidays\NonShabbosEvent.cs" />
+    <Compile Include="Calendar\Holidays\OffsetEvent.cs" />
+    <Compile Include="Calendar\Holidays\SpecialShabbosEvent.cs" />
+    <Compile Include="Calendar\Omer.cs" />
+    <Compile Include="Calendar\Parshiyos.cs" />
+    <Compile Include="Calendar\Zmanim\CalculatingZmanimProvider.cs" />
+    <Compile Include="Calendar\Zmanim\CsvZmanimProvider.cs" />
+    <Compile Include="Calendar\Zmanim\FixedZmanimProvider.cs" />
+    <Compile Include="Calendar\Zmanim\OUZmanimProvider.cs" />
+    <Compile Include="Calendar\Zmanim\YearlyZmanimDictionary.cs" />
+    <Compile Include="Calendar\Zmanim\YearlyZmanimProvider.cs" />
+    <Compile Include="Calendar\Zmanim\ZmanimInfo.cs" />
+    <Compile Include="Calendar\Zmanim\ZmanimProvider.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="DB.cs" />
+    <Compile Include="Disposable.cs" />
+    <Compile Include="Email.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FtpClient.cs" />
+    <Compile Include="IProgressReporter.cs" />
+    <Compile Include="Office.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Updates\UpdateChecker.cs" />
+    <Compile Include="Updates\UpdateStreamer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shul.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDictionary Include="..\CustomDictionary.xml">
+      <Link>CustomDictionary.xml</Link>
+    </CodeAnalysisDictionary>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Access.mdb">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Access2007.accdb">
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
