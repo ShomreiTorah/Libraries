@@ -98,7 +98,7 @@ namespace ShomreiTorah.Common.Updates {
 					}
 				}
 			} finally {
-				if (progressReporter.WasCanceled)
+				if (progressReporter != null && !progressReporter.WasCanceled)
 					Directory.Delete(destination, true);
 			}
 		}
