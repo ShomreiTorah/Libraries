@@ -24,7 +24,7 @@ using System.Runtime.CompilerServices;
 // mailto:sjaak@sjaakpriester.nl
 
 
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms{
 	///<summary>A functional replacement for the standard GDI+ ColorMatrix class.</summary>
 	public class QColorMatrix {
 		// The luminance weight factors for the RGB color space.

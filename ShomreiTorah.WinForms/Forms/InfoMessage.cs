@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace ShomreiTorah.Forms {
+namespace ShomreiTorah.WinForms.Forms {
 	///<summary>A FadingPopup that displays a notification.</summary>
 	public sealed partial class InfoMessage : FadingPopup {
 		///<summary>The amount of time that an InfoMessage is visible for by default.</summary>

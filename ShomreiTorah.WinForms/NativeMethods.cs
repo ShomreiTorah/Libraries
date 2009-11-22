@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 
-namespace ShomreiTorah {
+namespace ShomreiTorah.WinForms {
 	static class NativeMethods {
 		public const int LayeredWindow = 0x80000;//WS_EX_LAYERED
 

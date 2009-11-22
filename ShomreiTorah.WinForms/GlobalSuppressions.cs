@@ -8,5 +8,5 @@
 // "In Project Suppression File". 
 // You do not need to add suppressions to this file manually. 
 
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "MaxPopupHeight", Scope = "member", Target = "ShomreiTorah.Controls.Lookup.#PopupOpen")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Scope = "member", Target = "ShomreiTorah.Controls.GoogleMapControl.#pictureBox_Click(System.Object,System.EventArgs)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "MaxPopupHeight", Scope = "member", Target = "ShomreiTorah.WinForms.Controls.Lookup.#PopupOpen")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Scope = "member", Target = "ShomreiTorah.WinForms.Controls.GoogleMapControl.#pictureBox_Click(System.Object,System.EventArgs)")]

@@ -12,7 +12,7 @@ using System.Net;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
 
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms.Controls {
 	///<summary>A control that displays a Google Map of an address.</summary>
 	[Description("A control that displays a Google Map of an address.")]
 	[ToolboxItem(true)]

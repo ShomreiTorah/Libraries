@@ -19,7 +19,7 @@ using DevExpress.XtraEditors.Drawing;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.Utils;
 
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms.Controls {
 	///<summary>An interactive Hebrew calendar.</summary>
 	[Description("An interactive Hebrew calendar.")]
 	[ToolboxBitmap(typeof(HebrewCalendar), "Images.Calendar.png")]
@@ -260,7 +260,7 @@ namespace ShomreiTorah.Controls {
 		public ICalendarPainter CalendarPainter { get { return Painter; } }
 		abstract class BaseCalendarPainter : ICalendarPainter, IDisposable {
 			public HebrewCalendar Calendar { get; protected set; }
-			//CS1690: Accessing a member on 'ShomreiTorah.Controls.HebrewCalendar.hoverDate' may cause a runtime exception because it is a field of a marshal-by-reference class
+			//CS1690: Accessing a member on 'ShomreiTorah.WinForms.Controls.HebrewCalendar.hoverDate' may cause a runtime exception because it is a field of a marshal-by-reference class
 			public CalendarHitTestInfo HoverItem { get { return Calendar.hoverItem; } }
 
 			protected BaseCalendarPainter(HebrewCalendar calendar) { Calendar = calendar; }

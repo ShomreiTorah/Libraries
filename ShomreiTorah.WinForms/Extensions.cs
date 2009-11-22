@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Data;
 using System.Drawing;
 
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms {
 	///<summary>Contains miscellaneous extension methods.</summary>
 	public static class Extensions {
 		#region Graphics
@@ -21,7 +21,7 @@ namespace ShomreiTorah.Controls {
 			if (graphics == null) throw new ArgumentNullException("graphics");
 			if (text == null) throw new ArgumentNullException("text");
 			if (font == null) throw new ArgumentNullException("font");
-		
+
 			using (var format = new StringFormat()) {
 				format.SetMeasurableCharacterRanges(new[] { new CharacterRange(0, text.Length) });
 

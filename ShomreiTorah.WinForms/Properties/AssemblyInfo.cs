@@ -7,11 +7,11 @@ using System;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ShomreiTorah.Controls")]
+[assembly: AssemblyTitle("ShomreiTorah.WinForms")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Congregation Shomrei Torah")]
-[assembly: AssemblyProduct("ShomreiTorah.Controls")]
+[assembly: AssemblyProduct("ShomreiTorah.WinForms")]
 [assembly: AssemblyCopyright("Copyright © Congregation Shomrei Torah 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

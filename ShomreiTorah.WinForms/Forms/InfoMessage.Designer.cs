@@ -1,4 +1,4 @@
-namespace ShomreiTorah.Forms {
+namespace ShomreiTorah.WinForms.Forms {
 	partial class InfoMessage {
 		/// <summary>
 		/// Required designer variable.

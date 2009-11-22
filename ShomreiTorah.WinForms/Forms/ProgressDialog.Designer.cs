@@ -1,4 +1,4 @@
-namespace ShomreiTorah.Forms {
+namespace ShomreiTorah.WinForms.Forms {
 	partial class ProgressDialog {
 		/// <summary>
 		/// Required designer variable.

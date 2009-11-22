@@ -1,4 +1,4 @@
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms.Controls {
 	partial class GoogleMapControl {
 		/// <summary> 
 		/// Required designer variable.
@@ -44,7 +44,7 @@ namespace ShomreiTorah.Controls {
 			// pictureBox
 			// 
 			this.pictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.pictureBox.InitialImage = global::ShomreiTorah.Controls.Properties.Resources.Loading32;
+			this.pictureBox.InitialImage = global::ShomreiTorah.WinForms.Properties.Resources.Loading32;
 			this.pictureBox.Location = new System.Drawing.Point(2, 2);
 			this.pictureBox.Name = "pictureBox";
 			this.pictureBox.Size = new System.Drawing.Size(222, 196);

@@ -8,7 +8,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing;
 using System.Diagnostics.CodeAnalysis;
 
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms.Controls {
 	///<summary>A blank control for drawing on.</summary>
 	[DefaultEvent("Paint")]
 	[Description("A blank control for drawing on.")]

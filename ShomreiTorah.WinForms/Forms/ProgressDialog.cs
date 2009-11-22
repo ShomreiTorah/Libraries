@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Taskbar;
 
-namespace ShomreiTorah.Forms {
+namespace ShomreiTorah.WinForms.Forms {
 	///<summary>A FadingPopup that displays the progress of an operation.</summary>
 	public partial class ProgressDialog : FadingPopup {
 		readonly int progressBarWidthWithCancel;

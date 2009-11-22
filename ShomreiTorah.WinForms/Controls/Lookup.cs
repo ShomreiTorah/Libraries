@@ -18,7 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 using DevExpress.Utils.Win;
 using System.Collections.ObjectModel;
 
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms.Controls {
 
 	///<summary>A control that allows the user to select an item from a list.</summary>
 	[DefaultEvent("ItemSelected")]
@@ -338,7 +338,7 @@ namespace ShomreiTorah.Controls {
 			UpdateDisplay();
 		}
 
-		///<summary>Raises the System.Windows.Forms.Control.MouseWheel event.</summary>
+		///<summary>Raises the System.Windows.WinForms.Forms.Control.MouseWheel event.</summary>
 		protected override void OnMouseWheel(MouseEventArgs e) {
 			if (e == null) throw new ArgumentNullException("e");
 			base.OnMouseWheel(e);
@@ -740,21 +740,21 @@ namespace ShomreiTorah.Controls {
 				PopupHeightChanged(this, e);
 		}
 
-		///<summary>Raises the System.Windows.Forms.Control.ParentChanged event.</summary>
+		///<summary>Raises the System.Windows.WinForms.Forms.Control.ParentChanged event.</summary>
 		protected override void OnParentChanged(EventArgs e) { base.OnParentChanged(e); if (!DesignMode) Parent.Controls.Add(popupPanel); }
-		///<summary>Raises the System.Windows.Forms.Control.SizeChanged event.</summary>
+		///<summary>Raises the System.Windows.WinForms.Forms.Control.SizeChanged event.</summary>
 		protected override void OnSizeChanged(EventArgs e) {
 			base.OnSizeChanged(e);
 			Height = 20;
 			if (!DesignMode) popupPanel.Width = Width;
 		}
-		///<summary>Raises the System.Windows.Forms.Control.LocationChanged event.</summary>
+		///<summary>Raises the System.Windows.WinForms.Forms.Control.LocationChanged event.</summary>
 		protected override void OnLocationChanged(EventArgs e) {
 			base.OnLocationChanged(e);
 			if (DesignMode) return;
 			popupPanel.Location = new Point(Left, ResultsLocation == ResultsLocation.Top ? Top - popupPanel.Height : Bottom);
 		}
-		///<summary>Raises the System.Windows.Forms.Control.Layout event.</summary>
+		///<summary>Raises the System.Windows.WinForms.Forms.Control.Layout event.</summary>
 		protected override void OnLayout(LayoutEventArgs e) {
 			base.OnLayout(e);
 			if (ResultsLocation == ResultsLocation.Top)

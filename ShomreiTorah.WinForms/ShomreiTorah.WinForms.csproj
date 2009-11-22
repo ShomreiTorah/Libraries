@@ -8,8 +8,8 @@
     <ProjectGuid>{0B927F97-8CDD-47CB-B775-CA1E0AB2409C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ShomreiTorah.Controls</RootNamespace>
-    <AssemblyName>ShomreiTorah.Controls</AssemblyName>
+    <RootNamespace>ShomreiTorah.WinForms</RootNamespace>
+    <AssemblyName>ShomreiTorah.WinForms</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
@@ -48,7 +48,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <DocumentationFile>bin\Debug\ShomreiTorah.Controls.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\ShomreiTorah.WinForms.xml</DocumentationFile>
     <CodeAnalysisRuleSet>..\ShomreiTorah.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -59,7 +59,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\ShomreiTorah.Controls.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\ShomreiTorah.WinForms.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DevExpress.Data.v9.2, Version=9.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
@@ -92,7 +92,7 @@
     <Compile Include="Controls\Canvas.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Extensions.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Controls\GoogleMapControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -132,7 +132,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Controls\QColorMatrix.cs" />
+    <Compile Include="QColorMatrix.cs" />
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>

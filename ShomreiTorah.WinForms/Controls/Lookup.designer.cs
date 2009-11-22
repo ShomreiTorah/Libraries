@@ -1,6 +1,6 @@
 using DevExpress.XtraEditors;
 using System.Windows.Forms;
-namespace ShomreiTorah.Controls {
+namespace ShomreiTorah.WinForms.Controls {
 	partial class Lookup {
 		/// <summary> 
 		/// Required designer variable.
@@ -16,7 +16,7 @@ namespace ShomreiTorah.Controls {
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges")]
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
-			this.popupCanvas = new ShomreiTorah.Controls.Canvas();
+			this.popupCanvas = new ShomreiTorah.WinForms.Controls.Canvas();
 			this.resizeAnimator = new System.Windows.Forms.Timer(this.components);
 			this.keyPressTimer = new System.Windows.Forms.Timer(this.components);
 			this.Title = new DevExpress.XtraEditors.SimpleButton();

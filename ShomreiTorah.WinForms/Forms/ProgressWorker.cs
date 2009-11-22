@@ -8,7 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using ShomreiTorah.Common;
 
-namespace ShomreiTorah.Forms {
+namespace ShomreiTorah.WinForms.Forms {
 	///<summary>Executes operations with progress.</summary>
 	public static class ProgressWorker {
 		///<summary>Executes an operation and displays its progress.</summary>

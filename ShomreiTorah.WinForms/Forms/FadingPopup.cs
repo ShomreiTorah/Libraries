@@ -11,7 +11,7 @@ using DevExpress.Utils.Drawing;
 using DevExpress.Utils.ViewInfo;
 using DevExpress.XtraEditors;
 
-namespace ShomreiTorah.Forms {
+namespace ShomreiTorah.WinForms.Forms {
 	///<summary>Specifies the phase of a FadingPopup.</summary>
 	public enum Phase {
 		///<summary>The popup is not shown.</summary>
