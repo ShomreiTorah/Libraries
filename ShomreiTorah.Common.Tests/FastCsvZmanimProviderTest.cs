@@ -100,7 +100,7 @@ namespace ShomreiTorah.Common.Tests {
 			//if (max.Month != 12 || max.Day != 31) max = new DateTime(max.Year - 1, 12, 31);
 
 			DateTime min = new DateTime(2009, 1, 1), max = new DateTime(2012, 12, 31);
-			var xmlZmanim = XmlZmanimProvider.Default.GetZmanim(min, max).ToArray();
+			var sourceZmanim = CalculatingZmanimProvider.Default.GetZmanim(min, max).ToArray();
 
 			var provider = CreateProvider();
 
@@ -108,21 +108,25 @@ namespace ShomreiTorah.Common.Tests {
 			Assert.AreEqual(DateTime.MinValue, provider.MaxDate);
 			Assert.IsNull(provider.GetZmanim(DateTime.Now));
 
-			provider.Write(xmlZmanim, true);
+			provider.Write(sourceZmanim, true);
 
 			Assert.AreEqual(min, provider.MinDate);
 			Assert.AreEqual(max, provider.MaxDate);
 
 
 			var loadedZmanim = provider.GetZmanim(min, max).ToArray();
-			Assert.AreEqual(xmlZmanim.Length, loadedZmanim.Length);
+			Assert.AreEqual(sourceZmanim.Length, loadedZmanim.Length);
 			for (int i = 0; i < loadedZmanim.Length; i++) {
-				var e = xmlZmanim[i];
+				var e = sourceZmanim[i];
 				var a = loadedZmanim[i];
 				Assert.AreEqual(e.Date, a.Date);
 				Assert.AreEqual(e.Times.Count, a.Times.Count);
 				foreach (var key in e.Times.Keys) {
-					Assert.AreEqual(a[key], e[key]);
+					var expected = e[key];
+
+					//Igonre extra precision.
+					expected = new TimeSpan(expected.Hours, expected.Minutes, expected.Seconds);
+					Assert.AreEqual(expected, a[key]);
 				}
 			}
 		}
