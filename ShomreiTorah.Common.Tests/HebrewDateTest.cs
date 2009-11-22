@@ -1,7 +1,6 @@
 using ShomreiTorah.Common.Calendar;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using ShomreiTorah.Util;
 
 namespace ShomreiTorah.Common.Tests {
 
@@ -83,17 +82,17 @@ namespace ShomreiTorah.Common.Tests {
 			}
 			Assert.Inconclusive("I must figure out how to handle years without וילך.");
 		}
-		/// <summary>
-		///A test for Parsha
-		///</summary>
-		[TestMethod()]
-		public void ParshaTest() {
-			var start = new DateTime(1584, 1, 1);
-			start += TimeSpan.FromDays(6 - (int)start.DayOfWeek);
-			for (var d = start; d.Year < 2239; d += TimeSpan.FromDays(7)) {
-				Assert.AreEqual(Parshiyos.Getפרשה(d), new HebrewDate(d).Parsha ?? "No פרשה");
-			}
-		}
+		///// <summary>
+		/////A test for Parsha
+		/////</summary>
+		//[TestMethod()]
+		//public void ParshaTest() {
+		//    var start = new DateTime(1584, 1, 1);
+		//    start += TimeSpan.FromDays(6 - (int)start.DayOfWeek);
+		//    for (var d = start; d.Year < 2239; d += TimeSpan.FromDays(7)) {
+		//        Assert.AreEqual(Parshiyos.Getפרשה(d), new HebrewDate(d).Parsha ?? "No פרשה");
+		//    }
+		//}
 
 		/// <summary>
 		///A test for GetYearType
