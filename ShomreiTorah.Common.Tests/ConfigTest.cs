@@ -81,7 +81,7 @@ namespace ShomreiTorah.Common.Tests {
 		///</summary>
 		[TestMethod()]
 		public void ReadAttributeTest() {
-			Assert.AreEqual(@"L:\Community\Rabbi Weinberger's Shul\Membership\ListMaker\Data.lmdb.gz", Config.ReadAttribute("ListMaker", "DatabasePath"));
+			Assert.AreEqual(@"SMTP.GMail.com", Config.ReadAttribute("SMTP", "Gmail", "Server"));
 		}
 		[TestMethod]
 		public void LoadedTest() { Assert.IsTrue(Config.Loaded); }
