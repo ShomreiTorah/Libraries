@@ -27,8 +27,14 @@ namespace ShomreiTorah.Common.Updates {
 			if (rootPath == null) throw new ArgumentNullException("rootPath");
 			if (paths == null) throw new ArgumentNullException("paths");
 
+			var totalLength = paths.Sum(p => new FileInfo(p).Length);
+			int totalRead = 0;
 			if (progressReporter != null)
-				progressReporter.Maximum = paths.Length;
+				progressReporter.Maximum = (int)totalLength;
+
+			var buffer = new byte[4096];
+
+			target.Write(totalLength);
 			target.Write(paths.Length);
 			var rootUri = new Uri(rootPath + "\\", UriKind.Absolute);
 			for (int i = 0; i < paths.Length; i++) {
@@ -38,7 +44,6 @@ namespace ShomreiTorah.Common.Updates {
 				if (progressReporter != null) {
 					if (!progressReporter.WasCanceled)
 						return;
-					progressReporter.Progress = i;
 					progressReporter.Caption = "Adding " + relativePath;
 				}
 
@@ -46,7 +51,16 @@ namespace ShomreiTorah.Common.Updates {
 				using (var file = File.Open(paths[i], FileMode.Open, FileAccess.Read)) {
 					target.Write(file.Length);
 
-					file.CopyTo(target);
+					while (true) {
+						if (progressReporter != null) progressReporter.Progress = totalRead;
+
+						var bytesRead = file.Read(buffer, 0, buffer.Length);
+						if (bytesRead == 0) break;
+
+						totalRead += bytesRead;
+
+						target.Write(buffer, 0, bytesRead);
+					}
 				}
 			}
 		}
@@ -62,6 +76,11 @@ namespace ShomreiTorah.Common.Updates {
 
 			try {
 				byte[] buffer = new byte[4096];
+
+				var totalSize = source.Read<long>();
+				if (progressReporter != null) progressReporter.Maximum = totalSize > int.MaxValue ? -1 : (int)totalSize;
+				int totalRead = 0;
+
 				int fileCount = source.Read<int>();
 				for (int i = 0; i < fileCount; i++) {
 					var relativePath = source.ReadString();
@@ -85,18 +104,22 @@ namespace ShomreiTorah.Common.Updates {
 							if (progressReporter != null) {
 								if (!progressReporter.WasCanceled)
 									return;
-								if (progressReporter.Maximum >= 0)
-									progressReporter.Progress = (int)bytesRead;
+								if (progressReporter.Maximum > 0)//If it's less than 4GB
+									progressReporter.Progress = totalRead;
 							}
+
 							var chunkSize = source.Read(buffer, 0, (int)Math.Min(length - bytesRead, buffer.Length));
 							if (chunkSize == 0) throw new InvalidDataException("File is too short");
 
 							bytesRead += chunkSize;
+							totalRead += chunkSize;
 							file.Write(buffer, 0, chunkSize);
 							if (bytesRead >= length) break;
 						}
 					}
 				}
+				if (totalSize != totalRead)
+					throw new InvalidDataException("Not enough bytes");
 			} finally {
 				if (progressReporter != null && !progressReporter.WasCanceled)
 					Directory.Delete(destination, true);
