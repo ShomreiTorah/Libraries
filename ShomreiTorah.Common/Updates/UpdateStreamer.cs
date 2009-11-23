@@ -72,6 +72,10 @@ namespace ShomreiTorah.Common.Updates {
 		public static void ExtractArchive(Stream source, string destination, IProgressReporter progressReporter) {
 			if (source == null) throw new ArgumentNullException("source");
 			if (destination == null) throw new ArgumentNullException("destination");
+
+			if (Directory.Exists(destination) && Directory.GetFileSystemEntries(destination).Length > 0)
+				throw new ArgumentException("The destination directory cannot have existing files", "destination");
+
 			Directory.CreateDirectory(destination);
 
 			try {
