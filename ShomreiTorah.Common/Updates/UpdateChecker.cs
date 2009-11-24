@@ -134,9 +134,9 @@ namespace ShomreiTorah.Common.Updates {
 				using (var cypherStream = response.GetResponseStream())
 				using (var transform = decryptor.CreateDecryptor())
 				using (var hasher = new SHA512CryptoServiceProvider())
-				using (var decryptingStream = new CryptoStream(cypherStream, transform, CryptoStreamMode.Read))
-				using (var hashingStream = new CryptoStream(decryptingStream, hasher, CryptoStreamMode.Read))
-				using (var unzipper = new GZipStream(hashingStream, CompressionMode.Decompress)) {
+				using (var hashingStream = new CryptoStream(cypherStream, hasher, CryptoStreamMode.Read))
+				using (var decryptingStream = new CryptoStream(hashingStream, transform, CryptoStreamMode.Read))
+				using (var unzipper = new GZipStream(decryptingStream, CompressionMode.Decompress)) {
 					UpdateStreamer.ExtractArchive(unzipper, path, progress);
 
 					if (progress.WasCanceled) throw new InvalidOperationException("Cancelled");
