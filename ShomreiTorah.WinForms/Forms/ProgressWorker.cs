@@ -29,7 +29,6 @@ namespace ShomreiTorah.WinForms.Forms {
 
 			bool cancelled = false;
 			using (var dialog = new ProgressForm() { CancelState = cancellable ? ButtonMode.Normal : ButtonMode.Hidden }) {
-				object syncer = new object();
 
 				dialog.FadeIn();
 				ThreadPool.QueueUserWorkItem(delegate {
@@ -38,17 +37,13 @@ namespace ShomreiTorah.WinForms.Forms {
 					} catch (Exception ex) {
 						exception = ex;
 					} finally {
-						lock (syncer) {
-							dialog.Finished = true;
-							dialog.FadeOut();
-						}
-					}
-					lock (syncer) {
-						if (!dialog.IsDisposed)
-							dialog.ShowDialog(parent);
+						dialog.Finished = true;
+						dialog.FadeOut();
 					}
 					cancelled = dialog.WasCanceled;
 				});
+				if (!dialog.IsDisposed && !dialog.Finished)
+					dialog.ShowDialog(parent);
 			}
 			if (exception != null)
 				throw new TargetInvocationException(exception);

@@ -29,7 +29,7 @@ namespace ShomreiTorah.WinForms.Forms {
 		protected override void OnClosed(EventArgs e) {
 			base.OnClosed(e);
 			if (TaskbarManager.IsPlatformSupported)
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress);
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, Handle);
 		}
 		void UpdateTaskbar() {
 			if (!TaskbarManager.IsPlatformSupported) return;
