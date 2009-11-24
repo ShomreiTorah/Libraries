@@ -19,8 +19,15 @@ namespace ShomreiTorah.Common.Updates {
 		#region Read ShomreiTorahConfig
 		static SymmetricAlgorithm CreateKD() {
 			var retVal = SymmetricAlgorithm.Create(Config.ReadAttribute("Updates", "Cryptography", "BlobDecryptor", "Algorithm"));
-			retVal.Key = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "BlobDecryptor", "Key").Value);
-			retVal.IV = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "BlobDecryptor", "IV").Value);
+
+			var key = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "BlobDecryptor", "Key").Value);
+			var iv = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "BlobDecryptor", "IV").Value);
+
+			retVal.KeySize = key.Length * 8;
+			retVal.BlockSize = iv.Length * 8;
+
+			retVal.Key = key;
+			retVal.IV = iv;
 			return retVal;
 		}
 

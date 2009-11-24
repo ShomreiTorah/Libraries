@@ -83,11 +83,11 @@ namespace ShomreiTorah.WinForms.Forms {
 		///<summary>Begins the fade-out phase, which culminates in closing the form.</summary>
 		[SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "FadeOut")]
 		public void FadeOut() {
-			if (Opacity <= 0) return;
 			if (InvokeRequired) {
 				BeginInvoke(new Action(FadeOut));
 				return;
 			}
+			if (Opacity <= 0) return;
 			Phase = Phase.FadingOut;
 			StartTimer();
 		}

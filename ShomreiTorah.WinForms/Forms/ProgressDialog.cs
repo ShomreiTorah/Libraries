@@ -34,12 +34,12 @@ namespace ShomreiTorah.WinForms.Forms {
 		void UpdateTaskbar() {
 			if (!TaskbarManager.IsPlatformSupported) return;
 			if (!Visible)
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress);
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, Handle);
 			else if (Maximum < 0)
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Indeterminate);
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Indeterminate, Handle);
 			else {
-				TaskbarManager.Instance.SetProgressValue(Value, Maximum);
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
+				TaskbarManager.Instance.SetProgressValue(Value, Maximum, Handle);
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, Handle);
 			}
 		}
 		#endregion
