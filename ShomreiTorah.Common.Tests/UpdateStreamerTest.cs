@@ -56,33 +56,36 @@ namespace ShomreiTorah.Common.Tests {
 		///</summary>
 		[TestMethod]
 		public void WriteArchiveTest() {
-			var rand = new Random();
-			var files = Enumerable.Repeat(0, rand.Next(1, 20)).Select(i => {
-				var bytes = new byte[rand.Next(10, 16384)];
-				rand.NextBytes(bytes);
-				return new {
-					Bytes = bytes,
-					Name = Enumerable.Repeat(0, rand.Next(1, 4)).Select(j => Path.GetRandomFileName()).Join("\\") //new string(Array.ConvertAll(new char[rand.Next(4, 32)], c => (char)('a' + rand.Next(0, 26))))
-				};
-			}).ToArray();
+			foreach (var progress in new[] { null, new EmptyProgressReporter() }) {
 
-			var folder = CreateTempDir();
-			foreach (var file in files) {
-				var fullPath = Path.Combine(folder, file.Name);
-				Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
-				File.WriteAllBytes(fullPath, file.Bytes);
-			}
+				var rand = new Random();
+				var files = Enumerable.Repeat(0, rand.Next(1, 20)).Select(i => {
+					var bytes = new byte[rand.Next(10, 16384)];
+					rand.NextBytes(bytes);
+					return new {
+						Bytes = bytes,
+						Name = Enumerable.Repeat(0, rand.Next(1, 4)).Select(j => Path.GetRandomFileName()).Join("\\") //new string(Array.ConvertAll(new char[rand.Next(4, 32)], c => (char)('a' + rand.Next(0, 26))))
+					};
+				}).ToArray();
 
-			var stream = new MemoryStream();
-			UpdateStreamer.WriteArchive(stream, folder, null);
-			stream.Position = 0;
-			File.WriteAllBytes(Path.GetTempFileName(), stream.ToArray());
+				var folder = CreateTempDir();
+				foreach (var file in files) {
+					var fullPath = Path.Combine(folder, file.Name);
+					Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+					File.WriteAllBytes(fullPath, file.Bytes);
+				}
 
-			var newFolder = CreateTempDir();
-			UpdateStreamer.ExtractArchive(stream, newFolder, null);
+				var stream = new MemoryStream();
+				UpdateStreamer.WriteArchive(stream, folder, progress);
+				stream.Position = 0;
+				File.WriteAllBytes(Path.GetTempFileName(), stream.ToArray());
 
-			foreach (var file in files) {
-				CollectionAssert.AreEqual(file.Bytes, File.ReadAllBytes(Path.Combine(newFolder, file.Name)));
+				var newFolder = CreateTempDir();
+				UpdateStreamer.ExtractArchive(stream, newFolder, progress);
+
+				foreach (var file in files) {
+					CollectionAssert.AreEqual(file.Bytes, File.ReadAllBytes(Path.Combine(newFolder, file.Name)));
+				}
 			}
 		}
 		static string CreateTempDir() {
@@ -90,6 +93,13 @@ namespace ShomreiTorah.Common.Tests {
 			File.Delete(path);
 			Directory.CreateDirectory(path);
 			return path;
+		}
+
+		class EmptyProgressReporter : IProgressReporter {
+			public string Caption { get; set; }
+			public int Progress { get; set; }
+			public int Maximum { get; set; }
+			public bool WasCanceled { get { return false; } }
 		}
 	}
 }
