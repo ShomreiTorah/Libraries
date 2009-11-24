@@ -42,13 +42,13 @@ namespace ShomreiTorah.Common.Updates {
 				var relativePath = rootUri.MakeRelativeUri(uri).ToString();
 
 				if (progressReporter != null) {
-					if (!progressReporter.WasCanceled)
+					if (progressReporter.WasCanceled)
 						return;
 					progressReporter.Caption = "Adding " + relativePath;
 				}
 
 				target.WriteString(relativePath);
-				using (var file = File.Open(paths[i], FileMode.Open, FileAccess.Read)) {
+				using (var file = File.Open(paths[i], FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 					target.Write(file.Length);
 
 					while (true) {

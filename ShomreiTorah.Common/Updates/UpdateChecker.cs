@@ -31,7 +31,13 @@ namespace ShomreiTorah.Common.Updates {
 			return retVal;
 		}
 
-		internal static readonly SymmetricAlgorithm BlobDecryptor = CreateKD();
+		///<summary>Gets the SymmetricAlgorithm used to encrypt the Blob element in the update XML.</summary>
+		static readonly SymmetricAlgorithm BlobAlgorithm = CreateKD();
+
+		///<summary>Creates an ICryptoTransform that encrypts the Blob element in the update XML.</summary>
+		public static ICryptoTransform CreateBlobEncryptor() { return BlobAlgorithm.CreateEncryptor(); }
+		///<summary>Creates an ICryptoTransform that decrypts the Blob element in the update XML.</summary>
+		public static ICryptoTransform CreateBlobDecryptor() { return BlobAlgorithm.CreateDecryptor(); }
 
 		static RSACryptoServiceProvider CreateVerifier() {
 			var retVal = new RSACryptoServiceProvider();
@@ -40,7 +46,8 @@ namespace ShomreiTorah.Common.Updates {
 		}
 		internal static readonly RSACryptoServiceProvider UpdateVerifier = CreateVerifier();
 
-		internal static readonly Uri BaseUri = new Uri(Config.ReadAttribute("Updates", "BaseUri"), UriKind.Absolute);
+		///<summary>Gets the Uri that contains updates.</summary>
+		public static readonly Uri BaseUri = new Uri(Config.ReadAttribute("Updates", "BaseUri"), UriKind.Absolute);
 		#endregion
 
 		///<summary>Creates an UpdateChecker from an UpdatableAttribute defined in the calling assembly.</summary>
@@ -86,7 +93,8 @@ namespace ShomreiTorah.Common.Updates {
 			Description = element.Element("Description").Value;
 
 
-			var blob = UpdateChecker.BlobDecryptor.Decrypt(Convert.FromBase64String(element.Element("Blob").Value));
+
+			var blob = UpdateChecker.CreateBlobDecryptor().TransformBytes(Convert.FromBase64String(element.Element("Blob").Value));
 
 			var key = new byte[256 / 8];
 			Buffer.BlockCopy(blob, 0, key, 0, key.Length);
@@ -94,7 +102,7 @@ namespace ShomreiTorah.Common.Updates {
 			var iv = new byte[256 / 8];
 			Buffer.BlockCopy(blob, key.Length, iv, 0, iv.Length);
 
-			decryptor = new RijndaelManaged { Key = key, IV = iv };
+			decryptor = new RijndaelManaged { KeySize = 256, BlockSize = 256, Key = key, IV = iv };
 
 			signature = new byte[blob.Length - key.Length - iv.Length];
 			Buffer.BlockCopy(blob, key.Length + iv.Length, signature, 0, signature.Length);
@@ -129,6 +137,7 @@ namespace ShomreiTorah.Common.Updates {
 					UpdateStreamer.ExtractArchive(unzipper, path, progress);
 
 					if (progress.WasCanceled) throw new InvalidOperationException("Cancelled");
+					hashingStream.FlushFinalBlock();
 					var hash = hasher.Hash;
 					if (!UpdateChecker.UpdateVerifier.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA512"), signature))
 						throw new InvalidDataException("Bad signature");
