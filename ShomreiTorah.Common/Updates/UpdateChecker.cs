@@ -95,7 +95,7 @@ namespace ShomreiTorah.Common.Updates {
 			ProductName = element.Attribute("Name").Value;
 			NewVersion = new Version(element.Attribute("NewVersion").Value);
 			PublishDate = DateTime.Parse(element.Attribute("PublishDate").Value, CultureInfo.InvariantCulture);
-			Description = element.Element("Description").Value;
+			Description = element.Element("Description").Value.Replace("\n", "\r\n").Replace("\r\r", "\r");
 
 			var blob = UpdateChecker.CreateBlobDecryptor().TransformBytes(Convert.FromBase64String(element.Element("Blob").Value));
 
@@ -140,7 +140,6 @@ namespace ShomreiTorah.Common.Updates {
 					UpdateStreamer.ExtractArchive(unzipper, path, progress);
 
 					if (progress.WasCanceled) throw new InvalidOperationException("Canceled");
-					decryptingStream.FlushFinalBlock();
 					var hash = hasher.Hash;
 					if (!UpdateChecker.UpdateVerifier.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA512"), signature))
 						throw new InvalidDataException("Bad signature");
