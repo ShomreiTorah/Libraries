@@ -17,6 +17,11 @@ namespace ShomreiTorah.Common.Updates {
 	///<summary>Checks for updates.</summary>
 	public class UpdateChecker {
 		#region Read ShomreiTorahConfig
+		///<summary>The key size for the AES algorithm that encrypts updates.</summary>
+		public const int UpdateKeySize = 256;
+		///<summary>The block size for the AES algorithm that encrypts updates.</summary>
+		public const int UpdateBlockSize = 256;
+
 		static SymmetricAlgorithm CreateKD() {
 			var retVal = SymmetricAlgorithm.Create(Config.ReadAttribute("Updates", "Cryptography", "BlobDecryptor", "Algorithm"));
 
@@ -92,17 +97,15 @@ namespace ShomreiTorah.Common.Updates {
 			PublishDate = DateTime.Parse(element.Attribute("PublishDate").Value, CultureInfo.InvariantCulture);
 			Description = element.Element("Description").Value;
 
-
-
 			var blob = UpdateChecker.CreateBlobDecryptor().TransformBytes(Convert.FromBase64String(element.Element("Blob").Value));
 
-			var key = new byte[256 / 8];
+			var key = new byte[UpdateChecker.UpdateKeySize / 8];
 			Buffer.BlockCopy(blob, 0, key, 0, key.Length);
 
-			var iv = new byte[256 / 8];
+			var iv = new byte[UpdateChecker.UpdateBlockSize / 8];
 			Buffer.BlockCopy(blob, key.Length, iv, 0, iv.Length);
 
-			decryptor = new RijndaelManaged { KeySize = 256, BlockSize = 256, Key = key, IV = iv };
+			decryptor = new RijndaelManaged { KeySize = UpdateChecker.UpdateKeySize, BlockSize = UpdateChecker.UpdateBlockSize, Key = key, IV = iv };
 
 			signature = new byte[blob.Length - key.Length - iv.Length];
 			Buffer.BlockCopy(blob, key.Length + iv.Length, signature, 0, signature.Length);
