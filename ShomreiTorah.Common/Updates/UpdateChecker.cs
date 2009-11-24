@@ -139,7 +139,7 @@ namespace ShomreiTorah.Common.Updates {
 				using (var unzipper = new GZipStream(decryptingStream, CompressionMode.Decompress)) {
 					UpdateStreamer.ExtractArchive(unzipper, path, progress);
 
-					if (progress.WasCanceled) throw new InvalidOperationException("Cancelled");
+					if (progress.WasCanceled) throw new InvalidOperationException("Canceled");
 					hashingStream.FlushFinalBlock();
 					var hash = hasher.Hash;
 					if (!UpdateChecker.UpdateVerifier.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA512"), signature))

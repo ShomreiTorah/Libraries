@@ -27,7 +27,7 @@ namespace ShomreiTorah.WinForms.Forms {
 
 			Exception exception = null;
 
-			bool cancelled = false;
+			bool canceled = false;
 			using (var dialog = new ProgressForm() { CancelState = cancellable ? ButtonMode.Normal : ButtonMode.Hidden }) {
 
 				dialog.FadeIn();
@@ -40,14 +40,14 @@ namespace ShomreiTorah.WinForms.Forms {
 						dialog.Finished = true;
 						dialog.FadeOut();
 					}
-					cancelled = dialog.WasCanceled;
+					canceled = dialog.WasCanceled;
 				});
 				if (!dialog.IsDisposed && !dialog.Finished)
 					dialog.ShowDialog(parent);
 			}
 			if (exception != null)
 				throw new TargetInvocationException(exception);
-			return !cancelled;
+			return !canceled;
 		}
 		class ProgressForm : ProgressDialog, IProgressReporter {
 			public bool Finished { get; set; }
