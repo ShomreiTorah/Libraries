@@ -92,7 +92,8 @@ namespace ShomreiTorah.Common {
 			using (var requestStream = request.GetRequestStream()) {
 				contents.CopyTo(requestStream, progress);
 			}
-			request.GetResponse().Close();
+			if (progress == null || !progress.WasCanceled)
+				request.GetResponse().Close();
 		}
 	}
 }
