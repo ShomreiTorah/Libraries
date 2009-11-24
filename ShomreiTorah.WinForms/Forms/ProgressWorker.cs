@@ -28,7 +28,7 @@ namespace ShomreiTorah.WinForms.Forms {
 			Exception exception = null;
 
 			bool canceled = false;
-			using (var dialog = new ProgressForm() { CancelState = cancellable ? ButtonMode.Normal : ButtonMode.Hidden }) {
+			using (var dialog = new ProgressForm() { CanCancel = cancellable }) {
 
 				dialog.FadeIn();
 				ThreadPool.QueueUserWorkItem(delegate {
@@ -83,6 +83,19 @@ namespace ShomreiTorah.WinForms.Forms {
 				CancelState = ButtonMode.Disabled;
 			}
 			public bool WasCanceled { get; private set; }
+
+
+			public bool CanCancel {
+				get { return CancelState != ButtonMode.Hidden; }
+				set {
+					MyInvoke(() => {
+						if (value)
+							CancelState = WasCanceled ? ButtonMode.Disabled : ButtonMode.Normal;
+						else
+							CancelState = ButtonMode.Hidden;
+					});
+				}
+			}
 		}
 	}
 }

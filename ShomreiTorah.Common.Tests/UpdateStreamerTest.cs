@@ -99,6 +99,7 @@ namespace ShomreiTorah.Common.Tests {
 			public string Caption { get; set; }
 			public int Progress { get; set; }
 			public int Maximum { get; set; }
+			public bool CanCancel { get; set; }
 			public bool WasCanceled { get { return false; } }
 		}
 	}

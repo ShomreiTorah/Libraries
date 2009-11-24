@@ -14,5 +14,7 @@ namespace ShomreiTorah.Common {
 		int Maximum { get; set; }
 		///<summary>Gets whether the cancel button has been clicked.</summary>
 		bool WasCanceled { get; }
+		///<summary>Gets or sets whether the operation can be canceled.</summary>
+		bool CanCancel { get; set; }
 	}
 }
