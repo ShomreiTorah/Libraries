@@ -88,7 +88,7 @@ namespace ShomreiTorah.Common.Updates {
 				int fileCount = source.Read<int>();
 				for (int i = 0; i < fileCount; i++) {
 					var relativePath = source.ReadString();
-					if (progressReporter != null && !progressReporter.WasCanceled)
+					if (progressReporter != null && progressReporter.WasCanceled)
 						return;
 
 					string targetPath = Path.Combine(destination, relativePath);
@@ -96,7 +96,7 @@ namespace ShomreiTorah.Common.Updates {
 					long length = source.Read<long>();
 
 					if (progressReporter != null) {
-						if (!progressReporter.WasCanceled)
+						if (progressReporter.WasCanceled)
 							return;
 						progressReporter.Maximum = length > int.MaxValue ? -1 : (int)length;
 						progressReporter.Caption = "Extracting " + relativePath;
@@ -106,7 +106,7 @@ namespace ShomreiTorah.Common.Updates {
 						long bytesRead = 0;
 						while (true) {
 							if (progressReporter != null) {
-								if (!progressReporter.WasCanceled)
+								if (progressReporter.WasCanceled)
 									return;
 								if (progressReporter.Maximum > 0)//If it's less than 4GB
 									progressReporter.Progress = totalRead;
@@ -125,7 +125,7 @@ namespace ShomreiTorah.Common.Updates {
 				if (totalSize != totalRead)
 					throw new InvalidDataException("Not enough bytes");
 			} finally {
-				if (progressReporter != null && !progressReporter.WasCanceled)
+				if (progressReporter != null && progressReporter.WasCanceled)
 					Directory.Delete(destination, true);
 			}
 		}
