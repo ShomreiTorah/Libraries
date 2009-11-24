@@ -226,18 +226,10 @@ namespace ShomreiTorah.Common {
 		#region Cryptography
 		///<summary>Encrypts data.</summary>
 		///<param name="algorithm">The symetric algorithm to encrypt the data with.</param>
-		///<param name="plaintexts">The data to encrypt.</param>
+		///<param name="plaintext">The data to encrypt.</param>
 		///<returns>The encrypted data.</returns>
-		public static byte[] Encrypt(this SymmetricAlgorithm algorithm, params byte[][] plaintexts) {
-			using (var stream = new MemoryStream())
-			using (var encryptor = algorithm.CreateEncryptor())
-			using (var cryptoStream = new CryptoStream(stream, encryptor, CryptoStreamMode.Write)) {
-				foreach (var plainText in plaintexts)
-					cryptoStream.WriteAllBytes(plainText);
-
-				cryptoStream.FlushFinalBlock();
-				return stream.ToArray();
-			}
+		public static byte[] Encrypt(this SymmetricAlgorithm algorithm, byte[] plaintext) {
+			return algorithm.CreateEncryptor().TransformBytes(plaintext);
 		}
 
 		///<summary>Decrypts data.</summary>
@@ -245,10 +237,18 @@ namespace ShomreiTorah.Common {
 		///<param name="cipherText">The encrypted data.</param>
 		///<returns>The decrypted data.</returns>
 		public static byte[] Decrypt(this SymmetricAlgorithm algorithm, byte[] cipherText) {
-			using (var stream = new MemoryStream(cipherText.Length))
-			using (var decryptor = algorithm.CreateDecryptor())
-			using (var cryptoStream = new CryptoStream(stream, decryptor, CryptoStreamMode.Write)) {
-				cryptoStream.WriteAllBytes(cipherText);
+			return algorithm.CreateDecryptor().TransformBytes(cipherText);
+		}
+
+		///<summary>Runs a byte array through an ICryptoTransform.</summary>
+		///<param name="transform">The transform to run the data through.  This parameter will be disposed.</param>
+		///<param name="data">The data to transform.</param>
+		///<returns>The transformed data.</returns>
+		public static byte[] TransformBytes(this ICryptoTransform transform, byte[] data) {
+			using (transform)
+			using (var stream = new MemoryStream(data.Length))
+			using (var cryptoStream = new CryptoStream(stream, transform, CryptoStreamMode.Write)) {
+				cryptoStream.WriteAllBytes(data);
 				cryptoStream.FlushFinalBlock();
 				return stream.ToArray();
 			}
@@ -442,7 +442,7 @@ namespace ShomreiTorah.Common {
 		///<typeparam name="TAttribute">The type of attribute to return.</typeparam>
 		///<param name="provider">The object to get the attribute for.</param>
 		///<param name="inherit">Whether to look up the hierarchy chain for attributes.</param>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification="Return value")]
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Return value")]
 		public static TAttribute[] GetCustomAttributes<TAttribute>(this ICustomAttributeProvider provider, bool inherit) where TAttribute : Attribute {
 			return (TAttribute[])provider.GetCustomAttributes(typeof(TAttribute), inherit);
 		}
