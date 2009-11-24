@@ -205,17 +205,33 @@ namespace ShomreiTorah.Common {
 		///<param name="from">The stream to copy from.  This stream must be readable.</param>
 		///<param name="to">The stream to copy to.  This stream must be writable.</param>
 		///<returns>The number of bytes copied.</returns>
-		public static long CopyTo(this Stream from, Stream to) {
+		public static long CopyTo(this Stream from, Stream to) { return from.CopyTo(to, null); }
+		///<summary>Copies one stream to another.</summary>
+		///<param name="from">The stream to copy from.  This stream must be readable.</param>
+		///<param name="to">The stream to copy to.  This stream must be writable.</param>
+		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
+		///<returns>The number of bytes copied.</returns>
+		public static long CopyTo(this Stream from, Stream to, IProgressReporter progress) {
 			if (from == null) throw new ArgumentNullException("from");
 			if (to == null) throw new ArgumentNullException("to");
 
 			if (!from.CanRead) throw new ArgumentException("Source stream must be readable", "from");
 			if (!to.CanWrite) throw new ArgumentException("Source stream must be writable", "to");
 
+			if (progress != null) {
+				try {
+					progress.Maximum = from.Length > int.MaxValue ? -1 : (int)from.Length;
+				} catch (NotSupportedException) { progress.Maximum = -1; }
+			}
+
 			long retVal = 0;
 			var buffer = new byte[4096];
 			while (true) {
 				var bytesRead = from.Read(buffer, 0, buffer.Length);
+
+				if (progress != null && progress.Maximum > 0) progress.Progress = (int)retVal;
+				if (progress != null && progress.WasCanceled) return -1;
+
 				retVal += bytesRead;
 				if (bytesRead == 0) return retVal;
 				to.Write(buffer, 0, bytesRead);

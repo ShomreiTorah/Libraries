@@ -65,19 +65,32 @@ namespace ShomreiTorah.Common {
 		///<summary>Uploads a file to the server.</summary>
 		///<param name="relativePath">The relative path on the server to upload the file to.</param>
 		///<param name="localPath">The path of a file on disk to upload.</param>
-		public void UploadFile(Uri relativePath, string localPath) {
+		public void UploadFile(Uri relativePath, string localPath) { UploadFile(relativePath, localPath, null); }
+
+		///<summary>Uploads a file to the server.</summary>
+		///<param name="relativePath">The relative path on the server to upload the file to.</param>
+		///<param name="contents">The content to upload.</param>
+		public void UploadFile(Uri relativePath, Stream contents) { UploadFile(relativePath, contents, null); }
+		///<summary>Uploads a file to the server.</summary>
+		///<param name="relativePath">The relative path on the server to upload the file to.</param>
+		///<param name="localPath">The path of a file on disk to upload.</param>
+		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
+		public void UploadFile(Uri relativePath, string localPath, IProgressReporter progress) {
 			using (var contents = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-				UploadFile(relativePath, contents);
+				UploadFile(relativePath, contents, progress);
 		}
 
 		///<summary>Uploads a file to the server.</summary>
 		///<param name="relativePath">The relative path on the server to upload the file to.</param>
 		///<param name="contents">The content to upload.</param>
-		public void UploadFile(Uri relativePath, Stream contents) {
+		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
+		public void UploadFile(Uri relativePath, Stream contents, IProgressReporter progress) {
+			if (progress != null) progress.Maximum = -1;
+
 			var request = CreateRequest(relativePath);
 			request.Method = WebRequestMethods.Ftp.UploadFile;
 			using (var requestStream = request.GetRequestStream()) {
-				contents.CopyTo(requestStream);
+				contents.CopyTo(requestStream, progress);
 			}
 			request.GetResponse().Close();
 		}
