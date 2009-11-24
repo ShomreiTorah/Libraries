@@ -98,7 +98,6 @@ namespace ShomreiTorah.Common.Updates {
 					if (progressReporter != null) {
 						if (progressReporter.WasCanceled)
 							return;
-						progressReporter.Maximum = length > int.MaxValue ? -1 : (int)length;
 						progressReporter.Caption = "Extracting " + relativePath;
 					}
 
