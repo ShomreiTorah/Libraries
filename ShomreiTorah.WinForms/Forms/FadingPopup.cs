@@ -29,10 +29,17 @@ namespace ShomreiTorah.WinForms.Forms {
 		[SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges", Justification = "Animation")]
 		public FadingPopup() {
 			base.TopLevel = true;
-			base.ShowInTaskbar = base.ControlBox = false;
+			base.ControlBox = false;
+			ShowInTaskbar = Application.OpenForms.Count == 0;
+
 			timer = new Timer { Interval = 10 };
 			timer.Tick += delegate { OnTick(); };
 			Opacity = 0;
+		}
+		///<summary>Raises the Load event.</summary>
+		protected override void OnLoad(EventArgs e) {
+			base.OnLoad(e);
+			if (DesignMode) ShowInTaskbar = true;
 		}
 		Timer timer;
 		///<summary>Raises the Shown event.</summary>

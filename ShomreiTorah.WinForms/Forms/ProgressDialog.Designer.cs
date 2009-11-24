@@ -87,7 +87,6 @@ namespace ShomreiTorah.WinForms.Forms {
 			this.Controls.Add(this.label);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "ProgressDialog";
-			this.ShowInTaskbar = false;
 			this.Text = "Please Wait...";
 			((System.ComponentModel.ISupportInitialize)(this.marqueeBar.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.progressBar.Properties)).EndInit();
