@@ -53,7 +53,9 @@ namespace ShomreiTorah.Common {
 		///<summary>Gets the password that this client logs in with.</summary>
 		public string Password { get; private set; }
 
-		FtpWebRequest CreateRequest(Uri relativePath) {
+		///<summary>Creates an FtpWebRequest for the given local path.</summary>
+		///<param name="relativePath">The local path for the request.</param>
+		public FtpWebRequest CreateRequest(Uri relativePath) {
 			var retVal = WebRequest.Create(new Uri(host, relativePath)) as FtpWebRequest;
 			retVal.Credentials = login;
 			retVal.EnableSsl = UseSsl;
