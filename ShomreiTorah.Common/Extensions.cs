@@ -123,6 +123,22 @@ namespace ShomreiTorah.Common {
 		///<remarks>This method removes the need for temporary variables to get the length of the byte array.</remarks>
 		public static void WriteAllBytes(this Stream stream, byte[] data) { stream.Write(data, 0, data.Length); }
 
+		///<summary>Fills a byte array from a stream.</summary>
+		///<returns>The number of bytes read.  If the end of the stream was reached, this will be less than the size of the array.</returns>
+		///<remarks>Stream.Read is not guaranteed to read length bytes even if it doesn't hit the end of the stream, so I wrote this method, which is.</remarks>
+		public static int ReadFill(this Stream stream, byte[] buffer) { return stream.ReadFill(buffer, buffer.Length); }
+		///<summary>Reads a givne number of bytes into a byte array from a stream.</summary>
+		///<returns>The number of bytes read.  If the end of the stream was reached, this will be less than the length.</returns>
+		///<remarks>Stream.Read is not guaranteed to read length bytes even if it doesn't hit the end of the stream, so I wrote this method, which is.</remarks>
+		public static int ReadFill(this Stream stream, byte[] buffer, int length) {
+			int position = 0;
+			while (position < length) {
+				var bytesRead = stream.Read(buffer, position, length - position);
+				if (bytesRead == 0) break;
+				position += bytesRead;
+			}
+			return position;
+		}
 		#region Numbers
 		///<summary>Writes a number to a stream.</summary>
 		public static void Write(this Stream stream, short value) { stream.Write(BitConverter.GetBytes(value), 0, 2); }
@@ -155,7 +171,7 @@ namespace ShomreiTorah.Common {
 		static byte[] convertBuffer;
 		static byte[] Read(this Stream stream, int length) {
 			if (convertBuffer == null) convertBuffer = new byte[16];
-			stream.Read(convertBuffer, 0, length);
+			stream.ReadFill(convertBuffer, length);
 			return convertBuffer;
 		}
 		///<summary>Reads a number from a stream.</summary>
