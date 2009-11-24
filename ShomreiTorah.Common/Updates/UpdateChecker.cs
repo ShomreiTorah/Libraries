@@ -140,7 +140,7 @@ namespace ShomreiTorah.Common.Updates {
 					UpdateStreamer.ExtractArchive(unzipper, path, progress);
 
 					if (progress.WasCanceled) throw new InvalidOperationException("Canceled");
-					hashingStream.FlushFinalBlock();
+					decryptingStream.FlushFinalBlock();
 					var hash = hasher.Hash;
 					if (!UpdateChecker.UpdateVerifier.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA512"), signature))
 						throw new InvalidDataException("Bad signature");
