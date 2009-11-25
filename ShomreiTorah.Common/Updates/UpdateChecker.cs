@@ -145,7 +145,8 @@ namespace ShomreiTorah.Common.Updates {
 						throw new InvalidDataException("Bad signature");
 				}
 			} catch (Exception ex) {
-				Directory.Delete(path, true);
+				if (Directory.Exists(path))
+					Directory.Delete(path, true);
 				throw new UpdateErrorException(ex);
 			}
 			return path;
