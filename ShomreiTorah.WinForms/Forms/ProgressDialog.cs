@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using System.Diagnostics;
 
 namespace ShomreiTorah.WinForms.Forms {
 	///<summary>A FadingPopup that displays the progress of an operation.</summary>
@@ -20,6 +21,8 @@ namespace ShomreiTorah.WinForms.Forms {
 		}
 
 		#region Windows 7
+		IntPtr handleForTaskbar;
+
 		///<summary>Rasiases the Shown event.</summary>
 		protected override void OnShown(EventArgs e) {
 			base.OnShown(e);
@@ -28,18 +31,24 @@ namespace ShomreiTorah.WinForms.Forms {
 		///<summary>Rasiases the Closed event.</summary>
 		protected override void OnClosed(EventArgs e) {
 			base.OnClosed(e);
-			if (TaskbarManager.IsPlatformSupported)
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, Handle);
+			if (TaskbarManager.IsPlatformSupported && handleForTaskbar != IntPtr.Zero)
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, handleForTaskbar);
 		}
 		void UpdateTaskbar() {
 			if (!TaskbarManager.IsPlatformSupported) return;
+
+			if (handleForTaskbar == IntPtr.Zero)
+				handleForTaskbar = Process.GetCurrentProcess().MainWindowHandle;
+			if (handleForTaskbar == IntPtr.Zero)
+				handleForTaskbar = Handle;
+
 			if (!Visible)
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, Handle);
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, handleForTaskbar);
 			else if (Maximum < 0)
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Indeterminate, Handle);
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Indeterminate, handleForTaskbar);
 			else {
-				TaskbarManager.Instance.SetProgressValue(Value, Maximum, Handle);
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, Handle);
+				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, handleForTaskbar);
+				TaskbarManager.Instance.SetProgressValue(Value, Maximum, handleForTaskbar);
 			}
 		}
 		#endregion
