@@ -139,12 +139,14 @@ namespace ShomreiTorah.Common.Updates {
 				using (var unzipper = new GZipStream(decryptingStream, CompressionMode.Decompress)) {
 					UpdateStreamer.ExtractArchive(unzipper, path, progress);
 
-					if (progress.WasCanceled) throw new InvalidOperationException("Canceled");
+					if (progress.WasCanceled) return null;
 					var hash = hasher.Hash;
 					if (!UpdateChecker.UpdateVerifier.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA512"), signature))
 						throw new InvalidDataException("Bad signature");
 				}
 			} catch (Exception ex) {
+				if (progress.WasCanceled) return null;	//If it was canceled, we'l get a CryptoException because the CryptoStream was closed 
+
 				if (Directory.Exists(path))
 					Directory.Delete(path, true);
 				throw new UpdateErrorException(ex);
