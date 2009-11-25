@@ -28,7 +28,7 @@ namespace ShomreiTorah.WinForms.Forms {
 		///<summary>Creates a new FadingPopup.</summary>
 		[SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges", Justification = "Animation")]
 		public FadingPopup() {
-			base.TopLevel = true;
+			base.TopMost = true;
 			base.ControlBox = false;
 			ShowInTaskbar = Application.OpenForms.Count == 0;
 
