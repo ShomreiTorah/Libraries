@@ -83,7 +83,8 @@ namespace ShomreiTorah.Common.Updates {
 			try {
 				var document = XDocument.Load(new Uri(BaseUri, new Uri(ProductName + ".xml", UriKind.Relative)).ToString());
 				if (document == null) return null;
-				return new UpdateInfo(document.Root);
+				var newUpdate = new UpdateInfo(document.Root);
+				return newUpdate.NewVersion > CurrentVersion ? newUpdate : null;
 			} catch { return null; }
 		}
 
