@@ -181,7 +181,7 @@ namespace ShomreiTorah.Common.Updates {
 				using (var response = request.GetResponse())
 				using (var cypherStream = response.GetResponseStream())
 				using (var transform = decryptor.CreateDecryptor())
-				using (var hasher = new SHA512CryptoServiceProvider())
+				using (var hasher = new SHA512Managed())
 				using (var hashingStream = new CryptoStream(cypherStream, hasher, CryptoStreamMode.Read))
 				using (var decryptingStream = new CryptoStream(hashingStream, transform, CryptoStreamMode.Read))
 				using (var unzipper = new GZipStream(decryptingStream, CompressionMode.Decompress)) {
