@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using System.Text;
+using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Diagnostics.CodeAnalysis;
-using System.Xml.Linq;
-using System.Globalization;
-using System.Security.Cryptography;
-using System.IO;
-using System.Net;
-using System.IO.Compression;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
+using System.Text;
+using System.Xml.Linq;
 
 namespace ShomreiTorah.Common.Updates {
 	///<summary>Checks for updates.</summary>
@@ -84,6 +85,52 @@ namespace ShomreiTorah.Common.Updates {
 				if (document == null) return null;
 				return new UpdateInfo(document.Root);
 			} catch { return null; }
+		}
+
+		///<summary>Applies a downloaded update.  After this method returns, the calling program must exit.</summary>
+		///<param name="updatePath">The path to the temporary folder containing the downloaded update (returned by <see cref="UpdateInfo.ExtractFiles"/>)</param>
+		///<param name="appPath">The directory to apply the update to (the folder that contains the program being updated).</param>
+		public static void ApplyUpdate(string updatePath, string appPath) {
+			if (updatePath == null) throw new ArgumentNullException("updatePath");
+			if (appPath == null) throw new ArgumentNullException("appPath");
+
+			if (!Directory.Exists(updatePath)) throw new ArgumentException(updatePath + " does not exist", "updatePath");
+			if (!Directory.Exists(appPath)) throw new ArgumentException(appPath + " does not exist", "appPath");
+
+			var updaterExePath = MakeUpdaterExePath();
+
+			using (var updaterExeStream = typeof(UpdateChecker).Assembly.GetManifestResourceStream(typeof(UpdateChecker), "UpdateApplier.exe"))
+			using (var fileStream = File.Create(updaterExePath)) {
+				updaterExeStream.CopyTo(fileStream);
+			}
+
+			string args;
+			using (var me = Process.GetCurrentProcess()) args = me.Id.ToString(CultureInfo.InvariantCulture);
+			args += " " + EscapeCommandArg(updatePath) + " " + EscapeCommandArg(appPath);
+
+			using (var updateProcess = Process.Start(new ProcessStartInfo {
+				FileName = updaterExePath,
+				Arguments = args,
+				UseShellExecute = false,
+				RedirectStandardOutput = true
+			})) {
+				updateProcess.StandardOutput.ReadLine();	//Wait until the child process is ready, to ensure that it can get our command line before we exit.
+			}
+		}
+		static string EscapeCommandArg(string arg) { return "\"" + arg.Replace("\"", "\"\"") + "\""; }
+		static string MakeUpdaterExePath() {
+			var tempDir = Path.GetTempPath();
+			var updaterExePath = Path.Combine(tempDir, "UpdateApplier.exe");
+			int fileNameIndex = 0;
+			while (File.Exists(updaterExePath)) {
+				try {
+					File.Delete(updaterExePath);
+				} catch (IOException) {
+					fileNameIndex++;
+					updaterExePath = Path.Combine(tempDir, "UpdateApplier (" + fileNameIndex + ".exe");
+				}
+			}
+			return updaterExePath;
 		}
 	}
 
