@@ -39,7 +39,7 @@ namespace ShomreiTorah.Common.Updates {
 			var rootUri = new Uri(rootPath + "\\", UriKind.Absolute);
 			for (int i = 0; i < paths.Length; i++) {
 				var uri = new Uri(paths[i], UriKind.Absolute);
-				var relativePath = rootUri.MakeRelativeUri(uri).ToString();
+				var relativePath = Uri.UnescapeDataString(rootUri.MakeRelativeUri(uri).ToString());
 
 				if (progressReporter != null) {
 					if (progressReporter.WasCanceled)
