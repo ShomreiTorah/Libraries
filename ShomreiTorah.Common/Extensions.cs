@@ -139,6 +139,26 @@ namespace ShomreiTorah.Common {
 			}
 			return position;
 		}
+
+		///<summary>Checks whether the bytes in a stream are equal to those in another stream.</summary>
+		///<returns>True if the streams have the same contents.</returns>
+		public static bool IsEqualTo(this Stream first, Stream second) {
+			try {
+				if (first.Length != second.Length && first.Position == second.Position) return false;
+			} catch (NotSupportedException) { }
+
+			byte[] buffer1 = new byte[4096];
+			byte[] buffer2 = new byte[4096];
+			while (true) {
+				int bytesRead = first.ReadFill(buffer1);
+				if (second.ReadFill(buffer2) != bytesRead) return false;	//Stream lengths are unequal.
+
+				if (!buffer1.SequenceEqual(buffer2)) return false;
+
+				if (bytesRead == 0) return true;
+			}
+		}
+
 		#region Numbers
 		///<summary>Writes a number to a stream.</summary>
 		public static void Write(this Stream stream, short value) { stream.Write(BitConverter.GetBytes(value), 0, 2); }

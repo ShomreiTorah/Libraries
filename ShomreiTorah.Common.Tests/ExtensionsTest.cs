@@ -325,5 +325,22 @@ namespace ShomreiTorah.Common.Tests {
 			Assert.AreEqual("th", 1169.GetSuffix());
 			Assert.AreEqual("th", 3270.GetSuffix());
 		}
+
+		/// <summary>
+		///A test for IsEqualTo
+		///</summary>
+		[TestMethod()]
+		public void IsEqualToTest() {
+			var rand = new Random();
+
+			var bytes = new byte[rand.Next(128, 16384)];
+			rand.NextBytes(bytes);
+			Assert.IsTrue(new MemoryStream(bytes).IsEqualTo(new MemoryStream(bytes)));
+
+			var otherBytes = new byte[rand.Next(128, 16384)];
+			rand.NextBytes(otherBytes);
+
+			Assert.IsFalse(new MemoryStream(bytes).IsEqualTo(new MemoryStream(otherBytes)));
+		}
 	}
 }
