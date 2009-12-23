@@ -198,7 +198,7 @@ namespace ShomreiTorah.Common {
 		public static T Execute<T>(this IDbCommand command) {
 			if (command == null) throw new ArgumentNullException("command");
 
-			if (typeof(T).IsAssignableFrom(typeof(IDataReader)))
+			if (typeof(IDataReader).IsAssignableFrom(typeof(T)))
 				return (T)command.ExecuteReader(CommandBehavior.CloseConnection);
 			using (command)
 			using (command.Connection)
