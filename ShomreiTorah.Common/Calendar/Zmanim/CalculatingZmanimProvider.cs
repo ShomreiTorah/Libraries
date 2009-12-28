@@ -7,14 +7,16 @@ using System.Globalization;
 namespace ShomreiTorah.Common.Calendar.Zmanim {
 	///<summary>A ZmanimProvider that calculates Zmanim for a latitude and longitude.</summary>
 	public class CalculatingZmanimProvider : YearlyZmanimProvider {
-		///<summary>Creates a new CalculatingZmanimProvider instance.</summary>
-		protected CalculatingZmanimProvider() {
-			Latitude = double.Parse(Config.ReadAttribute("Zmanim", "Latitude"), CultureInfo.InvariantCulture);
-			Longitude = double.Parse(Config.ReadAttribute("Zmanim", "Longitude"), CultureInfo.InvariantCulture);
+		///<summary>Creates a new CalculatingZmanimProvider instance for the location specified in ShomreiTorahConfig.</summary>
+		private CalculatingZmanimProvider()
+			: this(double.Parse(Config.ReadAttribute("Zmanim", "Latitude"), CultureInfo.InvariantCulture),
+				   double.Parse(Config.ReadAttribute("Zmanim", "Longitude"), CultureInfo.InvariantCulture)) {
 		}
+		///<summary>Creates a CalculatingZmanimProvider for a given location.</summary>
+		public CalculatingZmanimProvider(double latitude, double longitude) { Latitude = latitude; Longitude = longitude; }
 		[ThreadStatic]
 		static CalculatingZmanimProvider defaultInstance;
-		///<summary>Gets the CalculatingZmanimProvider instance.</summary>
+		///<summary>Gets the CalculatingZmanimProvider instance for the location specified in ShomreiTorahConfig.</summary>
 		///<remarks>Since CalculatingZmanimProvider is not thread-safe, this will create a different instance for each thread.</remarks>
 		public new static CalculatingZmanimProvider Default {
 			get {
