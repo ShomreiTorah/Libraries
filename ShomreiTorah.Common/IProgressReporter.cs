@@ -17,4 +17,17 @@ namespace ShomreiTorah.Common {
 		///<summary>Gets or sets whether the operation can be canceled.</summary>
 		bool CanCancel { get; set; }
 	}
+	///<summary>An IProgressReporter that doesn't do anything.</summary>
+	///<remarks>This is used in methods that optionally take an IProgressReporter, like this:
+	///<code>progress = progress ?? new EmptyProgressReporter();</code></remarks>
+	public sealed class EmptyProgressReporter : IProgressReporter {
+		///<summary>Creates a new EmptyProgressReporter instance.</summary>
+		public EmptyProgressReporter() { ((IProgressReporter)this).Maximum = -1; }
+
+		string IProgressReporter.Caption { get; set; }
+		int IProgressReporter.Progress { get; set; }
+		int IProgressReporter.Maximum { get; set; }
+		bool IProgressReporter.WasCanceled { get { return false; } }
+		bool IProgressReporter.CanCancel { get; set; }
+	}
 }

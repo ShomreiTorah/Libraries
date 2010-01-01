@@ -252,21 +252,22 @@ namespace ShomreiTorah.Common {
 			if (to == null) throw new ArgumentNullException("to");
 
 			if (!from.CanRead) throw new ArgumentException("Source stream must be readable", "from");
-			if (!to.CanWrite) throw new ArgumentException("Source stream must be writable", "to");
+			if (!to.CanWrite) throw new ArgumentException("Destination stream must be writable", "to");
 
 			if (progress != null) {
 				try {
 					progress.Maximum = from.Length > int.MaxValue ? -1 : (int)from.Length;
 				} catch (NotSupportedException) { progress.Maximum = -1; }
 			}
+			progress = progress ?? new EmptyProgressReporter();
 
 			long retVal = 0;
 			var buffer = new byte[4096];
 			while (true) {
 				var bytesRead = from.Read(buffer, 0, buffer.Length);
 
-				if (progress != null && progress.Maximum > 0) progress.Progress = (int)retVal;
-				if (progress != null && progress.WasCanceled) return -1;
+				if (progress.Maximum > 0) progress.Progress = (int)retVal;
+				if (progress.WasCanceled) return -1;
 
 				retVal += bytesRead;
 				if (bytesRead == 0) return retVal;

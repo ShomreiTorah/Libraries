@@ -94,13 +94,5 @@ namespace ShomreiTorah.Common.Tests {
 			Directory.CreateDirectory(path);
 			return path;
 		}
-
-		class EmptyProgressReporter : IProgressReporter {
-			public string Caption { get; set; }
-			public int Progress { get; set; }
-			public int Maximum { get; set; }
-			public bool CanCancel { get; set; }
-			public bool WasCanceled { get { return false; } }
-		}
 	}
 }

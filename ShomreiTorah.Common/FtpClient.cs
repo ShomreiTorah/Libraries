@@ -85,14 +85,16 @@ namespace ShomreiTorah.Common {
 		///<param name="contents">The content to upload.</param>
 		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
 		public void UploadFile(Uri relativePath, Stream contents, IProgressReporter progress) {
-			if (progress != null) progress.Maximum = -1;
+			progress = progress ?? new EmptyProgressReporter();
+
+			progress.Maximum = -1;
 
 			var request = CreateRequest(relativePath);
 			request.Method = WebRequestMethods.Ftp.UploadFile;
 			using (var requestStream = request.GetRequestStream()) {
 				contents.CopyTo(requestStream, progress);
 			}
-			if (progress == null || !progress.WasCanceled)
+			if (!progress.WasCanceled)
 				request.GetResponse().Close();
 		}
 	}
