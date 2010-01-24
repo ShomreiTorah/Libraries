@@ -452,6 +452,9 @@ namespace ShomreiTorah.Common {
 		#endregion
 
 		#region Data
+		///<summary>Gets the rows in a typed DataTable that have not been deleted.</summary>
+		public static EnumerableRowCollection<TRow> CurrentRows<TRow>(this TypedTableBase<TRow> table) where TRow : DataRow { return table.Where(r => r.RowState != DataRowState.Deleted); }
+
 		///<summary>Gets the DataRows in a DataView.</summary>
 		public static IEnumerable<DataRow> Rows(this DataView view) { return view.Cast<DataRowView>().Select(drv => drv.Row); }
 		///<summary>Gets the typed DataRows in a DataView.</summary>
