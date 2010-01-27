@@ -30,6 +30,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		int pMaxPopupHeight = 400;
 		string pDefaultMessage = "Click here to see the directory, or type to search.";
 		bool pPopupOpen;
+		string pFilter = "";
 
 		int pSelectedIndex = -1;
 		ResultsLocation pResultsLocation = ResultsLocation.Top;
@@ -104,7 +105,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		#region Properties
 		///<summary>Gets or sets the location of the results list.</summary>
 		[Description("Gets or sets the location of the results list.")]
-		[Category("Appearance")]
+		[Category("Layout")]
 		[DefaultValue(ResultsLocation.Top)]
 		public ResultsLocation ResultsLocation {
 			get { return pResultsLocation; }
@@ -140,6 +141,14 @@ namespace ShomreiTorah.WinForms.Controls {
 		[Category("Data")]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 		public Collection<ColumnInfo> Columns { get { return columns; } }
+		///<summary>Gets or sets a fixed filter to apply to the table.</summary>
+		[Description("Gets or sets a fixed filter to apply to the table.")]
+		[DefaultValue("")]
+		[Category("Data")]
+		public string Filter {
+			get { return pFilter; }
+			set { pFilter = value ?? ""; RunFilter(); }
+		}
 
 		///<summary>Gets or sets the maximum height of the popup.</summary>
 		[Description("Gets or sets the maximum height of the popup.")]
@@ -290,33 +299,39 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		private void Input_KeyUp(object sender, KeyEventArgs e) {
 			keyPressTimer.Stop();
-
 			if (input.Text == oldText) return;								//If the text hasn't changed, don't rerun the query.
 			oldText = input.Text;
-
+			RunFilter();
+		}
+		void RunFilter() {
+			if (results == null) return;
 			if (input.Text.Length == 0)
-				results.RowFilter = "";
+				results.RowFilter = Filter;
 			else {
 				string[] Words = input.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);	//Build the query string
-				StringBuilder Filter = new StringBuilder();
+				StringBuilder actualFilter = new StringBuilder();
+
+				if (!String.IsNullOrEmpty(Filter))
+					actualFilter.Append("(").Append(Filter).Append(")");
 
 				foreach (string cWord in Words) {							//For each word,
-					if (Filter.Length != 0) Filter.Append(" And ");			//If this isn't the first word, add an OR.
-					Filter.Append(											//Add this word to the query.
-						"(HisName LIKE '" + cWord + "*' OR " +
-						 "HerName LIKE '" + cWord + "*' OR " +
-						 "LastName LIKE '" + cWord + "*')");
+					if (actualFilter.Length != 0) actualFilter.Append(" And ");			//If this isn't the first word, add an OR.
+					actualFilter.Append(											//Add this word to the query.
+						"(HisName  LIKE '").Append(cWord).Append("*' OR ").Append(
+						 "HerName  LIKE '").Append(cWord).Append("*' OR ").Append(
+						 "LastName LIKE '").Append(cWord).Append("*')");
+
 					if (cWord.Contains("-")) {
 						var spacedWord = cWord.Replace('-', ' ');
-						Filter.Append(											//Add this word to the query.
-							"OR (HisName LIKE '" + spacedWord + "*' OR " +
-								 "HerName LIKE '" + spacedWord + "*' OR " +
-								 "LastName LIKE '" + spacedWord + "*')");
+						actualFilter.Append(											//Add this word to the query.
+							"OR (HisName   LIKE '").Append(spacedWord).Append("*' OR ").Append(
+								 "HerName  LIKE '").Append(spacedWord).Append("*' OR ").Append(
+								 "LastName LIKE '").Append(spacedWord).Append("*')");
 					}
 
 				}
 				try {
-					results.RowFilter = Filter.ToString();
+					results.RowFilter = actualFilter.ToString();
 				} catch (SyntaxErrorException) { return; } catch (EvaluateException) { return; }
 			}
 			SelectedIndex = 0;
