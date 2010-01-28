@@ -30,7 +30,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		int pMaxPopupHeight = 400;
 		string pDefaultMessage = "Click here to see the directory, or type to search.";
 		bool pPopupOpen;
-		string pFilter = "";
+		string presetFilter = "";
 
 		int pSelectedIndex = -1;
 		ResultsLocation pResultsLocation = ResultsLocation.Top;
@@ -145,9 +145,9 @@ namespace ShomreiTorah.WinForms.Controls {
 		[Description("Gets or sets a fixed filter to apply to the table.")]
 		[DefaultValue("")]
 		[Category("Data")]
-		public string Filter {
-			get { return pFilter; }
-			set { pFilter = value ?? ""; RunFilter(); }
+		public string PresetFilter {
+			get { return presetFilter; }
+			set { presetFilter = value ?? ""; RunFilter(); }
 		}
 
 		///<summary>Gets or sets the maximum height of the popup.</summary>
@@ -182,7 +182,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				input.ForeColor = value ? Color.Black : Color.Gray;
 
 				IsAutoScrolling = false;
-				results.RowFilter = String.Empty;
+				RunFilter();
 				popupPanel.BringToFront();
 				UpdateDisplay();
 				resizeAnimator.Start();
@@ -306,13 +306,13 @@ namespace ShomreiTorah.WinForms.Controls {
 		void RunFilter() {
 			if (results == null) return;
 			if (input.Text.Length == 0)
-				results.RowFilter = Filter;
+				results.RowFilter = PresetFilter;
 			else {
 				string[] Words = input.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);	//Build the query string
 				StringBuilder actualFilter = new StringBuilder();
 
-				if (!String.IsNullOrEmpty(Filter))
-					actualFilter.Append("(").Append(Filter).Append(")");
+				if (!String.IsNullOrEmpty(PresetFilter))
+					actualFilter.Append("(").Append(PresetFilter).Append(")");
 
 				foreach (string cWord in Words) {							//For each word,
 					if (actualFilter.Length != 0) actualFilter.Append(" And ");			//If this isn't the first word, add an OR.
@@ -349,7 +349,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			if (PopupOpen)
 				input.Text = "";
 
-			results.RowFilter = "";
+			RunFilter();
 			UpdateDisplay();
 		}
 
