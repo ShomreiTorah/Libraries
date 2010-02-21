@@ -45,6 +45,7 @@ namespace ShomreiTorah.WinForms.Forms {
 			this.label.Size = new System.Drawing.Size(287, 28);
 			this.label.TabIndex = 0;
 			this.label.Text = "Please wait...";
+			this.label.UseMnemonic = false;
 			// 
 			// cancel
 			// 
@@ -80,13 +81,13 @@ namespace ShomreiTorah.WinForms.Forms {
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(311, 84);
-			this.ControlBox = false;
 			this.Controls.Add(this.progressBar);
 			this.Controls.Add(this.marqueeBar);
 			this.Controls.Add(this.cancel);
 			this.Controls.Add(this.label);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "ProgressDialog";
+			this.ShowInTaskbar = true;
 			this.Text = "Please Wait...";
 			((System.ComponentModel.ISupportInitialize)(this.marqueeBar.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.progressBar.Properties)).EndInit();
