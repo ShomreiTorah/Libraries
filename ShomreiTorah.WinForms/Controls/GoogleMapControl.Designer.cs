@@ -5,16 +5,6 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
 
-		/// <summary> 
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing) {
-			if (disposing && (components != null)) {
-				components.Dispose();
-			}
-			base.Dispose(disposing);
-		}
 
 		#region Component Designer generated code
 
@@ -23,9 +13,11 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			this.components = new System.ComponentModel.Container();
 			this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
 			this.pictureBox = new System.Windows.Forms.PictureBox();
 			this.message = new DevExpress.XtraEditors.LabelControl();
+			this.toolTipController = new DevExpress.Utils.ToolTipController(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
 			this.panelControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -66,6 +58,14 @@ namespace ShomreiTorah.WinForms.Controls {
 			this.message.Size = new System.Drawing.Size(222, 196);
 			this.message.TabIndex = 1;
 			// 
+			// toolTipController
+			// 
+			this.toolTipController.Appearance.Options.UseTextOptions = true;
+			this.toolTipController.Appearance.TextOptions.HotkeyPrefix = DevExpress.Utils.HKeyPrefix.None;
+			this.toolTipController.AppearanceTitle.Options.UseTextOptions = true;
+			this.toolTipController.AppearanceTitle.TextOptions.HotkeyPrefix = DevExpress.Utils.HKeyPrefix.None;
+			this.toolTipController.AutoPopDelay = 50000000;
+			// 
 			// GoogleMapControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -85,5 +85,6 @@ namespace ShomreiTorah.WinForms.Controls {
 		private DevExpress.XtraEditors.PanelControl panelControl1;
 		private System.Windows.Forms.PictureBox pictureBox;
 		private DevExpress.XtraEditors.LabelControl message;
+		private DevExpress.Utils.ToolTipController toolTipController;
 	}
 }

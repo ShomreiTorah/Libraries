@@ -12,16 +12,21 @@ using System.Net;
 using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using DevExpress.Utils;
+using System.Text.RegularExpressions;
 
 namespace ShomreiTorah.WinForms.Controls {
 	///<summary>A control that displays a Google Map of an address.</summary>
 	[Description("A control that displays a Google Map of an address.")]
 	[ToolboxItem(true)]
-	[ToolboxBitmap(typeof(HebrewCalendar), "Images.GoogleMaps.png")]
+	[ToolboxBitmap(typeof(GoogleMapControl), "Images.GoogleMaps.png")]
 	[DefaultEvent("SelectionChanged")]
 	[DefaultProperty("Address")]
 	public partial class GoogleMapControl : XtraUserControl {
 		const string ApiKey = "ABQIAAAAxElVnCsXmGsU2ZxWYPP3bhQz-N-4Jc1YS__jTpeG4G3_qb4iFxRvPsoEDVZ1mMOP9BvHOw4WIvAz8A";
+		readonly SuperToolTip tooltip = new SuperToolTip();
+		readonly ToolTipTitleItem tooltipTitle;
+		readonly ToolTipItem tooltipContents;
 
 		MapType mapType;
 		int zoom = 15;
@@ -32,6 +37,11 @@ namespace ShomreiTorah.WinForms.Controls {
 		public GoogleMapControl() {
 			InitializeComponent();
 			UpdateMap();
+
+			tooltipTitle = tooltip.Items.AddTitle("Address");
+			tooltipContents = tooltip.Items.Add(AddressString);
+			toolTipController.SetSuperTip(this, tooltip);
+			toolTipController.SetSuperTip(pictureBox, tooltip);
 		}
 
 		#region Properties
@@ -55,7 +65,9 @@ namespace ShomreiTorah.WinForms.Controls {
 			get { return addressString; }
 			set {
 				if (AddressString == value) return;
-				addressString = value; DoUpdate();
+				addressString = value;
+				tooltipContents.Text = (value ?? "").Replace("&", "&&");
+				DoUpdate();
 			}
 		}
 
@@ -70,7 +82,24 @@ namespace ShomreiTorah.WinForms.Controls {
 				mapType = value; DoUpdate();
 			}
 		}
+		///<summary>Gets or sets the title of the location being displayed.</summary>
+		[Description("Gets or sets the title of the location being displayed.")]
+		[Category("Data")]
+		[Bindable(true)]
+		[EditorBrowsable(EditorBrowsableState.Always)]
+		[Browsable(true)]
+		[DefaultValue("")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+		public override string Text {
+			get { return base.Text; }
+			set {
+				base.Text = value;
+				tooltipTitle.Text = value == null ? "Address" : value.Replace("&", "&&");
+			}
+		}
 		#endregion
+		static readonly Regex addressCleaner = new Regex(@"\s+");
+		string CleanAddress { get { return addressCleaner.Replace(AddressString ?? "", " "); } }
 
 		///<summary>Prevents the map from being downloaded until EndUpdate is called.</summary>
 		public void BeginUpdate() { updateCount++; }
@@ -91,17 +120,16 @@ namespace ShomreiTorah.WinForms.Controls {
 		///<summary>Downloads the map image from the server.</summary>
 		public void UpdateMap() {
 			updateQueued = false;
-			pictureBox.Cursor = String.IsNullOrEmpty(AddressString) ? null : Cursors.Hand;
 			pictureBox.Show();
 
-			if (String.IsNullOrEmpty(AddressString)) {
+			if (String.IsNullOrEmpty(CleanAddress)) {
+				pictureBox.Cursor = null;
 				pictureBox.Image = null;
-				return;
+			} else {
+				pictureBox.Cursor = Cursors.Hand;
+				LoadMapImage();
 			}
-
-			LoadMapImage();
 		}
-
 		static Uri AddKey(string url) {
 			var builder = new UriBuilder(url);
 			var keyString = "key=" + ApiKey;
@@ -122,16 +150,16 @@ namespace ShomreiTorah.WinForms.Controls {
 
 			pictureBox.LoadAsync(AddKey(String.Format(CultureInfo.InvariantCulture,
 													  "http://maps.google.com/maps/api/staticmap?size={0}x{1}&zoom={2}&maptype={3}&markers=color:blue|{4}&sensor=false",
-													  640, 640, Zoom, mapTypeString, Uri.EscapeDataString(AddressString))).ToString());
+													  640, 640, Zoom, mapTypeString, Uri.EscapeDataString(CleanAddress))).ToString());
 		}
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Error message")]
 		private void pictureBox_Click(object sender, EventArgs e) {
 			if (!String.IsNullOrEmpty(AddressString))
 				ThreadPool.QueueUserWorkItem(delegate {
 					try {
-						Process.Start("http://maps.google.com/maps?q=" + Uri.EscapeDataString(AddressString));
+						Process.Start("http://maps.google.com/maps?q=" + Uri.EscapeDataString(CleanAddress + (String.IsNullOrEmpty(Text) ? "" : " (" + Text + ")")));
 					} catch (Exception ex) {
-						MessageBox.Show("An error occurred while opening a map of " + addressString + Environment.NewLine + ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						XtraMessageBox.Show("An error occurred while opening a map of " + AddressString + Environment.NewLine + ex.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 				});
 		}
@@ -150,6 +178,18 @@ namespace ShomreiTorah.WinForms.Controls {
 				}
 			} else if (e.Error != null)
 				SetError(e.Error.Message);
+		}
+
+		/// <summary> 
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing) {
+			if (disposing) {
+				tooltip.Dispose();
+				if (components != null) components.Dispose();
+			}
+			base.Dispose(disposing);
 		}
 	}
 
