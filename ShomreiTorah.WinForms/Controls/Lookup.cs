@@ -111,6 +111,11 @@ namespace ShomreiTorah.WinForms.Controls {
 			get { return pResultsLocation; }
 			set { pResultsLocation = value; }
 		}
+		///<summary>Gets or sets whether pressing the Tab key will fire the ItemSelected event.</summary>
+		[Description("Gets or sets whether pressing the Tab key will fire the ItemSelected event.")]
+		[Category("Behavior")]
+		[DefaultValue(false)]
+		public bool SelectOnTab { get; set; }
 		///<summary>Gets or sets the title of the text box.</summary>
 		[Description("Gets or sets the title of the text box.")]
 		[Category("Appearance")]
@@ -193,6 +198,7 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		///<summary>Gets or sets the index in the results view of the selected row.</summary>
 		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public int SelectedIndex {
 			get { return pSelectedIndex; }
 			set {
@@ -229,7 +235,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			}
 			pressedKey = e.KeyData;
 
-			if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab) {
+			if (e.KeyCode == Keys.Enter || (SelectOnTab && e.KeyCode == Keys.Tab)) {
 				SelectRow();
 				return;
 			}
@@ -832,9 +838,9 @@ namespace ShomreiTorah.WinForms.Controls {
 		///<summary>Returns a hash value that uniquely describes this instance.</summary>
 		public override int GetHashCode() { return (FieldName ?? "").GetHashCode() ^ Left.GetHashCode() ^ Width.GetHashCode() ^ (FormatString ?? "").GetHashCode(); }
 
-		///<summary>CHecks whether two ColumnInfo values are equal.</summary>
+		///<summary>Checks whether two ColumnInfo values are equal.</summary>
 		public static bool operator ==(ColumnInfo first, ColumnInfo second) { return first.Equals(second); }
-		///<summary>CHecks whether two ColumnInfo values are unequal.</summary>
+		///<summary>Checks whether two ColumnInfo values are unequal.</summary>
 		public static bool operator !=(ColumnInfo first, ColumnInfo second) { return !first.Equals(second); }
 		#endregion
 	}
