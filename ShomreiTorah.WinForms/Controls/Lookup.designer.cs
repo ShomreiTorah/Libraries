@@ -18,7 +18,6 @@ namespace ShomreiTorah.WinForms.Controls {
 			this.components = new System.ComponentModel.Container();
 			this.popupCanvas = new ShomreiTorah.WinForms.Controls.Canvas();
 			this.resizeAnimator = new System.Windows.Forms.Timer(this.components);
-			this.keyPressTimer = new System.Windows.Forms.Timer(this.components);
 			this.Title = new DevExpress.XtraEditors.SimpleButton();
 			this.input = new DevExpress.XtraEditors.TextEdit();
 			this.popupScroller = new DevExpress.XtraEditors.VScrollBar();
@@ -46,11 +45,6 @@ namespace ShomreiTorah.WinForms.Controls {
 			// 
 			this.resizeAnimator.Interval = 10;
 			this.resizeAnimator.Tick += new System.EventHandler(this.ResizeAnimator_Tick);
-			// 
-			// keyPressTimer
-			// 
-			this.keyPressTimer.Interval = 150;
-			this.keyPressTimer.Tick += new System.EventHandler(this.KeyPressTimer_Tick);
 			// 
 			// Title
 			// 
@@ -128,7 +122,6 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		private System.Windows.Forms.Timer resizeAnimator;
 		private Canvas popupCanvas;
-		private System.Windows.Forms.Timer keyPressTimer;
 		private SimpleButton Title;
 		private TextEdit input;
 		private DevExpress.XtraEditors.VScrollBar popupScroller;

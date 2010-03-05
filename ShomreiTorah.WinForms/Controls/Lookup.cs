@@ -24,8 +24,6 @@ namespace ShomreiTorah.WinForms.Controls {
 	[DefaultEvent("ItemSelected")]
 	[Description("A control that allows the user to select an item from a list.")]
 	public partial class Lookup : XtraUserControl {
-		//private class ScrollPanel : XtraScrollableControl { internal void RaiseScroll(MouseEventArgs e) { OnMouseWheel(e); } }
-
 		DataView results = new DataView();
 		int pMaxPopupHeight = 400;
 		string pDefaultMessage = "Click here to see the directory, or type to search.";
@@ -36,6 +34,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		ResultsLocation pResultsLocation = ResultsLocation.Top;
 
 		///<summary>Occurs when a row is selected.</summary>
+		[Description("Occurs when a row is selected.")]
+		[Category("Action")]
 		public event EventHandler<ItemSelectionEventArgs> ItemSelected;
 		///<summary>Raises the ItemSelected event.</summary>
 		///<param name="e">An ItemSelectionEventArgs object that provides the event data.</param>
@@ -222,7 +222,6 @@ namespace ShomreiTorah.WinForms.Controls {
 		#endregion
 		#region Keyboard Events
 		string oldText = "";
-		Keys pressedKey;																						//The key that was last depressed.  Used in KeyPressTimer.
 
 		void MaskBox_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e) {
 			if (e.KeyCode == Keys.Tab)
@@ -233,7 +232,6 @@ namespace ShomreiTorah.WinForms.Controls {
 				IsAutoScrolling = false;
 				return;
 			}
-			pressedKey = e.KeyData;
 
 			if (e.KeyCode == Keys.Enter || (SelectOnTab && e.KeyCode == Keys.Tab)) {
 				SelectRow();
@@ -245,56 +243,43 @@ namespace ShomreiTorah.WinForms.Controls {
 				return;
 			}
 			PopupOpen = true;
+			if (results.Count > 0) {
+				if (e.Control) {
+					if (e.KeyCode == Keys.Home) SelectedIndex = 0;
+					if (e.KeyCode == Keys.End) SelectedIndex = results.Count - 1;
+				}
 
-			if (e.KeyCode == Keys.Up
-			 || e.KeyCode == Keys.Down
-			 || e.KeyCode == Keys.PageUp
-			 || e.KeyCode == Keys.PageDown
-			 && results.Count != 0) {	//If the up or down keys were pressed, and there are one or more results,
-				KeyPressTimer_Tick(null, null);											//Handle the initial keydown,
-				e.SuppressKeyPress = true;
+				if (e.KeyCode == Keys.Up
+				 || e.KeyCode == Keys.Down
+				 || e.KeyCode == Keys.PageUp
+				 || e.KeyCode == Keys.PageDown) {
+					if (SelectedIndex == -1) {
+						SelectedIndex = 0;
+						popupScroller.Value = 0;
+					} else {
+						switch (e.KeyData) {
+							case Keys.Up: SelectedIndex--; break;
+							case Keys.Down: SelectedIndex++; break;
+							case Keys.PageUp:
+								SelectedIndex -= popupCanvas.Height / lineHeight;
+								break;
+							case Keys.PageDown:
+								SelectedIndex += popupCanvas.Height / lineHeight;
+								break;
+						}
+					}
+					e.SuppressKeyPress = true;
+				}
 			}
 
-			if ((e.KeyValue > 'z' && e.KeyData != Keys.OemMinus) || (
-				!Char.IsControl((Char)e.KeyValue)
-				&& !Char.IsLetter((Char)e.KeyValue)
-				&& e.KeyData != Keys.OemMinus
-				&& e.KeyCode != Keys.Space
-				&& e.KeyCode != Keys.Delete
-				&& e.KeyCode != Keys.Left
-				&& e.KeyCode != Keys.Right
-				&& e.KeyCode != Keys.Up
-				&& e.KeyCode != Keys.Down
-				&& e.KeyCode != Keys.PageDown
-				&& e.KeyCode != Keys.PageUp
-				&& e.KeyCode != Keys.Home
-				&& e.KeyCode != Keys.End
-				))
+			if (!Char.IsControl((Char)e.KeyValue)
+			 && (e.KeyValue > 'z' || !Char.IsLetter((char)e.KeyValue))
+			 && !AllowedKeys.Contains(e.KeyCode))
 				e.SuppressKeyPress = true;
 		}
-
-		private void KeyPressTimer_Tick(object sender, EventArgs e) {
-			if (SelectedIndex == -1 && results.Count != 0) {
-				SelectedIndex = 0;
-				popupScroller.Value = 0;
-				return;
-			}
-
-			switch (pressedKey) {
-				case Keys.Up:
-					SelectedIndex--;
-					break;
-				case Keys.Down:
-					SelectedIndex++;
-					break;
-				case Keys.PageUp:
-					SelectedIndex -= popupCanvas.Height / lineHeight;
-					break;
-				case Keys.PageDown:
-					SelectedIndex += popupCanvas.Height / lineHeight;
-					break;
-			}
-		}
+		static readonly ReadOnlyCollection<Keys> AllowedKeys = new ReadOnlyCollection<Keys>(new[] { 
+			Keys.OemMinus, Keys.Space, Keys.Delete, Keys.Left, Keys.Right, Keys.Up, Keys.Down, Keys.PageDown, Keys.PageUp, Keys.Home, Keys.End 
+		});
 
 		private void Input_KeyPress(object sender, KeyPressEventArgs e) {
 			if (input.SelectionStart == 0 || input.Text[input.SelectionStart - 1] == ' ')
@@ -304,7 +289,6 @@ namespace ShomreiTorah.WinForms.Controls {
 		}
 
 		private void Input_KeyUp(object sender, KeyEventArgs e) {
-			keyPressTimer.Stop();
 			if (input.Text == oldText) return;								//If the text hasn't changed, don't rerun the query.
 			oldText = input.Text;
 			RunFilter();
@@ -322,13 +306,14 @@ namespace ShomreiTorah.WinForms.Controls {
 
 				foreach (string cWord in Words) {							//For each word,
 					if (actualFilter.Length != 0) actualFilter.Append(" And ");			//If this isn't the first word, add an OR.
+					var escapedWord = cWord.Replace("'", @"''");
 					actualFilter.Append(											//Add this word to the query.
-						"(HisName  LIKE '").Append(cWord).Append("*' OR ").Append(
-						 "HerName  LIKE '").Append(cWord).Append("*' OR ").Append(
-						 "LastName LIKE '").Append(cWord).Append("*')");
+						"(HisName  LIKE '").Append(escapedWord).Append("*' OR ").Append(
+						 "HerName  LIKE '").Append(escapedWord).Append("*' OR ").Append(
+						 "LastName LIKE '").Append(escapedWord).Append("*')");
 
-					if (cWord.Contains("-")) {
-						var spacedWord = cWord.Replace('-', ' ');
+					if (escapedWord.Contains("-")) {
+						var spacedWord = escapedWord.Replace('-', ' ');
 						actualFilter.Append(											//Add this word to the query.
 							"OR (HisName   LIKE '").Append(spacedWord).Append("*' OR ").Append(
 								 "HerName  LIKE '").Append(spacedWord).Append("*' OR ").Append(
