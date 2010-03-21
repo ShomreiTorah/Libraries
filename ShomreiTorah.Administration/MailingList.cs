@@ -12,14 +12,23 @@ using System.IO;
 namespace ShomreiTorah.Administration {
 	///<summary>Manages the Shul's email list.</summary>
 	public class MailingList {
-		static MailingList defaultInstance = new MailingList(DB.Default);
+		static class DefaultContainer {
+			[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Prevent beforefieldinit")]
+			static DefaultContainer() { }
+			public static MailingList defaultInstance = new MailingList(DB.Default);
+		}
 
 		///<summary>Gets or sets the production mailing list.</summary>
-		public static MailingList Default { get { return defaultInstance; } set { defaultInstance = value; } }
-		static MailingList testInstance = new MailingList(DB.Test);
+		public static MailingList Default { get { return DefaultContainer.defaultInstance; } set { DefaultContainer.defaultInstance = value; } }
+
+		static class TestContainer {
+			[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Prevent beforefieldinit")]
+			static TestContainer() { }
+			public static MailingList testInstance = new MailingList(DB.Test);
+		}
 
 		///<summary>Gets or sets the test mailing list.</summary>
-		public static MailingList Test { get { return testInstance; } set { testInstance = value; } }
+		public static MailingList Test { get { return TestContainer.testInstance; } set { TestContainer.testInstance = value; } }
 
 		///<summary>Creates a new MailingList instance.</summary>
 		public MailingList(DBConnector database) {
@@ -43,7 +52,7 @@ namespace ShomreiTorah.Administration {
 					Email.Notify(person.DisplayName + " is already on the email list", emailBody);
 					throw new UserInputException(UserInputProblem.Duplicate);
 				} else {
-					connection.ExecuteNonQuery("INSERT INTO tblMlMembers VALUES(@DisplayName, @Address, @ID, '', '', 1, getdate(), 1)", new { person.DisplayName, person.Address, ID = HexValue(20) });
+					connection.ExecuteNonQuery("INSERT INTO tblMlMembers(Name, Email, ID_Code) VALUES(@DisplayName, @Address, @ID)", new { person.DisplayName, person.Address, ID = HexValue(20) });
 					Email.Notify(person.DisplayName + " was added to the email list", emailBody);
 				}
 			}
@@ -69,7 +78,7 @@ namespace ShomreiTorah.Administration {
 		public Subscriber? FindMember(string email, string code) {
 			if (String.IsNullOrEmpty(email) || String.IsNullOrEmpty(code))
 				return null;
-			using (var reader = Database.ExecuteReader("SELECT Name, Email, ID_Code AS Code, Join_Date AS JoinDate FROM tblMLMembers WHERE Email = @email AND ID_Code = @code")) {
+			using (var reader = Database.ExecuteReader("SELECT Name, Email, ID_Code, Join_Date FROM tblMLMembers WHERE Email = @email AND ID_Code = @code", new { email, code })) {
 				if (reader.Read())
 					return new Subscriber(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetDateTime(3));
 			}
@@ -79,8 +88,14 @@ namespace ShomreiTorah.Administration {
 		///<summary>Removes a member from the email list.</summary>
 		///<returns>Whether the subscriber was successfully removed.</returns>
 		public bool Unsubscribe(Subscriber subscriber) {
-			return (1 == Database.ExecuteNonQuery("DELETE FROM tblMLMembers WHERE Name=@DisplayName AND Email = @Address AND ID_Code = @Code",
-												  new { subscriber.Address.DisplayName, subscriber.Address.Address, subscriber.Code }));
+			var succeeded = (1 == Database.ExecuteNonQuery("DELETE FROM tblMLMembers WHERE Name = @DisplayName AND Email = @Address AND ID_Code = @Code",
+														   new { subscriber.Address.DisplayName, subscriber.Address.Address, subscriber.Code }));
+			if (succeeded) {
+				Email.Notify("Email Unsubscribe  :-(",
+					subscriber.Address.DisplayName + " (" + subscriber.Address.Address + ") has been removed from the email list.\r\n\r\n"
+				  + "(joined on " + subscriber.JoinDate.ToString("F", CultureInfo.CurrentCulture) + ")");
+			}
+			return succeeded;
 		}
 		static readonly Random rand = new Random();
 		static string HexValue(int length) {
