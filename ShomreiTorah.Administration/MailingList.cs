@@ -43,17 +43,24 @@ namespace ShomreiTorah.Administration {
 		public MailSender CreateSender(bool archive) { return new MailSender(this, archive); }
 
 		///<summary>Adds an email address to the mailing list.</summary>
-		public void Add(MailAddress person) {
+		///<param name="person">A MailAddress object containing the name and email address of the person to add.</param>
+		public void Add(MailAddress person) { Add(person, false); }
+		///<summary>Adds an email address to the mailing list.</summary>
+		///<param name="person">A MailAddress object containing the name and email address of the person to add.</param>
+		///<param name="noNotify">If true, no notification email about the subscription will be sent.</param>
+		public void Add(MailAddress person, bool noNotify) {
 			if (person == null) throw new ArgumentNullException("person");
 			string emailBody = "Name:  " + person.DisplayName + Environment.NewLine + "Email: " + person.Address;
 
 			using (var connection = Database.OpenConnection()) {
 				if (0 != connection.Sql<int>("SELECT COUNT(*) FROM tblMlMembers WHERE LOWER(Email)=LOWER(@Address)").Execute(new { person.Address })) {
-					Email.Notify(person.DisplayName + " is already on the email list", emailBody);
+					if (!noNotify)
+						Email.Notify(person.DisplayName + " is already on the email list", emailBody);
 					throw new UserInputException(UserInputProblem.Duplicate);
 				} else {
 					connection.ExecuteNonQuery("INSERT INTO tblMlMembers(Name, Email, ID_Code) VALUES(@DisplayName, @Address, @ID)", new { person.DisplayName, person.Address, ID = HexValue(20) });
-					Email.Notify(person.DisplayName + " was added to the email list", emailBody);
+					if (!noNotify)
+						Email.Notify(person.DisplayName + " was added to the email list", emailBody);
 				}
 			}
 		}
