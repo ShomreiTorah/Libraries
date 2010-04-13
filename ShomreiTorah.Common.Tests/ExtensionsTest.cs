@@ -298,7 +298,7 @@ namespace ShomreiTorah.Common.Tests {
 			var from = new MemoryStream(sourceBytes);
 			var to = new MemoryStream();
 
-			Assert.AreEqual(sourceBytes.Length, from.CopyTo(to));
+			Assert.AreEqual(sourceBytes.Length, Extensions.CopyTo(from, to));
 			CollectionAssert.AreEqual(sourceBytes, to.ToArray());
 		}
 
