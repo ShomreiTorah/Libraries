@@ -49,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <DocumentationFile>bin\Debug\ShomreiTorah.WinForms.xml</DocumentationFile>
-    <CodeAnalysisRuleSet>..\..\ShomreiTorah Strict.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\ShomreiTorah Minimal.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
