@@ -283,9 +283,9 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		private void Input_KeyPress(object sender, KeyPressEventArgs e) {
 			if (input.SelectionStart == 0 || input.Text[input.SelectionStart - 1] == ' ')
-				e.KeyChar = char.ToUpper(e.KeyChar, CultureInfo.CurrentUICulture);
+				e.KeyChar = char.ToUpper(e.KeyChar, CultureInfo.CurrentCulture);
 			else
-				e.KeyChar = char.ToLower(e.KeyChar, CultureInfo.CurrentUICulture);
+				e.KeyChar = char.ToLower(e.KeyChar, CultureInfo.CurrentCulture);
 		}
 
 		private void Input_KeyUp(object sender, KeyEventArgs e) {
@@ -626,7 +626,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			}
 			if (words.Length == 0) {														//If the user has not entered a search,
 				foreach (ColumnInfo cColumn in Columns) {									//For each column in the list of columns to draw,
-					var cellText = String.Format(CultureInfo.CurrentUICulture, cColumn.FormatString, row[cColumn.FieldName]);
+					var cellText = String.Format(CultureInfo.CurrentCulture, cColumn.FormatString, row[cColumn.FieldName]);
 					g.DrawString(															//Draw each column using the correct brush and font.
 						cellText,
 						TextFont,
@@ -642,7 +642,7 @@ namespace ShomreiTorah.WinForms.Controls {
 						BoldBrush.LinearColors = new Color[] { Color.Red, Color.DarkRed };	//Change the color scheme of the highlight brush.
 
 					foreach (ColumnInfo cColumn in Columns) {								//For each column in the list of columns to draw,
-						var cellText = String.Format(CultureInfo.CurrentUICulture, cColumn.FormatString, row[cColumn.FieldName]);
+						var cellText = String.Format(CultureInfo.CurrentCulture, cColumn.FormatString, row[cColumn.FieldName]);
 						string MatchString = "";
 						float MatchWidth = 0;
 

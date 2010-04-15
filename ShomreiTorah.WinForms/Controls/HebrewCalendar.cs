@@ -27,7 +27,7 @@ namespace ShomreiTorah.WinForms.Controls {
 	[DefaultEvent("SelectionChanged")]
 	[DefaultProperty("Mode")]
 	public class HebrewCalendar : SimpleControl {
-		static CultureInfo Culture { get { return CultureInfo.CurrentUICulture; } }
+		static CultureInfo Culture { get { return CultureInfo.CurrentCulture; } }
 
 		///<summary>Creates a new HebrewCalendar instance.</summary>
 		[SuppressMessage("Microsoft.Mobility", "CA1601:DoNotUseTimersThatPreventPowerStateChanges", Justification = "Only runs while mouse is down")]

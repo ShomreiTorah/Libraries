@@ -145,7 +145,9 @@ namespace ShomreiTorah.Common.Updates {
 			PublishDate = DateTime.Parse(element.Attribute("PublishDate").Value, CultureInfo.InvariantCulture);
 			Description = element.Element("Description").Value.Replace("\n", "\r\n").Replace("\r\r", "\r");
 
-			var blob = UpdateChecker.CreateBlobDecryptor().TransformBytes(Convert.FromBase64String(element.Element("Blob").Value));
+			byte[] blob;
+			using (var transform = UpdateChecker.CreateBlobDecryptor())
+				blob = transform.TransformBytes(Convert.FromBase64String(element.Element("Blob").Value));
 
 			var key = new byte[UpdateChecker.UpdateKeySize / 8];
 			Buffer.BlockCopy(blob, 0, key, 0, key.Length);

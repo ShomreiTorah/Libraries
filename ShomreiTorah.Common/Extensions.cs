@@ -131,6 +131,9 @@ namespace ShomreiTorah.Common {
 		///<returns>The number of bytes read.  If the end of the stream was reached, this will be less than the length.</returns>
 		///<remarks>Stream.Read is not guaranteed to read length bytes even if it doesn't hit the end of the stream, so I wrote this method, which is.</remarks>
 		public static int ReadFill(this Stream stream, byte[] buffer, int length) {
+			if (stream == null) throw new ArgumentNullException("stream");
+			if (buffer == null) throw new ArgumentNullException("buffer");
+			
 			int position = 0;
 			while (position < length) {
 				var bytesRead = stream.Read(buffer, position, length - position);
@@ -190,13 +193,16 @@ namespace ShomreiTorah.Common {
 		[ThreadStatic]
 		static byte[] convertBuffer;
 		static byte[] Read(this Stream stream, int length) {
+			if (stream == null) throw new ArgumentNullException("stream");
+
 			if (convertBuffer == null) convertBuffer = new byte[16];
 			stream.ReadFill(convertBuffer, length);
 			return convertBuffer;
 		}
 		///<summary>Reads a number from a stream.</summary>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "How?")]
 		public static T Read<T>(this Stream stream) {
+			if (stream == null) throw new ArgumentNullException("stream");
+
 			switch (typeof(T).Name) {
 				case "Byte": return (T)(object)stream.ReadByte();
 				case "Int16": return (T)(object)BitConverter.ToInt16(stream.Read(2), 0);
@@ -221,6 +227,8 @@ namespace ShomreiTorah.Common {
 		///<param name="target">The stream to write to.</param>
 		///<param name="text">The string to write.</param>
 		public static void WriteString(this Stream target, string text) {
+			if (target == null) throw new ArgumentNullException("target");
+
 			var bytes = stringEncoding.GetBytes(text);
 			target.Write(bytes.Length);
 			target.Write(bytes, 0, bytes.Length);
@@ -282,6 +290,7 @@ namespace ShomreiTorah.Common {
 		///<param name="plaintext">The data to encrypt.</param>
 		///<returns>The encrypted data.</returns>
 		public static byte[] Encrypt(this SymmetricAlgorithm algorithm, byte[] plaintext) {
+			if (algorithm == null) throw new ArgumentNullException("algorithm");
 			return algorithm.CreateEncryptor().TransformBytes(plaintext);
 		}
 
@@ -290,6 +299,7 @@ namespace ShomreiTorah.Common {
 		///<param name="cipherText">The encrypted data.</param>
 		///<returns>The decrypted data.</returns>
 		public static byte[] Decrypt(this SymmetricAlgorithm algorithm, byte[] cipherText) {
+			if (algorithm == null) throw new ArgumentNullException("algorithm");
 			return algorithm.CreateDecryptor().TransformBytes(cipherText);
 		}
 
@@ -465,6 +475,8 @@ namespace ShomreiTorah.Common {
 		///<param name="args">The DataColumnChangeEventArgs for the value.</param>
 		///<param name="error">The error description, or null to clear the error.</param>
 		public static void SetError(this DataColumnChangeEventArgs args, string error) {
+			if (args == null) throw new ArgumentNullException("args");
+			
 			args.Row.SetColumnError(args.Column, error);
 		}
 		#endregion
@@ -500,6 +512,8 @@ namespace ShomreiTorah.Common {
 		///<param name="inherit">Whether to look up the hierarchy chain for attributes.</param>
 		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Return value")]
 		public static TAttribute[] GetCustomAttributes<TAttribute>(this ICustomAttributeProvider provider, bool inherit) where TAttribute : Attribute {
+			if (provider == null) throw new ArgumentNullException("provider");
+
 			return (TAttribute[])provider.GetCustomAttributes(typeof(TAttribute), inherit);
 		}
 		#endregion
