@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Diagnostics.CodeAnalysis;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
-using System.Data;
-using System.Drawing;
+using System.Windows.Forms;
 
 namespace ShomreiTorah.WinForms {
 	///<summary>Contains miscellaneous extension methods.</summary>
@@ -59,5 +59,10 @@ namespace ShomreiTorah.WinForms {
 			if (dataObject == null) throw new ArgumentNullException("dataObject");
 			return (TData)dataObject.GetData(typeof(TData));
 		}
+
+		///<summary>Shows a form as a modal dialog, and disposes the form when the dialog is closed.</summary>
+		public static DialogResult ShowDisposingDialog(this Form form) { using (form) return form.ShowDialog(); }
+		///<summary>Shows a form as a modal dialog, and disposes the form when the dialog is closed.</summary>
+		public static DialogResult ShowDisposingDialog(this Form form, IWin32Window owner) { using (form) return form.ShowDialog(owner); }
 	}
 }
