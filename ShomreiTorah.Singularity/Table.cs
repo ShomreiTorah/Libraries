@@ -8,7 +8,7 @@ namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
 	public class Table {
 		///<summary>Creates an empty table.</summary>
-		public Table() : this(new TableSchema()) { }
+		public Table(string name) : this(new TableSchema(name)) { }
 		///<summary>Creates a table from an existing schema.</summary>
 		public Table(TableSchema schema) {
 			Schema = schema;
@@ -20,6 +20,9 @@ namespace ShomreiTorah.Singularity {
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the schema of this table.</summary>
 		public RowCollection Rows { get; private set; }
+
+		///<summary>Returns a string representation of this instance.</summary>
+		public override string ToString() { return "Table: " + Schema.Name; }
 
 		class EventedRowCollection : RowCollection {
 			readonly Table parent;

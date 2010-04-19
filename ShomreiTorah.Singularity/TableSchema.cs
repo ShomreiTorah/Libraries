@@ -8,10 +8,17 @@ namespace ShomreiTorah.Singularity {
 	///<summary>Contains the schema of a Singularity table.</summary>
 	public class TableSchema {
 		///<summary>Initializes a new instance of the <see cref="TableSchema"/> class.</summary>
-		public TableSchema() { Columns = new ColumnCollection(this); }
+		public TableSchema(string name) {
+			Columns = new ColumnCollection(this);
+			Name = name;
+		}
 
 		///<summary>Gets the columns in this schema.</summary>
 		public ColumnCollection Columns { get; private set; }
+		///<summary>Gets the name of the schema.</summary>
+		public string Name { get; private set; }
+		///<summary>Returns a string representation of this instance.</summary>
+		public override string ToString() { return "Schema: " + Name; }
 
 		#region Events
 		///<summary>Occurs when the schema is changed.</summary>
