@@ -62,6 +62,8 @@ namespace ShomreiTorah.Singularity {
 		///<returns>A ChildRowCollection containing a live view of the child rows.</returns>
 		public ChildRowCollection ChildRows(ChildRelation relation) { return ChildRows(relation, true); }
 		internal ChildRowCollection ChildRows(ChildRelation relation, bool forceCreate) {
+			if (relation == null) throw new ArgumentNullException("relation");
+
 			if (Table == null)
 				throw new InvalidOperationException("Child relations cannot be used on detached rows");
 			if (Table.Context == null)
