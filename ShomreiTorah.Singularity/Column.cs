@@ -75,6 +75,10 @@ namespace ShomreiTorah.Singularity {
 		///<returns>An error message, or null if the value is valid.</returns>
 		public override string ValidateValue(object value) {
 			if (DataType == null) return null;
+			if (value == null && !DataType.IsValueType) return null;
+
+			if (value == null && DataType.IsGenericType && DataType.GetGenericTypeDefinition() == typeof(Nullable<>))
+				return null;
 
 			//TODO: Conversions (numeric, Nullable<T>, DBNull, etc) (abstract ConvertValue?)
 			if (!DataType.IsInstanceOfType(value))
@@ -164,6 +168,7 @@ namespace ShomreiTorah.Singularity {
 			Items.Add(column);
 			Schema.EachRow(r => r.OnColumnAdded(column));
 			Schema.OnColumnAdded(new ColumnEventArgs(column));
+			Schema.OnSchemaChanged();
 			return column;
 		}
 
@@ -182,6 +187,7 @@ namespace ShomreiTorah.Singularity {
 
 			column.OnRemove();	//This will raise an event for ForeignKeyColumn, so we must be in a consistent state.
 			Schema.OnColumnRemoved(new ColumnEventArgs(column));
+			Schema.OnSchemaChanged();
 		}
 
 		///<summary>Gets the column with the given name, or null if there is no column with that name.</summary>
