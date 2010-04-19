@@ -146,7 +146,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the schema containing the columns.</summary>
 		public TableSchema Schema { get; private set; }
 
-		//Name uniqueness is enforced by the Column base class
+		//Parameters are validated by the Column base class
 
 		///<summary>Adds a column containing simple values.</summary>
 		public ValueColumn AddValueColumn(string name, Type dataType, object defaultValue) {
@@ -167,6 +167,11 @@ namespace ShomreiTorah.Singularity {
 			return column;
 		}
 
+		///<summary>Checks whether the collection contains a column with the specified name.</summary>
+		public bool Contains(string name) { return this[name] != null; }
+
+		///<summary>Removes a column from the schema.</summary>
+		public void RemoveColumn(string name) { RemoveColumn(this[name]); }
 		///<summary>Removes a column from the schema.</summary>
 		public void RemoveColumn(Column column) {
 			if (column == null) throw new ArgumentNullException("column");
