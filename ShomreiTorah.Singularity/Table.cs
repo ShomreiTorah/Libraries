@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
@@ -12,7 +13,6 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Creates a table from an existing schema.</summary>
 		public Table(TableSchema schema) {
 			Schema = schema;
-			Schema.AddTable(this);
 			Rows = new EventedRowCollection(this);
 		}
 
@@ -66,13 +66,6 @@ namespace ShomreiTorah.Singularity {
 		}
 		internal void ProcessValueChanged(Row row, Column column) {
 			OnValueChanged(new ValueChangedEventArgs(row, column));
-		}
-
-		internal void ProcessColumnAdded(Column column) {
-			foreach (var row in Rows) row.OnColumnAdded(column);
-		}
-		internal void ProcessColumnRemoved(Column column) {
-			foreach (var row in Rows) row.OnColumnRemoved(column);
 		}
 
 		#region Events
@@ -129,6 +122,9 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Gets the table with the given name, or null if there is no table with that name.</summary>
 		public Table this[string name] { get { return this.FirstOrDefault(t => t.Schema.Name == name); } }
+		///<summary>Gets the table with the given schema, or null if there is no table with that schema.</summary>
+		[SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
+		public Table this[TableSchema schema] { get { return this.FirstOrDefault(t => t.Schema == schema); } }
 
 		///<summary>Adds a table to the collection.</summary>
 		public void AddTable(Table table) {

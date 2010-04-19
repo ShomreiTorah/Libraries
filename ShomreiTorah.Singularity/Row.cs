@@ -12,6 +12,7 @@ namespace ShomreiTorah.Singularity {
 		public Row(TableSchema schema) {
 			if (schema == null) throw new ArgumentNullException("schema");
 			Schema = schema;
+			Schema.AddRow(this);
 			values = schema.Columns.ToDictionary(c => c, c => c.DefaultValue);
 		}
 
@@ -26,11 +27,7 @@ namespace ShomreiTorah.Singularity {
 		public Table Table { get; internal set; }
 
 		///<summary>Gets or sets the value of the specified column.</summary>
-		public object this[string name] {
-			get { return this[Schema.Columns[name]]; }
-			set { this[Schema.Columns[name]] = value; }
-		}
-
+		public object this[string name] { get { return this[Schema.Columns[name]]; } set { this[Schema.Columns[name]] = value; } }
 		///<summary>Gets or sets the value of the specified column.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
 		public object this[Column column] {
@@ -39,15 +36,50 @@ namespace ShomreiTorah.Singularity {
 				if (column == null) throw new ArgumentNullException("column");
 				if (column.Schema != Schema) throw new ArgumentException("Column must belong to same schema", "column");
 
+				var oldValue = this[column];
 				var error = ValidateValue(column, value);
 				if (!String.IsNullOrEmpty(error))
 					throw new ArgumentException(error, "value");
 
 				values[column] = value;
+				column.OnValueChanged(this, oldValue, value);
 				if (Table != null)
 					Table.ProcessValueChanged(this, column);
 			}
 		}
+
+		#region Child Relations
+		//Each relation's ChildRowCollection is created when first asked for.
+		//After it's created, it gets maintained by ForeignKeyColumn.OnValueChanged.
+
+		readonly Dictionary<ChildRelation, ChildRowCollection> childRelations = new Dictionary<ChildRelation, ChildRowCollection>();
+		internal void OnRelationRemoved(ChildRelation relation) { childRelations.Remove(relation); }	//Won't throw if not found
+
+		///<summary>Gets the child rows in the specified child relation.</summary>
+		///<returns>A ChildRowCollection containing a live view of the child rows.</returns>
+		public ChildRowCollection ChildRows(string relationName) { return ChildRows(Schema.ChildRelations[relationName]); }
+		///<summary>Gets the child rows in the specified child relation.</summary>
+		///<returns>A ChildRowCollection containing a live view of the child rows.</returns>
+		public ChildRowCollection ChildRows(ChildRelation relation) { return ChildRows(relation, true); }
+		internal ChildRowCollection ChildRows(ChildRelation relation, bool forceCreate) {
+			if (Table == null)
+				throw new InvalidOperationException("Child relations cannot be used on detached rows");
+			if (Table.Context == null)
+				throw new InvalidOperationException("Child relations can only be used for tables inside a DataContext");
+
+			ChildRowCollection retVal;
+			if (!childRelations.TryGetValue(relation, out retVal)
+			 && forceCreate) {
+				var childTable = Table.Context.Tables[relation.ChildSchema];
+				if (childTable == null)
+					throw new InvalidOperationException("Cannot find " + relation.ChildSchema.Name + " table");
+
+				retVal = new ChildRowCollection(this, relation, childTable, childTable.Rows.Where(r => r[relation.ChildColumn] == this));
+				childRelations.Add(relation, retVal);
+			}
+			return retVal;
+		}
+		#endregion
 
 		#region Helpers
 		///<summary>Checks whether a value would be valid for a given column.</summary>
@@ -76,5 +108,48 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Gets the row.</summary>
 		public Row Row { get; private set; }
+	}
+
+	///<summary>A collection of child rows belonging to a parent row.</summary>
+	public class ChildRowCollection : ReadOnlyCollection<Row> {
+		internal ChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
+			: base(childRows.ToList()) {
+			ParentRow = parentRow;
+			ChildTable = childTable;
+			Relation = relation;
+		}
+
+		///<summary>Gets the parent row for the collection's rows.</summary>
+		public Row ParentRow { get; private set; }
+		///<summary>Gets the child relation that this collection contains.</summary>
+		public ChildRelation Relation { get; private set; }
+		///<summary>Gets the child table that this collection contains rows from.</summary>
+		public Table ChildTable { get; private set; }
+
+		internal void AddRow(Row childRow) {
+			Items.Add(childRow);
+			OnRowAdded(new RowEventArgs(childRow));
+		}
+		internal void RemoveRow(Row childRow) {
+			Items.Remove(childRow);
+			OnRowRemoved(new RowEventArgs(childRow));
+		}
+
+		///<summary>Occurs when a row is added to the collection.</summary>
+		public event EventHandler<RowEventArgs> RowAdded;
+		///<summary>Raises the RowAdded event.</summary>
+		///<param name="e">A RowEventArgs object that provides the event data.</param>
+		protected virtual void OnRowAdded(RowEventArgs e) {
+			if (RowAdded != null)
+				RowAdded(this, e);
+		}
+		///<summary>Occurs when a row is removed from the collection.</summary>
+		public event EventHandler<RowEventArgs> RowRemoved;
+		///<summary>Raises the RowRemoved event.</summary>
+		///<param name="e">A RowEventArgs object that provides the event data.</param>
+		protected virtual void OnRowRemoved(RowEventArgs e) {
+			if (RowRemoved != null)
+				RowRemoved(this, e);
+		}
 	}
 }
