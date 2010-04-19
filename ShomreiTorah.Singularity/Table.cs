@@ -8,8 +8,11 @@ namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
 	public class Table {
 		///<summary>Creates an empty table.</summary>
-		public Table() {
-			Schema = new TableSchema();
+		public Table() : this(new TableSchema()) { }
+		///<summary>Creates a table from an existing schema.</summary>
+		public Table(TableSchema schema) {
+			Schema = schema;
+			Schema.AddTable(this);
 			Rows = new EventedRowCollection(this);
 		}
 
@@ -58,6 +61,13 @@ namespace ShomreiTorah.Singularity {
 		}
 		internal void ProcessValueChanged(Row row, Column column) {
 			OnValueChanged(new ValueChangedEventArgs(row, column));
+		}
+
+		internal void ProcessColumnAdded(Column column) {
+			foreach (var row in Rows) row.OnColumnAdded(column);
+		}
+		internal void ProcessColumnRemoved(Column column) {
+			foreach (var row in Rows) row.OnColumnRemoved(column);
 		}
 
 		#region Events

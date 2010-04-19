@@ -17,6 +17,9 @@ namespace ShomreiTorah.Singularity {
 
 		readonly Dictionary<Column, object> values;
 
+		internal void OnColumnAdded(Column column) { values.Add(column, column.DefaultValue); }
+		internal void OnColumnRemoved(Column column) { values.Remove(column); }
+
 		///<summary>Gets the schema of this row.</summary>
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the Table containing this row, if any.</summary>
@@ -33,6 +36,9 @@ namespace ShomreiTorah.Singularity {
 		public object this[Column column] {
 			get { return values[column]; }
 			set {
+				if (column == null) throw new ArgumentNullException("column");
+				if (column.Schema != Schema) throw new ArgumentException("Column must belong to same schema", "column");
+
 				var error = ValidateValue(column, value);
 				if (!String.IsNullOrEmpty(error))
 					throw new ArgumentException(error, "value");

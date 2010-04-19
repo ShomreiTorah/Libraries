@@ -6,33 +6,109 @@ using System.Collections.ObjectModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column in a Singularity table.</summary>
-	public class Column {
-		/// <summary>Initializes a new instance of the <see cref="Column"/> class.</summary>
-		public Column(string name, Type dataType) {
-			if (String.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
-			if (dataType == null) throw new ArgumentNullException("dataType");
+	public abstract class Column {
+		string name;
+		object defaultValue;
 
-			Name = name; DataType = dataType;
+		internal Column(TableSchema schema, string name) {
+			if (String.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
+			if (Schema.Columns[name] != null)
+				throw new ArgumentException("A column named " + name + " already exists", "name");
+
+			this.name = name;	//Don't call the property setter to avoid a redundant SchemaChanged
+			Schema = schema;
 		}
 
+		///<summary>Gets the schema containing this column.</summary>
+		public TableSchema Schema { get; private set; }
 		///<summary>Gets or sets the name of the column.</summary>
-		public string Name { get; set; }
+		public string Name {
+			get { return name; }
+			set {
+				if (String.IsNullOrEmpty(value)) throw new ArgumentNullException("value");
+				if (value == Name) return;
+				if (Schema.Columns[value] != null)
+					throw new ArgumentException("A column named " + name + " already exists", "value");
+				name = value;
+				Schema.OnSchemaChanged();
+			}
+		}
 
-		///<summary>Gets or sets the data-type of the column.</summary>
-		public Type DataType { get; set; }
+		///<summary>Checks whether a value is valid for this column.</summary>
+		///<returns>An error message, or null if the value is valid.</returns>
+		public abstract string ValidateValue(object value);
 
 		///<summary>Gets or sets the default value of the column.</summary>
-		public object DefaultValue { get; set; }
+		public virtual object DefaultValue {
+			get { return defaultValue; }
+			set {
+				var error = ValidateValue(value);
+				if (!String.IsNullOrEmpty(error))
+					throw new ArgumentException(error, "value");
+				defaultValue = value;
+			}
+		}
+	}
+	///<summary>Provides data for column events.</summary>
+	public class ColumnEventArgs : EventArgs {
+		///<summary>Creates a new ColumnEventArgs instance.</summary>
+		public ColumnEventArgs(Column column) { Column = column; }
+
+		///<summary>Gets the row.</summary>
+		public Column Column { get; private set; }
+	}
+	///<summary>A column containing simple values.</summary>
+	public sealed class ValueColumn : Column {
+		internal ValueColumn(TableSchema schema, string name, Type dataType, object defaultValue)
+			: base(schema, name) {
+			Name = name;
+			DataType = dataType;
+			DefaultValue = defaultValue;
+		}
+
+		///<summary>Gets or sets the data-type of the column, or null if the column can hold any datatype.</summary>
+		public Type DataType { get; set; }
+
+		///<summary>Checks whether a value is valid for this column.</summary>
+		///<returns>An error message, or null if the value is valid.</returns>
+		public override string ValidateValue(object value) {
+			if (DataType == null) return null;
+
+			//TODO: Conversions (numeric, Nullable<T>, DBNull, etc) (abstract ConvertValue?)
+			if (!DataType.IsInstanceOfType(value))
+				return "The " + Name + " column cannot hold a " + (value == null ? "null" : value.GetType().Name) + " value.";
+			return null;
+		}
 	}
 
 	///<summary>A collection of Column objects.</summary>
-	public class ColumnCollection : Collection<Column> {
-		///<summary>Inserts an element into the ColumnCollection at the specified index.</summary>
-		protected override void InsertItem(int index, Column item) {
-			if (item == null) throw new ArgumentNullException("item");
-			if (this[item.Name] != null) throw new ArgumentException("A column named " + item.Name + " already exists.");
+	public class ColumnCollection : ReadOnlyCollection<Column> {
+		internal ColumnCollection(TableSchema schema) : base(new List<Column>()) { Schema = schema; }
 
-			base.InsertItem(index, item);
+		///<summary>Gets the schema containing the columns.</summary>
+		public TableSchema Schema { get; private set; }
+
+		//Name uniqueness is enforced by the Column base class
+
+		///<summary>Adds a column containing simple values.</summary>
+		public ValueColumn AddValueColumn(string name, Type dataType, object defaultValue) {
+			return AddColumn(new ValueColumn(Schema, name, dataType, defaultValue));
+		}
+
+		TColumn AddColumn<TColumn>(TColumn column) where TColumn : Column {
+			Items.Add(column);
+			Schema.EachTable(t => t.ProcessColumnAdded(column));
+			Schema.OnColumnAdded(new ColumnEventArgs(column));
+			return column;
+		}
+
+		///<summary>Removes a column from the schema.</summary>
+		public void RemoveColumn(Column column) {
+			if (column == null) throw new ArgumentNullException("column");
+			if (column.Schema != Schema) throw new ArgumentException("Cannot remove column from different schema", "column");
+			Items.Remove(column);
+			Schema.EachTable(t => t.ProcessColumnRemoved(column));
+			Schema.OnColumnRemoved(new ColumnEventArgs(column));
 		}
 
 		///<summary>Gets the column with the given name, or null if there is no column with that name.</summary>
