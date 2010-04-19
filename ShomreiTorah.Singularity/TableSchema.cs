@@ -93,7 +93,7 @@ namespace ShomreiTorah.Singularity {
 			ChildColumn = childColumn;
 
 			ParentSchema.ValidateName(name);
-			this.name = ChildColumn.Name;	//Don't call the property setter to avoid a redundant SchemaChanged
+			this.name = name;			//Don't call the property setter to avoid a redundant SchemaChanged
 		}
 
 		///<summary>Gets the schema that contains the parent rows.</summary>
