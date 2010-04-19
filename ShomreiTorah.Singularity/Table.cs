@@ -27,27 +27,26 @@ namespace ShomreiTorah.Singularity {
 		public override string ToString() { return "Table: " + Schema.Name; }
 
 		class EventedRowCollection : RowCollection {
-			readonly Table parent;
-			public EventedRowCollection(Table parent) { this.parent = parent; }
+			public EventedRowCollection(Table parent) : base(parent) { }
 
 			protected override void ClearItems() {
 				base.ClearItems();
-				parent.ProcessCleared();
+				Table.ProcessCleared();
 			}
 			protected override void InsertItem(int index, Row item) {
 				base.InsertItem(index, item);
-				parent.ProcessRowAdded(item);
+				Table.ProcessRowAdded(item);
 			}
 			protected override void RemoveItem(int index) {
 				var row = this[index];
 				base.RemoveItem(index);
-				parent.ProcessRowRemoved(row);
+				Table.ProcessRowRemoved(row);
 			}
 			protected override void SetItem(int index, Row item) {
 				var oldRow = this[index];
 				base.SetItem(index, item);
-				parent.ProcessRowRemoved(oldRow);
-				parent.ProcessRowAdded(item);
+				Table.ProcessRowRemoved(oldRow);
+				Table.ProcessRowAdded(item);
 			}
 		}
 
