@@ -33,6 +33,8 @@ namespace ShomreiTorah.Singularity {
 
 
 		internal virtual void OnRemove() { Schema = null; }
+		internal virtual void OnRowAdded(Row row) { }
+		internal virtual void OnRowRemoved(Row row) { }
 
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
@@ -122,16 +124,23 @@ namespace ShomreiTorah.Singularity {
 			if (row.Table == null) return;
 			if (row.Table.Context == null) return;
 
-			var oldParent = oldValue as Row;
-			if (oldParent != null) {
-				var c = oldParent.ChildRows(ChildRelation, false);
-				if (c != null) c.RemoveRow(row);
-			}
-			var newParent = newValue as Row;
+			RemoveFromParent(row, (Row)oldValue);
+			AddToParent(row);
+		}
+		internal override void OnRowAdded(Row row) { AddToParent(row); }
+		internal override void OnRowRemoved(Row row) { RemoveFromParent(row, (Row)row[this]); }
+
+		void AddToParent(Row childRow) {
+			var newParent = (Row)childRow[this];
 			if (newParent != null) {
 				var c = newParent.ChildRows(ChildRelation, false);
-				if (c != null) c.AddRow(row);
+				if (c != null) c.AddRow(childRow);
 			}
+		}
+		void RemoveFromParent(Row childRow, Row oldParent) {
+			if (oldParent == null) return;
+			var c = oldParent.ChildRows(ChildRelation, false);
+			if (c != null) c.RemoveRow(childRow);
 		}
 
 		internal override void OnRemove() {

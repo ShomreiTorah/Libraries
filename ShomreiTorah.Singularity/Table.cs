@@ -30,8 +30,9 @@ namespace ShomreiTorah.Singularity {
 			public EventedRowCollection(Table parent) : base(parent) { }
 
 			protected override void ClearItems() {
+				Table.ProcessClearing();
 				base.ClearItems();
-				Table.ProcessCleared();
+				Table.OnTableCleared();
 			}
 			protected override void InsertItem(int index, Row item) {
 				base.InsertItem(index, item);
@@ -40,28 +41,33 @@ namespace ShomreiTorah.Singularity {
 			protected override void RemoveItem(int index) {
 				var row = this[index];
 				base.RemoveItem(index);
-				Table.ProcessRowRemoved(row);
+				Table.ProcessRowRemoved(row, true);
 			}
 			protected override void SetItem(int index, Row item) {
 				var oldRow = this[index];
 				base.SetItem(index, item);
-				Table.ProcessRowRemoved(oldRow);
+				Table.ProcessRowRemoved(oldRow, true);
 				Table.ProcessRowAdded(item);
 			}
 		}
 
 		void ProcessRowAdded(Row row) {
 			row.Table = this;
+			foreach (var column in Schema.Columns)
+				column.OnRowAdded(row);		//Adds the row to parent relations
 			OnRowAdded(new RowEventArgs(row));
 		}
-		void ProcessRowRemoved(Row row) {
+		void ProcessRowRemoved(Row row, bool raiseEvent) {
 			row.Table = null;
-			OnRowRemoved(new RowEventArgs(row));
+			foreach (var column in Schema.Columns)
+				column.OnRowRemoved(row);	//Removes the row from parent relations
+
+			if (raiseEvent)
+				OnRowRemoved(new RowEventArgs(row));
 		}
-		void ProcessCleared() {
+		void ProcessClearing() {
 			foreach (var row in Rows)
-				row.Table = null;
-			OnTableCleared();
+				ProcessRowRemoved(row, false);
 		}
 		internal void ProcessValueChanged(Row row, Column column) {
 			OnValueChanged(new ValueChangedEventArgs(row, column));
