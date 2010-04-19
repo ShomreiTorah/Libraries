@@ -82,6 +82,12 @@ namespace ShomreiTorah.Singularity {
 		#endregion
 
 		#region Helpers
+		///<summary>Removes the row from its table.</summary>
+		public virtual void RemoveRow() {
+			if (Table == null) throw new InvalidOperationException("Cannot delete a detached row");
+			Table.Rows.Remove(this);
+		}
+
 		///<summary>Checks whether a value would be valid for a given column.</summary>
 		///<param name="column">The column containing the value.</param>
 		///<param name="newValue">The value to validate.</param>
