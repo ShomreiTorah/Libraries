@@ -9,6 +9,8 @@ namespace ShomreiTorah.Singularity {
 	public class TableSchema {
 		///<summary>Initializes a new instance of the <see cref="TableSchema"/> class.</summary>
 		public TableSchema(string name) {
+			if (String.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
+			
 			Columns = new ColumnCollection(this);
 			Name = name;
 		}
