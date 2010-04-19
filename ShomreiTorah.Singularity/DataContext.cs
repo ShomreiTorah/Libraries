@@ -7,7 +7,7 @@ namespace ShomreiTorah.Singularity {
 	///<summary>Contains tables in a Singularity database.</summary>
 	public class DataContext {
 		///<summary>Creates a new DataContext.</summary>
-		public DataContext() { Tables = new TableCollection(); }
+		public DataContext() { Tables = new TableCollection(this); }
 
 		///<summary>Gets the tables in this context.</summary>
 		public TableCollection Tables { get; private set; }

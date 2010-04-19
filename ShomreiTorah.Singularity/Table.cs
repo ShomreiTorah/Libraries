@@ -16,6 +16,8 @@ namespace ShomreiTorah.Singularity {
 			Rows = new EventedRowCollection(this);
 		}
 
+		///<summary>Gets the DataContext that contains this table.</summary>
+		public DataContext Context { get; internal set; }
 		///<summary>Gets the schema of this table.</summary>
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the schema of this table.</summary>
@@ -120,5 +122,24 @@ namespace ShomreiTorah.Singularity {
 		public Column Column { get; private set; }
 	}
 	///<summary>A collection of Table objects.</summary>
-	public class TableCollection : Collection<Table> { }
+	public sealed class TableCollection : ReadOnlyCollection<Table>, ICollection<Table> {
+		internal TableCollection(DataContext context) : base(new List<Table>()) { Context = context; }
+		///<summary>Gets the DataContext that contains this table.</summary>
+		public DataContext Context { get; private set; }
+
+		///<summary>Gets the table with the given name, or null if there is no table with that name.</summary>
+		public Table this[string name] { get { return this.FirstOrDefault(t => t.Schema.Name == name); } }
+
+		///<summary>Adds a table to the collection.</summary>
+		public void AddTable(Table table) {
+			if (table == null) throw new ArgumentNullException("table");
+
+			if (this.Any(t => t.Schema == table.Schema))	//Otherwise, we get sticky situations for child relations.  (What if there are multiple tables with the child schema?)
+				throw new ArgumentException("This DataContext already has a " + table.Schema.Name + " table", "table");
+
+			table.Context = Context;
+			Items.Add(table);
+		}
+		void ICollection<Table>.Add(Table table) { AddTable(table); }
+	}
 }
