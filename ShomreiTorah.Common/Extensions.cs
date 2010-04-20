@@ -482,6 +482,10 @@ namespace ShomreiTorah.Common {
 		#endregion
 
 		#region Reflection
+		///<summary>Checks whether a given type is a nullable type.</summary>
+		///<returns>True if the type is a nullable value type.</returns>
+		public static bool IsNullable(this Type type) { return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>); }
+
 		///<summary>Gets a custom attribute defined on a member.</summary>
 		///<typeparam name="TAttribute">The type of attribute to return.</typeparam>
 		///<param name="provider">The object to get the attribute for.</param>
