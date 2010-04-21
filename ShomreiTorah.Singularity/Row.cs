@@ -12,8 +12,8 @@ namespace ShomreiTorah.Singularity {
 		public Row(TableSchema schema) {
 			if (schema == null) throw new ArgumentNullException("schema");
 			Schema = schema;
-			Schema.AddRow(this);
 			values = schema.Columns.ToDictionary(c => c, c => c.DefaultValue);
+			Schema.AddRow(this);
 		}
 
 		readonly Dictionary<Column, object> values;
@@ -107,9 +107,9 @@ namespace ShomreiTorah.Singularity {
 		#endregion
 	}
 	///<summary>A collection of Row objects.</summary>
-	public class RowCollection : Collection<Row> {
+	public class TableRowCollection : Collection<Row> {
 		///<summary>Creates a RowColelction for the specified table.</summary>
-		public RowCollection(Table table) {
+		public TableRowCollection(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 
 			Table = table;

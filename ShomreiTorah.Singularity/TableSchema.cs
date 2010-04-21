@@ -57,8 +57,14 @@ namespace ShomreiTorah.Singularity {
 
 		List<WeakReference<Row>> rows = new List<WeakReference<Row>>();
 		internal void AddRow(Row row) { rows.Add(new WeakReference<Row>(row)); }
+		internal void RemoveRow(Row row) { rows.RemoveAll(r => r.Target == row); }
+
+		///<summary>Gets the attached rows belonging to this schema.</summary>
+		///<remarks>This will only contain rows attached to a table.  It's used to validate column changes.</remarks>
+		internal IEnumerable<Row> Rows { get { return rows.Select(w => w.Target).Where(r => r != null); } }
+
 		internal void EachRow(Action<Row> method) {
-			foreach (var row in rows.Select(w => w.Target).Where(r => r != null))
+			foreach (var row in Rows)
 				method(row);
 		}
 
@@ -81,7 +87,9 @@ namespace ShomreiTorah.Singularity {
 			if (row.Schema != this) throw new ArgumentException("Row must belong to this schema", "row");
 			if (column.Schema != this) throw new ArgumentException("Column must belong to this schema", "column");
 
-			return column.ValidateValue(newValue);
+			if (row.Table == null)
+				return column.ValidateValueType(newValue);
+			return column.ValidateValue(row, newValue);
 		}
 	}
 	///<summary>A relation mapping a parent row to a set of child rows.</summary>

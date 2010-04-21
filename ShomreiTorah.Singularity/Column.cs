@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column in a Singularity table.</summary>
@@ -38,15 +39,18 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
-		public abstract string ValidateValue(object value);
+		public abstract string ValidateValue(Row row, object value);
+		///<summary>Checks whether a value's type is valid for this column.  This method will only validate the basic datatype.</summary>
+		///<returns>An error message, or null if the value is valid.</returns>
+		public abstract string ValidateValueType(object value);
 
 		internal virtual void OnValueChanged(Row row, object oldValue, object newValue) { }
 
 		///<summary>Gets or sets the default value of the column.</summary>
-		public virtual object DefaultValue {
+		public object DefaultValue {
 			get { return defaultValue; }
 			set {
-				var error = ValidateValue(value);
+				var error = ValidateValueType(value);
 				if (!String.IsNullOrEmpty(error))
 					throw new ArgumentException(error, "value");
 				defaultValue = value;
@@ -62,36 +66,65 @@ namespace ShomreiTorah.Singularity {
 		public Column Column { get; private set; }
 	}
 	///<summary>A column containing simple values.</summary>
-	public sealed class ValueColumn : Column {
+	public class ValueColumn : Column {
 		internal ValueColumn(TableSchema schema, string name, Type dataType, object defaultValue)
 			: base(schema, name) {
-			Name = name;
 			DataType = dataType;
 			DefaultValue = defaultValue;
+
+			allowNulls = DataType == null || !DataType.IsValueType;		//Don't set the property so as not to trigger re-validation
+			if (!allowNulls && DataType.IsNullable()) {
+				allowNulls = true;
+				DataType = Nullable.GetUnderlyingType(DataType);
+			}
 		}
 
 		///<summary>Gets or sets the data-type of the column, or null if the column can hold any datatype.</summary>
 		public Type DataType { get; private set; }
 
+		bool allowNulls;
+
+		///<summary>Gets or sets whether the column can contain null values.</summary>
+		public bool AllowNulls {
+			get { return allowNulls; }
+			set {
+				if (AllowNulls == value) return;
+				allowNulls = value;
+
+				if (!AllowNulls && Schema.Rows.Where(r => r.Table != null).Any(r => r[this] == null)) {
+					allowNulls = true;
+					throw new InvalidOperationException("The " + Name + " column contains duplicate values, and cannot disallow nulls.");
+				}
+			}
+		}
+
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
-		public override string ValidateValue(object value) {
-			if (DataType == null) return null;
-			if (value == null && !DataType.IsValueType) return null;
+		public override string ValidateValue(Row row, object value) {
+			if (value == null)
+				return AllowNulls ? null : ("The " + Name + " column cannot contain nulls");
 
-			if (value == null && DataType.IsGenericType && DataType.GetGenericTypeDefinition() == typeof(Nullable<>))
-				return null;
+			if (DataType == null) return null;
 
 			//TODO: Conversions (numeric, Nullable<T>, DBNull, etc) (abstract ConvertValue?)
 			if (!DataType.IsInstanceOfType(value))
-				return "The " + Name + " column cannot hold a " + (value == null ? "null" : value.GetType().Name) + " value.";
+				return "The " + Name + " column cannot hold a " + value.GetType().Name + " value.";
+			return null;
+		}
+		///<summary>Checks whether a value's type is valid for this column.  This method will only validate the basic datatype.</summary>
+		///<returns>An error message, or null if the value is valid.</returns>
+		public override string ValidateValueType(object value) {
+			if (value == null || DataType == null)
+				return null;
+			if (!DataType.IsInstanceOfType(value))
+				return "The " + Name + " column cannot hold a " + value.GetType().Name + " value.";
 			return null;
 		}
 	}
 	///<summary>A column containing parent rows from a different table.</summary>
-	public sealed class ForeignKeyColumn : Column {
+	public sealed class ForeignKeyColumn : ValueColumn {
 		internal ForeignKeyColumn(TableSchema schema, string name, TableSchema foreignSchema, string foreignName)
-			: base(schema, name) {
+			: base(schema, name, typeof(Row), null) {
 			if (foreignSchema == null) throw new ArgumentNullException("foreignSchema");
 			ForeignSchema = foreignSchema;
 
@@ -106,14 +139,22 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
-		public override string ValidateValue(object value) {
+		public override string ValidateValue(Row row, object value) {
 			if (value == null)
-				return null;	//TODO: Handle invalid defaults
-			var row = value as Row;
-			if (row == null)
+				return AllowNulls ? null : ("The " + Name + " column cannot contain nulls");
+
+			return ValidateValueType(value);
+		}
+		///<summary>Checks whether a value's type is valid for this column.  This method will only validate the basic datatype.</summary>
+		///<returns>An error message, or null if the value is valid.</returns>
+		public override string ValidateValueType(object value) {
+			if (value == null) return null;
+			var foreignRow = value as Row;
+
+			if (foreignRow == null)
 				return "The " + Name + " column can only hold rows";
-			if (row.Schema != ForeignSchema)
-				return "The " + Name + " column cannot hold " + row.Schema.Name + " rows.";
+			if (foreignRow.Schema != ForeignSchema)
+				return "The " + Name + " column cannot hold " + foreignRow.Schema.Name + " rows.";
 
 			return null;
 		}

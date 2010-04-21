@@ -21,12 +21,12 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the schema of this table.</summary>
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the schema of this table.</summary>
-		public RowCollection Rows { get; private set; }
+		public TableRowCollection Rows { get; private set; }
 
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Table: " + Schema.Name; }
 
-		class EventedRowCollection : RowCollection {
+		class EventedRowCollection : TableRowCollection {
 			public EventedRowCollection(Table parent) : base(parent) { }
 
 			protected override void ClearItems() {
@@ -35,6 +35,7 @@ namespace ShomreiTorah.Singularity {
 				Table.OnTableCleared();
 			}
 			protected override void InsertItem(int index, Row item) {
+				Table.ValidateAddRow(item);
 				base.InsertItem(index, item);
 				Table.ProcessRowAdded(item);
 			}
@@ -44,11 +45,24 @@ namespace ShomreiTorah.Singularity {
 				Table.ProcessRowRemoved(row, true);
 			}
 			protected override void SetItem(int index, Row item) {
+				Table.ValidateAddRow(item);
 				var oldRow = this[index];
 				base.SetItem(index, item);
 				Table.ProcessRowRemoved(oldRow, true);
 				Table.ProcessRowAdded(item);
 			}
+		}
+		void ValidateAddRow(Row row) {
+			if (row.Table != null)
+				throw new ArgumentException("Row is already in a table", "row");
+			try {
+				row.Table = this;
+				foreach (var column in Schema.Columns) {
+					var error = Schema.ValidateValue(row, column, row[column]);
+					if (!String.IsNullOrEmpty(error))
+						throw new InvalidOperationException(error);
+				}
+			} finally { row.Table = null; }
 		}
 
 		void ProcessRowAdded(Row row) {
@@ -59,6 +73,7 @@ namespace ShomreiTorah.Singularity {
 		}
 		void ProcessRowRemoved(Row row, bool raiseEvent) {
 			row.Table = null;
+			Schema.RemoveRow(row);
 			foreach (var column in Schema.Columns)
 				column.OnRowRemoved(row);	//Removes the row from parent relations
 
