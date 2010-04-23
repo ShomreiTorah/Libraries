@@ -26,6 +26,10 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Schema: " + Name; }
 
+		//TODO: Unique
+		///<summary>Gets or sets the column that serves as the primary key, or null if the schema has no primary key.</summary>
+		public Column PrimaryKey { get; set; }
+
 		#region Events
 		///<summary>Occurs when the schema is changed.</summary>
 		public event EventHandler SchemaChanged;
