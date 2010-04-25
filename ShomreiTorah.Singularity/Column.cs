@@ -78,7 +78,7 @@ namespace ShomreiTorah.Singularity {
 			DataType = dataType;
 			DefaultValue = defaultValue;
 
-			allowNulls = DataType == null || !DataType.IsValueType;		//Don't set the property so as not to trigger re-validation
+			allowNulls = DataType == null || !DataType.IsValueType;		//Don't set the property so as not to trigger validation
 			if (!allowNulls && DataType.IsNullable()) {
 				allowNulls = true;
 				DataType = Nullable.GetUnderlyingType(DataType);
@@ -86,33 +86,50 @@ namespace ShomreiTorah.Singularity {
 		}
 
 
-		bool allowNulls;
+		bool allowNulls, unique;
 
-		///<summary>Gets or sets whether the column can contain null values.</summary>
+		///<summary>Gets or sets value indicating whether the column can contain null values.</summary>
 		public bool AllowNulls {
 			get { return allowNulls; }
 			set {
 				if (AllowNulls == value) return;
-				allowNulls = value;
 
-				if (!AllowNulls && Schema.Rows.Where(r => r.Table != null).Any(r => r[this] == null)) {
-					allowNulls = true;
-					throw new InvalidOperationException("The " + Name + " column contains duplicate values, and cannot disallow nulls.");
+				if (!value && Schema.Rows.Where(r => r.Table != null).Any(r => r[this] == null))
+					throw new InvalidOperationException("The " + Name + " column contains null values, and cannot disallow nulls.");
+
+				allowNulls = value;
+			}
+		}
+		///<summary>Gets or sets a value indicating whether this column can contain duplicate values.</summary>
+		public bool Unique {
+			get { return unique; }
+			set {
+				if (unique == value) return;
+
+				if (value) {
+					if (Schema.Rows.GroupBy(r => new { r.Table, Val = r[this] }).Any(g => g.Has(2)))
+						throw new InvalidOperationException("The " + Name + " column contains duplicate values, and cannot enforce uniqueness.");
 				}
+
+				unique = value;
 			}
 		}
 
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
 		public override string ValidateValue(Row row, object value) {
-			if (value == null)
-				return AllowNulls ? null : ("The " + Name + " column cannot contain nulls");
-
-			if (DataType == null) return null;
+			if (!AllowNulls && value == null)
+				return "The " + Name + " column cannot contain nulls";
 
 			//TODO: Conversions (numeric, Nullable<T>, DBNull, etc) (abstract ConvertValue?)
-			if (!DataType.IsInstanceOfType(value))
+			if (value != null && DataType != null && !DataType.IsInstanceOfType(value))
 				return "The " + Name + " column cannot hold a " + value.GetType().Name + " value.";
+
+			if (Unique) {
+				if (row.Table.Rows.Any(r => r != row && Equals(value, r[this])))
+					return "The " + Name + " column cannot contain duplicate values";
+			}
+
 			return null;
 		}
 		///<summary>Checks whether a value's type is valid for this column.  This method will only validate the basic datatype.</summary>
@@ -144,10 +161,11 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
 		public override string ValidateValue(Row row, object value) {
-			if (value == null)
-				return AllowNulls ? null : ("The " + Name + " column cannot contain nulls");
+			var error = ValidateValueType(value);	//Validate the schema.  Everything else is handled correctly by the base class.
+			if (error != null)
+				return error;
 
-			return ValidateValueType(value);
+			return base.ValidateValue(row, value);
 		}
 		///<summary>Checks whether a value's type is valid for this column.  This method will only validate the basic datatype.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
