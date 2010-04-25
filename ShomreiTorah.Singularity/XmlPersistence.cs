@@ -39,13 +39,22 @@ namespace ShomreiTorah.Singularity {
 		}
 		sealed class XmlTablePopulator : TablePopulator<XElement> {
 			readonly XElement tableElement;
-			public XmlTablePopulator(Table table, XElement element) : base(table) { tableElement = element; }
+			readonly string primaryKeyName;
+			public XmlTablePopulator(Table table, XElement element)
+				: base(table) {
+				tableElement = element;
+
+				if (table.Schema.PrimaryKey != null)
+					primaryKeyName = XmlConvert.EncodeLocalName(table.Schema.PrimaryKey.Name);
+			}
 
 			protected override IEnumerable<XElement> GetRows() { return tableElement.Elements("Row"); }
 
 			protected override IEnumerable<KeyValuePair<Column, object>> GetValues(XElement values) {
 				return Columns.Select(c => new KeyValuePair<Column, object>(c, values.Element(XmlConvert.EncodeLocalName(c.Name)).Value));
 			}
+
+			protected override object GetPrimaryKey(XElement values) { return values.Element(primaryKeyName).Value; }
 		}
 	}
 
@@ -58,7 +67,7 @@ namespace ShomreiTorah.Singularity {
 		public void FillTable() {
 			//Maps each of this table's foreign keys to 
 			//a dictionary mapping primary keys to rows.
-			var keyMap = Columns
+			var foreignKeyMap = Columns
 				.OfType<ForeignKeyColumn>()
 				.ToDictionary(
 					col => col,
@@ -67,10 +76,21 @@ namespace ShomreiTorah.Singularity {
 					)
 				);
 
-			//TODO: Apply changes to existing rows.
+			Dictionary<object, Row> keyMap = null;
+			if (Table.Schema.PrimaryKey != null) {
+				keyMap = Table.Rows.ToDictionary(row => row[Table.Schema.PrimaryKey]);
+			}
 
 			foreach (var rowSource in GetRows()) {
-				var row = new Row(Table.Schema);
+				Row row = null;
+
+				if (keyMap != null) {
+					if (keyMap.TryGetValue(CoercePrimaryKey(rowSource), out row))
+						keyMap.Remove(row[Table.Schema.PrimaryKey]);
+				}
+
+				if (row == null)
+					row = new Row(Table.Schema);
 
 				foreach (var field in GetValues(rowSource)) {
 					var foreignKey = field.Key as ForeignKeyColumn;
@@ -78,10 +98,20 @@ namespace ShomreiTorah.Singularity {
 					if (foreignKey == null)
 						row[field.Key] = field.Key.CoerceValue(field.Value, CultureInfo.InvariantCulture);
 					else
-						row[field.Key] = keyMap[foreignKey][foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture)];
+						row[field.Key] = foreignKeyMap[foreignKey][foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture)];
 				}
 
-				Table.Rows.Add(row);
+				if (row.Table == null)		//If we created this row, as opposed to getting it out of the keyMap
+					Table.Rows.Add(row);
+			}
+
+			//Next, remove all rows that weren't in the source.
+			//(All rows that were in the source would have been
+			//removed from keyMap when they were loaded)
+			if (keyMap != null) {
+				foreach (var oldRow in Table.Rows.Intersect(keyMap.Values).ToArray()) {
+					oldRow.RemoveRow();
+				}
 			}
 		}
 		///<summary>Gets the columns that this instance fills.</summary>
@@ -92,5 +122,14 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the column values for a row.</summary>
 		///<param name="values">A TValueSource object from GetRows.</param>
 		protected abstract IEnumerable<KeyValuePair<Column, object>> GetValues(TValueSource values);
+
+		private object CoercePrimaryKey(TValueSource rowSource) {
+			return Table.Schema.PrimaryKey.CoerceValue(GetPrimaryKey(rowSource), CultureInfo.InvariantCulture);
+		}
+
+
+		///<summary>Gets the primary key for a row.</summary>
+		///<param name="values">A TValueSource object from GetRows.</param>
+		protected abstract object GetPrimaryKey(TValueSource values);
 	}
 }

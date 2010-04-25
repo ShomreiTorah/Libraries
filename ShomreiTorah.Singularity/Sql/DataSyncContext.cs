@@ -31,10 +31,10 @@ namespace ShomreiTorah.Singularity.Sql {
 		public TableSynchronizerCollection Tables { get; private set; }
 
 		///<summary>Populates the tables from the database.</summary>
-		public void FillTables() {
+		public void ReadData() {
 			using (var connection = SqlProvider.OpenConnection()) {
 				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema)) {
-					table.FillTable(connection);
+					table.ReadData(connection);
 				}
 			}
 		}

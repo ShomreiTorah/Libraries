@@ -29,12 +29,12 @@ namespace ShomreiTorah.Singularity.Sql {
 		public ISqlProvider SqlProvider { get; private set; }
 
 		///<summary>Populates this instance's table from the database.</summary>
-		public void FillTable() {
+		public void ReadData() {
 			using (var connection = SqlProvider.OpenConnection())
-				FillTable(connection);
+				ReadData(connection);
 		}
 		///<summary>Populates this instance's table from the database.</summary>
-		public void FillTable(DbConnection connection) {
+		public void ReadData(DbConnection connection) {
 
 			using (var command = SqlProvider.CreateSelectCommand(connection, Mapping))
 			using (var reader = command.ExecuteReader()) {
@@ -46,11 +46,14 @@ namespace ShomreiTorah.Singularity.Sql {
 			readonly SchemaMapping mapping;
 
 			readonly int[] columnIndices;
+			readonly int primaryKeyIndex;
 			public DataReaderTablePopulator(Table table, SchemaMapping mapping, DbDataReader reader)
 				: base(table) {
 				this.reader = reader;
 				this.mapping = mapping;
 				columnIndices = mapping.Columns.Select(c => reader.GetOrdinal(c.SqlName)).ToArray();
+				if (table.Schema.PrimaryKey != null)
+					primaryKeyIndex = reader.GetOrdinal(mapping.Columns[table.Schema.PrimaryKey].SqlName);
 			}
 
 			protected override IEnumerable<Column> Columns { get { return mapping.Columns.Select(cm => cm.Column); } }
@@ -58,8 +61,10 @@ namespace ShomreiTorah.Singularity.Sql {
 			protected override IEnumerable<IDataRecord> GetRows() { return reader.Cast<IDataRecord>(); }
 
 			protected override IEnumerable<KeyValuePair<Column, object>> GetValues(IDataRecord values) {
-				return columnIndices.Select((readerIndex, tableIndex) => new KeyValuePair<Column, object>(mapping.Columns[tableIndex].Column, reader[readerIndex]));
+				return columnIndices.Select((readerIndex, tableIndex) => new KeyValuePair<Column, object>(mapping.Columns[tableIndex].Column, values[readerIndex]));
 			}
+
+			protected override object GetPrimaryKey(IDataRecord values) { return values[primaryKeyIndex]; }
 		}
 	}
 }
