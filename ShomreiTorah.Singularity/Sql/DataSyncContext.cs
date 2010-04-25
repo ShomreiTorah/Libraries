@@ -33,7 +33,7 @@ namespace ShomreiTorah.Singularity.Sql {
 		///<summary>Populates the tables from the database.</summary>
 		public void FillTables() {
 			using (var connection = SqlProvider.OpenConnection()) {
-				foreach (var table in Tables.SortDependencies()) {
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema)) {
 					table.FillTable(connection);
 				}
 			}
@@ -62,29 +62,5 @@ namespace ShomreiTorah.Singularity.Sql {
 		}
 		///<summary>Removes the synchronizer for the given table, preventing the table from being synchronized to the database.</summary>
 		public void RemoveMapping(Table table) { Items.Remove(this[table]); }
-
-		///<summary>Returns the synchronizers in an order in which all dependant tables are after their dependencies.</summary>
-		public IEnumerable<TableSynchronizer> SortDependencies() {
-			var pendingTables = this.ToList();
-			var processedSchemas = new HashSet<TableSchema>();
-
-			var returnedTables = new List<TableSynchronizer>();
-			while (pendingTables.Any()) {
-				returnedTables.Clear();
-
-				foreach (var table in pendingTables.ToArray()) {
-					if (!table.Table.Schema.ChildRelations.Select(cr => cr.ParentSchema).Except(processedSchemas).Any()) {
-						returnedTables.Add(table);
-						processedSchemas.Add(table.Table.Schema);
-
-						yield return table;
-					}
-				}
-
-				if (returnedTables.Count == 0)
-					throw new InvalidOperationException("Cyclic dependency detected");
-				pendingTables.RemoveAll(returnedTables.Contains);
-			}
-		}
 	}
 }
