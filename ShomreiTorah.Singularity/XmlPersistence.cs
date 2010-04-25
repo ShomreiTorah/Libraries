@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Xml;
 using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	partial class Table {
@@ -54,6 +55,7 @@ namespace ShomreiTorah.Singularity {
 				return Columns.Select(c => new KeyValuePair<Column, object>(c, values.Element(XmlConvert.EncodeLocalName(c.Name)).Value));
 			}
 
+			[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 			protected override object GetPrimaryKey(XElement values) { return values.Element(primaryKeyName).Value; }
 		}
 	}

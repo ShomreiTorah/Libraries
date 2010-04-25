@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data.Common;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Synchronizes a Singularity table with a table in an SQL database.</summary>
@@ -64,6 +65,7 @@ namespace ShomreiTorah.Singularity.Sql {
 				return columnIndices.Select((readerIndex, tableIndex) => new KeyValuePair<Column, object>(mapping.Columns[tableIndex].Column, values[readerIndex]));
 			}
 
+			[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 			protected override object GetPrimaryKey(IDataRecord values) { return values[primaryKeyIndex]; }
 		}
 	}
