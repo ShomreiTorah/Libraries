@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.Common;
+using System.Data;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Synchronizes a Singularity table with a table in an SQL database.</summary>
@@ -34,39 +35,30 @@ namespace ShomreiTorah.Singularity.Sql {
 		}
 		///<summary>Populates this instance's table from the database.</summary>
 		public void FillTable(DbConnection connection) {
-			//TODO: Apply changes to existing rows.
-
-			//Maps each of this table's foreign keys to 
-			//a dictionary mapping primary keys to rows.
-			var keyMap = Mapping.Columns
-				.Select(cm => cm.Column)
-				.OfType<ForeignKeyColumn>()
-				.ToDictionary(
-					col => col,
-					col => Table.Context.Tables[col.ForeignSchema].Rows.ToDictionary(
-						foreignRow => foreignRow[foreignRow.Table.Schema.PrimaryKey]
-					)
-				);
 
 			using (var command = SqlProvider.CreateSelectCommand(connection, Mapping))
 			using (var reader = command.ExecuteReader()) {
-				int[] columnIndices = Mapping.Columns.Select(c => reader.GetOrdinal(c.SqlName)).ToArray();
-				while (reader.Read()) {
-					var row = new Row(Table.Schema);
+				new DataReaderTablePopulator(Table, Mapping, reader).FillTable();
+			}
+		}
+		sealed class DataReaderTablePopulator : TablePopulator<IDataRecord> {
+			readonly DbDataReader reader;
+			readonly SchemaMapping mapping;
 
-					for (int i = 0; i < Mapping.Columns.Count; i++) {
-						var foreignKey = Mapping.Columns[i].Column as ForeignKeyColumn;
+			readonly int[] columnIndices;
+			public DataReaderTablePopulator(Table table, SchemaMapping mapping, DbDataReader reader)
+				: base(table) {
+				this.reader = reader;
+				this.mapping = mapping;
+				columnIndices = mapping.Columns.Select(c => reader.GetOrdinal(c.SqlName)).ToArray();
+			}
 
-						var dbValue = reader[columnIndices[i]];
+			protected override IEnumerable<Column> Columns { get { return mapping.Columns.Select(cm => cm.Column); } }
 
-						if (foreignKey == null)
-							row[Mapping.Columns[i].Column] = dbValue;
-						else
-							row[Mapping.Columns[i].Column] = keyMap[foreignKey][dbValue];
-					}
+			protected override IEnumerable<IDataRecord> GetRows() { return reader.Cast<IDataRecord>(); }
 
-					Table.Rows.Add(row);
-				}
+			protected override IEnumerable<KeyValuePair<Column, object>> GetValues(IDataRecord values) {
+				return columnIndices.Select((readerIndex, tableIndex) => new KeyValuePair<Column, object>(mapping.Columns[tableIndex].Column, reader[readerIndex]));
 			}
 		}
 	}

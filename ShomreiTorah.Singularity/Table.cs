@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
-	public class Table {
+	public partial class Table {
 		///<summary>Creates an empty table.</summary>
 		public Table(string name) : this(new TableSchema(name)) { }
 		///<summary>Creates a table from an existing schema.</summary>
