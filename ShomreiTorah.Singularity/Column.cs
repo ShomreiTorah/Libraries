@@ -56,6 +56,12 @@ namespace ShomreiTorah.Singularity {
 				defaultValue = value;
 			}
 		}
+
+		///<summary>Gets or sets the data-type of the column, or null if the column can hold any datatype.</summary>
+		public Type DataType { get; protected set; }
+
+		///<summary>Coerces a value to the datatype for this column.</summary>
+		public virtual object CoerceValue(object value, IFormatProvider provider) { return DataType == null ? value : Convert.ChangeType(value, DataType, provider); }
 	}
 	///<summary>Provides data for column events.</summary>
 	public class ColumnEventArgs : EventArgs {
@@ -79,8 +85,6 @@ namespace ShomreiTorah.Singularity {
 			}
 		}
 
-		///<summary>Gets or sets the data-type of the column, or null if the column can hold any datatype.</summary>
-		public Type DataType { get; private set; }
 
 		bool allowNulls;
 
