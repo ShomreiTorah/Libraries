@@ -16,11 +16,11 @@ namespace ShomreiTorah.Common {
 	///<summary>Contains miscellaneous extension methods.</summary>
 	public static class Extensions {
 		#region Collections
-		///<summary>Creates a ReadOnlyCollection that wraps the items currently an enumerable.</summary>
+		///<summary>Creates a ReadOnlyCollection that wraps the present contents of a collection.</summary>
 		///<param name="items">The items to copy into the collection.  Changes to the items will be ignored.</param>
 		public static ReadOnlyCollection<T> ReadOnlyCopy<T>(this IEnumerable<T> items) { return new ReadOnlyCollection<T>(items.ToArray()); }
 
-		///<summary>Checks whether the given enumerable has at least the given number of elements.</summary>
+		///<summary>Determines whether a sequence has at least a certain number of elements.</summary>
 		///<param name="items">The enumerable to check.</param>
 		///<param name="minCount">The minimum number of elements</param>
 		///<returns>True if items has at least minCount elements.</returns>
@@ -45,17 +45,34 @@ namespace ShomreiTorah.Common {
 			return false;
 		}
 
-		///<summary>Finds the index of the first item matching an expression in an enumerable.</summary>
+		///<summary>Finds the index of the first item matching an expression in a sequence.</summary>
 		///<param name="items">The enumerable to search.</param>
 		///<param name="predicate">The expression to test the items against.</param>
 		///<returns>The index of the first matching item, or -1 if no items match.</returns>
-		public static int IndexOf<T>(this IEnumerable<T> items, Func<T, bool> predicate) {
+		public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate) {
 			if (items == null) throw new ArgumentNullException("items");
 			if (predicate == null) throw new ArgumentNullException("predicate");
 
 			int retVal = 0;
 			foreach (var item in items) {
 				if (predicate(item)) return retVal;
+				retVal++;
+			}
+			return -1;
+		}
+		///<summary>Finds the index of the first occurrence of an item in a sequence.</summary>
+		///<param name="items">The enumerable to search.</param>
+		///<param name="predicate">The item to search for.</param>
+		///<returns>The index of the first occurrence of the item, or -1 if the item was not found.</returns>
+		public static int IndexOf<T>(this IEnumerable<T> items, T item) {
+			if (items == null) throw new ArgumentNullException("items");
+
+			var collection = items as IList<T>;
+			if (collection != null) collection.IndexOf(item);
+
+			int retVal = 0;
+			foreach (var otherItem in items) {
+				if (EqualityComparer<T>.Default.Equals(item, otherItem)) return retVal;
 				retVal++;
 			}
 			return -1;
@@ -133,7 +150,7 @@ namespace ShomreiTorah.Common {
 		public static int ReadFill(this Stream stream, byte[] buffer, int length) {
 			if (stream == null) throw new ArgumentNullException("stream");
 			if (buffer == null) throw new ArgumentNullException("buffer");
-			
+
 			int position = 0;
 			while (position < length) {
 				var bytesRead = stream.Read(buffer, position, length - position);
@@ -476,7 +493,7 @@ namespace ShomreiTorah.Common {
 		///<param name="error">The error description, or null to clear the error.</param>
 		public static void SetError(this DataColumnChangeEventArgs args, string error) {
 			if (args == null) throw new ArgumentNullException("args");
-			
+
 			args.Row.SetColumnError(args.Column, error);
 		}
 		#endregion
