@@ -62,7 +62,7 @@ namespace ShomreiTorah.Common {
 		}
 		///<summary>Finds the index of the first occurrence of an item in a sequence.</summary>
 		///<param name="items">The enumerable to search.</param>
-		///<param name="predicate">The item to search for.</param>
+		///<param name="item">The item to search for.</param>
 		///<returns>The index of the first occurrence of the item, or -1 if the item was not found.</returns>
 		public static int IndexOf<T>(this IEnumerable<T> items, T item) {
 			if (items == null) throw new ArgumentNullException("items");
