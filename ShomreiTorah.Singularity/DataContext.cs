@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>Contains tables in a Singularity database.</summary>
-	public class DataContext {
+	public partial class DataContext {
 		///<summary>Creates a new DataContext.</summary>
 		public DataContext() { Tables = new TableCollection(this); }
 

@@ -8,6 +8,24 @@ using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
+	partial class DataContext {
+		///<summary>Saves the tables in this DataContext to an XML document.</summary>
+		public XDocument ToXml() {
+			return new XDocument("DataContext", Tables.SortDependencies(t => t.Schema).Select(t => t.ToXml()));
+		}
+
+		///<summary>Reads data into this DataContext's tables from an XML element.</summary>
+		public void ReadXml(XContainer element) {
+			if (element == null) throw new ArgumentNullException("element");
+			if (element.Elements().Count() == 1 && element.Elements().Single().Name == "DataContext")
+				element = element.Elements().Single();
+
+			foreach (var tableElement in element.Elements()) {
+				Tables[XmlConvert.DecodeName(tableElement.Name.LocalName)].ReadXml(tableElement);
+			}
+		}
+	}
+
 	partial class Table {
 		///<summary>Saves the contents of this table to an XML element.</summary>
 		public XElement ToXml() {
