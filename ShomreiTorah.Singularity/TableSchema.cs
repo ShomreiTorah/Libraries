@@ -31,8 +31,8 @@ namespace ShomreiTorah.Singularity {
 		public Column PrimaryKey {
 			get { return primaryKey; }
 			set {
-				if (value != null && !((ValueColumn)value).Unique)
-					throw new ArgumentException("Primary keys must be unique", "value");
+				if (value != null)
+					((ValueColumn)value).Unique = true;
 
 				primaryKey = value;
 			}
@@ -68,7 +68,7 @@ namespace ShomreiTorah.Singularity {
 		#endregion
 
 		List<WeakReference<Row>> rows = new List<WeakReference<Row>>();
-		internal void AddRow(Row row) { rows.Add(new WeakReference<Row>(row)); }
+		internal virtual void AddRow(Row row) { rows.Add(new WeakReference<Row>(row)); }
 		internal void RemoveRow(Row row) { rows.RemoveAll(r => r.Target == row); }
 
 		///<summary>Gets the attached rows belonging to this schema.</summary>
