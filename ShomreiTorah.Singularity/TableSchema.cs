@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>Contains the schema of a Singularity table.</summary>
-	public class TableSchema {
+	public partial class TableSchema {
 		///<summary>Initializes a new instance of the <see cref="TableSchema"/> class.</summary>
 		public TableSchema(string name) {
 			if (String.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
@@ -26,9 +26,17 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Schema: " + Name; }
 
-		//TODO: Unique
+		Column primaryKey;
 		///<summary>Gets or sets the column that serves as the primary key, or null if the schema has no primary key.</summary>
-		public Column PrimaryKey { get; set; }
+		public Column PrimaryKey {
+			get { return primaryKey; }
+			set {
+				if (value != null && !((ValueColumn)value).Unique)
+					throw new ArgumentException("Primary keys must be unique", "value");
+
+				primaryKey = value;
+			}
+		}
 
 		#region Events
 		///<summary>Occurs when the schema is changed.</summary>
