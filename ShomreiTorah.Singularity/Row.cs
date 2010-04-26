@@ -106,32 +106,6 @@ namespace ShomreiTorah.Singularity {
 		public T Field<T>(Column column) { return (T)this[column]; }
 		#endregion
 	}
-	///<summary>A collection of Row objects.</summary>
-	public class TableRowCollection : Collection<Row> {
-		///<summary>Creates a RowColelction for the specified table.</summary>
-		public TableRowCollection(Table table) {
-			if (table == null) throw new ArgumentNullException("table");
-
-			Table = table;
-		}
-
-		///<summary>Gets the table containing the rows.</summary>
-		public Table Table { get; private set; }
-
-		///<summary>Adds a row from an array of values.</summary>
-		public Row AddFromValues(params object[] values) {
-			if (values == null) throw new ArgumentNullException("values");
-
-			var retVal = new Row(Table.Schema);
-			int index = 0;
-			foreach (var col in Table.Schema.Columns) {
-				retVal[col] = values[index];
-				index++;
-			}
-			Add(retVal);
-			return retVal;
-		}
-	}
 
 	///<summary>Provides data for row events.</summary>
 	public class RowEventArgs : EventArgs {
