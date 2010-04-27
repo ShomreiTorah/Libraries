@@ -136,11 +136,6 @@ namespace ShomreiTorah.Singularity {
 		Table Table { get; }
 	}
 
-	///<summary>Used by ForeignKeyColumn to maintain ChildRowCollections.</summary>
-	internal interface IMutableChildRowCollection {
-		void AddRow(Row row);
-		void RemoveRow(Row row);
-	}
 	///<summary>A collection of strongly-typed child rows.</summary>
 	public interface IChildRowCollection<TChildRow> : IEnumerable<TChildRow> where TChildRow : Row {
 
@@ -164,5 +159,48 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Indicates whether this collection contains a row.</summary>
 		bool Contains(TChildRow row);
+	}
+
+	partial class Row {
+		readonly Dictionary<ChildRelation, object> typedChildRelations = new Dictionary<ChildRelation, object>();
+
+		///<summary>Gets the typed child rows in the specified child relation.</summary>
+		///<returns>A typed ChildRowCollection containing a live view of the child rows.</returns>
+		protected IChildRowCollection<TChildRow> TypedChildRows<TChildRow>(ForeignKeyColumn foreignKey) where TChildRow : Row {
+			if (foreignKey == null) throw new ArgumentNullException("foreignKey");
+
+
+			object retVal = null;
+			if (!typedChildRelations.TryGetValue(foreignKey.ChildRelation, out retVal)) {
+				retVal = new TypedChildRowCollection<TChildRow>(ChildRows(foreignKey.ChildRelation));
+				typedChildRelations.Add(foreignKey.ChildRelation, retVal);
+			}
+			return (IChildRowCollection<TChildRow>)retVal;
+		}
+
+		class TypedChildRowCollection<TChildRow> : IChildRowCollection<TChildRow> where TChildRow : Row {
+			readonly IChildRowCollection<Row> inner;
+			public TypedChildRowCollection(IChildRowCollection<Row> inner) { this.inner = inner; }
+
+			public Row ParentRow { get { return inner.ParentRow; } }
+			public ChildRelation Relation { get { return inner.Relation; } }
+			public Table ChildTable { get { return inner.ChildTable; } }
+
+			public event EventHandler<RowEventArgs> RowAdded {
+				add { inner.RowAdded += value; }
+				remove { inner.RowAdded -= value; }
+			}
+			public event EventHandler<RowEventArgs> RowRemoved {
+				add { inner.RowRemoved += value; }
+				remove { inner.RowRemoved -= value; }
+			}
+
+			public TChildRow this[int index] { get { return (TChildRow)inner[index]; } }
+			public int Count { get { return inner.Count; } }
+			public bool Contains(TChildRow row) { return inner.Contains(row); }
+
+			public IEnumerator<TChildRow> GetEnumerator() { return inner.Cast<TChildRow>().GetEnumerator(); }
+			IEnumerator IEnumerable.GetEnumerator() { return inner.GetEnumerator(); }
+		}
 	}
 }

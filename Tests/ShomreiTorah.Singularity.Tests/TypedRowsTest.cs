@@ -84,13 +84,7 @@ namespace ShomreiTorah.Singularity.Tests {
 				set { base[XRepsColumn] = value; }
 			}
 
-			protected override IChildRowCollection<Row> CreateChildRowCollection(ChildRelation relation, IEnumerable<Row> childRows) {
-				if (relation == PowersRow.BaseColumn.ChildRelation)
-					return InstantiateChildRowCollection<PowersRow>(relation, childRows);
-
-				return base.CreateChildRowCollection(relation, childRows);
-			}
-			public IChildRowCollection<PowersRow> Powers { get { return ChildRows<PowersRow>(PowersRow.BaseColumn); } }
+			public IChildRowCollection<PowersRow> Powers { get { return TypedChildRows<PowersRow>(PowersRow.BaseColumn); } }
 		}
 		class PowersRow : Row {
 			public static ForeignKeyColumn BaseColumn { get; private set; }
