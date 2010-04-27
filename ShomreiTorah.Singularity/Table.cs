@@ -41,13 +41,13 @@ namespace ShomreiTorah.Singularity {
 
 			///<summary>Creates a detached row for this table.</summary>
 			///<remarks>Overridden by typed tables.</remarks>
-			internal virtual TRow CreateRow() { return (TRow)new Row(Table.Schema); }
+			public virtual TRow CreateRow() { return (TRow)new Row(Table.Schema); }
 			public TRow AddFromValues(params object[] values) {
 				if (values == null) throw new ArgumentNullException("values");
 
 				var retVal = CreateRow();
 				int index = 0;
-				foreach (var col in Table.Schema.Columns) {
+				foreach (var col in Table.Schema.Columns.Take(values.Length)) {
 					retVal[col] = values[index];
 					index++;
 				}
@@ -80,6 +80,7 @@ namespace ShomreiTorah.Singularity {
 
 			#region ITableRowCollection<Row> passthroughs
 			Row ITableRowCollection<Row>.AddFromValues(params object[] values) { return AddFromValues(values); }
+			Row ITableRowCollection<Row>.CreateRow() { return CreateRow(); }
 
 			Row IList<Row>.this[int index] {
 				get { return this[index]; }
@@ -105,7 +106,7 @@ namespace ShomreiTorah.Singularity {
 			try {
 				row.Table = this;
 				foreach (var column in Schema.Columns) {
-					var error = Schema.ValidateValue(row, column, row[column]);
+					var error = row.ValidateValue(column, row[column]);
 					if (!String.IsNullOrEmpty(error))
 						throw new InvalidOperationException(error);
 				}
@@ -197,7 +198,11 @@ namespace ShomreiTorah.Singularity {
 		public void AddTable(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 
-			if (this.Any(t => t.Schema == table.Schema))	//Otherwise, we get sticky situations for child relations.  (What if there are multiple tables with the child schema?)
+			//If we allow duplicate tables for the smae schema, we get 
+			//sticky situations for child relations. (What if there are
+			//multiple tables with the child schema?)  Also, it breaks 
+			//XML persistence.
+			if (this[table.Schema.Name] != null)
 				throw new ArgumentException("This DataContext already has a " + table.Schema.Name + " table", "table");
 
 			table.Context = Context;

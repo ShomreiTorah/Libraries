@@ -37,31 +37,60 @@ namespace ShomreiTorah.Singularity {
 				if (column.Schema != Schema) throw new ArgumentException("Column must belong to same schema", "column");
 
 				var oldValue = this[column];
-				var error = ValidateValue(column, value);
+				var error = Table == null ? ValidateValueType(column, value) : ValidateValue(column, value);
 				if (!String.IsNullOrEmpty(error))
 					throw new ArgumentException(error, "value");
 
 				values[column] = value;
-				column.OnValueChanged(this, oldValue, value);
-				if (Table != null)
-					Table.ProcessValueChanged(this, column);
+
+				OnValueChanged(column, oldValue, value);
 			}
+		}
+
+		///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+		///<param name="column">The column containing the value.</param>
+		///<param name="newValue">The value to validate.</param>
+		///<returns>An error message, or null if the value is valid.</returns>
+		///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+		public virtual string ValidateValue(Column column, object newValue) {
+			if (column == null) throw new ArgumentNullException("column");
+			return column.ValidateValue(this, newValue);
+		}
+
+		///<summary>Checks whether a value would be valid for a given column in a detached row.</summary>
+		///<param name="column">The column containing the value.</param>
+		///<param name="newValue">The value to validate.</param>
+		///<returns>An error message, or null if the value is valid.</returns>
+		///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+		public virtual string ValidateValueType(Column column, object newValue) {
+			if (column == null) throw new ArgumentNullException("column");
+			return column.ValidateValueType(newValue);
+		}
+
+		///<summary>Processes a change of a column value.</summary>
+		///<remarks>This method is overridden by typed rows to perform custom logic.</remarks>
+		protected virtual void OnValueChanged(Column column, object oldValue, object newValue) {
+			if (column == null) throw new ArgumentNullException("column");
+
+			column.OnValueChanged(this, oldValue, newValue);
+			if (Table != null)
+				Table.ProcessValueChanged(this, column);
 		}
 
 		#region Child Relations
 		//Each relation's ChildRowCollection is created when first asked for.
 		//After it's created, it gets maintained by ForeignKeyColumn.OnValueChanged.
 
-		readonly Dictionary<ChildRelation, ChildRowCollection> childRelations = new Dictionary<ChildRelation, ChildRowCollection>();
+		readonly Dictionary<ChildRelation, IChildRowCollection<Row>> childRelations = new Dictionary<ChildRelation, IChildRowCollection<Row>>();
 		internal void OnRelationRemoved(ChildRelation relation) { childRelations.Remove(relation); }	//Won't throw if not found
 
 		///<summary>Gets the child rows in the specified child relation.</summary>
 		///<returns>A ChildRowCollection containing a live view of the child rows.</returns>
-		public ChildRowCollection ChildRows(string relationName) { return ChildRows(Schema.ChildRelations[relationName]); }
+		public IChildRowCollection<Row> ChildRows(string relationName) { return ChildRows(Schema.ChildRelations[relationName]); }
 		///<summary>Gets the child rows in the specified child relation.</summary>
 		///<returns>A ChildRowCollection containing a live view of the child rows.</returns>
-		public ChildRowCollection ChildRows(ChildRelation relation) { return ChildRows(relation, true); }
-		internal ChildRowCollection ChildRows(ChildRelation relation, bool forceCreate) {
+		public IChildRowCollection<Row> ChildRows(ChildRelation relation) { return ChildRows(relation, true); }
+		internal IChildRowCollection<Row> ChildRows(ChildRelation relation, bool forceCreate) {
 			if (relation == null) throw new ArgumentNullException("relation");
 
 			if (Table == null)
@@ -69,17 +98,89 @@ namespace ShomreiTorah.Singularity {
 			if (Table.Context == null)
 				throw new InvalidOperationException("Child relations can only be used for tables inside a DataContext");
 
-			ChildRowCollection retVal;
+			IChildRowCollection<Row> retVal;
 			if (!childRelations.TryGetValue(relation, out retVal)
 			 && forceCreate) {
 				var childTable = Table.Context.Tables[relation.ChildSchema];
 				if (childTable == null)
 					throw new InvalidOperationException("Cannot find " + relation.ChildSchema.Name + " table");
 
-				retVal = new ChildRowCollection(this, relation, childTable, childTable.Rows.Where(r => r[relation.ChildColumn] == this));
+				retVal = CreateChildRowCollection(relation, childTable.Rows.Where(r => r[relation.ChildColumn] == this));
 				childRelations.Add(relation, retVal);
 			}
 			return retVal;
+		}
+		///<summary>Gets the typed child rows in the specified child relation.</summary>
+		///<returns>A typed ChildRowCollection containing a live view of the child rows.</returns>
+		protected IChildRowCollection<TChildRow> ChildRows<TChildRow>(ForeignKeyColumn column) where TChildRow : Row {
+			if (column == null) throw new ArgumentNullException("column");
+
+			return (IChildRowCollection<TChildRow>)ChildRows(column.ChildRelation);
+		}
+
+		///<summary>Creates an IChildRowCollection for the given child relation.  Overridden by typed rows.</summary>
+		protected virtual IChildRowCollection<Row> CreateChildRowCollection(ChildRelation relation, IEnumerable<Row> childRows) {
+			if (relation == null) throw new ArgumentNullException("relation");
+			if (childRows == null) throw new ArgumentNullException("childRows");
+
+			return new UntypedChildRowCollection<Row>(this, relation, Table.Context.Tables[relation.ChildSchema], childRows);
+		}
+		///<summary>Creates a typed IChildRowCollection.  Used by overridden CreateChildRowCollection implementations.</summary>
+		///<remarks>This function instantiates a private child class that implements the generic  IChildRowCollection.</remarks>
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Runtime type")]
+		protected IChildRowCollection<Row> InstantiateChildRowCollection<TChildRow>(ChildRelation relation, IEnumerable<Row> childRows) where TChildRow : Row {
+			if (relation == null) throw new ArgumentNullException("relation");
+
+			return new TypedChildRowCollection<TChildRow>(this, relation, Table.Context.Tables[relation.ChildSchema], childRows);
+		}
+
+		class UntypedChildRowCollection<TChildRow> : ReadOnlyCollection<TChildRow>, IChildRowCollection<Row>, IMutableChildRowCollection where TChildRow : Row {
+			internal UntypedChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
+				: base(childRows.Cast<TChildRow>().ToList()) {
+				ParentRow = parentRow;
+				ChildTable = childTable;
+				Relation = relation;
+			}
+
+			///<summary>Gets the parent row for the collection's rows.</summary>
+			public Row ParentRow { get; private set; }
+			///<summary>Gets the child relation that this collection contains.</summary>
+			public ChildRelation Relation { get; private set; }
+			///<summary>Gets the child table that this collection contains rows from.</summary>
+			public Table ChildTable { get; private set; }
+
+			public void AddRow(Row childRow) {
+				Items.Add((TChildRow)childRow);
+				OnRowAdded(new RowEventArgs(childRow));
+			}
+			public void RemoveRow(Row childRow) {
+				Items.Remove((TChildRow)childRow);
+				OnRowRemoved(new RowEventArgs(childRow));
+			}
+
+			public event EventHandler<RowEventArgs> RowAdded;
+			void OnRowAdded(RowEventArgs e) {
+				if (RowAdded != null)
+					RowAdded(this, e);
+			}
+			public event EventHandler<RowEventArgs> RowRemoved;
+			void OnRowRemoved(RowEventArgs e) {
+				if (RowRemoved != null)
+					RowRemoved(this, e);
+			}
+
+			public bool Contains(Row row) { return row != null && row.Table == ChildTable && row[Relation.ChildColumn] == ParentRow; }
+
+			IEnumerator<Row> IEnumerable<Row>.GetEnumerator() {
+				foreach (TChildRow row in this)	 //If I'm not careful, I'll get a nasty stack overflow.
+					yield return row;
+			}
+			Row IChildRowCollection<Row>.this[int index] { get { return this[index]; } }
+		}
+
+		sealed class TypedChildRowCollection<TChildRow> : UntypedChildRowCollection<TChildRow>, IChildRowCollection<TChildRow> where TChildRow : Row {
+			internal TypedChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
+				: base(parentRow, relation, childTable, childRows) { }
 		}
 		#endregion
 
@@ -91,21 +192,18 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		///<summary>Checks whether a value would be valid for a given column.</summary>
-		///<param name="column">The column containing the value.</param>
-		///<param name="newValue">The value to validate.</param>
-		///<returns>An error message, or null if the value is valid.</returns>
-		public string ValidateValue(Column column, object newValue) { return Schema.ValidateValue(this, column, newValue); }
-		///<summary>Checks whether a value would be valid for a given column.</summary>
 		///<param name="column">The name of column containing the value.</param>
 		///<param name="newValue">The value to validate.</param>
 		///<returns>An error message, or null if the value is valid.</returns>
-		public string ValidateValue(string column, object newValue) { return Schema.ValidateValue(this, Schema.Columns[column], newValue); }
+		public string ValidateValue(string column, object newValue) { return ValidateValue(Schema.Columns[column], newValue); }
 		///<summary>Gets the value of the specified column.</summary>
 		public T Field<T>(string name) { return (T)this[name]; }
 		///<summary>Gets the value of the specified column.</summary>
 		public T Field<T>(Column column) { return (T)this[column]; }
 		#endregion
 	}
+
+
 
 	///<summary>Provides data for row events.</summary>
 	public class RowEventArgs : EventArgs {
@@ -114,48 +212,5 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Gets the row.</summary>
 		public Row Row { get; private set; }
-	}
-
-	///<summary>A collection of child rows belonging to a parent row.</summary>
-	public class ChildRowCollection : ReadOnlyCollection<Row> {
-		internal ChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
-			: base(childRows.ToList()) {
-			ParentRow = parentRow;
-			ChildTable = childTable;
-			Relation = relation;
-		}
-
-		///<summary>Gets the parent row for the collection's rows.</summary>
-		public Row ParentRow { get; private set; }
-		///<summary>Gets the child relation that this collection contains.</summary>
-		public ChildRelation Relation { get; private set; }
-		///<summary>Gets the child table that this collection contains rows from.</summary>
-		public Table ChildTable { get; private set; }
-
-		internal void AddRow(Row childRow) {
-			Items.Add(childRow);
-			OnRowAdded(new RowEventArgs(childRow));
-		}
-		internal void RemoveRow(Row childRow) {
-			Items.Remove(childRow);
-			OnRowRemoved(new RowEventArgs(childRow));
-		}
-
-		///<summary>Occurs when a row is added to the collection.</summary>
-		public event EventHandler<RowEventArgs> RowAdded;
-		///<summary>Raises the RowAdded event.</summary>
-		///<param name="e">A RowEventArgs object that provides the event data.</param>
-		protected virtual void OnRowAdded(RowEventArgs e) {
-			if (RowAdded != null)
-				RowAdded(this, e);
-		}
-		///<summary>Occurs when a row is removed from the collection.</summary>
-		public event EventHandler<RowEventArgs> RowRemoved;
-		///<summary>Raises the RowRemoved event.</summary>
-		///<param name="e">A RowEventArgs object that provides the event data.</param>
-		protected virtual void OnRowRemoved(RowEventArgs e) {
-			if (RowRemoved != null)
-				RowRemoved(this, e);
-		}
 	}
 }

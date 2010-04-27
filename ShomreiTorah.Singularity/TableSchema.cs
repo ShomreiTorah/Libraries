@@ -87,22 +87,6 @@ namespace ShomreiTorah.Singularity {
 			if (ChildRelations[name] != null)
 				throw new ArgumentException("A child relation named " + name + " already exists", "name");
 		}
-
-		///<summary>Checks whether a value is valid for a given column in a given row.</summary>
-		///<param name="row">The row to validate for.</param>
-		///<param name="column">The column containing the value.</param>
-		///<param name="newValue">The value to validate.</param>
-		///<returns>An error message, or null if the value is valid.</returns>
-		public virtual string ValidateValue(Row row, Column column, object newValue) {
-			if (row == null) throw new ArgumentNullException("row");
-			if (column == null) throw new ArgumentNullException("column");
-			if (row.Schema != this) throw new ArgumentException("Row must belong to this schema", "row");
-			if (column.Schema != this) throw new ArgumentException("Column must belong to this schema", "column");
-
-			if (row.Table == null)
-				return column.ValidateValueType(newValue);
-			return column.ValidateValue(row, newValue);
-		}
 	}
 	///<summary>A relation mapping a parent row to a set of child rows.</summary>
 	public sealed class ChildRelation {

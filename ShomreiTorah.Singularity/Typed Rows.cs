@@ -46,7 +46,7 @@ namespace ShomreiTorah.Singularity {
 				: base(parent) {
 				this.rowCreator = rowCreator;
 			}
-			internal override TRow CreateRow() { return rowCreator(); }
+			public override TRow CreateRow() { return rowCreator(); }
 		}
 
 		//This class maintains separate backing fields for typed events, 
@@ -104,13 +104,45 @@ namespace ShomreiTorah.Singularity {
 		public Column Column { get; private set; }
 	}
 
-	///<summary>A collection of strongly-typed rows.</summary>
+	///<summary>A collection of strongly-typed rows in a table.</summary>
 	public interface ITableRowCollection<TRow> : IList<TRow> where TRow : Row {
-
 		///<summary>Adds a row from an array of values.</summary>
 		TRow AddFromValues(params object[] value);
 
 		///<summary>Gets the table that contains these rows.</summary>
 		Table Table { get; }
+
+		///<summary>Creates a new row for this table.</summary>
+		TRow CreateRow();
+	}
+
+	///<summary>Used by ForeignKeyColumn to maintain ChildRowCollections.</summary>
+	internal interface IMutableChildRowCollection {
+		void AddRow(Row row);
+		void RemoveRow(Row row);
+	}
+	///<summary>A collection of strongly-typed child rows.</summary>
+	public interface IChildRowCollection<TChildRow> : IEnumerable<TChildRow> where TChildRow : Row {
+
+		///<summary>Gets the parent row for the collection's rows.</summary>
+		Row ParentRow { get; }
+		///<summary>Gets the child relation that this collection contains.</summary>
+		ChildRelation Relation { get; }
+		///<summary>Gets the child table that this collection contains rows from.</summary>
+		Table ChildTable { get; }
+
+		///<summary>Occurs when a row is added to the collection.</summary>
+		event EventHandler<RowEventArgs> RowAdded;
+		///<summary>Occurs when a row is removed from the collection.</summary>
+		event EventHandler<RowEventArgs> RowRemoved;
+
+		///<summary>Gets the row at the specified index.</summary>
+		TChildRow this[int index] { get; }
+
+		///<summary>Gets the number of rows in this instance.</summary>
+		int Count { get; }
+
+		///<summary>Indicates whether this collection contains a row.</summary>
+		bool Contains(TChildRow row);
 	}
 }

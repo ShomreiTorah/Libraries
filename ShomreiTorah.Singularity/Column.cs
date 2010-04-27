@@ -196,13 +196,13 @@ namespace ShomreiTorah.Singularity {
 		void AddToParent(Row childRow) {
 			var newParent = (Row)childRow[this];
 			if (newParent != null) {
-				var c = newParent.ChildRows(ChildRelation, false);
+				var c = (IMutableChildRowCollection)newParent.ChildRows(ChildRelation, false);
 				if (c != null) c.AddRow(childRow);
 			}
 		}
 		void RemoveFromParent(Row childRow, Row oldParent) {
 			if (oldParent == null) return;
-			var c = oldParent.ChildRows(ChildRelation, false);
+			var c = (IMutableChildRowCollection)oldParent.ChildRows(ChildRelation, false);
 			if (c != null) c.RemoveRow(childRow);
 		}
 
