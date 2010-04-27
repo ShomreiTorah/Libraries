@@ -172,7 +172,7 @@ namespace ShomreiTorah.Singularity {
 		public void AddTable(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 
-			//If we allow duplicate tables for the smae schema, we get 
+			//If we allow duplicate tables for the same schema, we get 
 			//sticky situations for child relations. (What if there are
 			//multiple tables with the child schema?)  Also, it breaks 
 			//XML persistence.
