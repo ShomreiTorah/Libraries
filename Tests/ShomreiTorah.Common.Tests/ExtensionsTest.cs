@@ -226,8 +226,8 @@ namespace ShomreiTorah.Common.Tests {
 		///</summary>
 		[TestMethod()]
 		public void IndexOfTest() {
-			Assert.AreEqual(-1, Enumerable.Range(0, 12).IndexOf(i => i - 3 == 12));
-			Assert.AreEqual(+9, Enumerable.Range(0, 12).IndexOf(i => i + 3 == 12));
+			Assert.AreEqual(-1, Enumerable.Range(0, 12).FindIndex(i => i - 3 == 12));
+			Assert.AreEqual(+9, Enumerable.Range(0, 12).FindIndex(i => i + 3 == 12));
 		}
 
 		/// <summary>
