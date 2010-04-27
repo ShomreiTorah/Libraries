@@ -110,7 +110,7 @@ namespace ShomreiTorah.Singularity {
 				}
 
 				if (row == null)
-					row = Table.Rows.CreateRow();
+					row = Table.CreateRow();
 
 				foreach (var field in GetValues(rowSource)) {
 					var foreignKey = field.Key as ForeignKeyColumn;

@@ -15,37 +15,31 @@ namespace ShomreiTorah.Singularity {
 			Schema = schema;
 
 			if (Rows == null)	//If not set by TypedTable
-				Rows = new RowCollection<Row>(this);
+				Rows = new RowCollection(this);
 		}
+		///<summary>Creates a detached row for this table.</summary>
+		///<remarks>Overridden by typed tables.</remarks>
+		public virtual Row CreateRow() { return new Row(Schema); }
 
 		///<summary>Gets the DataContext that contains this table.</summary>
 		public DataContext Context { get; internal set; }
 		///<summary>Gets the schema of this table.</summary>
 		public TableSchema Schema { get; private set; }
-		///<summary>Gets the schema of this table.</summary>
+		///<summary>Gets the rows in this table.</summary>
 		public ITableRowCollection<Row> Rows { get; internal set; }
 
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Table: " + Schema.Name; }
 
-		///<summary>A collection of strongly-typed rows (See TypedTable) that can be exposed as a collection of weakly-typed rows.</summary>
-		//This class inherits Collection<TRow> to make the data storage strongly 
-		//typed, and implements ITableRowCollection<Row> for the base Table class
-		//class to expose as a weakly-typed collection.  Thee single class cannot
-		//implement ITableRowCollection twice with different parameters, so there
-		//is an inherited TypedRowCollection in TypedTable for ITableRowCollection<TRow>.
-		internal class RowCollection<TRow> : Collection<TRow>, ITableRowCollection<Row> where TRow : Row {
+		class RowCollection : Collection<Row>, ITableRowCollection<Row> {
 			internal RowCollection(Table table) { Table = table; }
 
 			public Table Table { get; private set; }
 
-			///<summary>Creates a detached row for this table.</summary>
-			///<remarks>Overridden by typed tables.</remarks>
-			public virtual TRow CreateRow() { return (TRow)new Row(Table.Schema); }
-			public TRow AddFromValues(params object[] values) {
+			public Row AddFromValues(params object[] values) {
 				if (values == null) throw new ArgumentNullException("values");
 
-				var retVal = CreateRow();
+				var retVal = Table.CreateRow();
 				int index = 0;
 				foreach (var col in Table.Schema.Columns.Take(values.Length)) {
 					retVal[col] = values[index];
@@ -60,7 +54,7 @@ namespace ShomreiTorah.Singularity {
 				base.ClearItems();
 				Table.OnTableCleared();
 			}
-			protected override void InsertItem(int index, TRow item) {
+			protected override void InsertItem(int index, Row item) {
 				Table.ValidateAddRow(item);
 				base.InsertItem(index, item);
 				Table.ProcessRowAdded(item);
@@ -70,36 +64,15 @@ namespace ShomreiTorah.Singularity {
 				base.RemoveItem(index);
 				Table.ProcessRowRemoved(row, true);
 			}
-			protected override void SetItem(int index, TRow item) {
+			protected override void SetItem(int index, Row item) {
 				Table.ValidateAddRow(item);
 				var oldRow = this[index];
 				base.SetItem(index, item);
 				Table.ProcessRowRemoved(oldRow, true);
 				Table.ProcessRowAdded(item);
 			}
-
-			#region ITableRowCollection<Row> passthroughs
-			Row ITableRowCollection<Row>.AddFromValues(params object[] values) { return AddFromValues(values); }
-			Row ITableRowCollection<Row>.CreateRow() { return CreateRow(); }
-
-			Row IList<Row>.this[int index] {
-				get { return this[index]; }
-				set { this[index] = (TRow)value; }
-			}
-
-			int IList<Row>.IndexOf(Row item) { return IndexOf((TRow)item); }
-			void IList<Row>.Insert(int index, Row item) { Insert(index, (TRow)item); }
-			void ICollection<Row>.Add(Row item) { Add((TRow)item); }
-			bool ICollection<Row>.Contains(Row item) { return Contains((TRow)item); }
-			void ICollection<Row>.CopyTo(Row[] array, int arrayIndex) { CopyTo((TRow[])array, arrayIndex); }
-			bool ICollection<Row>.Remove(Row item) { return Remove((TRow)item); }
-			IEnumerator<Row> IEnumerable<Row>.GetEnumerator() {
-				foreach (TRow row in this) //If I'm not careful, I'll get a nasty stack overflow.
-					yield return row;
-			}
-			bool ICollection<Row>.IsReadOnly { get { return false; } }
-			#endregion
 		}
+
 		void ValidateAddRow(Row row) {
 			if (row.Table != null)
 				throw new ArgumentException("Row is already in a table", "row");

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Collections;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A schema that contains strongly-typed rows.</summary>
@@ -27,26 +28,48 @@ namespace ShomreiTorah.Singularity {
 
 	///<summary>A table that contains strongly-typed rows.</summary>
 	public class TypedTable<TRow> : Table where TRow : Row {
+		readonly Func<TRow> rowCreator;
+
 		///<summary>Creates a typed table from its typed schema.</summary>
 		public TypedTable(TypedSchema<TRow> schema) : this(schema, Activator.CreateInstance<TRow>) { }
 		///<summary>Creates a typed table from its typed schema.</summary>
 		public TypedTable(TypedSchema<TRow> schema, Func<TRow> rowCreator)
 			: base(schema) {
 			if (rowCreator == null) throw new ArgumentNullException("rowCreator");
+			this.rowCreator = rowCreator;
 
-			base.Rows = new TypedRowCollection(this, rowCreator);
+			Rows = new TypedRowCollection(base.Rows);
 		}
 
-		///<summary>Gets the schema of this table.</summary>
-		public new ITableRowCollection<TRow> Rows { get { return (TypedRowCollection)base.Rows; } }
+		///<summary>Creates a detached row for this table.</summary>
+		public override Row CreateRow() { return rowCreator(); }
 
-		class TypedRowCollection : RowCollection<TRow>, ITableRowCollection<TRow> {
-			readonly Func<TRow> rowCreator;
-			internal TypedRowCollection(TypedTable<TRow> parent, Func<TRow> rowCreator)
-				: base(parent) {
-				this.rowCreator = rowCreator;
+		///<summary>Gets the rows in this table.</summary>
+		public new ITableRowCollection<TRow> Rows { get; private set; }
+
+		///<summary>A typed wrapper around an untyped row collection.</summary>
+		class TypedRowCollection : ITableRowCollection<TRow> {
+			readonly ITableRowCollection<Row> inner;
+			internal TypedRowCollection(ITableRowCollection<Row> inner) { this.inner = inner; }
+
+			public TRow AddFromValues(params object[] values) { return (TRow)inner.AddFromValues(values); }
+			public Table Table { get { return inner.Table; } }
+			public int IndexOf(TRow item) { return inner.IndexOf(item); }
+			public void Insert(int index, TRow item) { inner.Insert(index, item); }
+			public void RemoveAt(int index) { inner.RemoveAt(index); }
+			public TRow this[int index] {
+				get { return (TRow)inner[index]; }
+				set { inner[index] = value; }
 			}
-			public override TRow CreateRow() { return rowCreator(); }
+			public void Add(TRow item) { inner.Add(item); }
+			public void Clear() { inner.Clear(); }
+			public bool Contains(TRow item) { return inner.Contains(item); }
+			public void CopyTo(TRow[] array, int arrayIndex) { inner.CopyTo(array, arrayIndex); }
+			public int Count { get { return inner.Count; } }
+			public bool IsReadOnly { get { return inner.IsReadOnly; } }
+			public bool Remove(TRow item) { return inner.Remove(item); }
+			public IEnumerator<TRow> GetEnumerator() { return inner.Cast<TRow>().GetEnumerator(); }
+			IEnumerator IEnumerable.GetEnumerator() { return inner.GetEnumerator(); }
 		}
 
 		//This class maintains separate backing fields for typed events, 
@@ -107,13 +130,10 @@ namespace ShomreiTorah.Singularity {
 	///<summary>A collection of strongly-typed rows in a table.</summary>
 	public interface ITableRowCollection<TRow> : IList<TRow> where TRow : Row {
 		///<summary>Adds a row from an array of values.</summary>
-		TRow AddFromValues(params object[] value);
+		TRow AddFromValues(params object[] values);
 
 		///<summary>Gets the table that contains these rows.</summary>
 		Table Table { get; }
-
-		///<summary>Creates a new row for this table.</summary>
-		TRow CreateRow();
 	}
 
 	///<summary>Used by ForeignKeyColumn to maintain ChildRowCollections.</summary>
