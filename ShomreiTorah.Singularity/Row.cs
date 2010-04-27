@@ -73,8 +73,23 @@ namespace ShomreiTorah.Singularity {
 			if (column == null) throw new ArgumentNullException("column");
 
 			column.OnValueChanged(this, oldValue, newValue);
-			if (Table != null)
+			if (Table != null) {
 				Table.ProcessValueChanged(this, column);
+
+				//Raise ValueChanged events on every foreign
+				//row that contains this row as a child.  If
+				//the ChildRowCollection for the parent row 
+				//doesn't exist, the event obviously has no 
+				//handlers, so I can skip it.  If the column
+				//that changed is a ForeignKeyColumn, don't 
+				//raise a ValueChanged event for its parent 
+				//row (which just got a RowAdded event)
+				foreach (var parentCollection in Schema.Columns.OfType<ForeignKeyColumn>().Where(fkc => fkc != column)
+													   .Select(fkc => Field<Row>(fkc).ChildRows(fkc.ChildRelation, false))) {
+					if (parentCollection != null)	//If the ChildRowCollection for this parent row has been created,
+						parentCollection.OnValueChanged(new ValueChangedEventArgs(this, column));
+				}
+			}
 		}
 
 		#region Child Relations
@@ -168,6 +183,11 @@ namespace ShomreiTorah.Singularity {
 		void OnRowRemoved(RowEventArgs e) {
 			if (RowRemoved != null)
 				RowRemoved(this, e);
+		}
+		public event EventHandler<ValueChangedEventArgs> ValueChanged;
+		internal void OnValueChanged(ValueChangedEventArgs e) {
+			if (ValueChanged != null)
+				ValueChanged(this, e);
 		}
 
 		public new bool Contains(Row row) { return row != null && row.Table == ChildTable && row[Relation.ChildColumn] == ParentRow; }

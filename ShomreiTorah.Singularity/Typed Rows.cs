@@ -150,6 +150,8 @@ namespace ShomreiTorah.Singularity {
 		event EventHandler<RowEventArgs> RowAdded;
 		///<summary>Occurs when a row is removed from the collection.</summary>
 		event EventHandler<RowEventArgs> RowRemoved;
+		///<summary>Occurs when a column value is changed in one of the rows in the collection.</summary>
+		event EventHandler<ValueChangedEventArgs> ValueChanged;
 
 		///<summary>Gets the row at the specified index.</summary>
 		TChildRow this[int index] { get; }
@@ -193,6 +195,10 @@ namespace ShomreiTorah.Singularity {
 			public event EventHandler<RowEventArgs> RowRemoved {
 				add { inner.RowRemoved += value; }
 				remove { inner.RowRemoved -= value; }
+			}
+			public event EventHandler<ValueChangedEventArgs> ValueChanged {
+				add { inner.ValueChanged += value; }
+				remove { inner.ValueChanged -= value; }
 			}
 
 			public TChildRow this[int index] { get { return (TChildRow)inner[index]; } }
