@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestSettings name="Local" id="7b8bd57b-f980-43b4-a5ab-db72ace7fb71" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-  <Description>These are default test settings for a local test run.</Description>
+  <Description>These are default test settings for a local test run, with Code Coverage enabled</Description>
   <Execution>
     <TestTypeSpecific>
       <UnitTestRunConfig testTypeId="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b">
@@ -21,34 +21,6 @@
     </TestTypeSpecific>
     <AgentRule name="LocalMachineDefaultRole">
       <DataCollectors>
-        <DataCollector uri="datacollector://Microsoft/TestImpact/1.0" assemblyQualifiedName="Microsoft.VisualStudio.TraceCollector.TestImpactDataCollector, Microsoft.VisualStudio.TraceCollector, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-          <Configuration>
-            <WorkerProcessList xmlns="">
-              <WorkerProcess>w3wp.exe</WorkerProcess>
-            </WorkerProcessList>
-            <MaximumConcurrentTests xmlns="">32</MaximumConcurrentTests>
-            <InstrumentIIS xmlns="">False</InstrumentIIS>
-            <RemoteInstrumentIIS xmlns="">False</RemoteInstrumentIIS>
-            <ProcessList IsExclusionList="True" xmlns="">
-              <Process>devenv.exe</Process>
-              <Process>mtm.exe</Process>
-              <Process>TestAgentConfigUI.exe</Process>
-              <Process>TestControllerConfigUI.exe</Process>
-              <Process>DW20.exe</Process>
-              <Process>TFSMgmt.exe</Process>
-              <Process>TFSJobAgent.exe</Process>
-              <Process>TFSBuildServiceHost.exe</Process>
-            </ProcessList>
-            <ModuleList IsExclusionList="True" xmlns="">
-              <Module>PublicKeyToken:B77A5C561934E089</Module>
-              <Module>PublicKeyToken:B03F5F7F11D50A3A</Module>
-              <Module>PublicKeyToken:31BF3856AD364E35</Module>
-              <Module>PublicKeyToken:89845DCD8080CC91</Module>
-              <Module>PublicKeyToken:71E9BCE111E9429C</Module>
-              <Module>Microsoft.</Module>
-            </ModuleList>
-          </Configuration>
-        </DataCollector>
         <DataCollector uri="datacollector://microsoft/CodeCoverage/1.0" assemblyQualifiedName="Microsoft.VisualStudio.TestTools.CodeCoverage.CoveragePlugIn, Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" friendlyName="Code Coverage">
           <Configuration>
             <CodeCoverage keyFile="Libraries\ShomreiTorah.Singularity\Shul.pfx" xmlns="">
