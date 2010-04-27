@@ -111,6 +111,7 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		#region Events
+		///<summary>Occurs when the table is cleared.</summary>
 		public event EventHandler TableCleared;
 		///<summary>Raises the TableCleared event.</summary>
 		protected virtual void OnTableCleared() { OnTableCleared(EventArgs.Empty); }
