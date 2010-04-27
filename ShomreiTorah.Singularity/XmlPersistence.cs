@@ -11,7 +11,7 @@ namespace ShomreiTorah.Singularity {
 	partial class DataContext {
 		///<summary>Saves the tables in this DataContext to an XML document.</summary>
 		public XDocument ToXml() {
-			return new XDocument("DataContext", Tables.SortDependencies(t => t.Schema).Select(t => t.ToXml()));
+			return new XDocument(new XElement("DataContext", Tables.SortDependencies(t => t.Schema).Select(t => t.ToXml())));
 		}
 
 		///<summary>Reads data into this DataContext's tables from an XML element.</summary>
@@ -110,7 +110,7 @@ namespace ShomreiTorah.Singularity {
 				}
 
 				if (row == null)
-					row = new Row(Table.Schema);
+					row = Table.Rows.CreateRow();
 
 				foreach (var field in GetValues(rowSource)) {
 					var foreignKey = field.Key as ForeignKeyColumn;
