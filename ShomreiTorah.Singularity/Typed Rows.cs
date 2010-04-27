@@ -48,7 +48,7 @@ namespace ShomreiTorah.Singularity {
 		public new ITableRowCollection<TRow> Rows { get; private set; }
 
 		///<summary>A typed wrapper around an untyped row collection.</summary>
-		class TypedRowCollection : ITableRowCollection<TRow> {
+		sealed class TypedRowCollection : ITableRowCollection<TRow> {
 			readonly ITableRowCollection<Row> inner;
 			internal TypedRowCollection(ITableRowCollection<Row> inner) { this.inner = inner; }
 
@@ -178,7 +178,7 @@ namespace ShomreiTorah.Singularity {
 			return (IChildRowCollection<TChildRow>)retVal;
 		}
 
-		class TypedChildRowCollection<TChildRow> : IChildRowCollection<TChildRow> where TChildRow : Row {
+		sealed class TypedChildRowCollection<TChildRow> : IChildRowCollection<TChildRow> where TChildRow : Row {
 			readonly IChildRowCollection<Row> inner;
 			public TypedChildRowCollection(IChildRowCollection<Row> inner) { this.inner = inner; }
 

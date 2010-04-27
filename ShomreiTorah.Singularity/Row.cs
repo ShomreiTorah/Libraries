@@ -135,7 +135,7 @@ namespace ShomreiTorah.Singularity {
 		#endregion
 	}
 
-	internal class ChildRowCollection : ReadOnlyCollection<Row>, IChildRowCollection<Row> {
+	internal sealed class ChildRowCollection : ReadOnlyCollection<Row>, IChildRowCollection<Row> {
 		internal ChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
 			: base(childRows.ToList()) {
 			ParentRow = parentRow;

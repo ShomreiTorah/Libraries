@@ -215,8 +215,8 @@ namespace ShomreiTorah.Singularity {
 	}
 
 
-	///<summary>A collection of Column objects.</summary>
-	public class ColumnCollection : ReadOnlyCollection<Column> {
+	///<summary>A collection of columns in a schema.</summary>
+	public sealed class ColumnCollection : ReadOnlyCollection<Column> {
 		internal ColumnCollection(TableSchema schema) : base(new List<Column>()) { Schema = schema; }
 
 		///<summary>Gets the schema containing the columns.</summary>

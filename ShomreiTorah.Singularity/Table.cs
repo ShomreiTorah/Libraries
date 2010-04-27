@@ -31,7 +31,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Table: " + Schema.Name; }
 
-		class RowCollection : Collection<Row>, ITableRowCollection<Row> {
+		sealed class RowCollection : Collection<Row>, ITableRowCollection<Row> {
 			internal RowCollection(Table table) { Table = table; }
 
 			public Table Table { get; private set; }
@@ -111,10 +111,9 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		#region Events
-		///<summary>Occurs when the table is cleared.</summary>
 		public event EventHandler TableCleared;
 		///<summary>Raises the TableCleared event.</summary>
-		internal protected virtual void OnTableCleared() { OnTableCleared(EventArgs.Empty); }
+		protected virtual void OnTableCleared() { OnTableCleared(EventArgs.Empty); }
 		///<summary>Raises the TableCleared event.</summary>
 		///<param name="e">An EventArgs object that provides the event data.</param>
 		protected virtual void OnTableCleared(EventArgs e) {
@@ -156,7 +155,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the column.</summary>
 		public Column Column { get; private set; }
 	}
-	///<summary>A collection of Table objects.</summary>
+	///<summary>A collection of tables contained in a DataContext.</summary>
 	public sealed class TableCollection : ReadOnlyCollection<Table>, ICollection<Table> {
 		internal TableCollection(DataContext context) : base(new List<Table>()) { Context = context; }
 		///<summary>Gets the DataContext that contains this table.</summary>

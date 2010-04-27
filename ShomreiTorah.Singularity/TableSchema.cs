@@ -118,14 +118,13 @@ namespace ShomreiTorah.Singularity {
 			}
 		}
 	}
-	///<summary>A collection of ChildRelation objects.</summary>
-	public class ChildRelationCollection : ReadOnlyCollection<ChildRelation> {
+	///<summary>A collection of child relations in a schema.</summary>
+	public sealed class ChildRelationCollection : ReadOnlyCollection<ChildRelation> {
 		//Called by ForeignKeyColumn
 		internal ChildRelation AddRelation(ChildRelation relation) { Items.Add(relation); return relation; }
 		internal void RemoveRelation(ChildRelation relation) { Items.Remove(relation); }
 
 		internal ChildRelationCollection(TableSchema schema) : base(new List<ChildRelation>()) { Schema = schema; }
-
 
 		///<summary>Gets the schema containing the columns.</summary>
 		public TableSchema Schema { get; private set; }
