@@ -35,6 +35,7 @@ namespace ShomreiTorah.Singularity {
 			internal RowCollection(Table table) { Table = table; }
 
 			public Table Table { get; private set; }
+			public new bool Contains(Row row) { return row != null && row.Table == Table; }
 
 			public Row AddFromValues(params object[] values) {
 				if (values == null) throw new ArgumentNullException("values");
