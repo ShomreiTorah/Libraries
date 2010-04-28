@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity.DataBinding {
 	///<summary>A base class for a wrapper around a typed DataContext for use in a designer.</summary>
@@ -11,9 +12,9 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		///<summary>Gets the DataContext instance to bind to at runtime.</summary>
 		///<remarks>This method will not be called at design-time.</remarks>
 		protected abstract TDataContext FindDataContext();
-		bool IListSource.ContainsListCollection { get { return true; } }
 
 		TDataContext dataContext;
+		///<summary>Gets the typed DataContext wrapped by this instance.</summary>
 		public TDataContext DataContext {
 			get {
 				if (dataContext == null)
@@ -21,6 +22,9 @@ namespace ShomreiTorah.Singularity.DataBinding {
 				return dataContext;
 			}
 		}
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
+		bool IListSource.ContainsListCollection { get { return true; } }
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		System.Collections.IList IListSource.GetList() { return DataContext.Tables; }
 	}
 }
