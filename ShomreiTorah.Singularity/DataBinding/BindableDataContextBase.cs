@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Collections;
 
 namespace ShomreiTorah.Singularity.DataBinding {
 	///<summary>A base class for a wrapper around a typed DataContext for use in a designer.</summary>
@@ -22,9 +23,10 @@ namespace ShomreiTorah.Singularity.DataBinding {
 				return dataContext;
 			}
 		}
+
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		bool IListSource.ContainsListCollection { get { return true; } }
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
-		System.Collections.IList IListSource.GetList() { return DataContext.Tables; }
+		IList IListSource.GetList() { return DataContext.GetList(); }
 	}
 }

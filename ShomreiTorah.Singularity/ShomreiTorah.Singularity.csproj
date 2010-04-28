@@ -57,8 +57,10 @@
     <Compile Include="DataBinding\BindableDataContextBase.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DataBinding\DataContextBinder.cs" />
     <Compile Include="DataBinding\PropertyDescriptors.cs" />
     <Compile Include="DataBinding\RowCollectionBinder.cs" />
+    <Compile Include="DataBinding\TypedListUtils.cs" />
     <Compile Include="DataContext.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />

@@ -14,7 +14,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			if (component == null) throw new ArgumentNullException("component");
 			return ShouldSerializeValue((T)component);
 		}
-		protected abstract bool ShouldSerializeValue(T component);
+		protected virtual bool ShouldSerializeValue(Row component) { return false; }
 
 		public override object GetValue(object component) {
 			if (component == null) throw new ArgumentNullException("component");
@@ -28,11 +28,12 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		}
 		protected abstract void SetValue(T component, object value);
 
+		public override bool CanResetValue(object component) { return false; }
 		public override void ResetValue(object component) {
 			if (component == null) throw new ArgumentNullException("component");
 			ResetValue((T)component);
 		}
-		protected abstract void ResetValue(T component);
+		protected virtual void ResetValue(Row component) { }
 	}
 
 	sealed class ColumnPropertyDescriptor : PropertyDescriptor<Row> {
@@ -56,25 +57,26 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			return other != null && Column == other.Column;
 		}
 	}
-	sealed class ChildRelationPropertyDescriptor : PropertyDescriptor<Row> {
+
+	sealed class ChildRelationPropertyDescriptor : PropertyDescriptor<Row>, ITypedListPropertyProvider {
 		public ChildRelation Relation { get; private set; }
 
 		public ChildRelationPropertyDescriptor(ChildRelation relation) : base(relation.Name) { this.Relation = relation; }
 
-		protected override object GetValue(Row component) { return component.ChildRows(Relation); ; }
-		protected override void SetValue(Row component, object value) { throw new NotSupportedException(); }
-		protected override void ResetValue(Row component) { throw new NotSupportedException(); }
-
-		public override bool CanResetValue(object component) { return false; }
-		protected override bool ShouldSerializeValue(Row component) { return false; }
+		protected override object GetValue(Row component) { return ((IListSource)component.ChildRows(Relation)).GetList(); }
+		protected override void SetValue(Row component, object value) { }
 
 		public override bool IsReadOnly { get { return true; } }
-		public override Type PropertyType { get { return typeof(IList<Row>); } }
+		public override Type PropertyType { get { return typeof(IBindingList); } }
 
 		public override int GetHashCode() { return Relation.GetHashCode(); }
 		public override bool Equals(object obj) {
 			var other = obj as ChildRelationPropertyDescriptor;
 			return other != null && Relation == other.Relation;
 		}
+
+		public string ChildListName { get { return Relation.ChildSchema.Name; } }
+
+		public PropertyDescriptorCollection GetItemProperties() { return Relation.ChildSchema.CreatePropertyDescriptors(); }
 	}
 }

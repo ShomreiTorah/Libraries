@@ -16,6 +16,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			: base(wrappedList) {
 			Schema = schema;
 			Schema.SchemaChanged += new EventHandler(Schema_SchemaChanged);
+			AllowNew = true;
 		}
 
 		#region ITypedList
@@ -24,7 +25,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		PropertyDescriptorCollection PropertyDescriptors {
 			get {
 				if (propertyDescriptors == null)
-					propertyDescriptors = CreatePropertyDescriptors(Schema);
+					propertyDescriptors = Schema.CreatePropertyDescriptors();
 
 				return propertyDescriptors;
 			}
@@ -34,34 +35,15 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			//TODO: More specifc events (requires ColumnRenamed and Relation... events)
 			OnListChanged(SchemaReset);
 		}
-		static PropertyDescriptorCollection CreatePropertyDescriptors(TableSchema schema) {
-			var descriptors = new List<PropertyDescriptor>(schema.Columns.Count + schema.ChildRelations.Count);
-
-			descriptors.AddRange(schema.Columns.Select(c => new ColumnPropertyDescriptor(c)));
-			descriptors.AddRange(schema.ChildRelations.Select(c => new ChildRelationPropertyDescriptor(c)));
-
-			return new PropertyDescriptorCollection(descriptors.ToArray(), true);
-		}
 
 		public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors) {
 			Debug.Assert(listAccessors == null || listAccessors.Length == 0, (listAccessors ?? new PropertyDescriptor[0]).Select(pd => pd.Name).Join("."));
-			//TODO: Traverse listAccessors and return properties for child schema.
-
-			if (listAccessors == null || listAccessors.Length == 0)
-				return PropertyDescriptors;
-
-			var relations = (ChildRelationPropertyDescriptor[])listAccessors;
-			return CreatePropertyDescriptors(relations.Last().Relation.ChildSchema);
+			return listAccessors.GetProperties(() => PropertyDescriptors);
 		}
 
 		public string GetListName(PropertyDescriptor[] listAccessors) {
 			Debug.Assert(listAccessors == null || listAccessors.Length == 0, (listAccessors ?? new PropertyDescriptor[0]).Select(pd => pd.Name).Join("."));
-
-			if (listAccessors == null || listAccessors.Length == 0)
-				return ListName;
-
-			var relations = (ChildRelationPropertyDescriptor[])listAccessors;
-			return relations.Last().Relation.ChildSchema.Name;
+			return listAccessors.GetListName(parentListName: ListName);
 		}
 		#endregion
 
@@ -138,7 +120,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 				//ForeignKeyColumn methods.  It isn't worth it
 				//to honor the index parameter.
 
-				Debug.Assert(index == Count, "A row is being inserted into the middle of a ChildRowCollectionProxy.\r\nConsider overriding ChildRowsBinder.OnListChanged to correct the index");
+				Debug.Assert(index == Count, "A row is being inserted into the middle of a ChildRowCollectionProxy.\r\nConsider overriding ChildRowsBinder.OnListChanged to correct the index in the event");
 				//I may want to override OnListChanged in the 
 				//parent BindingList to always raise Add event
 				//for the last index.  (If the above assert is
