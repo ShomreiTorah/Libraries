@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
-	public partial class Table {
+	public partial class Table : IListSource {
 		///<summary>Creates an empty table.</summary>
 		public Table(string name) : this(new TableSchema(name)) { }
 		///<summary>Creates a table from an existing schema.</summary>
@@ -31,7 +32,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Table: " + Schema.Name; }
 
-		sealed class RowCollection : Collection<Row>, ITableRowCollection<Row> {
+		sealed class RowCollection : Collection<Row>, ITableRowCollection<Row>, IListSource {
 			internal RowCollection(Table table) { Table = table; }
 
 			public Table Table { get; private set; }
@@ -58,20 +59,32 @@ namespace ShomreiTorah.Singularity {
 			protected override void InsertItem(int index, Row item) {
 				Table.ValidateAddRow(item);
 				base.InsertItem(index, item);
-				Table.ProcessRowAdded(item);
+				Table.ProcessRowAdded(item, index);
 			}
 			protected override void RemoveItem(int index) {
 				var row = this[index];
 				base.RemoveItem(index);
-				Table.ProcessRowRemoved(row, true);
+				Table.ProcessRowRemoved(row, index, true);
 			}
 			protected override void SetItem(int index, Row item) {
 				Table.ValidateAddRow(item);
 				var oldRow = this[index];
 				base.SetItem(index, item);
-				Table.ProcessRowRemoved(oldRow, true);
-				Table.ProcessRowAdded(item);
+				Table.ProcessRowRemoved(oldRow, index, true);
+				Table.ProcessRowAdded(item, index);
 			}
+
+			public bool ContainsListCollection { get { return false; } }
+
+			public System.Collections.IList GetList() { return ((IListSource)Table).GetList(); }
+		}
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
+		bool IListSource.ContainsListCollection { get { return false; } }
+		DataBinding.TableBinder binder;
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
+		System.Collections.IList IListSource.GetList() {
+			if (binder == null) binder = new DataBinding.TableBinder(this);
+			return binder;
 		}
 
 		void ValidateAddRow(Row row) {
@@ -87,24 +100,24 @@ namespace ShomreiTorah.Singularity {
 			} finally { row.Table = null; }
 		}
 
-		void ProcessRowAdded(Row row) {
+		void ProcessRowAdded(Row row, int index) {
 			row.Table = this;
 			foreach (var column in Schema.Columns)
 				column.OnRowAdded(row);		//Adds the row to parent relations
-			OnRowAdded(new RowEventArgs(row));
+			OnRowAdded(new RowListEventArgs(row, index));
 		}
-		void ProcessRowRemoved(Row row, bool raiseEvent) {
+		void ProcessRowRemoved(Row row, int index, bool raiseEvent) {
 			row.Table = null;
 			Schema.RemoveRow(row);
 			foreach (var column in Schema.Columns)
 				column.OnRowRemoved(row);	//Removes the row from parent relations
 
 			if (raiseEvent)
-				OnRowRemoved(new RowEventArgs(row));
+				OnRowRemoved(new RowListEventArgs(row, index));
 		}
 		void ProcessClearing() {
 			foreach (var row in Rows)
-				ProcessRowRemoved(row, false);
+				ProcessRowRemoved(row, -1, false);
 		}
 		internal void ProcessValueChanged(Row row, Column column) {
 			OnValueChanged(new ValueChangedEventArgs(row, column));
@@ -123,18 +136,18 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		///<summary>Occurs when a row is added to the table.</summary>
-		public event EventHandler<RowEventArgs> RowAdded;
+		public event EventHandler<RowListEventArgs> RowAdded;
 		///<summary>Raises the RowAdded event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
-		protected virtual void OnRowAdded(RowEventArgs e) {
+		protected virtual void OnRowAdded(RowListEventArgs e) {
 			if (RowAdded != null)
 				RowAdded(this, e);
 		}
 		///<summary>Occurs when a row is removed from the table.</summary>
-		public event EventHandler<RowEventArgs> RowRemoved;
+		public event EventHandler<RowListEventArgs> RowRemoved;
 		///<summary>Raises the RowRemoved event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
-		protected virtual void OnRowRemoved(RowEventArgs e) {
+		protected virtual void OnRowRemoved(RowListEventArgs e) {
 			if (RowRemoved != null)
 				RowRemoved(this, e);
 		}
@@ -147,12 +160,15 @@ namespace ShomreiTorah.Singularity {
 				ValueChanged(this, e);
 		}
 		#endregion
+
 	}
 	///<summary>Provides data for the ValueChanged event.</summary>
-	public class ValueChangedEventArgs : RowEventArgs {
+	public class ValueChangedEventArgs : EventArgs {
 		///<summary>Creates a new ValueChangedEventArgs instance.</summary>
-		public ValueChangedEventArgs(Row row, Column column) : base(row) { Column = column; }
+		public ValueChangedEventArgs(Row row, Column column) { Row = row; Column = column; }
 
+		///<summary>Gets the row.</summary>
+		public Row Row { get; private set; }
 		///<summary>Gets the column.</summary>
 		public Column Column { get; private set; }
 	}

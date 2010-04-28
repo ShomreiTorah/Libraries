@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections;
+using System.ComponentModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A schema that contains strongly-typed rows.</summary>
@@ -48,7 +49,7 @@ namespace ShomreiTorah.Singularity {
 		public new ITableRowCollection<TRow> Rows { get; private set; }
 
 		///<summary>A typed wrapper around an untyped row collection.</summary>
-		sealed class TypedRowCollection : ITableRowCollection<TRow> {
+		sealed class TypedRowCollection : ITableRowCollection<TRow>, IListSource {
 			readonly ITableRowCollection<Row> inner;
 			internal TypedRowCollection(ITableRowCollection<Row> inner) { this.inner = inner; }
 
@@ -70,6 +71,9 @@ namespace ShomreiTorah.Singularity {
 			public bool Remove(TRow item) { return inner.Remove(item); }
 			public IEnumerator<TRow> GetEnumerator() { return inner.Cast<TRow>().GetEnumerator(); }
 			IEnumerator IEnumerable.GetEnumerator() { return inner.GetEnumerator(); }
+
+			public bool ContainsListCollection { get { return false; } }
+			public IList GetList() { return ((IListSource)inner).GetList(); }
 		}
 
 		//This class maintains separate backing fields for typed events, 
@@ -81,7 +85,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Raises the RowAdded event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-		protected override void OnRowAdded(RowEventArgs e) {
+		protected override void OnRowAdded(RowListEventArgs e) {
 			base.OnRowAdded(e);
 			if (RowAdded != null)
 				RowAdded(this, new RowEventArgs<TRow>((TRow)e.Row));
@@ -91,7 +95,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Raises the RowRemoved event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-		protected override void OnRowRemoved(RowEventArgs e) {
+		protected override void OnRowRemoved(RowListEventArgs e) {
 			base.OnRowRemoved(e);
 			if (RowRemoved != null)
 				RowRemoved(this, new RowEventArgs<TRow>((TRow)e.Row));
@@ -119,12 +123,9 @@ namespace ShomreiTorah.Singularity {
 		public TRow Row { get; private set; }
 	}
 	///<summary>Provides data for the strongly-typed ValueChanged event.</summary>
-	public class ValueChangedEventArgs<TRow> : RowEventArgs where TRow : Row {
+	public class ValueChangedEventArgs<TRow> : ValueChangedEventArgs where TRow : Row {
 		///<summary>Creates a new ValueChangedEventArgs instance.</summary>
-		public ValueChangedEventArgs(TRow row, Column column) : base(row) { Column = column; }
-
-		///<summary>Gets the column.</summary>
-		public Column Column { get; private set; }
+		public ValueChangedEventArgs(TRow row, Column column) : base(row, column) { }
 	}
 
 	///<summary>A collection of strongly-typed rows in a table.</summary>
@@ -138,7 +139,6 @@ namespace ShomreiTorah.Singularity {
 
 	///<summary>A collection of strongly-typed child rows.</summary>
 	public interface IChildRowCollection<TChildRow> : IEnumerable<TChildRow> where TChildRow : Row {
-
 		///<summary>Gets the parent row for the collection's rows.</summary>
 		Row ParentRow { get; }
 		///<summary>Gets the child relation that this collection contains.</summary>
@@ -147,9 +147,9 @@ namespace ShomreiTorah.Singularity {
 		Table ChildTable { get; }
 
 		///<summary>Occurs when a row is added to the collection.</summary>
-		event EventHandler<RowEventArgs> RowAdded;
+		event EventHandler<RowListEventArgs> RowAdded;
 		///<summary>Occurs when a row is removed from the collection.</summary>
-		event EventHandler<RowEventArgs> RowRemoved;
+		event EventHandler<RowListEventArgs> RowRemoved;
 		///<summary>Occurs when a column value is changed in one of the rows in the collection.</summary>
 		event EventHandler<ValueChangedEventArgs> ValueChanged;
 
@@ -180,7 +180,7 @@ namespace ShomreiTorah.Singularity {
 			return (IChildRowCollection<TChildRow>)retVal;
 		}
 
-		sealed class TypedChildRowCollection<TChildRow> : IChildRowCollection<TChildRow> where TChildRow : Row {
+		sealed class TypedChildRowCollection<TChildRow> : IChildRowCollection<TChildRow>, IListSource where TChildRow : Row {
 			readonly IChildRowCollection<Row> inner;
 			public TypedChildRowCollection(IChildRowCollection<Row> inner) { this.inner = inner; }
 
@@ -188,11 +188,11 @@ namespace ShomreiTorah.Singularity {
 			public ChildRelation Relation { get { return inner.Relation; } }
 			public Table ChildTable { get { return inner.ChildTable; } }
 
-			public event EventHandler<RowEventArgs> RowAdded {
+			public event EventHandler<RowListEventArgs> RowAdded {
 				add { inner.RowAdded += value; }
 				remove { inner.RowAdded -= value; }
 			}
-			public event EventHandler<RowEventArgs> RowRemoved {
+			public event EventHandler<RowListEventArgs> RowRemoved {
 				add { inner.RowRemoved += value; }
 				remove { inner.RowRemoved -= value; }
 			}
@@ -207,6 +207,9 @@ namespace ShomreiTorah.Singularity {
 
 			public IEnumerator<TChildRow> GetEnumerator() { return inner.Cast<TChildRow>().GetEnumerator(); }
 			IEnumerator IEnumerable.GetEnumerator() { return inner.GetEnumerator(); }
+
+			public bool ContainsListCollection { get { return false; } }
+			public IList GetList() { return ((IListSource)inner).GetList(); }
 		}
 	}
 }

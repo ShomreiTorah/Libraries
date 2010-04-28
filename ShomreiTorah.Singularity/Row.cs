@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>An untyped row in a Singularity table.</summary>
@@ -150,7 +151,7 @@ namespace ShomreiTorah.Singularity {
 		#endregion
 	}
 
-	internal sealed class ChildRowCollection : ReadOnlyCollection<Row>, IChildRowCollection<Row> {
+	internal sealed class ChildRowCollection : ReadOnlyCollection<Row>, IChildRowCollection<Row>, IListSource {
 		internal ChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
 			: base(childRows.ToList()) {
 			ParentRow = parentRow;
@@ -167,20 +168,21 @@ namespace ShomreiTorah.Singularity {
 
 		internal void AddRow(Row childRow) {
 			Items.Add(childRow);
-			OnRowAdded(new RowEventArgs(childRow));
+			OnRowAdded(new RowListEventArgs(childRow, Count - 1));
 		}
 		internal void RemoveRow(Row childRow) {
-			Items.Remove(childRow);
-			OnRowRemoved(new RowEventArgs(childRow));
+			var index = IndexOf(childRow);
+			Items.RemoveAt(index);
+			OnRowRemoved(new RowListEventArgs(childRow, index));
 		}
 
-		public event EventHandler<RowEventArgs> RowAdded;
-		void OnRowAdded(RowEventArgs e) {
+		public event EventHandler<RowListEventArgs> RowAdded;
+		void OnRowAdded(RowListEventArgs e) {
 			if (RowAdded != null)
 				RowAdded(this, e);
 		}
-		public event EventHandler<RowEventArgs> RowRemoved;
-		void OnRowRemoved(RowEventArgs e) {
+		public event EventHandler<RowListEventArgs> RowRemoved;
+		void OnRowRemoved(RowListEventArgs e) {
 			if (RowRemoved != null)
 				RowRemoved(this, e);
 		}
@@ -191,14 +193,24 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		public new bool Contains(Row row) { return row != null && row.Table == ChildTable && row[Relation.ChildColumn] == ParentRow; }
+
+		public bool ContainsListCollection { get { return false; } }
+
+		DataBinding.ChildRowsBinder binder;
+		public System.Collections.IList GetList() {
+			if (binder == null) binder = new DataBinding.ChildRowsBinder(this);
+			return binder;
+		}
 	}
 
-	///<summary>Provides data for row events.</summary>
-	public class RowEventArgs : EventArgs {
+	///<summary>Provides data for row events in a list.</summary>
+	public class RowListEventArgs : EventArgs {
 		///<summary>Creates a new RowEventArgs instance.</summary>
-		public RowEventArgs(Row row) { Row = row; }
+		public RowListEventArgs(Row row, int index) { Row = row; Index = index; }
 
 		///<summary>Gets the row.</summary>
 		public Row Row { get; private set; }
+		///<summary>Gets the index of the row in the collection.</summary>
+		public int Index { get; private set; }
 	}
 }

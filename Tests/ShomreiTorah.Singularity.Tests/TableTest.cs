@@ -47,7 +47,7 @@ namespace ShomreiTorah.Singularity.Tests {
 
 			int rowCount = 0;
 			table.RowAdded += (s, e) => {
-				Assert.AreEqual(e.Row, table.Rows.Last());
+				Assert.AreEqual(e.Row, table.Rows[e.Index]);
 				rowCount++;
 				Assert.AreEqual(rowCount, table.Rows.Count);
 			};
@@ -103,7 +103,7 @@ namespace ShomreiTorah.Singularity.Tests {
 
 					int rowCount = 0;
 					children.RowAdded += (s, e) => {
-						Assert.AreEqual(e.Row, children.Last());
+						Assert.AreEqual(e.Row, children[e.Index]);
 						rowCount++;
 						Assert.AreEqual(rowCount, children.Count);
 					};
