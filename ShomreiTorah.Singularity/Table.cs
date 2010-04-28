@@ -14,9 +14,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Creates a table from an existing schema.</summary>
 		public Table(TableSchema schema) {
 			Schema = schema;
-
-			if (Rows == null)	//If not set by TypedTable
-				Rows = new RowCollection(this);
+			Rows = new RowCollection(this);
 		}
 		///<summary>Creates a detached row for this table.</summary>
 		///<remarks>Overridden by typed tables.</remarks>
