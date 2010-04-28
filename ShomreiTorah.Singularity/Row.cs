@@ -38,6 +38,9 @@ namespace ShomreiTorah.Singularity {
 				if (column.Schema != Schema) throw new ArgumentException("Column must belong to same schema", "column");
 
 				var oldValue = this[column];
+
+				if (Equals(oldValue, value)) return;
+
 				var error = Table == null ? ValidateValueType(column, value) : ValidateValue(column, value);
 				if (!String.IsNullOrEmpty(error))
 					throw new ArgumentException(error, "value");
