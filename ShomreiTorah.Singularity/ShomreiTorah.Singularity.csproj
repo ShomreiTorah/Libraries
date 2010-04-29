@@ -58,6 +58,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DataBinding\DataContextBinder.cs" />
+    <Compile Include="DataBinding\PhantomCollection.cs" />
     <Compile Include="DataBinding\PropertyDescriptors.cs" />
     <Compile Include="DataBinding\RowCollectionBinder.cs" />
     <Compile Include="DataBinding\TypedListUtils.cs" />

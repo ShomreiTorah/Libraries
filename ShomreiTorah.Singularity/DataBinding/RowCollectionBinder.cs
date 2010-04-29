@@ -12,8 +12,11 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public TableSchema Schema { get; protected set; }
 		protected abstract string ListName { get; }
 
-		protected RowCollectionBinder(TableSchema schema, IList<Row> wrappedList)
+		protected PhantomCollection<Row> PhantomCollection { get; private set; }
+
+		protected RowCollectionBinder(TableSchema schema, PhantomCollection<Row> wrappedList)
 			: base(wrappedList) {
+			PhantomCollection = wrappedList;
 			Schema = schema;
 			Schema.SchemaChanged += new EventHandler(Schema_SchemaChanged);
 			AllowNew = true;
@@ -67,11 +70,75 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			OnListChanged(new ListChangedEventArgs(ListChangedType.ItemDeleted, args.Index));
 		}
 		#endregion
+
+		bool suppressChangeEvent;
+		protected override void OnListChanged(ListChangedEventArgs e) {
+			if (!suppressChangeEvent)
+				base.OnListChanged(e);
+			suppressChangeEvent = false;
+		}
+
+		#region AddNew / CancelAddNew
+		//I completely replace BindingList's AddNew / CancelAddNew
+		//implementation with PhantomCollection, which doesn't add
+		//the item to the list until it's commited.  (I cannot add
+		//the row immediately because it will have invalid values)
+
+		//BindingList calls EndNew / CancelNew with an internally 
+		//maintained index of the item.  I perform my own tracking
+		//and can't rely on BindingList's index, so I override the
+		//methods that call EndNew and commit the item myself.
+		protected override sealed object AddNewCore() {
+			var item = CreateNewRow();
+			PhantomCollection.AddPhantom(item);
+			OnListChanged(new ListChangedEventArgs(ListChangedType.ItemAdded, Count - 1));
+			return item;
+		}
+
+		//These methods can be called with incorrect indices, which must be ignored.
+		//(See the documentation)
+		public override void EndNew(int itemIndex) {
+			if (!PhantomCollection.HasPhantomItem || itemIndex != Count - 1) return;
+			CommitPhantom();
+		}
+		public override void CancelNew(int itemIndex) {
+			if (!PhantomCollection.HasPhantomItem || itemIndex != Count - 1) return;
+			RemovePhantom();
+		}
+
+		protected void CommitPhantom() {
+			suppressChangeEvent = true;
+			PhantomCollection.CommitPhantom();	//Calls Add
+			Debug.Assert(!suppressChangeEvent, "OnListChanged didn't fire???");
+		}
+		protected void RemovePhantom() {
+			PhantomCollection.ResetPhantom();
+			OnListChanged(new ListChangedEventArgs(ListChangedType.ItemDeleted, Count));
+		}
+
+		protected override void InsertItem(int index, Row item) {
+			if (PhantomCollection.HasPhantomItem)
+				CommitPhantom();
+
+			base.InsertItem(index, item);
+		}
+		protected override void RemoveItem(int index) {
+			if (PhantomCollection.HasPhantomItem && index == Count - 1)
+				RemovePhantom();
+			else {
+				if (PhantomCollection.HasPhantomItem)
+					CommitPhantom();
+				base.RemoveItem(index);
+			}
+		}
+
+		protected abstract Row CreateNewRow();
+		#endregion
 	}
 
 	sealed class TableBinder : RowCollectionBinder {
 		public TableBinder(Table table)
-			: base(table.Schema, table.Rows) {
+			: base(table.Schema, new PhantomCollection<Row>(table.Rows)) {
 			Table = table;
 
 			Table.RowAdded += Table_RowAdded;
@@ -89,74 +156,31 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		protected override string ListName { get { return Schema.Name; } }
 
-		protected override object AddNewCore() { return Table.CreateRow(); }
+		protected override Row CreateNewRow() { return Table.CreateRow(); }
 	}
 	sealed class ChildRowsBinder : RowCollectionBinder {
 		#region Proxy Collection
-		//ChildRowsBinder wraps a ChildRowCollection, which
-		//is read only.  However, the binder should not be 
-		//read only, so I make a proxy IList<Row> to allow 
-		//the collection to be changed.  I cannot override 
-		//the mutation methods in BindingList because they 
-		//contain critical logic for CancelAddNew and event
-		//raising.
-		//Instead, ChildRowsBinder inherits BindingList and
-		//wraps a proxy type that implements IList<Row> and
-		//in turn wraps the ChildRowCollection, but allows 
-		//mutation.  ChildRowCollectionProxy cannot inherit
-		//Collection<Row> because Collection<Row> respects 
-		//the inner ChildRowCollection's ReadOnly property.
-		class ChildRowCollectionProxy : IList<Row> {
-			//I cannot inherit Collection<Row>; see long comment
-
+		//PhantomCollection wraps the original ChildRowCollection, 
+		//which is read-only.  I inherit it and override methods to
+		//support mutation.
+		class ChildRowCollectionProxy : PhantomCollection<Row> {
 			ChildRowCollection childRows;
-			public ChildRowCollectionProxy(ChildRowCollection list) { childRows = list; }
+			public ChildRowCollectionProxy(ChildRowCollection list) : base(list) { childRows = list; }
 
-			public void Add(Row item) { Insert(Count, item); }
-			public void Insert(int index, Row item) {
+			protected override bool RemoveInner(Row item) {
+				if (item == null) return false;
+				item.RemoveRow();
+				return true;
+			}
+
+			public override void Add(Row item) {
 				if (item == null) throw new ArgumentNullException("item");
-
-				//The row gets added to the collection by the 
-				//ForeignKeyColumn methods.  It isn't worth it
-				//to honor the index parameter.
-
-				Debug.Assert(index == Count, "A row is being inserted into the middle of a ChildRowCollectionProxy.\r\nConsider overriding ChildRowsBinder.OnListChanged to correct the index in the event");
-				//I may want to override OnListChanged in the 
-				//parent BindingList to always raise Add event
-				//for the last index.  (If the above assert is
-				//ever failed)
 
 				item[childRows.Relation.ChildColumn] = childRows.ParentRow;
 				childRows.ChildTable.Rows.Add(item);
 			}
 
-			public Row this[int index] {
-				get { return childRows[index]; }
-				set {
-					RemoveAt(index);
-					Insert(index, value);
-				}
-			}
-
-			public void Clear() {
-				for (int i = Count - 1; i >= 0; i--)
-					childRows[i].RemoveRow();
-			}
-			public void RemoveAt(int index) { Remove(this[index]); }
-			public bool Remove(Row item) {
-				if (item == null || !childRows.Contains(item)) return false;
-				item.RemoveRow();
-				return true;
-			}
-
-			public bool IsReadOnly { get { return false; } }	//Does not reflect the inner list
-
-			public int IndexOf(Row item) { return childRows.IndexOf(item); }
-			public bool Contains(Row item) { return childRows.Contains(item); }
-			public void CopyTo(Row[] array, int arrayIndex) { childRows.CopyTo(array, arrayIndex); }
-			public int Count { get { return childRows.Count; } }
-			public IEnumerator<Row> GetEnumerator() { return childRows.GetEnumerator(); }
-			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return childRows.GetEnumerator(); }
+			public override bool IsReadOnly { get { return false; } }	//The wrapped ChildRowCollection is read-only; we aren't
 		}
 		#endregion
 
@@ -177,7 +201,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		protected override string ListName { get { return ChildRows.Relation.Name; } }
 
-		protected override object AddNewCore() {
+		protected override Row CreateNewRow() {
 			var newRow = ChildRows.ChildTable.CreateRow();
 			newRow[ChildRows.Relation.ChildColumn] = ChildRows.ParentRow;
 			return newRow;
