@@ -63,7 +63,11 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		public ChildRelationPropertyDescriptor(ChildRelation relation) : base(relation.Name) { this.Relation = relation; }
 
-		protected override object GetValue(Row component) { return ((IListSource)component.ChildRows(Relation)).GetList(); }
+		protected override object GetValue(Row component) {
+			if (component.Table == null)	//If the row is detached, it cannot have child rows.
+				return new Row[0];
+			return ((IListSource)component.ChildRows(Relation)).GetList();
+		}
 		protected override void SetValue(Row component, object value) { }
 
 		public override bool IsReadOnly { get { return true; } }
