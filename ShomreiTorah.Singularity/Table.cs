@@ -62,13 +62,13 @@ namespace ShomreiTorah.Singularity {
 			protected override void RemoveItem(int index) {
 				var row = this[index];
 				base.RemoveItem(index);
-				Table.ProcessRowRemoved(row, index, true);
+				Table.ProcessRowRemoved(row, index);
 			}
 			protected override void SetItem(int index, Row item) {
 				Table.ValidateAddRow(item);
 				var oldRow = this[index];
 				base.SetItem(index, item);
-				Table.ProcessRowRemoved(oldRow, index, true);
+				Table.ProcessRowRemoved(oldRow, index);
 				Table.ProcessRowAdded(item, index);
 			}
 
@@ -106,14 +106,13 @@ namespace ShomreiTorah.Singularity {
 				column.OnRowAdded(row);		//Adds the row to parent relations
 			OnRowAdded(new RowListEventArgs(row, index));
 		}
-		void ProcessRowRemoved(Row row, int index, bool raiseEvent) {
+		void ProcessRowRemoved(Row row, int index) {
 			row.Table = null;
 			Schema.RemoveRow(row);
 			foreach (var column in Schema.Columns)
 				column.OnRowRemoved(row);	//Removes the row from parent relations
 
-			if (raiseEvent)
-				OnRowRemoved(new RowListEventArgs(row, index));
+			OnRowRemoved(new RowListEventArgs(row, index));
 		}
 		internal void ProcessValueChanged(Row row, Column column) {
 			OnValueChanged(new ValueChangedEventArgs(row, column));
