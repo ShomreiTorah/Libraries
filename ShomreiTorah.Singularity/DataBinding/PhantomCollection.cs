@@ -11,25 +11,23 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		protected IList<T> Inner { get; private set; }
 		public PhantomCollection(IList<T> inner) { Inner = inner; }
 
-		T phantomItem;
+		protected T PhantomItem { get; private set; }
 
-		public bool HasPhantomItem { get { return phantomItem != null; } }
+		public bool HasPhantomItem { get { return PhantomItem != null; } }
 
-		public void Insert(int index, T item) { throw new NotSupportedException(); }
-
-		public void AddPhantom(T item) {
-			if (phantomItem != null) throw new InvalidOperationException("Cannot add two phantom items");
-			phantomItem = item;
+		protected void AddPhantom(T item) {
+			if (PhantomItem != null) throw new InvalidOperationException("Cannot add two phantom items");
+			PhantomItem = item;
 		}
-		public void CommitPhantom() {
-			if (phantomItem == null) throw new InvalidOperationException("There is no phantom item");
-			var item = phantomItem;
-			phantomItem = null;
+		protected virtual void CommitPhantom() {
+			if (PhantomItem == null) throw new InvalidOperationException("There is no phantom item");
+			var item = PhantomItem;
+			PhantomItem = null;
 			Add(item);
 		}
-		public void ResetPhantom() {
-			if (phantomItem == null) throw new InvalidOperationException("There is no phantom item");
-			phantomItem = null;
+		protected virtual void RemovePhantom() {
+			if (PhantomItem == null) throw new InvalidOperationException("There is no phantom item");
+			PhantomItem = null;
 		}
 
 		public virtual void Add(T item) { Inner.Add(item); }
@@ -41,9 +39,9 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		}
 
 		public void RemoveAt(int index) { Remove(this[index]); }
-		public bool Remove(T item) {
-			if (HasPhantomItem && item == phantomItem) {
-				phantomItem = null;
+		public virtual bool Remove(T item) {
+			if (HasPhantomItem && item == PhantomItem) {
+				RemovePhantom();
 				return true;
 			}
 
@@ -52,22 +50,23 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		public virtual bool IsReadOnly { get { return Inner.IsReadOnly; } }
 
+		public void Insert(int index, T item) { throw new NotSupportedException(); }
 		#region Read passthrough (handles PhantomItem)
 		public T this[int index] {
 			get {
 				if (HasPhantomItem && index == Inner.Count)
-					return phantomItem;
+					return PhantomItem;
 				return Inner[index];
 			}
 			set { throw new NotSupportedException(); }
 		}
 		public int IndexOf(T item) {
-			if (HasPhantomItem && item == phantomItem)
+			if (HasPhantomItem && item == PhantomItem)
 				return Inner.Count;
 			return Inner.IndexOf(item);
 		}
 		public bool Contains(T item) {
-			if (HasPhantomItem && item == phantomItem)
+			if (HasPhantomItem && item == PhantomItem)
 				return true;
 			return Inner.Contains(item);
 		}
@@ -76,7 +75,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 			Inner.CopyTo(array, arrayIndex);
 			if (HasPhantomItem)
-				array[arrayIndex + Inner.Count] = phantomItem;
+				array[arrayIndex + Inner.Count] = PhantomItem;
 		}
 		public int Count { get { return Inner.Count + (HasPhantomItem ? 1 : 0); } }
 
@@ -91,7 +90,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			foreach (var item in Inner) {
 				yield return item;
 			}
-			yield return phantomItem;
+			yield return PhantomItem;
 		}
 		#endregion
 	}
