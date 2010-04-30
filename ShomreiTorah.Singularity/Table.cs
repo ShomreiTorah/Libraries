@@ -8,7 +8,7 @@ using System.ComponentModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
-	public partial class Table : IListSource {
+	public partial class Table : IListSource, IRowEventProvider {
 		///<summary>Creates an empty table.</summary>
 		public Table(string name) : this(new TableSchema(name)) { }
 		///<summary>Creates a table from an existing schema.</summary>
@@ -50,9 +50,9 @@ namespace ShomreiTorah.Singularity {
 			}
 
 			protected override void ClearItems() {
-				Table.ProcessClearing();
-				base.ClearItems();
-				Table.OnTableCleared();
+				for (int i = Count - 1; i >= 0; i--) {
+					RemoveAt(i);
+				}
 			}
 			protected override void InsertItem(int index, Row item) {
 				Table.ValidateAddRow(item);
@@ -76,6 +76,8 @@ namespace ShomreiTorah.Singularity {
 
 			public System.Collections.IList GetList() { return ((IListSource)Table).GetList(); }
 		}
+
+		IList<Row> IRowEventProvider.Rows { get { return Rows; } }
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		bool IListSource.ContainsListCollection { get { return false; } }
 		DataBinding.TableBinder binder;
@@ -113,26 +115,11 @@ namespace ShomreiTorah.Singularity {
 			if (raiseEvent)
 				OnRowRemoved(new RowListEventArgs(row, index));
 		}
-		void ProcessClearing() {
-			foreach (var row in Rows)
-				ProcessRowRemoved(row, -1, false);
-		}
 		internal void ProcessValueChanged(Row row, Column column) {
 			OnValueChanged(new ValueChangedEventArgs(row, column));
 		}
 
 		#region Events
-		///<summary>Occurs when the table is cleared.</summary>
-		public event EventHandler TableCleared;
-		///<summary>Raises the TableCleared event.</summary>
-		protected virtual void OnTableCleared() { OnTableCleared(EventArgs.Empty); }
-		///<summary>Raises the TableCleared event.</summary>
-		///<param name="e">An EventArgs object that provides the event data.</param>
-		protected virtual void OnTableCleared(EventArgs e) {
-			if (TableCleared != null)
-				TableCleared(this, e);
-		}
-
 		///<summary>Occurs when a row is added to the table.</summary>
 		public event EventHandler<RowListEventArgs> RowAdded;
 		///<summary>Raises the RowAdded event.</summary>
@@ -158,7 +145,6 @@ namespace ShomreiTorah.Singularity {
 				ValueChanged(this, e);
 		}
 		#endregion
-
 	}
 	///<summary>Provides data for the ValueChanged event.</summary>
 	public class ValueChangedEventArgs : EventArgs {

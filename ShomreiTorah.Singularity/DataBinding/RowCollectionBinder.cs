@@ -50,9 +50,6 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public bool RaisesItemChangedEvents { get { return true; } }
 
 		#region Change Events
-		static readonly ListChangedEventArgs ListReset = new ListChangedEventArgs(ListChangedType.Reset, -1);
-		protected void OnListReset() { OnListChanged(ListReset); }
-
 		protected void OnValueChanged(ValueChangedEventArgs args) {
 			OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, IndexOf(args.Row), new ColumnPropertyDescriptor(args.Column)));
 		}
@@ -182,13 +179,11 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			Table.RowAdded += Table_RowAdded;
 			Table.RowRemoved += Table_RowRemoved;
 			Table.ValueChanged += Table_ValueChanged;
-			Table.TableCleared += Table_TableCleared;
 		}
 
 		void Table_RowRemoved(object sender, RowListEventArgs e) { OnRowRemoved(e); }
 		void Table_ValueChanged(object sender, ValueChangedEventArgs e) { OnValueChanged(e); }
 		void Table_RowAdded(object sender, RowListEventArgs e) { OnRowAdded(e); }
-		void Table_TableCleared(object sender, EventArgs e) { OnListReset(); }
 
 		public Table Table { get; private set; }
 

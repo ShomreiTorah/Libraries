@@ -113,7 +113,6 @@ namespace ShomreiTorah.Singularity {
 		#endregion
 	}
 
-
 	///<summary>Provides data for strongly-typed row events.</summary>
 	public class RowEventArgs<TRow> : EventArgs where TRow : Row {
 		///<summary>Creates a new RowEventArgs instance.</summary>
@@ -126,41 +125,6 @@ namespace ShomreiTorah.Singularity {
 	public class ValueChangedEventArgs<TRow> : ValueChangedEventArgs where TRow : Row {
 		///<summary>Creates a new ValueChangedEventArgs instance.</summary>
 		public ValueChangedEventArgs(TRow row, Column column) : base(row, column) { }
-	}
-
-	///<summary>A collection of strongly-typed rows in a table.</summary>
-	public interface ITableRowCollection<TRow> : IList<TRow> where TRow : Row {
-		///<summary>Adds a row from an array of values.</summary>
-		TRow AddFromValues(params object[] values);
-
-		///<summary>Gets the table that contains these rows.</summary>
-		Table Table { get; }
-	}
-
-	///<summary>A collection of strongly-typed child rows.</summary>
-	public interface IChildRowCollection<TChildRow> : IEnumerable<TChildRow> where TChildRow : Row {
-		///<summary>Gets the parent row for the collection's rows.</summary>
-		Row ParentRow { get; }
-		///<summary>Gets the child relation that this collection contains.</summary>
-		ChildRelation Relation { get; }
-		///<summary>Gets the child table that this collection contains rows from.</summary>
-		Table ChildTable { get; }
-
-		///<summary>Occurs when a row is added to the collection.</summary>
-		event EventHandler<RowListEventArgs> RowAdded;
-		///<summary>Occurs when a row is removed from the collection.</summary>
-		event EventHandler<RowListEventArgs> RowRemoved;
-		///<summary>Occurs when a column value is changed in one of the rows in the collection.</summary>
-		event EventHandler<ValueChangedEventArgs> ValueChanged;
-
-		///<summary>Gets the row at the specified index.</summary>
-		TChildRow this[int index] { get; }
-
-		///<summary>Gets the number of rows in this instance.</summary>
-		int Count { get; }
-
-		///<summary>Indicates whether this collection contains a row.</summary>
-		bool Contains(TChildRow row);
 	}
 
 	partial class Row {

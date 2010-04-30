@@ -57,8 +57,10 @@ namespace ShomreiTorah.Singularity {
 			}
 		}
 
-		///<summary>Gets or sets the data-type of the column, or null if the column can hold any datatype.</summary>
+		///<summary>Gets the data-type of the column, or null if the column can hold any datatype.</summary>
 		public Type DataType { get; protected set; }
+		///<summary>Indicates whether the column's values can be changed.</summary>
+		public bool ReadOnly { get; protected set; }
 
 		///<summary>Coerces a value to the datatype for this column.</summary>
 		public virtual object CoerceValue(object value, IFormatProvider provider) { return DataType == null ? value : Convert.ChangeType(value, DataType, provider); }
@@ -216,7 +218,7 @@ namespace ShomreiTorah.Singularity {
 
 
 	///<summary>A collection of columns in a schema.</summary>
-	public sealed class ColumnCollection : ReadOnlyCollection<Column> {
+	public  sealed partial class ColumnCollection : ReadOnlyCollection<Column> {
 		internal ColumnCollection(TableSchema schema) : base(new List<Column>()) { Schema = schema; }
 
 		///<summary>Gets the schema containing the columns.</summary>

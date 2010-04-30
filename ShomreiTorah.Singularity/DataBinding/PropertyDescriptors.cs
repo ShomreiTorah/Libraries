@@ -48,7 +48,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public override bool CanResetValue(object component) { return true; }
 		protected override bool ShouldSerializeValue(Row component) { return component[Column] == Column.DefaultValue; }
 
-		public override bool IsReadOnly { get { return false; } }
+		public override bool IsReadOnly { get { return Column.ReadOnly; } }
 		public override Type PropertyType { get { return Column.DataType; } }
 
 		public override int GetHashCode() { return Column.GetHashCode(); }

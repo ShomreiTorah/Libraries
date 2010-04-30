@@ -32,10 +32,18 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets or sets the value of the specified column.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
 		public object this[Column column] {
-			get { return values[column]; }
+			get {
+				var value = values[column];
+				if (value == CalculatedColumn.Placeholder) {
+					value = ((CalculatedColumn)column).CalculateValue(this);
+					values[column] = value;
+				}
+				return values[column];
+			}
 			set {
 				if (column == null) throw new ArgumentNullException("column");
 				if (column.Schema != Schema) throw new ArgumentException("Column must belong to same schema", "column");
+				if (column.ReadOnly) throw new InvalidOperationException("A read-only column cannot be modified");
 
 				var oldValue = this[column];
 
@@ -73,7 +81,7 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Processes a change of a column value.</summary>
 		///<remarks>This method is overridden by typed rows to perform custom logic.</remarks>
-		protected virtual void OnValueChanged(Column column, object oldValue, object newValue) {
+		internal protected virtual void OnValueChanged(Column column, object oldValue, object newValue) {
 			if (column == null) throw new ArgumentNullException("column");
 
 			column.OnValueChanged(this, oldValue, newValue);
@@ -152,58 +160,6 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the value of the specified column.</summary>
 		public T Field<T>(Column column) { return (T)this[column]; }
 		#endregion
-	}
-
-	internal sealed class ChildRowCollection : ReadOnlyCollection<Row>, IChildRowCollection<Row>, IListSource {
-		internal ChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
-			: base(childRows.ToList()) {
-			ParentRow = parentRow;
-			ChildTable = childTable;
-			Relation = relation;
-		}
-
-		///<summary>Gets the parent row for the collection's rows.</summary>
-		public Row ParentRow { get; private set; }
-		///<summary>Gets the child relation that this collection contains.</summary>
-		public ChildRelation Relation { get; private set; }
-		///<summary>Gets the child table that this collection contains rows from.</summary>
-		public Table ChildTable { get; private set; }
-
-		internal void AddRow(Row childRow) {
-			Items.Add(childRow);
-			OnRowAdded(new RowListEventArgs(childRow, Count - 1));
-		}
-		internal void RemoveRow(Row childRow) {
-			var index = IndexOf(childRow);
-			Items.RemoveAt(index);
-			OnRowRemoved(new RowListEventArgs(childRow, index));
-		}
-
-		public event EventHandler<RowListEventArgs> RowAdded;
-		void OnRowAdded(RowListEventArgs e) {
-			if (RowAdded != null)
-				RowAdded(this, e);
-		}
-		public event EventHandler<RowListEventArgs> RowRemoved;
-		void OnRowRemoved(RowListEventArgs e) {
-			if (RowRemoved != null)
-				RowRemoved(this, e);
-		}
-		public event EventHandler<ValueChangedEventArgs> ValueChanged;
-		internal void OnValueChanged(ValueChangedEventArgs e) {
-			if (ValueChanged != null)
-				ValueChanged(this, e);
-		}
-
-		public new bool Contains(Row row) { return row != null && row.Table == ChildTable && row[Relation.ChildColumn] == ParentRow; }
-
-		public bool ContainsListCollection { get { return false; } }
-
-		DataBinding.ChildRowsBinder binder;
-		public System.Collections.IList GetList() {
-			if (binder == null) binder = new DataBinding.ChildRowsBinder(this);
-			return binder;
-		}
 	}
 
 	///<summary>Provides data for row events in a list.</summary>
