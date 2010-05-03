@@ -172,13 +172,19 @@ namespace ShomreiTorah.Singularity {
 		#endregion
 	}
 
-	///<summary>Provides data for row events in a list.</summary>
-	public class RowListEventArgs : EventArgs {
+	///<summary>Provides data for row events.</summary>
+	public class RowEventArgs : EventArgs {
 		///<summary>Creates a new RowEventArgs instance.</summary>
-		public RowListEventArgs(Row row, int index) { Row = row; Index = index; }
+		public RowEventArgs(Row row) { Row = row; }
 
 		///<summary>Gets the row.</summary>
 		public Row Row { get; private set; }
+	}
+	///<summary>Provides data for row events in a list.</summary>
+	public class RowListEventArgs : RowEventArgs {
+		///<summary>Creates a new RowEventArgs instance.</summary>
+		public RowListEventArgs(Row row, int index) :base(row){ Index = index; }
+
 		///<summary>Gets the index of the row in the collection.</summary>
 		public int Index { get; private set; }
 	}
