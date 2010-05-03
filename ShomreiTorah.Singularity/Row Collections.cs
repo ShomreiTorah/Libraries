@@ -41,11 +41,16 @@ namespace ShomreiTorah.Singularity {
 		bool Contains(TChildRow row);
 	}
 
-	interface IRowEventProvider {
+	///<summary>Contains rows and sends change events.</summary>
+	public interface IRowEventProvider {
+		///<summary>Gets the rows in the object.</summary>
 		IList<Row> Rows { get; }
 
+		///<summary>Occurs when a row is added to the collection.</summary>
 		event EventHandler<RowListEventArgs> RowAdded;
+		///<summary>Occurs when a row is removed from the collection.</summary>
 		event EventHandler<RowListEventArgs> RowRemoved;
+		///<summary>Occurs when a column value is changed in one of the rows in the collection.</summary>
 		event EventHandler<ValueChangedEventArgs> ValueChanged;
 	}
 
