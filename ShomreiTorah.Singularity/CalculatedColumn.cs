@@ -4,24 +4,32 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using System.Diagnostics.CodeAnalysis;
+using System.Collections.ObjectModel;
+using ShomreiTorah.Singularity.Dependencies;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column containing a value that is calculated automatically.</summary>
-	public sealed class CalculatedColumn : Column {
+	public sealed class CalculatedColumn : Column, Dependencies.IDependencyClient {
 		///<summary>An instances used when a calculated column's value has not been calculated.</summary>
 		///<remarks>Calculated columns are lazy, and will only run the delegate if the column's
 		///value is this object.  The dependency manager will set the column's value to this object
 		///whenever a dependency changes, triggering a recalc when the value is next fetched.</remarks>
-		internal static readonly object Placeholder = new object();
+		internal static readonly object UncalculatedValue = new object();
 
 		readonly Func<Row, object> func;
 
-		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func)
+		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Func<IDependencyClient, Dependency> dependencyGenerator)
 			: base(schema, name) {
 			this.func = func;
-			DefaultValue = Placeholder;
+			DefaultValue = UncalculatedValue;
 			DataType = dataType;
 			ReadOnly = true;
+			Dependency = dependencyGenerator(this);
+
+			foreach (var table in Schema.Rows.Select(r => r.Table).Distinct()) {
+				if (!Dependency.RequiresDataContext || table.Context != null)
+					Dependency.Register(table);
+			}
 		}
 
 		///<summary>Calculates this column's value in a row.</summary>
@@ -35,6 +43,11 @@ namespace ShomreiTorah.Singularity {
 		public override string ValidateValue(Row row, object value) { throw new NotSupportedException(); }
 		///<summary>This method is not supported.</summary>
 		public override string ValidateValueType(object value) { throw new NotSupportedException(); }
+
+		///<summary>Gets a dependency object that can track changes to the data that this column depends on.</summary>
+		internal Dependency Dependency { get; private set; }
+
+		void IDependencyClient.DependencyChanged(Row row) { row.InvalidateCalculatedValue(this); }
 	}
 	//The public AddCalculatedColumn take strongly-typed 
 	//expression trees with actual types of the value and
@@ -51,7 +64,7 @@ namespace ShomreiTorah.Singularity {
 			if (expression == null) throw new ArgumentNullException("expression");
 			var compiled = expression.Compile();
 
-			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled(row)));
+			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled(row), c => DependencyParser.GetDependencies(c, Schema, expression)));
 		}
 		///<summary>Adds a calculated column to the schema.</summary>
 		///<typeparam name="TValue">The type of the column's value.</typeparam>
@@ -63,9 +76,7 @@ namespace ShomreiTorah.Singularity {
 			if (expression == null) throw new ArgumentNullException("expression");
 			var compiled = expression.Compile();
 
-			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled((TRow)row)));
+			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled((TRow)row), c => DependencyParser.GetDependencies(c, Schema, expression)));
 		}
 	}
-
-	//TODO: Dependency manager
 }

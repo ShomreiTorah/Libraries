@@ -7,7 +7,7 @@ using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column in a Singularity table.</summary>
-	public abstract class Column {
+	public abstract class Column : INamedObject {
 		string name;
 		object defaultValue;
 
@@ -218,7 +218,7 @@ namespace ShomreiTorah.Singularity {
 
 
 	///<summary>A collection of columns in a schema.</summary>
-	public  sealed partial class ColumnCollection : ReadOnlyCollection<Column> {
+	public sealed partial class ColumnCollection : ReadOnlyCollection<Column> {
 		internal ColumnCollection(TableSchema schema) : base(new List<Column>()) { Schema = schema; }
 
 		///<summary>Gets the schema containing the columns.</summary>
@@ -266,5 +266,11 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Gets the column with the given name, or null if there is no column with that name.</summary>
 		public Column this[string name] { get { return this.FirstOrDefault(c => c.Name == name); } }
+	}
+
+	///<summary>An object with a unique name.</summary>
+	public interface INamedObject {
+		///<summary>Gets the object's name.</summary>
+		string Name { get; }
 	}
 }

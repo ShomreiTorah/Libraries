@@ -34,7 +34,7 @@ namespace ShomreiTorah.Singularity {
 		public object this[Column column] {
 			get {
 				var value = values[column];
-				if (value == CalculatedColumn.Placeholder) {
+				if (value == CalculatedColumn.UncalculatedValue) {
 					value = ((CalculatedColumn)column).CalculateValue(this);
 					values[column] = value;
 				}
@@ -79,12 +79,16 @@ namespace ShomreiTorah.Singularity {
 			return column.ValidateValueType(newValue);
 		}
 
-		///<summary>Processes a change of a column value.</summary>
-		///<remarks>This method is overridden by typed rows to perform custom logic.</remarks>
+		///<summary>Processes an explicit change of a column value.</summary>
+		///<remarks>This method is overridden by typed rows to perform custom logic.  It is not called for calculated columns.</remarks>
 		internal protected virtual void OnValueChanged(Column column, object oldValue, object newValue) {
 			if (column == null) throw new ArgumentNullException("column");
 
 			column.OnValueChanged(this, oldValue, newValue);
+			RaiseValueChanged(column);
+		}
+
+		void RaiseValueChanged(Column column) {
 			if (Table != null) {
 				Table.ProcessValueChanged(this, column);
 
@@ -102,6 +106,12 @@ namespace ShomreiTorah.Singularity {
 						parentCollection.OnValueChanged(new ValueChangedEventArgs(this, column));
 				}
 			}
+		}
+
+		///<summary>Clears the current value form a calculated column, causing it to be recalculated next time the value is retrieved.</summary>
+		internal void InvalidateCalculatedValue(CalculatedColumn column) {
+			values[column] = CalculatedColumn.UncalculatedValue;
+			RaiseValueChanged(column);
 		}
 
 		#region Child Relations

@@ -89,7 +89,7 @@ namespace ShomreiTorah.Singularity {
 		}
 	}
 	///<summary>A relation mapping a parent row to a set of child rows.</summary>
-	public sealed class ChildRelation {
+	public sealed class ChildRelation : INamedObject {
 		string name;
 		internal ChildRelation(ForeignKeyColumn childColumn, string name) {
 			ParentSchema = childColumn.ForeignSchema;

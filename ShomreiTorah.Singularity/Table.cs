@@ -9,19 +9,38 @@ using System.ComponentModel;
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
 	public partial class Table : IListSource, IRowEventProvider {
+		DataContext context;
+
 		///<summary>Creates an empty table.</summary>
 		public Table(string name) : this(new TableSchema(name)) { }
 		///<summary>Creates a table from an existing schema.</summary>
 		public Table(TableSchema schema) {
 			Schema = schema;
 			Rows = new RowCollection(this);
+			foreach (var cc in Schema.Columns.OfType<CalculatedColumn>().Where(cc => !cc.Dependency.RequiresDataContext))
+				cc.Dependency.Register(this);
+
 		}
 		///<summary>Creates a detached row for this table.</summary>
 		///<remarks>Overridden by typed tables.</remarks>
 		public virtual Row CreateRow() { return new Row(Schema); }
 
 		///<summary>Gets the DataContext that contains this table.</summary>
-		public DataContext Context { get; internal set; }
+		public DataContext Context {
+			get { return context; }
+			internal set {
+				if (context != null) {
+					foreach (var cc in Schema.Columns.OfType<CalculatedColumn>().Where(cc => cc.Dependency.RequiresDataContext))
+						cc.Dependency.Unregister(this);
+				}
+				context = value;
+				if (context != null) {
+					foreach (var cc in Schema.Columns.OfType<CalculatedColumn>().Where(cc => cc.Dependency.RequiresDataContext))
+						cc.Dependency.Register(this);
+				}
+			}
+		}
+
 		///<summary>Gets the schema of this table.</summary>
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the rows in this table.</summary>
