@@ -9,7 +9,7 @@ using ShomreiTorah.Singularity.Dependencies;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column containing a value that is calculated automatically.</summary>
-	public sealed class CalculatedColumn : Column, Dependencies.IDependencyClient {
+	public sealed class CalculatedColumn : Column {
 		///<summary>An instances used when a calculated column's value has not been calculated.</summary>
 		///<remarks>Calculated columns are lazy, and will only run the delegate if the column's
 		///value is this object.  The dependency manager will set the column's value to this object
@@ -18,18 +18,23 @@ namespace ShomreiTorah.Singularity {
 
 		readonly Func<Row, object> func;
 
-		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Func<IDependencyClient, Dependency> dependencyGenerator)
+		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Dependency dependency)
 			: base(schema, name) {
 			this.func = func;
 			DefaultValue = UncalculatedValue;
 			DataType = dataType;
 			ReadOnly = true;
-			Dependency = dependencyGenerator(this);
+			Dependency = dependency;
+			Dependency.RowInvalidated += Dependency_RowInvalidated;
 
 			foreach (var table in Schema.Rows.Select(r => r.Table).Distinct()) {
 				if (!Dependency.RequiresDataContext || table.Context != null)
 					Dependency.Register(table);
 			}
+		}
+
+		void Dependency_RowInvalidated(object sender, RowEventArgs e) {
+			e.Row.InvalidateCalculatedValue(this);
 		}
 
 		///<summary>Calculates this column's value in a row.</summary>
@@ -46,8 +51,6 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Gets a dependency object that can track changes to the data that this column depends on.</summary>
 		internal Dependency Dependency { get; private set; }
-
-		void IDependencyClient.DependencyChanged(Row row) { row.InvalidateCalculatedValue(this); }
 	}
 	//The public AddCalculatedColumn take strongly-typed 
 	//expression trees with actual types of the value and
@@ -64,7 +67,7 @@ namespace ShomreiTorah.Singularity {
 			if (expression == null) throw new ArgumentNullException("expression");
 			var compiled = expression.Compile();
 
-			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled(row), c => DependencyParser.GetDependencies(c, Schema, expression)));
+			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled(row), DependencyParser.GetDependencyTree(Schema, expression)));
 		}
 		///<summary>Adds a calculated column to the schema.</summary>
 		///<typeparam name="TValue">The type of the column's value.</typeparam>
@@ -76,7 +79,7 @@ namespace ShomreiTorah.Singularity {
 			if (expression == null) throw new ArgumentNullException("expression");
 			var compiled = expression.Compile();
 
-			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled((TRow)row), c => DependencyParser.GetDependencies(c, Schema, expression)));
+			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled((TRow)row), DependencyParser.GetDependencyTree(Schema, expression)));
 		}
 	}
 }

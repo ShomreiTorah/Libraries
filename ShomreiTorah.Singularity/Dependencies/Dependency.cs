@@ -6,35 +6,38 @@ using System.Collections.ObjectModel;
 
 namespace ShomreiTorah.Singularity.Dependencies {
 	///<summary>A base class for a dependency of a calculated column.</summary>
-	abstract class Dependency {
-		protected Dependency(IDependencyClient client) {
-			if (client == null) throw new ArgumentNullException("client");
-			Client = client;
-		}
-
-		///<summary>Gets the calculated column that depends on this dependency.</summary>
-		public IDependencyClient Client { get; private set; }
+	public abstract class Dependency {
+		///<summary>Creates a new Dependency.</summary>
+		protected Dependency() { }
 
 		///<summary>Indicates whether this dependency uses a table's DataContext.</summary>
 		///<remarks>If this property is true, the Register method will only be called when 
 		///for tables in a DataContext.</remarks>
 		public bool RequiresDataContext { get; protected set; }
 
-		///<summary>Registers event handlers for this dependency to track changes for a Table.</summary>
+		///<summary>Registers event handlers for this dependency to track changes for a table.</summary>
 		public abstract void Register(Table table);
 		///<summary>Unregisters event handlers registered in Register.</summary>
 		public abstract void Unregister(Table table);
 
-		protected void InvalidateValue(Row row) {
-			if (row == null) return;
-			Client.DependencyChanged(row);
+		///<summary>Informs the dependency's client that a dependent value has changed.</summary>
+		protected void OnRowInvalidated(Row row) { OnRowInvalidated(new RowEventArgs(row)); }
+
+		///<summary>Occurs when a row's dependencies have changed.</summary>
+		public event EventHandler<RowEventArgs> RowInvalidated;
+		///<summary>Raises the RowInvalidated event.</summary>
+		///<param name="e">A RowEventArgs object that provides the event data.</param>
+		internal protected virtual void OnRowInvalidated(RowEventArgs e) {
+			if (RowInvalidated != null)
+				RowInvalidated(this, e);
 		}
+
 	}
 
 	///<summary>A dependency that aggregates other dependencies.</summary>
-	sealed class AggregateDependency : Dependency {
-		public AggregateDependency(IDependencyClient client, IEnumerable<Dependency> dependencies)
-			: base(client) {
+	public sealed class AggregateDependency : Dependency {
+		///<summary>Creates a new AggregateDependency.</summary>
+		public AggregateDependency(IEnumerable<Dependency> dependencies) {
 			Dependencies = new ReadOnlyCollection<Dependency>(dependencies.ToArray());
 			RequiresDataContext = Dependencies.Any(d => d.RequiresDataContext);
 		}
@@ -42,20 +45,16 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		///<summary>Gets the dependencies aggregated by this dependency.</summary>
 		public ReadOnlyCollection<Dependency> Dependencies { get; private set; }
 
+		///<summary>Registers event handlers for this dependency to track changes for a table.</summary>
 		public override void Register(Table table) {
 			foreach (var d in Dependencies)
 				d.Register(table);
 		}
 
+		///<summary>Unregisters event handlers registered in Register.</summary>
 		public override void Unregister(Table table) {
 			foreach (var d in Dependencies)
 				d.Unregister(table);
 		}
-	}
-
-
-	///<summary>An object that reacts to changes in dependencies.</summary>
-	interface IDependencyClient {
-		void DependencyChanged(Row row);
 	}
 }

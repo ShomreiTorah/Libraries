@@ -4,18 +4,25 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using ShomreiTorah.Common;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity.Dependencies {
 	///<summary>A dependency on a row in a table or child relation.</summary>
-	abstract class RowDependency : Dependency, IDependencyClient {
-		protected RowDependency(RowDependencySetup setup)
-			: base(setup.Client) {
-			DependantColumns = new ReadOnlyCollection<Column>(setup.DependantColumns);
-			NestedDependencies = new ReadOnlyCollection<Dependency>(setup.NestedDependencies.Select(f => f(this)).ToArray());
+	public abstract class RowDependency : Dependency {
+		///<summary>Creates a new RowDependency.</summary>
+		protected RowDependency(RowDependencySetup setup){
+			if (setup == null) throw new ArgumentNullException("setup");
+
+			DependantColumns = new ReadOnlyCollection<Column>(setup.DependantColumns.ToArray());
+			NestedDependencies = new ReadOnlyCollection<Dependency>(setup.NestedDependencies.ToArray());
 
 			RequiresDataContext = NestedDependencies.Any(d => d.RequiresDataContext);
+
+			foreach (var d in NestedDependencies) 
+				d.RowInvalidated += NestedDependency_RowInvalidated;
 		}
 
+		///<summary>Registers event handlers for this dependency to track changes for a table.</summary>
 		public override void Register(Table table) {
 			var rc = GetRowCollection(table);
 			rc.RowAdded += DependantRowAdded;
@@ -27,6 +34,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 			foreach (var child in NestedDependencies)
 				child.Register(table);
 		}
+		///<summary>Unregisters event handlers registered in Register.</summary>
 		public override void Unregister(Table table) {
 			var rc = GetRowCollection(table);
 			rc.RowAdded -= DependantRowAdded;
@@ -41,20 +49,21 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		void DependantValueChanged(object sender, ValueChangedEventArgs e) {
 			if (!DependantColumns.Contains(e.Column)) return;
 			foreach (var row in GetAffectedRows(e.Row))
-				InvalidateValue(row);
+				OnRowInvalidated(row);
 		}
 
 		void DependantRowAdded(object sender, RowListEventArgs e) {
 			foreach (var row in GetAffectedRows(e.Row))
-				InvalidateValue(row);
+				OnRowInvalidated(row);
 		}
 		void DependantRowRemoved(object sender, RowListEventArgs e) {
 			foreach (var row in GetAffectedRows(e.Row))
-				InvalidateValue(row);
+				OnRowInvalidated(row);
 		}
-		public void DependencyChanged(Row row) {
-			foreach (var affectedRow in GetAffectedRows(row))
-				InvalidateValue(affectedRow);
+
+		void NestedDependency_RowInvalidated(object sender, RowEventArgs e) {
+			foreach (var affectedRow in GetAffectedRows(e.Row))
+				OnRowInvalidated(affectedRow);
 		}
 
 		///<summary>Gets the columns in the rows represented by this dependency that affect the calculated column.</summary>
@@ -66,33 +75,30 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		///<returns>A RowCollection containing rows that the value of the calculated column in the given table depend on.</returns>
 		protected abstract IRowEventProvider GetRowCollection(Table table);
 
-		///<summary>Gets the row(s) affect by a change in a row.</summary>
+		///<summary>Gets the row(s) affected by a change in a row.</summary>
 		///<param name="modifiedRow">The dependant row that was changed.</param>
 		///<returns>The rows for which the calculated column was affected.</returns>
 		protected abstract IEnumerable<Row> GetAffectedRows(Row modifiedRow);
 	}
 
 	///<summary>Contains parameters for a RowDependency instance.</summary>
-	sealed class RowDependencySetup {
-		public RowDependencySetup(TableSchema schema, IDependencyClient client) {
+	public sealed class RowDependencySetup {
+		///<summary>Creates a new RowDependencySetup.</summary>
+		public RowDependencySetup(TableSchema schema) {
 			if (schema == null) throw new ArgumentNullException("schema");
-			if (client == null) throw new ArgumentNullException("client");
 
 			Schema = schema;
-			Client = client;
 
 			DependantColumns = new SchemaColumnCollection(Schema);
-			NestedDependencies = new Collection<Func<IDependencyClient, Dependency>>();
+			NestedDependencies = new Collection<Dependency>();
 		}
 
 		///<summary>Gets the schema for the rows that the dependency will react to.</summary>
 		public TableSchema Schema { get; private set; }
-		///<summary>Gets the client that will react to changes in the dependency.</summary>
-		public IDependencyClient Client { get; private set; }
 
 		///<summary>Gets the columns that the dependency will listen for changes in.</summary>
 		public Collection<Column> DependantColumns { get; private set; }
-		///<summary>Gets functions that will create child dependencies that the dependency will depend on.</summary>
-		public Collection<Func<IDependencyClient, Dependency>> NestedDependencies { get; private set; }
+		///<summary>Gets the child dependencies that the dependency will depend on.</summary>
+		public Collection<Dependency> NestedDependencies { get; private set; }
 	}
 }
