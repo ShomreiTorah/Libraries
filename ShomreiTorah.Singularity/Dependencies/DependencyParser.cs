@@ -40,32 +40,37 @@ namespace ShomreiTorah.Singularity.Dependencies {
 			}
 			public new void Visit(Expression expr) { base.Visit(expr); }
 
-			protected override Expression VisitMemberAccess(MemberExpression m) {
-				if (m.Expression != null && m.Expression.Type == typeof(Row))	//Handle static members
-					VisitRowProperty(GetName(m), m);
-
-				return base.VisitMemberAccess(m);
-			}
 			protected override Expression VisitMethodCall(MethodCallExpression m) {
-				if (m.Object != null && m.Object.Type == typeof(Row))	//Handle static members
+				if (m.Object != null && m.Object.Type == typeof(Row)) {	//Check for row methods (the null check handles static members)
+					//The only interesting Row methods are Field<T>
+					//and ChildRows (and get_Item).  I ignore calls
+					//to methods on derived row classes.
+
+					//For a row access, I need to process the child
+					//expressions first, in case the row is from a 
+					//LINQ call.  (In which case the expression for
+					//the call will be added to rowExpressions when
+					//its expression is visited; see below)
+
+					//For LINQ calls, I need to traverse the child 
+					//expressions after running my code, because I 
+					//add the lambdas' parameters to rowExpressions
+					//here.
+					base.VisitMethodCall(m);						//Handle ChildRows().First().Field<T>
 					VisitRowProperty(GetName(m), m);
-				else if (IsLinqMethod(m.Method)		//Handle LINQ calls on child rows
-					  && typeof(Row).IsAssignableFrom(m.Arguments[0].Type.GetGenericArguments()[0])) {
+					return m;
+				} else if (IsLinqMethod(m.Method)		//Handle LINQ calls on child rows
+						&& TypeContains<Row>(m.Arguments[0].Type)) {
 					var childRow = GetRow(m.Arguments[0]);
-					if (typeof(Row).IsAssignableFrom(m.Type)
-					 || (typeof(IEnumerable).IsAssignableFrom(m.Type)
-					  && m.Type.IsGenericType
-					  && !m.Type.ContainsGenericParameters
-					  && typeof(Row).IsAssignableFrom(m.Type.GetGenericArguments()[0]))
-					) {
-						if (m.Method.Name == "Select")
+					if (TypeContains<Row>(m.Type)) {	//If the method returns row(s), mark the schema for the row(s) that it returns
+						if (m.Method.Name == "Select" || m.Method.Name == "SelectMany")
 							throw new InvalidOperationException("Select calls cannot return rows");
 						rowExpressions.Add(m, childRow);
 					}
 
 					foreach (var argument in m.Arguments.OfType<LambdaExpression>()
 														.SelectMany(l => l.Parameters)
-														.Where(p => typeof(Row).IsAssignableFrom(p.Type))) {
+														.Where(p => TypeContains<Row>(p.Type))) {
 						rowExpressions.Add(argument, childRow);
 					}
 				}
@@ -75,14 +80,22 @@ namespace ShomreiTorah.Singularity.Dependencies {
 			static bool IsLinqMethod(MethodInfo method) {
 				if (!method.IsStatic) return false;
 				var parameters = method.GetParameters();
-				if (parameters.Length < 2) return false;
+				if (parameters.Length < 1) return false;
 
 				if (parameters.Count(p => typeof(IEnumerable).IsAssignableFrom(p.ParameterType)) != 1)
 					return false;
-				if (!typeof(Delegate).IsAssignableFrom(parameters[1].ParameterType))
-					return false;
+				//if (parameters.Length >= 2 && !typeof(Delegate).IsAssignableFrom(parameters[1].ParameterType))
+				//    return false;
 
 				return true;
+			}
+
+			protected override Expression VisitMemberAccess(MemberExpression m) {
+				base.VisitMemberAccess(m);					//Handle ChildRows().First().ColumnProperty
+				if (m.Expression != null && typeof(Row).IsAssignableFrom(m.Expression.Type))	//Handle static members
+					VisitRowProperty(GetName(m), m);
+
+				return m;
 			}
 
 			void VisitRowProperty(string name, Expression expr) {
@@ -110,16 +123,20 @@ namespace ShomreiTorah.Singularity.Dependencies {
 
 			///<summary>Finds the RowInfo that represents the schema accessed by a parameter, LINQ call, child rows, or parent row expression.</summary>
 			RowInfo GetRow(Expression expr) {
+
 				//Parameters to lambda expressions, as well as calls to LINQ 
 				//methods that return row(s) will be found in this dictionary
 				RowInfo retVal;
-				if (rowExpressions.TryGetValue(expr, out retVal))
+				if (rowExpressions.TryGetValue(Unwrap(expr), out retVal))
 					return retVal;
 
 				//LINQ calls in the dictionary might return an IEnumerable<TRow>,
 				//so I only do this check if it isn't in the dictionary.
-				if (!typeof(Row).IsAssignableFrom(expr.Type))
-					throw new ArgumentException("Expression must be a row", "expr");
+				if (!TypeContains<Row>(expr.Type))
+					throw new ArgumentException("Expression must be a row: " + expr, "expr");
+
+				//After checking the expression's type, unwrap any casts.
+				expr = Unwrap(expr);
 
 				var childRow = GetRow(GetParent(expr));
 				var name = GetName(expr);
@@ -134,7 +151,6 @@ namespace ShomreiTorah.Singularity.Dependencies {
 					return retVal;
 				}
 
-				//TODO: Check expr.Type
 				//Handle child rows (ChildRows calls or typed properties)
 				var relation = childRow.Schema.ChildRelations[name];
 				if (relation != null) {
@@ -148,6 +164,23 @@ namespace ShomreiTorah.Singularity.Dependencies {
 				throw new InvalidOperationException("Unsupported row expression: " + expr);
 			}
 
+			///<summary>Checks whether a type contains value(s) of a desired type.</summary>
+			///<typeparam name="TDesired">The type to check for.</typeparam>
+			///<param name="check">The type to check.</param>
+			///<returns>True if check inherits TDesired or is a collection or array of types that inherit TDesired.</returns>
+			static bool TypeContains<TDesired>(Type check) {
+				if (typeof(TDesired).IsAssignableFrom(check))
+					return true;
+				if (check.GetInterfaces().Any(i =>
+							i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+						 && TypeContains<TDesired>(i.GetGenericArguments().Single())
+					))
+					return true;
+				if (check.HasElementType && TypeContains<TDesired>(check.GetElementType()))	//Handle arrays
+					return true;
+				return false;
+			}
+
 			///<summary>Gets the expression for the object that a field or method is invoked on.</summary>
 			static Expression GetParent(Expression expr) {
 				var member = expr as MemberExpression;
@@ -158,10 +191,16 @@ namespace ShomreiTorah.Singularity.Dependencies {
 				if (methodCall != null)
 					return methodCall.Object;
 
-				//Other possibilities:
-				//InvocationExpression, UnaryExpression, TypeBinaryExpression
 
-				throw new ArgumentException("Expression does not have a parent", "expr");
+				throw new ArgumentException("Expression does not have a parent: " + expr, "expr");
+			}
+			///<summary>Unwraps wrapper expressions like type casts and returns the inner expression that was wrapped.</summary>
+			static Expression Unwrap(Expression expr) {
+				var unary = expr as UnaryExpression;
+				if (unary != null)
+					return Unwrap(unary.Operand);
+				//I might need to add TypeBinaryExpression
+				return expr;
 			}
 
 			///<summary>Gets the column or relation name that an expressions resolves to.</summary>
