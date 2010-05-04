@@ -23,7 +23,7 @@
       <DataCollectors>
         <DataCollector uri="datacollector://microsoft/CodeCoverage/1.0" assemblyQualifiedName="Microsoft.VisualStudio.TestTools.CodeCoverage.CoveragePlugIn, Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" friendlyName="Code Coverage">
           <Configuration>
-            <CodeCoverage keyFile="Libraries\ShomreiTorah.Singularity\Shul.pfx" xmlns="">
+            <CodeCoverage xmlns="">
               <Regular>
                 <CodeCoverageItem binaryFile="Libraries\ShomreiTorah.Singularity\bin\Debug\ShomreiTorah.Singularity.dll" pdbFile="Libraries\ShomreiTorah.Singularity\bin\Debug\ShomreiTorah.Singularity.pdb" />
               </Regular>
