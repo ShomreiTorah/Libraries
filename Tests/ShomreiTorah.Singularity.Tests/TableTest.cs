@@ -141,6 +141,7 @@ namespace ShomreiTorah.Singularity.Tests {
 			Assert.AreEqual(0, numbersTable.Schema.ChildRelations.Count);
 		}
 
+		[Ignore]
 		[TestMethod]
 		public void ValueCoercionTest() {
 			Assert.Inconclusive("I need to design coercion");
