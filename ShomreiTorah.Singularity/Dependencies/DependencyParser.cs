@@ -42,52 +42,20 @@ namespace ShomreiTorah.Singularity.Dependencies {
 
 			protected override Expression VisitMethodCall(MethodCallExpression m) {
 				if (m.Object != null && m.Object.Type == typeof(Row)) {	//Check for row methods (the null check handles static members)
-					//The only interesting Row methods are Field<T>
-					//and ChildRows (and get_Item).  I ignore calls
-					//to methods on derived row classes.
-
-					//For a row access, I need to process the child
-					//expressions first, in case the row is from a 
-					//LINQ call.  (In which case the expression for
-					//the call will be added to rowExpressions when
-					//its expression is visited; see below)
-
-					//For LINQ calls, I need to traverse the child 
-					//expressions after running my code, because I 
-					//add the lambdas' parameters to rowExpressions
-					//here.
-					base.VisitMethodCall(m);						//Handle ChildRows().First().Field<T>
 					VisitRowProperty(GetName(m), m);
-					return m;
 				} else if (IsLinqMethod(m.Method)		//Handle LINQ calls on child rows
 						&& TypeContains<Row>(m.Arguments[0].Type)) {
-					var childRow = GetRow(m.Arguments[0]);
-					if (TypeContains<Row>(m.Type)) {	//If the method returns row(s), mark the schema for the row(s) that it returns
-						if (m.Method.Name == "Select" || m.Method.Name == "SelectMany")
-							throw new InvalidOperationException("Select calls cannot return rows");
-						rowExpressions.Add(m, childRow);
-					}
 
-					foreach (var argument in m.Arguments.OfType<LambdaExpression>()
+					var childRow = GetRow(m.Arguments[0]);
+
+					foreach (var lambdaParameter in m.Arguments.OfType<LambdaExpression>()
 														.SelectMany(l => l.Parameters)
 														.Where(p => TypeContains<Row>(p.Type))) {
-						rowExpressions.Add(argument, childRow);
+						rowExpressions.Add(lambdaParameter, childRow);
 					}
 				}
 
 				return base.VisitMethodCall(m);
-			}
-			static bool IsLinqMethod(MethodInfo method) {
-				if (!method.IsStatic) return false;
-				var parameters = method.GetParameters();
-				if (parameters.Length < 1) return false;
-
-				if (parameters.Count(p => typeof(IEnumerable).IsAssignableFrom(p.ParameterType)) != 1)
-					return false;
-				//if (parameters.Length >= 2 && !typeof(Delegate).IsAssignableFrom(parameters[1].ParameterType))
-				//    return false;
-
-				return true;
 			}
 
 			protected override Expression VisitMemberAccess(MemberExpression m) {
@@ -118,25 +86,36 @@ namespace ShomreiTorah.Singularity.Dependencies {
 				throw new InvalidOperationException("Unknown row property: " + expr);
 			}
 
-			///<summary>Maps parameter and LINQ call expressions to the RowInfo objects for the schema that they access.</summary>
+			///<summary>Maps parameter expressions to the RowInfo objects for the schema that they access.</summary>
 			readonly Dictionary<Expression, RowInfo> rowExpressions = new Dictionary<Expression, RowInfo>();
 
 			///<summary>Finds the RowInfo that represents the schema accessed by a parameter, LINQ call, child rows, or parent row expression.</summary>
+			///<remarks>
+			/// GetRow can be called on any expression that returns a row or set of rows.
+			/// Unless the expression is a ParameterExpression, it does not need to have 
+			/// already been walked.  If it is a ParameterExpression, it must be in the 
+			/// rowExpressions dictionary.  Parameters to LINQ lambdas are added to the
+			/// dictionary by VisitMethodCall before walking the parameters; parameters
+			/// to the root expression are added by the constructor.
+			///</remarks>
 			RowInfo GetRow(Expression expr) {
-
-				//Parameters to lambda expressions, as well as calls to LINQ 
-				//methods that return row(s) will be found in this dictionary
-				RowInfo retVal;
-				if (rowExpressions.TryGetValue(Unwrap(expr), out retVal))
-					return retVal;
-
-				//LINQ calls in the dictionary might return an IEnumerable<TRow>,
-				//so I only do this check if it isn't in the dictionary.
 				if (!TypeContains<Row>(expr.Type))
 					throw new ArgumentException("Expression must be a row: " + expr, "expr");
+				expr = Unwrap(expr);	//After checking the expression's type, unwrap any casts.
 
-				//After checking the expression's type, unwrap any casts.
-				expr = Unwrap(expr);
+				//Parameters to lambda expressions will be found in this dictionary
+				RowInfo retVal;
+				if (rowExpressions.TryGetValue(expr, out retVal))
+					return retVal;
+
+				var methodCall = expr as MethodCallExpression;
+				if (methodCall != null && IsLinqMethod(methodCall.Method)) {
+					//A LINQ method returns rows from the same 
+					//schema that it was passed.
+					if (methodCall.Method.Name == "Select" || methodCall.Method.Name == "SelectMany")
+						throw new InvalidOperationException("Select calls cannot return rows");
+					return GetRow(methodCall.Arguments[0]);
+				}
 
 				var childRow = GetRow(GetParent(expr));
 				var name = GetName(expr);
@@ -164,6 +143,16 @@ namespace ShomreiTorah.Singularity.Dependencies {
 				throw new InvalidOperationException("Unsupported row expression: " + expr);
 			}
 
+			static bool IsLinqMethod(MethodInfo method) {
+				if (!method.IsStatic) return false;
+				var parameters = method.GetParameters();
+				if (parameters.Length < 1) return false;
+
+				if (parameters.Count(p => typeof(IEnumerable).IsAssignableFrom(p.ParameterType)) != 1)
+					return false;
+
+				return true;
+			}
 			///<summary>Checks whether a type contains value(s) of a desired type.</summary>
 			///<typeparam name="TDesired">The type to check for.</typeparam>
 			///<param name="check">The type to check.</param>
