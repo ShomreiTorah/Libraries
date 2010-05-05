@@ -171,7 +171,12 @@ namespace ShomreiTorah.Singularity.Dependencies {
 			static bool TypeContains<TDesired>(Type check) {
 				if (typeof(TDesired).IsAssignableFrom(check))
 					return true;
-				if (check.GetInterfaces().Any(i =>
+
+				IEnumerable<Type> interfaces = check.GetInterfaces();
+
+				if (check.IsInterface)	//Handle raw IEnumerable<TDesired> (or derived)
+					interfaces = interfaces.Concat(Enumerable.Repeat(check, 1));
+				if (interfaces.Any(i =>
 							i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
 						 && TypeContains<TDesired>(i.GetGenericArguments().Single())
 					))
