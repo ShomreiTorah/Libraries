@@ -73,9 +73,8 @@ namespace ShomreiTorah.Singularity {
 	//expression trees with actual types of the value and
 	//the row.  The column needs a weakly-typed delegate 
 	//to calculate the values, so the generic Add methods
-	//generate weakly-typed delegates.   (Since I haven't
-	//upgraded to .Net 4.0 yet, I cannot use variance in 
-	//delegates)
+	//generate weakly-typed delegates.  Variance will not
+	//help for typed rows.
 	partial class ColumnCollection {
 		///<summary>Adds a calculated column to the schema.</summary>
 		///<typeparam name="TValue">The type of the column's value.</typeparam>
