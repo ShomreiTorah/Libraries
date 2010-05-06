@@ -23,7 +23,14 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			if (PhantomItem == null) throw new InvalidOperationException("There is no phantom item");
 			var item = PhantomItem;
 			PhantomItem = null;
-			Add(item);
+
+			try {
+				Add(item);
+			} catch {
+				if (!Contains(item))		//If the add failed validation, the PhantomItem should remain.  (Calling EndNew should never remove an item)
+					PhantomItem = item;
+				throw;
+			}
 		}
 		protected virtual void RemovePhantom() {
 			if (PhantomItem == null) throw new InvalidOperationException("There is no phantom item");
