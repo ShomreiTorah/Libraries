@@ -113,6 +113,11 @@ namespace ShomreiTorah.Singularity {
 			values[column] = CalculatedColumn.UncalculatedValue;
 			RaiseValueChanged(column);
 		}
+		///<summary>Toggles the value of a calculated column between the default value (if the row is detached) and the uncalculated value (if the row is attached).</summary>
+		///<remarks>This is called by each CalculatedColumn when the row is added to or removed from the table.</remarks>
+		internal void ToggleCalcColDefault(CalculatedColumn column) {
+			values[column] = Table == null ? column.DefaultValue : CalculatedColumn.UncalculatedValue;
+		}
 
 		#region Child Relations
 		//Each relation's ChildRowCollection is created when first asked for.
@@ -183,7 +188,7 @@ namespace ShomreiTorah.Singularity {
 	///<summary>Provides data for row events in a list.</summary>
 	public class RowListEventArgs : RowEventArgs {
 		///<summary>Creates a new RowEventArgs instance.</summary>
-		public RowListEventArgs(Row row, int index) :base(row){ Index = index; }
+		public RowListEventArgs(Row row, int index) : base(row) { Index = index; }
 
 		///<summary>Gets the index of the row in the collection.</summary>
 		public int Index { get; private set; }

@@ -112,6 +112,8 @@ namespace ShomreiTorah.Singularity {
 			try {
 				row.Table = this;
 				foreach (var column in Schema.Columns) {
+					if (!column.CanValidate) continue;
+
 					var error = row.ValidateValue(column, row[column]);
 					if (!String.IsNullOrEmpty(error))
 						throw new InvalidOperationException(error);
@@ -122,14 +124,14 @@ namespace ShomreiTorah.Singularity {
 		void ProcessRowAdded(Row row, int index) {
 			row.Table = this;
 			foreach (var column in Schema.Columns)
-				column.OnRowAdded(row);		//Adds the row to parent relations
+				column.OnRowAdded(row);		//Adds the row to parent relations, and handles calculated columns
 			OnRowAdded(new RowListEventArgs(row, index));
 		}
 		void ProcessRowRemoved(Row row, int index) {
 			row.Table = null;
 			Schema.RemoveRow(row);
 			foreach (var column in Schema.Columns)
-				column.OnRowRemoved(row);	//Removes the row from parent relations
+				column.OnRowRemoved(row);	//Removes the row from parent relations, and handles calculated columns
 
 			OnRowRemoved(new RowListEventArgs(row, index));
 		}

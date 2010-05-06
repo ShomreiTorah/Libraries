@@ -13,17 +13,21 @@ namespace ShomreiTorah.Singularity {
 		///<summary>An instances used when a calculated column's value has not been calculated.</summary>
 		///<remarks>Calculated columns are lazy, and will only run the delegate if the column's
 		///value is this object.  The dependency manager will set the column's value to this object
-		///whenever a dependency changes, triggering a recalc when the value is next fetched.</remarks>
+		///whenever a dependency changes, triggering a recalc when the value is next fetched.
+		///
+		///Calculated columns are not supported in detached rows; any calculated column in a 
+		///detached row will equal the column's DefaultValue property.</remarks>
 		internal static readonly object UncalculatedValue = new object();
 
 		readonly Func<Row, object> func;
 
 		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Dependency dependency)
 			: base(schema, name) {
+			CanValidate = false;
 			this.func = func;
-			DefaultValue = UncalculatedValue;
 			DataType = dataType;
 			ReadOnly = true;
+
 			Dependency = dependency;
 			Dependency.RowInvalidated += Dependency_RowInvalidated;
 
@@ -31,18 +35,31 @@ namespace ShomreiTorah.Singularity {
 				if (!Dependency.RequiresDataContext || table.Context != null)
 					Dependency.Register(table);
 			}
+
+			if (dataType.IsValueType)
+				DefaultValue = Activator.CreateInstance(dataType);
+			//Otherwise, keep it null.
 		}
 
 		void Dependency_RowInvalidated(object sender, RowEventArgs e) {
 			e.Row.InvalidateCalculatedValue(this);
 		}
 
+		///<summary>Gets the value that will be used for this column in a detached row.</summary>
+		///<remarks>By default, this will be equal to the default value for the column's type.</remarks>
+		public override object DefaultValue {
+			get { return base.DefaultValue; }
+			set { base.DefaultValue = value; Schema.EachRow(r => r.ToggleCalcColDefault(this)); }
+		}
 		///<summary>Calculates this column's value in a row.</summary>
 		public object CalculateValue(Row row) {
 			if (row == null) throw new ArgumentNullException("row");
 			if (row.Schema != Schema) throw new ArgumentException("Row must belong to the schema containing this column");
 			return func(row);
 		}
+
+		internal override void OnRowAdded(Row row) { row.ToggleCalcColDefault(this); }
+		internal override void OnRowRemoved(Row row) { row.ToggleCalcColDefault(this); }
 
 		///<summary>This method is not supported.</summary>
 		public override string ValidateValue(Row row, object value) { throw new NotSupportedException(); }
@@ -56,7 +73,9 @@ namespace ShomreiTorah.Singularity {
 	//expression trees with actual types of the value and
 	//the row.  The column needs a weakly-typed delegate 
 	//to calculate the values, so the generic Add methods
-	//generate weakly-typed delegates.
+	//generate weakly-typed delegates.   (Since I haven't
+	//upgraded to .Net 4.0 yet, I cannot use variance in 
+	//delegates)
 	partial class ColumnCollection {
 		///<summary>Adds a calculated column to the schema.</summary>
 		///<typeparam name="TValue">The type of the column's value.</typeparam>

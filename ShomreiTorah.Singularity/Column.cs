@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using ShomreiTorah.Common;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column in a Singularity table.</summary>
@@ -15,6 +16,7 @@ namespace ShomreiTorah.Singularity {
 			Schema = schema;
 			Schema.ValidateName(name);
 			this.name = name;	//Don't call the property setter to avoid a redundant SchemaChanged
+			CanValidate = true;
 		}
 
 		///<summary>Gets the schema containing this column.</summary>
@@ -46,13 +48,17 @@ namespace ShomreiTorah.Singularity {
 
 		internal virtual void OnValueChanged(Row row, object oldValue, object newValue) { }
 
+		internal bool CanValidate { get;  set; }
+
 		///<summary>Gets or sets the default value of the column.</summary>
-		public object DefaultValue {
+		public virtual object DefaultValue {
 			get { return defaultValue; }
 			set {
-				var error = ValidateValueType(value);
-				if (!String.IsNullOrEmpty(error))
-					throw new ArgumentException(error, "value");
+				if (CanValidate) {
+					var error = ValidateValueType(value);
+					if (!String.IsNullOrEmpty(error))
+						throw new ArgumentException(error, "value");
+				}
 				defaultValue = value;
 			}
 		}
@@ -75,6 +81,7 @@ namespace ShomreiTorah.Singularity {
 	}
 	///<summary>A column containing simple values.</summary>
 	public class ValueColumn : Column {
+		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification="DefaultValue is not overridden by this branch")]
 		internal ValueColumn(TableSchema schema, string name, Type dataType, object defaultValue)
 			: base(schema, name) {
 			DataType = dataType;
