@@ -173,7 +173,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 	sealed class TableBinder : RowCollectionBinder {
 		public TableBinder(Table table)
-			: base(table.Schema, new PhantomCollection<Row>(table.Rows)) {
+			: base(table.Schema, table.Rows) {
 			Table = table;
 
 			Table.RowAdded += Table_RowAdded;
