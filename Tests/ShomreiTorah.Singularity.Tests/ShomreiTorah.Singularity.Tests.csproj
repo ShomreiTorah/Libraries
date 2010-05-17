@@ -58,6 +58,7 @@
     <Compile Include="Dependencies\TypedRowParsingTest.cs" />
     <Compile Include="ExtensionsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SchemaMappingTest.cs" />
     <Compile Include="TableSchemaTest.cs" />
     <Compile Include="TableTest.cs" />
     <Compile Include="TypedRowsTest.cs" />
