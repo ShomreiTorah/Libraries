@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using ShomreiTorah.Singularity;
 
-namespace ShomreiTorah.Singularity.Tests {
+namespace ShomreiTorah.Singularity.Tests.Sql {
 	[TestClass]
 	public class SchemaMappingTest {
 		public TestContext TestContext { get; set; }
