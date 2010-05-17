@@ -17,7 +17,7 @@ namespace ShomreiTorah.Singularity.Sql {
 
 			Columns = new ColumnMappingCollection(this);
 
-			Schema.ColumnAdded += (s, e) => Columns.AddMapping(e.Column);
+			Schema.ColumnAdded += (s, e) => { if (!(e.Column is CalculatedColumn)) Columns.AddMapping(e.Column); };
 			Schema.ColumnRemoved += (s, e) => Columns.RemoveMapping(e.Column);
 		}
 
@@ -41,6 +41,7 @@ namespace ShomreiTorah.Singularity.Sql {
 		///<summary>Creates a mapping for a column.</summary>
 		internal ColumnMapping(Column column) {
 			if (column == null) throw new ArgumentNullException("column");
+			if (column is CalculatedColumn) throw new ArgumentException("Calculated columns cannot be mapped.", "column");
 
 			Column = column;
 			SqlName = column.Name;
@@ -56,7 +57,10 @@ namespace ShomreiTorah.Singularity.Sql {
 	///<summary>A collection of ColumnMapping objects.</summary>
 	public class ColumnMappingCollection : ReadOnlyCollection<ColumnMapping> {
 		///<summary>Creates a ColumnMappingCollection that wraps a list of ColumnMapping objects.</summary>
-		internal ColumnMappingCollection(SchemaMapping schema) : base(schema.Schema.Columns.Select(c => new ColumnMapping(c)).ToList()) { SchemaMapping = schema; }
+		internal ColumnMappingCollection(SchemaMapping schema)
+			: base(schema.Schema.Columns.Where(c => !(c is CalculatedColumn)).Select(c => new ColumnMapping(c)).ToList()) {
+			SchemaMapping = schema;
+		}
 		///<summary>Gets the schema mapping that contains these columns.</summary>
 		public SchemaMapping SchemaMapping { get; private set; }
 
