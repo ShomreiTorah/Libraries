@@ -175,6 +175,11 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the value of the specified column.</summary>
 		public T Field<T>(Column column) { return (T)this[column]; }
 		#endregion
+
+		///<summary>A unique identifier for the version row stored in SQL Server.</summary>
+		///<remarks>This property is the only piece of the Singularity table engine that is
+		///coupled to the Sql namespace.  Having this property avoids an ugly dictionary.</remarks>
+		internal object RowVersion { get; set; }
 	}
 
 	///<summary>Provides data for row events.</summary>

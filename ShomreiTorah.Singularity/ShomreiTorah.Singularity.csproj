@@ -74,6 +74,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Row Collections.cs" />
     <Compile Include="Row.cs" />
+    <Compile Include="Sql\Utils.cs" />
     <Compile Include="Typed Rows.cs" />
     <Compile Include="XmlPersistence.cs" />
     <Compile Include="Sql\DataSyncContext.cs" />

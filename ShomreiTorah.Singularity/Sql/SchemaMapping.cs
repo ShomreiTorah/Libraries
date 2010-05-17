@@ -31,6 +31,9 @@ namespace ShomreiTorah.Singularity.Sql {
 
 		///<summary>Gets the mapping objects for the columns in the table.</summary>
 		public ColumnMappingCollection Columns { get; private set; }
+
+		///<summary>Gets the column mapping for the table's primary key, if any.</summary>
+		public ColumnMapping PrimaryKey { get { return Schema.PrimaryKey == null ? null : Columns[Schema.PrimaryKey]; } }
 	}
 
 	///<summary>Maps a column in a Singularity table to a column in an SQL database.</summary>

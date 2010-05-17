@@ -12,5 +12,12 @@ namespace ShomreiTorah.Singularity.Sql {
 
 		///<summary>Creates a SELECT command for the given SchemaMapping.</summary>
 		DbCommand CreateSelectCommand(DbConnection connection, SchemaMapping schema);
+
+		///<summary>Applies an inserted row to the database.</summary>
+		void ApplyInsert(DbConnection connection, SchemaMapping schema, Row row);
+		///<summary>Applies an update row to the database.</summary>
+		void ApplyUpdate(DbConnection connection, SchemaMapping schema, Row row);
+		///<summary>Applies a deleted row to the database.</summary>
+		void ApplyDelete(DbConnection connection, SchemaMapping schema, Row row);
 	}
 }

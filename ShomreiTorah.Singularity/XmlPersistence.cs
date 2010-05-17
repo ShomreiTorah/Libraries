@@ -96,6 +96,11 @@ namespace ShomreiTorah.Singularity {
 					)
 				);
 
+			//Maps primary-key values to existing 
+			//rows in the table that have not been
+			//processed yet.  Any rows that remain
+			//in this dictionary after populating 
+			//the table will be removed.
 			Dictionary<object, Row> keyMap = null;
 			if (Table.Schema.PrimaryKey != null) {
 				keyMap = Table.Rows.ToDictionary(row => row[Table.Schema.PrimaryKey]);
@@ -120,6 +125,7 @@ namespace ShomreiTorah.Singularity {
 					else
 						row[field.Key] = foreignKeyMap[foreignKey][foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture)];
 				}
+				OnRowPopulated(row, rowSource);
 
 				if (row.Table == null)		//If we created this row, as opposed to getting it out of the keyMap
 					Table.Rows.Add(row);
@@ -142,6 +148,10 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the column values for a row.</summary>
 		///<param name="values">A TValueSource object from GetRows.</param>
 		protected abstract IEnumerable<KeyValuePair<Column, object>> GetValues(TValueSource values);
+
+		///<summary>Called after a row is populated from a value source.</summary>
+		///<remarks>This method is overridden by TableSynchronizer to populate the RowVersion.</remarks>
+		protected virtual void OnRowPopulated(Row row, TValueSource values) { }
 
 		private object CoercePrimaryKey(TValueSource rowSource) {
 			return Table.Schema.PrimaryKey.CoerceValue(GetPrimaryKey(rowSource), CultureInfo.InvariantCulture);
