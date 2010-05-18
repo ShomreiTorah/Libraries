@@ -53,6 +53,7 @@ namespace ShomreiTorah.Singularity.Sql {
 					using (var reader = command.ExecuteReader()) {
 						new DataReaderTablePopulator(Table, Mapping, reader).FillTable();
 					}
+					changes.Clear();
 				} finally { isReadingDB = false; }
 			}
 		}
