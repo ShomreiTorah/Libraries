@@ -19,5 +19,8 @@ namespace ShomreiTorah.Singularity.Sql {
 		void ApplyUpdate(DbConnection connection, SchemaMapping schema, Row row);
 		///<summary>Applies a deleted row to the database.</summary>
 		void ApplyDelete(DbConnection connection, SchemaMapping schema, Row row);
+
+		///<summary>Returns a DbCommand containing a CREATE TABLE statement for the given schema mapping.</summary>
+		DbCommand CreateTable(DbConnection connection, SchemaMapping schema);
 	}
 }
