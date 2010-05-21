@@ -67,16 +67,16 @@ namespace ShomreiTorah.Singularity.Sql {
 			var sql = new StringBuilder();
 
 			//INSERT INTO [SchemaName].[TableName]
-			//	([FirstColumn], [SecondColumn]
+			//	([FirstColumn], [SecondColumn])
 			//OUTPUT INSERTED.RowVersion
-			//VALUES(@Col1, @Col2) INTO @NewVersion;
+			//VALUES(@Col0, @Col1);
 
 			sql.Append("INSERT INTO ").AppendLine(QualifyTable(schema));
 			sql.Append("\t(").AppendJoin(
 				schema.Columns.Select(c => c.SqlName.EscapeSqlIdentifier()), ", "
 			).AppendLine(")");
 
-			sql.AppendLine("OUTPUT INSERTED.RowVersion INTO @NewVersion");
+			sql.AppendLine("OUTPUT INSERTED.RowVersion");
 
 			sql.Append("VALUES(").AppendJoin(
 				schema.Columns.Select((c, i) => "@Col" + i.ToString(CultureInfo.InvariantCulture)), ", "
@@ -85,13 +85,14 @@ namespace ShomreiTorah.Singularity.Sql {
 			using (var command = connection.CreateCommand(sql.ToString())) {
 				PopulateParameters(command, schema, row);
 
-				var versionParameter = command.CreateParameter();
-				versionParameter.ParameterName = "NewVersion";
-				versionParameter.Direction = ParameterDirection.Output;
+				using (var reader = command.ExecuteReader()) {
+					if (!reader.Read())
+						throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+					row.RowVersion = reader.GetValue(0);
 
-				if (command.ExecuteNonQuery() != 1)
-					throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
-				row["RowVersion"] = versionParameter.Value;
+					if (reader.Read())
+						throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+				}
 			}
 		}
 		///<summary>Applies an update row to the database.</summary>
@@ -103,7 +104,7 @@ namespace ShomreiTorah.Singularity.Sql {
 			var sql = new StringBuilder();
 
 			//UPDATE [SchemaName].[TableName]
-			//SET [FirstColumn] = @Col1, [SecondColumn] = @Col2
+			//SET [FirstColumn] = @Col0, [SecondColumn] = @Col1
 			//OUTPUT INSERTED.RowVersionINTO @version
 			//WHERE @IDColumn = @ID AND RowVersion = @version;
 
@@ -111,21 +112,26 @@ namespace ShomreiTorah.Singularity.Sql {
 			sql.Append("SET").AppendJoin(
 				schema.Columns.Select((c, i) => c.SqlName.EscapeSqlIdentifier() + " = @Col" + i.ToString(CultureInfo.InvariantCulture)), ", "
 			).AppendLine();
-			sql.AppendLine("OUTPUT INSERTED.RowVersion INTO @version");
-			sql.Append("WHERE ").Append(schema.PrimaryKey.SqlName.EscapeSqlIdentifier()).Append(" = @ID AND RowVersion = @version;");
+			sql.AppendLine("OUTPUT INSERTED.RowVersion");
+			sql.Append("WHERE ").Append(schema.PrimaryKey.SqlName.EscapeSqlIdentifier()).Append(" = @Col").Append(schema.Columns.IndexOf(schema.PrimaryKey))
+								.Append(" AND RowVersion = @version;");
 
 			using (var command = connection.CreateCommand(sql.ToString())) {
 				PopulateParameters(command, schema, row);
 
 				var versionParameter = command.CreateParameter();
-				versionParameter.ParameterName = "version";
-				versionParameter.Direction = ParameterDirection.InputOutput;
+				versionParameter.ParameterName = "@version";
 				versionParameter.Value = row.RowVersion;
+				command.Parameters.Add(versionParameter);
 
-				if (command.ExecuteNonQuery() != 1)
-					throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+				using (var reader = command.ExecuteReader()) {
+					if (!reader.Read())
+						throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+					row.RowVersion = reader.GetValue(0);
 
-				row.RowVersion = versionParameter.Value;
+					if (reader.Read())
+						throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+				}
 			}
 		}
 
@@ -138,10 +144,11 @@ namespace ShomreiTorah.Singularity.Sql {
 			for (int i = 0; i < schema.Columns.Count; i++) {
 				var parameter = command.CreateParameter();
 
-				parameter.ParameterName = "Col" + i.ToString(CultureInfo.InvariantCulture);
+				parameter.ParameterName = "@Col" + i.ToString(CultureInfo.InvariantCulture);
 				//TODO: Foreign keys
 				parameter.Value = row[schema.Columns[i].Column];
-				i++;
+
+				command.Parameters.Add(parameter);
 			}
 		}
 
