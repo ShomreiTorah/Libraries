@@ -48,7 +48,7 @@ namespace ShomreiTorah.Singularity {
 
 		internal virtual void OnValueChanged(Row row, object oldValue, object newValue) { }
 
-		internal bool CanValidate { get;  set; }
+		internal bool CanValidate { get; set; }
 
 		///<summary>Gets or sets the default value of the column.</summary>
 		public virtual object DefaultValue {
@@ -70,7 +70,7 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Coerces a value to the datatype for this column.</summary>
 		public virtual object CoerceValue(object value, IFormatProvider provider) {
-			if (value == null) return null;		
+			if (value == null || value == DBNull.Value) return null;
 			if (DataType == null) return value;
 			return Convert.ChangeType(value, DataType, provider);
 		}
@@ -85,7 +85,7 @@ namespace ShomreiTorah.Singularity {
 	}
 	///<summary>A column containing simple values.</summary>
 	public class ValueColumn : Column {
-		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification="DefaultValue is not overridden by this branch")]
+		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "DefaultValue is not overridden by this branch")]
 		internal ValueColumn(TableSchema schema, string name, Type dataType, object defaultValue)
 			: base(schema, name) {
 			DataType = dataType;
