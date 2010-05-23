@@ -145,11 +145,23 @@ namespace ShomreiTorah.Singularity.Sql {
 				var parameter = command.CreateParameter();
 
 				parameter.ParameterName = "@Col" + i.ToString(CultureInfo.InvariantCulture);
-				//TODO: Foreign keys
-				parameter.Value = row[schema.Columns[i].Column];
+				parameter.Value = GetColumnValue(row, schema.Columns[i].Column) ?? DBNull.Value;
 
 				command.Parameters.Add(parameter);
 			}
+		}
+		static object GetColumnValue(Row row, Column column) {
+			var foreignKey = column as ForeignKeyColumn;
+
+			if (foreignKey == null)
+				return row[column];
+
+			if (foreignKey.ForeignSchema.PrimaryKey == null)
+				throw new InvalidOperationException("A foreign key column that references a table without a primary key cannot be saved to a SQL database");
+
+			var foreignRow = row.Field<Row>(column);
+			if (foreignRow == null) return null;
+			return foreignRow[foreignKey.ForeignSchema.PrimaryKey];
 		}
 
 		///<summary>Applies a deleted row to the database.</summary>
@@ -168,8 +180,8 @@ namespace ShomreiTorah.Singularity.Sql {
 			}
 		}
 
+		//TODO: Move to ListMaker
 		#region DDL
-
 		///<summary>Returns a DbCommand containing a CREATE TABLE statement for the given schema mapping.</summary>
 		///<remarks>In addition to the columns in the SchemaMapping, a RowVersion column will be created.</remarks>
 		public DbCommand CreateTable(DbConnection connection, SchemaMapping schema) {
@@ -190,6 +202,8 @@ namespace ShomreiTorah.Singularity.Sql {
 			foreach (var column in schema.Columns) {
 				if (column == schema.PrimaryKey)
 					AppendPrimaryKey(sql, column);
+				else if (column.Column is ForeignKeyColumn)
+					AppendForeignKey(sql, column);
 				else
 					AppendColumn(sql, column);
 
@@ -218,7 +232,6 @@ namespace ShomreiTorah.Singularity.Sql {
 			if (sql == null) throw new ArgumentNullException("sql");
 			if (column == null) throw new ArgumentNullException("column");
 
-			//TODO: Foreign keys
 			var nullable = ((ValueColumn)column.Column).AllowNulls;
 
 			sql.AppendFormat("\t{0,-30}\t{1,-20}\t{2}",
@@ -227,22 +240,30 @@ namespace ShomreiTorah.Singularity.Sql {
 				nullable ? "NULL" : "NOT NULL"
 			);
 		}
+		protected virtual void AppendForeignKey(StringBuilder sql, ColumnMapping column) {
+			if (sql == null) throw new ArgumentNullException("sql");
+			if (column == null) throw new ArgumentNullException("column");
+
+			var foreignKey = (ForeignKeyColumn)column.Column;
+
+			throw new NotImplementedException();
+		}
 		static readonly Dictionary<Type, string> SqlTypes = new Dictionary<Type, string> {
-			{ typeof(DateTimeOffset),	"DATETIME" },
+		    { typeof(DateTimeOffset),	"DATETIME" },
 
-			{ typeof(Guid),		"UNIQUEIDENTIFIER" },
-			{ typeof(String),	"NVARCHAR(1024)" },
-			{ typeof(DateTime),	"DATETIME" },
+		    { typeof(Guid),		"UNIQUEIDENTIFIER" },
+		    { typeof(String),	"NVARCHAR(1024)" },
+		    { typeof(DateTime),	"DATETIME" },
 
-			{ typeof(Byte),		"TINYINT" },
-			{ typeof(Int16),	"SMALLINT" },
-			{ typeof(Int32),	"INTEGER" },
-			{ typeof(Int64),	"BIGINT" },
+		    { typeof(Byte),		"TINYINT" },
+		    { typeof(Int16),	"SMALLINT" },
+		    { typeof(Int32),	"INTEGER" },
+		    { typeof(Int64),	"BIGINT" },
 
-			{ typeof(Decimal),	"MONEY" },
-			{ typeof(Double),	"FLOAT" },
-			{ typeof(Single),	"REAL" },
-			{ typeof(Boolean),	"BIT" },
+		    { typeof(Decimal),	"MONEY" },
+		    { typeof(Double),	"FLOAT" },
+		    { typeof(Single),	"REAL" },
+		    { typeof(Boolean),	"BIT" },
 
 		};
 		///<summary>Gets the name of the SQL Server type corresponding to a CLR type.</summary>
