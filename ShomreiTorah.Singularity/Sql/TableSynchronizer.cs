@@ -114,7 +114,7 @@ namespace ShomreiTorah.Singularity.Sql {
 			var changeIndex = GetChangeIndex(e.Row);
 
 			if (changeIndex >= 0)
-				Debug.Assert(changes[changeIndex].ChangeType == RowChangeType.Added);	//If it wasn't added to the DB yet, we don't need to track value changes
+				Debug.Assert(changes[changeIndex].ChangeType != RowChangeType.Removed);	//If it wasn't added to the DB yet, or if it's already been changed, we don't need to track value changes
 			else
 				changes.Add(new RowChange(e.Row, RowChangeType.Changed));
 		}
