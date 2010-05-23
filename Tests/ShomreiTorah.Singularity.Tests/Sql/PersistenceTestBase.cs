@@ -12,7 +12,6 @@ namespace ShomreiTorah.Singularity.Tests.Sql {
 	/// </summary>
 	[TestClass]
 	public abstract class PersistenceTestBase {
-
 		#region Additional test attributes
 		//
 		// You can use the following additional attributes as you write your tests:
@@ -35,20 +34,8 @@ namespace ShomreiTorah.Singularity.Tests.Sql {
 		//
 		#endregion
 
-		protected PersistenceTestBase() {
-			NumbersSchema = new TableSchema("Numbers");
-			NumbersSchema.PrimaryKey = NumbersSchema.Columns.AddValueColumn("ID", typeof(Guid), Guid.Empty);
-			NumbersSchema.Columns.AddValueColumn("Value", typeof(int), 2);
-			NumbersSchema.Columns.AddValueColumn("IsEven", typeof(bool), false);
-			NumbersSchema.Columns.AddValueColumn("String", typeof(string), null).AllowNulls = false;
-
-			NumbersMapping = new SchemaMapping(NumbersSchema);
-		}
-
-		public TableSchema NumbersSchema { get; private set; }
-		public SchemaMapping NumbersMapping { get; private set; }
-
 		public ISqlProvider SqlProvider { get; protected set; }
+
 		[TestMethod]
 		public void SimpleTableTest() {
 			using (var connection = SqlProvider.OpenConnection())
@@ -61,8 +48,16 @@ CREATE TABLE [Numbers](
 	[RowVersion]	RowVersion
 );");
 
-			var table = new Table(NumbersSchema);
-			var syncer = new TableSynchronizer(table, NumbersMapping, SqlProvider);
+			var schema = new TableSchema("Numbers");
+			schema.PrimaryKey = schema.Columns.AddValueColumn("ID", typeof(Guid), Guid.Empty);
+			schema.Columns.AddValueColumn("Value", typeof(int), 2);
+			schema.Columns.AddValueColumn("IsEven", typeof(bool), false);
+			schema.Columns.AddValueColumn("String", typeof(string), null).AllowNulls = false;
+
+			var mapping = new SchemaMapping(schema);
+
+			var table = new Table(schema);
+			var syncer = new TableSynchronizer(table, mapping, SqlProvider);
 
 			table.Rows.AddFromValues(Guid.NewGuid(), 2, true, "2");
 			syncer.ReadData();
@@ -86,8 +81,8 @@ CREATE TABLE [Numbers](
 
 			syncer.WriteData();
 
-			var newTable = new Table(NumbersSchema);
-			var newSyncer = new TableSynchronizer(newTable, NumbersMapping, SqlProvider);
+			var newTable = new Table(schema);
+			var newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
 			newSyncer.ReadData();
 
 			AssertTablesEqual(table, newTable);
@@ -101,8 +96,59 @@ CREATE TABLE [Numbers](
 			newSyncer.ReadData();
 			AssertTablesEqual(table, newTable);
 
-			newTable = new Table(NumbersSchema);
-			newSyncer = new TableSynchronizer(newTable, NumbersMapping, SqlProvider);
+			newTable = new Table(schema);
+			newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
+			newSyncer.ReadData();
+
+			AssertTablesEqual(table, newTable);
+			syncer.ReadData();
+			AssertTablesEqual(newTable, table);
+		}
+
+		[TestMethod]
+		public void NullValuesTest() {
+			using (var connection = SqlProvider.OpenConnection())
+				connection.ExecuteNonQuery(@"
+CREATE TABLE [NullableTest](
+	[ID]			UNIQUEIDENTIFIER	NOT NULL	ROWGUIDCOL	PRIMARY KEY DEFAULT(newid()),
+	[Integer]		INTEGER				NULL,
+	[String]		NVARCHAR(1024)		NULL,
+	[RowVersion]	RowVersion
+);");
+
+
+			var schema = new TableSchema("NullableTest");
+			schema.PrimaryKey = schema.Columns.AddValueColumn("ID", typeof(Guid), Guid.Empty);
+			schema.Columns.AddValueColumn("Integer", typeof(int?), null);
+			schema.Columns.AddValueColumn("String", typeof(string), null);
+
+			var mapping = new SchemaMapping(schema);
+
+			var table = new Table(schema);
+			var syncer = new TableSynchronizer(table, mapping, SqlProvider);
+
+			table.Rows.AddFromValues(Guid.NewGuid());
+			table.Rows.AddFromValues(Guid.NewGuid(), 4, null);
+			table.Rows.AddFromValues(Guid.NewGuid(), null, "4");
+			table.Rows.AddFromValues(Guid.NewGuid(), 4, "4");
+
+			syncer.WriteData();
+
+			var newTable = new Table(schema);
+			var newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
+			newSyncer.ReadData();
+
+			AssertTablesEqual(table, newTable);
+
+			table.Rows[0]["Integer"] = 5;
+			table.Rows[0]["String"] = "5";
+			table.Rows[3]["Integer"] = null;
+			table.Rows[3]["String"] = null;
+
+			syncer.WriteData();
+
+			newTable = new Table(schema);
+			newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
 			newSyncer.ReadData();
 
 			AssertTablesEqual(table, newTable);
