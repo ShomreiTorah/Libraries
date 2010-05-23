@@ -69,7 +69,11 @@ namespace ShomreiTorah.Singularity {
 		public bool ReadOnly { get; protected set; }
 
 		///<summary>Coerces a value to the datatype for this column.</summary>
-		public virtual object CoerceValue(object value, IFormatProvider provider) { return DataType == null ? value : Convert.ChangeType(value, DataType, provider); }
+		public virtual object CoerceValue(object value, IFormatProvider provider) {
+			if (value == null) return null;		
+			if (DataType == null) return value;
+			return Convert.ChangeType(value, DataType, provider);
+		}
 	}
 	///<summary>Provides data for column events.</summary>
 	public class ColumnEventArgs : EventArgs {
