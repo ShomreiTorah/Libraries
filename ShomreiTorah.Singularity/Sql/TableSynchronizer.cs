@@ -133,12 +133,12 @@ namespace ShomreiTorah.Singularity.Sql {
 			return changes.FindIndex(rc => rc.Row == row);
 		}
 
-		///<summary>Populates this instance's table from the database.</summary>
+		///<summary>Saves changes in this instance's table to the database.</summary>
 		public void WriteData() {
 			using (var connection = SqlProvider.OpenConnection())
 				WriteData(connection);
 		}
-		///<summary>Populates this instance's table from the database.</summary>
+		///<summary>Saves changes in this instance's table to the database.</summary>
 		public void WriteData(DbConnection connection) {
 			//TODO: Transaction?
 
