@@ -256,6 +256,18 @@ namespace ShomreiTorah.Singularity.Tests {
 
 			var sortedRows = table.Rows.OrderBy(r => r.Field<int>("Number")).ToArray();
 			ValidateRows(sortedRows, evenRow, oddRow);
+
+			((ValueColumn)table.Schema.Columns["X Repetitions"]).AllowNulls = true;
+			table.Rows.AddFromValues(24, null, null);
+			table.Rows.AddFromValues(25, null, null);
+
+			var xml = table.ToXml();
+			table.ReadXml(xml);
+			Assert.AreEqual(xml.ToString(), table.ToXml().ToString());
+
+			table.Rows.Clear();
+			table.ReadXml(xml);
+			Assert.AreEqual(xml.ToString(), table.ToXml().ToString());
 		}
 		void ValidateRows(IList<Row> rows, Row evenRow, Row oddRow) {
 			for (int i = 0; i < rows.Count; i++) {
