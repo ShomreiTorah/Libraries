@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ShomreiTorah.Common;
 using ShomreiTorah.Singularity.Sql;
 
 namespace ShomreiTorah.Singularity.Tests.Sql {
@@ -51,9 +52,14 @@ namespace ShomreiTorah.Singularity.Tests.Sql {
 		[TestMethod]
 		public void SimpleTableTest() {
 			using (var connection = SqlProvider.OpenConnection())
-			using (var command = SqlProvider.CreateTable(connection, NumbersMapping)) {
-				command.ExecuteNonQuery();
-			}
+				connection.ExecuteNonQuery(@"
+CREATE TABLE [Numbers](
+	[ID]			UNIQUEIDENTIFIER	NOT NULL	ROWGUIDCOL	PRIMARY KEY DEFAULT(newid()),
+	[Value]			INTEGER				NOT NULL,
+	[IsEven]		BIT					NOT NULL,
+	[String]		NVARCHAR(1024)		NOT NULL,
+	[RowVersion]	RowVersion
+);");
 
 			var table = new Table(NumbersSchema);
 			var syncer = new TableSynchronizer(table, NumbersMapping, SqlProvider);
