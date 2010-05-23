@@ -41,13 +41,17 @@ namespace ShomreiTorah.Singularity {
 		static object GetColumnValue(Row row, Column column) {
 			var foreignKey = column as ForeignKeyColumn;
 
+			var value = row[column];
+			if (value == null) return new XElement("Null");
+
 			if (foreignKey == null)
-				return row[column];
+				return value;
 
 			if (foreignKey.ForeignSchema.PrimaryKey == null)
 				throw new InvalidOperationException("A foreign key column that references a table without a primary key cannot be saved to XML");
 
-			return row.Field<Row>(column)[foreignKey.ForeignSchema.PrimaryKey];
+			var foreignRow = (Row)value;
+			return foreignRow[foreignKey.ForeignSchema.PrimaryKey];
 		}
 
 		///<summary>Reads data from an XML element into this table.</summary>
@@ -70,11 +74,17 @@ namespace ShomreiTorah.Singularity {
 			protected override IEnumerable<XElement> GetRows() { return tableElement.Elements("Row"); }
 
 			protected override IEnumerable<KeyValuePair<Column, object>> GetValues(XElement values) {
-				return Columns.Select(c => new KeyValuePair<Column, object>(c, values.Element(XmlConvert.EncodeLocalName(c.Name)).Value));
+				return Columns.Select(c => new KeyValuePair<Column, object>(c, GetValue(values.Element(XmlConvert.EncodeLocalName(c.Name)))));
+			}
+
+			static object GetValue(XElement valueElement) {
+				if (valueElement.Elements().Count() == 1 && valueElement.Elements().Single().Name == "Null")
+					return null;
+				return valueElement.Value;
 			}
 
 			[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
-			protected override object GetPrimaryKey(XElement values) { return values.Element(primaryKeyName).Value; }
+			protected override object GetPrimaryKey(XElement values) { return GetValue(values.Element(primaryKeyName)); }
 		}
 	}
 
@@ -120,7 +130,9 @@ namespace ShomreiTorah.Singularity {
 				foreach (var field in GetValues(rowSource)) {
 					var foreignKey = field.Key as ForeignKeyColumn;
 
-					if (foreignKey == null)
+					if (field.Value == null)
+						row[field.Key] = null;
+					else if (foreignKey == null)
 						row[field.Key] = field.Key.CoerceValue(field.Value, CultureInfo.InvariantCulture);
 					else
 						row[field.Key] = foreignKeyMap[foreignKey][foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture)];
