@@ -130,7 +130,7 @@ namespace ShomreiTorah.Singularity {
 				foreach (var field in GetValues(rowSource)) {
 					var foreignKey = field.Key as ForeignKeyColumn;
 
-					if (field.Value == null)
+					if (field.Value == null || field.Value == DBNull.Value)
 						row[field.Key] = null;
 					else if (foreignKey == null)
 						row[field.Key] = field.Key.CoerceValue(field.Value, CultureInfo.InvariantCulture);
