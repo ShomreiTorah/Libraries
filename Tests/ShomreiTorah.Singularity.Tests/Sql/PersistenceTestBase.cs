@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ShomreiTorah.Common;
+using ShomreiTorah.Common.Calendar;
 using ShomreiTorah.Singularity.Sql;
 
 namespace ShomreiTorah.Singularity.Tests.Sql {
@@ -48,61 +49,67 @@ CREATE TABLE [Numbers](
 	[RowVersion]	RowVersion
 );");
 
-			var schema = new TableSchema("Numbers");
-			schema.PrimaryKey = schema.Columns.AddValueColumn("ID", typeof(Guid), Guid.Empty);
-			schema.Columns.AddValueColumn("Value", typeof(int), 2);
-			schema.Columns.AddValueColumn("IsEven", typeof(bool), false);
-			schema.Columns.AddValueColumn("String", typeof(string), null).AllowNulls = false;
+			try {
+				var schema = new TableSchema("Numbers");
+				schema.PrimaryKey = schema.Columns.AddValueColumn("ID", typeof(Guid), null);
+				schema.Columns.AddValueColumn("Value", typeof(int), 2);
+				schema.Columns.AddValueColumn("IsEven", typeof(bool), false);
+				schema.Columns.AddValueColumn("String", typeof(string), null).AllowNulls = false;
 
-			var mapping = new SchemaMapping(schema);
+				var mapping = new SchemaMapping(schema);
 
-			var table = new Table(schema);
-			var syncer = new TableSynchronizer(table, mapping, SqlProvider);
+				var table = new Table(schema);
+				var syncer = new TableSynchronizer(table, mapping, SqlProvider);
 
-			table.Rows.AddFromValues(Guid.NewGuid(), 2, true, "2");
-			syncer.ReadData();
-			Assert.AreEqual(0, table.Rows.Count);
+				table.Rows.AddFromValues(Guid.NewGuid(), 2, true, "2");
+				syncer.ReadData();
+				Assert.AreEqual(0, table.Rows.Count);
 
-			for (int i = 0; i < 10; i++) {
-				var row = table.Rows.AddFromValues(Guid.NewGuid(), i, i % 2 == 0, "t");
-				row["String"] = i.ToString();
+				for (int i = 0; i < 10; i++) {
+					var row = table.Rows.AddFromValues(Guid.NewGuid(), i, i % 2 == 0, "t");
+					row["String"] = i.ToString();
+				}
+				Assert.IsTrue(syncer.Changes.All(c => c.ChangeType == RowChangeType.Added));
+				Assert.AreEqual(10, syncer.Changes.Count);
+				Assert.IsTrue(syncer.Changes.Select(c => c.Row).SequenceEqual(table.Rows));
+
+				syncer.WriteData();
+
+				foreach (var row in table.Rows.Where(r => r.Field<bool>("IsEven"))) {
+					row["String"] += "E";
+				}
+				Assert.IsTrue(syncer.Changes.All(c => c.ChangeType == RowChangeType.Changed));
+				Assert.AreEqual(5, syncer.Changes.Count);
+
+				syncer.WriteData();
+
+				var newTable = new Table(schema);
+				var newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
+				newSyncer.ReadData();
+
+				AssertTablesEqual(table, newTable);
+
+				table.Rows[4].RemoveRow();
+				table.Rows[7].RemoveRow();
+				table.Rows[2].RemoveRow();
+
+				syncer.WriteData();
+
+				newSyncer.ReadData();
+				AssertTablesEqual(table, newTable);
+
+				newTable = new Table(schema);
+				newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
+				newSyncer.ReadData();
+
+				AssertTablesEqual(table, newTable);
+				syncer.ReadData();
+				AssertTablesEqual(newTable, table);
+			} finally {
+				using (var connection = SqlProvider.OpenConnection())
+					connection.ExecuteNonQuery(@"DROP TABLE Numbers;");
 			}
-			Assert.IsTrue(syncer.Changes.All(c => c.ChangeType == RowChangeType.Added));
-			Assert.AreEqual(10, syncer.Changes.Count);
-			Assert.IsTrue(syncer.Changes.Select(c => c.Row).SequenceEqual(table.Rows));
 
-			syncer.WriteData();
-
-			foreach (var row in table.Rows.Where(r => r.Field<bool>("IsEven"))) {
-				row["String"] += "E";
-			}
-			Assert.IsTrue(syncer.Changes.All(c => c.ChangeType == RowChangeType.Changed));
-			Assert.AreEqual(5, syncer.Changes.Count);
-
-			syncer.WriteData();
-
-			var newTable = new Table(schema);
-			var newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
-			newSyncer.ReadData();
-
-			AssertTablesEqual(table, newTable);
-
-			table.Rows[4].RemoveRow();
-			table.Rows[7].RemoveRow();
-			table.Rows[2].RemoveRow();
-
-			syncer.WriteData();
-
-			newSyncer.ReadData();
-			AssertTablesEqual(table, newTable);
-
-			newTable = new Table(schema);
-			newSyncer = new TableSynchronizer(newTable, mapping, SqlProvider);
-			newSyncer.ReadData();
-
-			AssertTablesEqual(table, newTable);
-			syncer.ReadData();
-			AssertTablesEqual(newTable, table);
 		}
 
 		[TestMethod]
@@ -116,9 +123,8 @@ CREATE TABLE [NullableTest](
 	[RowVersion]	RowVersion
 );");
 
-
 			var schema = new TableSchema("NullableTest");
-			schema.PrimaryKey = schema.Columns.AddValueColumn("ID", typeof(Guid), Guid.Empty);
+			schema.PrimaryKey = schema.Columns.AddValueColumn("ID", typeof(Guid), null);
 			schema.Columns.AddValueColumn("Integer", typeof(int?), null);
 			schema.Columns.AddValueColumn("String", typeof(string), null);
 
@@ -156,6 +162,123 @@ CREATE TABLE [NullableTest](
 			AssertTablesEqual(newTable, table);
 		}
 
+		static readonly Random rand = new Random();
+		[TestMethod]
+		public void ForeignKeysTest() {
+			using (var connection = SqlProvider.OpenConnection()) {
+				connection.ExecuteNonQuery(@"
+CREATE TABLE [Numbers](
+	[ID]			UNIQUEIDENTIFIER	NOT NULL	ROWGUIDCOL	PRIMARY KEY DEFAULT(newid()),
+	[Number]		INTEGER				NOT NULL,
+	[Date]			DATETIME			NULL,
+	[RowVersion]	RowVersion
+);");
+				connection.ExecuteNonQuery(@"
+CREATE TABLE [Powers](
+	[ID]			UNIQUEIDENTIFIER	NOT NULL	ROWGUIDCOL	PRIMARY KEY DEFAULT(newid()),
+	[Number]		UNIQUEIDENTIFIER	NULL		REFERENCES Numbers(Id),
+	[Exponent]		INTEGER				NOT NULL,
+	[Value]			INTEGER				NOT NULL,
+	[RowVersion]	RowVersion
+);");
+			}
+
+
+			try {
+				var numbersSchema = new TableSchema("Numbers");
+				var powersSchema = new TableSchema("Powers");
+
+				numbersSchema.PrimaryKey = numbersSchema.Columns.AddValueColumn("ID", typeof(Guid), null);
+				numbersSchema.Columns.AddValueColumn("Number", typeof(int), 0);
+				numbersSchema.Columns.AddValueColumn("Date", typeof(DateTime?), null);
+
+				powersSchema.PrimaryKey = powersSchema.Columns.AddValueColumn("ID", typeof(Guid), null);
+				powersSchema.Columns.AddForeignKey("Number", numbersSchema, "Powers").AllowNulls = true;
+				powersSchema.Columns.AddValueColumn("Exponent", typeof(int), 0);
+				powersSchema.Columns.AddValueColumn("Value", typeof(int), 0);
+
+				var context = new DataContext();
+				Table numbersTable, powersTable;
+				context.Tables.AddTable(numbersTable = new Table(numbersSchema));
+				context.Tables.AddTable(powersTable = new Table(powersSchema));
+
+				var syncContext = new DataSyncContext(context, SqlProvider);
+
+				Action verify = delegate {
+					var newContext = new DataContext();
+					newContext.Tables.AddTable(new Table(numbersSchema));
+					newContext.Tables.AddTable(new Table(powersSchema));
+					var newSyncContext = new DataSyncContext(newContext, SqlProvider);
+					newSyncContext.ReadData();
+
+					AssertTablesEqual(context.Tables[numbersSchema], newContext.Tables[numbersSchema]);
+					AssertTablesEqual(context.Tables[powersSchema], newContext.Tables[powersSchema]);
+
+
+					context.Tables[powersSchema].Rows.Clear();
+					context.Tables[numbersSchema].Rows.Clear();
+					syncContext.ReadData();
+
+					AssertTablesEqual(newContext.Tables[numbersSchema], context.Tables[numbersSchema]);
+					AssertTablesEqual(newContext.Tables[powersSchema], context.Tables[powersSchema]);
+				};
+
+				for (int i = 0; i < 10; i++) {
+					var row = numbersTable.Rows.AddFromValues(Guid.NewGuid(), i);
+
+					if (rand.NextDouble() < .4)
+						row["Date"] = DateTime.Today.AddMinutes((int)(1000000 * (.5 - rand.NextDouble())));
+
+					for (int j = 0; j < 10; j++) {
+						powersTable.Rows.AddFromValues(Guid.NewGuid(), row, j, (int)Math.Pow(i, j));
+					}
+					powersTable.Rows.Remove(powersTable.Rows.Last());
+				}
+
+				powersTable.Rows.AddFromValues(Guid.NewGuid(), null, 1, -1);
+				powersTable.Rows.AddFromValues(Guid.NewGuid(), null, 2, -1);
+				powersTable.Rows.AddFromValues(Guid.NewGuid(), null, 3, -1);
+				powersTable.Rows.AddFromValues(Guid.NewGuid(), null, 4, -1);
+
+				syncContext.WriteData();
+				verify();
+
+				for (int i = powersTable.Rows.Count - 1; i >= 0; i--) {
+					if (rand.NextDouble() < .2)
+						powersTable.Rows.RemoveAt(i);
+				}
+				for (int i = numbersTable.Rows.Count - 1; i >= 0; i--) {
+					if (rand.NextDouble() < .2) {
+						while (numbersTable.Rows[i].ChildRows("Powers").Count > 0) {
+							if (rand.NextDouble() < .5)
+								numbersTable.Rows[i].ChildRows("Powers")[0].RemoveRow();
+							else
+								numbersTable.Rows[i].ChildRows("Powers")[0]["Number"] = numbersTable.Rows[rand.Next(numbersTable.Rows.Count)];
+						}
+
+						numbersTable.Rows.RemoveAt(i);
+					}
+				}
+				syncContext.WriteData();
+				verify();
+
+				var hundred = numbersTable.Rows.AddFromValues(Guid.NewGuid(), 100);
+				powersTable.Rows.AddFromValues(Guid.NewGuid(), hundred, 1, 100);
+				powersTable.Rows.AddFromValues(Guid.NewGuid(), hundred, 2, 10000);
+				powersTable.Rows[rand.Next(powersTable.Rows.Count)]["Number"] = hundred;
+				syncContext.WriteData();
+				verify();
+
+
+
+			} finally {
+				using (var connection = SqlProvider.OpenConnection()) {
+					connection.ExecuteNonQuery(@"DROP TABLE Powers;");
+					connection.ExecuteNonQuery(@"DROP TABLE Numbers;");
+				}
+			}
+		}
+
 		static void AssertTablesEqual(Table expected, Table actual) {
 			Assert.AreEqual(expected.Rows.Count, actual.Rows.Count);
 
@@ -164,7 +287,20 @@ CREATE TABLE [NullableTest](
 
 			for (int r = 0; r < expected.Rows.Count; r++) {
 				foreach (var c in expected.Schema.Columns) {
-					Assert.AreEqual(expectedRows[r][c], actualRows[r][c], actual.Schema.Name + "[" + r + "]." + c.Name);
+					var fkc = c as ForeignKeyColumn;
+
+					if (fkc == null)
+						Assert.AreEqual(expectedRows[r][c], actualRows[r][c], actual.Schema.Name + "[" + r + "]." + c.Name);
+					else {
+						Row e = expectedRows[r].Field<Row>(c), a = actualRows[r].Field<Row>(c);
+						if (e == null || a == null)
+							Assert.AreEqual(e, a, actual.Schema.Name + "[" + r + "]." + c.Name);
+						else
+							Assert.AreEqual(e[fkc.ForeignSchema.PrimaryKey],
+											a[fkc.ForeignSchema.PrimaryKey],
+											actual.Schema.Name + "[" + r + "]." + c.Name
+										   );
+					}
 				}
 			}
 		}

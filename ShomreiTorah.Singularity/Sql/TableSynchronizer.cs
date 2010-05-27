@@ -140,9 +140,22 @@ namespace ShomreiTorah.Singularity.Sql {
 		}
 		///<summary>Saves changes in this instance's table to the database.</summary>
 		public void WriteData(DbConnection connection) {
-			//TODO: Transaction?
+			//TODO: Transaction
 
-			foreach (var change in changes) {
+			if (connection == null) throw new ArgumentNullException("connection");
+
+			WriteChanges(connection, null);
+		}
+
+		internal void WriteChanges(DbConnection connection, RowChangeType? changeType) {
+			IEnumerable<RowChange> relevantChanges;
+
+			if (changeType == null)
+				relevantChanges = changes;
+			else
+				relevantChanges = changes.Where(rc => rc.ChangeType == changeType);
+
+			foreach (var change in relevantChanges) {
 				try {
 					switch (change.ChangeType) {
 						case RowChangeType.Added:
@@ -159,10 +172,16 @@ namespace ShomreiTorah.Singularity.Sql {
 					}
 				} catch (DBConcurrencyException) {
 					//TODO: Make my own exception class, and get the new values from the database.
+					throw;
 				}
 			}
 
-			changes.Clear();
+			//If we didn't get any exceptions, clear the changes.
+			//We assume that the connection has a transaction.
+			if (changeType == null)
+				changes.Clear();
+			else
+				changes.RemoveAll(rc => rc.ChangeType == changeType);
 		}
 		#endregion
 	}

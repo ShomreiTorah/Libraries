@@ -38,6 +38,21 @@ namespace ShomreiTorah.Singularity.Sql {
 				}
 			}
 		}
+		///<summary>Saves changes in the tables to the database.</summary>
+		public void WriteData() {
+			using (var connection = SqlProvider.OpenConnection()) {
+
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
+					table.WriteChanges(connection, RowChangeType.Added);
+
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
+					table.WriteChanges(connection, RowChangeType.Changed);
+
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema).Reverse())
+					table.WriteChanges(connection, RowChangeType.Removed);
+
+			}
+		}
 	}
 
 	///<summary>A collection of TableSynchronizer objects.</summary>
