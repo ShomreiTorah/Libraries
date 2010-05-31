@@ -5,6 +5,7 @@ using System.Text;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>An untyped row in a Singularity table.</summary>
@@ -26,6 +27,11 @@ namespace ShomreiTorah.Singularity {
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the Table containing this row, if any.</summary>
 		public Table Table { get; internal set; }
+
+		///<summary>Returns a string containing the row's values.</summary>
+		public override string ToString() {
+			return Schema.Name + " {" + Schema.Columns.Join(", ", c => c.Name + " = " + this[c]) + "}";
+		}
 
 		///<summary>Gets or sets the value of the specified column.</summary>
 		public object this[string name] { get { return this[Schema.Columns[name]]; } set { this[Schema.Columns[name]] = value; } }
