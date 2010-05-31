@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Data.Common;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Synchronizes a Singularity database with an SQL database.</summary>	
@@ -40,18 +41,27 @@ namespace ShomreiTorah.Singularity.Sql {
 		}
 		///<summary>Saves changes in the tables to the database.</summary>
 		public void WriteData() {
-			using (var connection = SqlProvider.OpenConnection()) {
+			using (var connection = SqlProvider.OpenConnection())
+				WriteData(connection);
+		}
+		///<summary>Saves changes in the tables to the database.</summary>
+		public void WriteData(DbConnection connection) {
+			using (var transactionContext = new TransactionContext(connection)) {
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
+					table.WriteChanges(transactionContext, RowChangeType.Added);
 
 				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
-					table.WriteChanges(connection, RowChangeType.Added);
-
-				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
-					table.WriteChanges(connection, RowChangeType.Changed);
+					table.WriteChanges(transactionContext, RowChangeType.Changed);
 
 				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema).Reverse())
-					table.WriteChanges(connection, RowChangeType.Removed);
+					table.WriteChanges(transactionContext, RowChangeType.Removed);
 
+				transactionContext.Commit();
 			}
+			//If we didn't get an exception, clear the changes.
+			//If we did, don't clear, since we didn't commit it
+			foreach (var table in Tables)
+				table.ClearChanges();
 		}
 	}
 

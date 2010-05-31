@@ -7,6 +7,7 @@ using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Synchronizes a Singularity table with a table in an SQL database.</summary>
@@ -153,10 +154,17 @@ namespace ShomreiTorah.Singularity.Sql {
 		///<summary>Saves changes in this instance's table to the database.</summary>
 		public void WriteData(DbConnection connection) {
 			if (connection == null) throw new ArgumentNullException("connection");
-			WriteChanges(connection, null);
+
+			using (var transactionContext = new TransactionContext(connection)) {
+				WriteChanges(transactionContext, null);
+				transactionContext.Commit();
+			}
+			//If we didn't get an exception, clear the changes.
+			//If we did, don't clear, since we didn't commit it
+			ClearChanges();
 		}
 
-		internal void WriteChanges(DbConnection connection, RowChangeType? changeType) {
+		internal void WriteChanges(TransactionContext context, RowChangeType? changeType) {
 			IEnumerable<RowChange> relevantChanges;
 
 			if (changeType == null)
@@ -168,13 +176,13 @@ namespace ShomreiTorah.Singularity.Sql {
 				try {
 					switch (change.ChangeType) {
 						case RowChangeType.Added:
-							SqlProvider.ApplyInsert(connection, Mapping, change.Row);
+							SqlProvider.ApplyInsert(context, Mapping, change.Row);
 							break;
 						case RowChangeType.Changed:
-							SqlProvider.ApplyUpdate(connection, Mapping, change.Row);
+							SqlProvider.ApplyUpdate(context, Mapping, change.Row);
 							break;
 						case RowChangeType.Removed:
-							SqlProvider.ApplyDelete(connection, Mapping, change.Row);
+							SqlProvider.ApplyDelete(context, Mapping, change.Row);
 							break;
 						default:
 							throw new InvalidOperationException("Unknown change type: " + change.ChangeType);
@@ -184,14 +192,9 @@ namespace ShomreiTorah.Singularity.Sql {
 					throw;
 				}
 			}
-
-			//If we didn't get any exceptions, clear the changes.
-			//We assume that the connection has a transaction.
-			if (changeType == null)
-				changes.Clear();
-			else
-				changes.RemoveAll(rc => rc.ChangeType == changeType);
 		}
+
+		internal void ClearChanges() { changes.Clear(); }
 		#endregion
 	}
 

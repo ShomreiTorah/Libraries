@@ -59,8 +59,8 @@ namespace ShomreiTorah.Singularity.Sql {
 
 
 		///<summary>Applies an inserted row to the database.</summary>
-		public virtual void ApplyInsert(DbConnection connection, SchemaMapping schema, Row row) {
-			if (connection == null) throw new ArgumentNullException("connection");
+		public virtual void ApplyInsert(TransactionContext context, SchemaMapping schema, Row row) {
+			if (context == null) throw new ArgumentNullException("context");
 			if (schema == null) throw new ArgumentNullException("schema");
 			if (row == null) throw new ArgumentNullException("row");
 
@@ -82,7 +82,7 @@ namespace ShomreiTorah.Singularity.Sql {
 				schema.Columns.Select((c, i) => "@Col" + i.ToString(CultureInfo.InvariantCulture)), ", "
 			).Append(");");
 
-			using (var command = connection.CreateCommand(sql.ToString())) {
+			using (var command = context.CreateCommand(sql.ToString())) {
 				PopulateParameters(command, schema, row);
 
 				using (var reader = command.ExecuteReader()) {
@@ -96,8 +96,8 @@ namespace ShomreiTorah.Singularity.Sql {
 			}
 		}
 		///<summary>Applies an update row to the database.</summary>
-		public virtual void ApplyUpdate(DbConnection connection, SchemaMapping schema, Row row) {
-			if (connection == null) throw new ArgumentNullException("connection");
+		public virtual void ApplyUpdate(TransactionContext context, SchemaMapping schema, Row row) {
+			if (context == null) throw new ArgumentNullException("context");
 			if (schema == null) throw new ArgumentNullException("schema");
 			if (row == null) throw new ArgumentNullException("row");
 
@@ -116,7 +116,7 @@ namespace ShomreiTorah.Singularity.Sql {
 			sql.Append("WHERE ").Append(schema.PrimaryKey.SqlName.EscapeSqlIdentifier()).Append(" = @Col").Append(schema.Columns.IndexOf(schema.PrimaryKey))
 								.Append(" AND RowVersion = @version;");
 
-			using (var command = connection.CreateCommand(sql.ToString())) {
+			using (var command = context.CreateCommand(sql.ToString())) {
 				PopulateParameters(command, schema, row);
 
 				var versionParameter = command.CreateParameter();
@@ -165,13 +165,13 @@ namespace ShomreiTorah.Singularity.Sql {
 		}
 
 		///<summary>Applies a deleted row to the database.</summary>
-		public void ApplyDelete(DbConnection connection, SchemaMapping schema, Row row) {
-			if (connection == null) throw new ArgumentNullException("connection");
+		public void ApplyDelete(TransactionContext context, SchemaMapping schema, Row row) {
+			if (context == null) throw new ArgumentNullException("context");
 			if (schema == null) throw new ArgumentNullException("schema");
 			if (row == null) throw new ArgumentNullException("row");
 
 			//Should work fine for SQLCE too
-			using (var command = connection.CreateCommand(
+			using (var command = context.CreateCommand(
 				"DELETE FROM " + QualifyTable(schema) + " WHERE " + schema.PrimaryKey.SqlName.EscapeSqlIdentifier() + " = @ID AND RowVersion = @version",
 				new { ID = row[row.Schema.PrimaryKey], version = row.RowVersion }
 			)) {

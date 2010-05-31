@@ -76,6 +76,7 @@
     <Compile Include="Row Collections.cs" />
     <Compile Include="Row.cs" />
     <Compile Include="Sql\SqlCeSqlProvider.cs" />
+    <Compile Include="Sql\TransactionContext.cs" />
     <Compile Include="Sql\Utils.cs" />
     <Compile Include="Typed Rows.cs" />
     <Compile Include="XmlPersistence.cs" />
