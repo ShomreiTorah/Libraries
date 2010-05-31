@@ -123,8 +123,20 @@ namespace ShomreiTorah.Singularity.Sql {
 			if (isReadingDB) return;
 			var changeIndex = GetChangeIndex(e.Row);
 			if (changeIndex >= 0) {
-				Debug.Assert(changes[changeIndex].ChangeType != RowChangeType.Removed, "Row was removed twice");
+				var type = changes[changeIndex].ChangeType;
+
+				Debug.Assert(type != RowChangeType.Removed, "Row was removed twice");
+
+				//If a row was added, then removed, we shouldn't 
+				//record any change.  If a row was changed, then 
+				//removed, we should remove the Change change and
+				//add a Remove change.
+
 				changes.RemoveAt(changeIndex);
+
+				if (type != RowChangeType.Added)
+					changes.Add(new RowChange(e.Row, RowChangeType.Removed));
+
 			} else
 				changes.Add(new RowChange(e.Row, RowChangeType.Removed));
 		}
@@ -140,10 +152,7 @@ namespace ShomreiTorah.Singularity.Sql {
 		}
 		///<summary>Saves changes in this instance's table to the database.</summary>
 		public void WriteData(DbConnection connection) {
-			//TODO: Transaction
-
 			if (connection == null) throw new ArgumentNullException("connection");
-
 			WriteChanges(connection, null);
 		}
 
@@ -195,6 +204,11 @@ namespace ShomreiTorah.Singularity.Sql {
 
 		///<summary>Gets the way that the row was changed.</summary>
 		public RowChangeType ChangeType { get; private set; }
+
+		///<summary>Returns a string representation of this change.</summary>
+		public override string ToString() {
+			return ChangeType + ": " + Row;
+		}
 	}
 	///<summary>A type of change in a tracked row.</summary>
 	public enum RowChangeType {
