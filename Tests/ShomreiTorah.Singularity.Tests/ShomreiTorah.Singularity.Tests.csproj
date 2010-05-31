@@ -60,6 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sql\PersistenceTestBase.cs" />
     <Compile Include="Sql\SchemaMappingTest.cs" />
+    <Compile Include="Sql\SqlCeTest.cs" />
     <Compile Include="Sql\SqlServerTest.cs" />
     <Compile Include="TableSchemaTest.cs" />
     <Compile Include="TableTest.cs" />

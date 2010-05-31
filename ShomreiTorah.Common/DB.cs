@@ -14,6 +14,7 @@ using System.Xml.Linq;
 using System.Data.OleDb;
 using System.Data.Odbc;
 using System.IO;
+using System.Data.SqlServerCe;
 
 namespace ShomreiTorah.Common {
 	///<summary>Manages database connections.</summary>
@@ -67,6 +68,12 @@ namespace ShomreiTorah.Common {
 		}
 
 		#region OleDB Files
+		static string CreateSqlCeConnectionString(string filePath) {
+			var builder = new DbConnectionStringBuilder();
+			builder["Data Source"] = filePath;
+			return builder.ConnectionString;
+		}
+
 		static readonly List<KeyValuePair<DatabaseFile, string>> FormatExtensions = new List<KeyValuePair<DatabaseFile, string>> {
 			new KeyValuePair<DatabaseFile, string>(DatabaseFile.Access,				".mdb"),
 			new KeyValuePair<DatabaseFile, string>(DatabaseFile.Access2007,			".accdb"),
@@ -75,6 +82,8 @@ namespace ShomreiTorah.Common {
 			new KeyValuePair<DatabaseFile, string>(DatabaseFile.Excel2007,			".xlsx"),
 			new KeyValuePair<DatabaseFile, string>(DatabaseFile.Excel2007Binary,	".xlsb"),
 			new KeyValuePair<DatabaseFile, string>(DatabaseFile.Excel2007Macro,		".xlsm"),
+
+			new KeyValuePair<DatabaseFile, string>(DatabaseFile.SqlCe,		".sdf"),
 		};
 
 		///<summary>Gets the database format that uses the given extension.</summary>
@@ -104,6 +113,9 @@ namespace ShomreiTorah.Common {
 
 			const string ExcelProperties = "IMEX=0;HDR=YES";
 			switch (format) {
+				case DatabaseFile.SqlCe:
+					return new DBConnector(SqlCeProviderFactory.Instance, CreateSqlCeConnectionString(filePath));
+
 				case DatabaseFile.Access:
 					csBuilder.Provider = "Microsoft.Jet.OLEDB.4.0";
 					break;
@@ -141,19 +153,32 @@ namespace ShomreiTorah.Common {
 		///<param name="format">The format of the file.</param>
 		///<returns>A DBConnector that connects to the path.</returns>
 		public static DBConnector CreateFile(string filePath, DatabaseFile format) {
-			if (format == DatabaseFile.Access || format == DatabaseFile.Access2007) {
-				//OleDB can't create Access databases, so I
-				//embedded empty databases in the aseembly.
-				using (var originalStream = typeof(DB).Assembly.GetManifestResourceStream("ShomreiTorah.Common.Data." + format.ToString() + format.GetExtension()))
-				using (var file = File.Create(filePath)) {
-					originalStream.CopyTo(file);
-				}
-			} else {
-				//It is not possible to have an empty Excel
-				//file, so I just delete any existing file.
-				//The file will be automatically created if
-				//the client creates a table.
-				File.Delete(filePath);
+			switch (format) {
+				case DatabaseFile.Access:
+				case DatabaseFile.Access2007:
+					//OleDB can't create Access databases, so I
+					//embedded empty databases in the assembly.
+					using (var originalStream = typeof(DB).Assembly.GetManifestResourceStream("ShomreiTorah.Common.Data." + format.ToString() + format.GetExtension()))
+					using (var file = File.Create(filePath)) {
+						originalStream.CopyTo(file);
+					}
+					break;
+				case DatabaseFile.Excel:
+				case DatabaseFile.Excel2007:
+				case DatabaseFile.Excel2007Binary:
+				case DatabaseFile.Excel2007Macro:
+					//It is not possible to have an empty Excel
+					//file, so I just delete any existing file.
+					//The file will be automatically created if
+					//the client creates a table.
+					File.Delete(filePath);
+					break;
+				case DatabaseFile.SqlCe:
+					using (var engine = new SqlCeEngine(CreateSqlCeConnectionString(filePath)))
+						engine.CreateDatabase();
+					break;
+				default:
+					break;
 			}
 
 			return DB.OpenFile(filePath, format);
@@ -367,6 +392,9 @@ namespace ShomreiTorah.Common {
 		Excel2007Binary,
 		///<summary>An Excel 2007 .xlsm file with macros.</summary>
 		Excel2007Macro,
+
+		///<summary>A SQL Server Compact Edition database.</summary>
+		SqlCe
 	}
 
 	///<summary>Connects to a database.</summary>

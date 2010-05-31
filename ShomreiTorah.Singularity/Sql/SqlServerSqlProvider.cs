@@ -24,7 +24,7 @@ namespace ShomreiTorah.Singularity.Sql {
 		public DbConnection OpenConnection() { return Connector.OpenConnection(); }
 
 		///<summary>Gets the name of the SQL Server table referenced by a SchemaMapping.</summary>
-		///<returns>The table name, with the schema name if any.</returns>
+		///<returns>The escaped table name, with the schema name if any.</returns>
 		///<remarks>SQL CE doesn't support schemas, so SqlCeProvider overrides this method.</remarks>
 		protected virtual string QualifyTable(SchemaMapping mapping) {
 			if (mapping == null) throw new ArgumentNullException("mapping");
@@ -59,7 +59,7 @@ namespace ShomreiTorah.Singularity.Sql {
 
 
 		///<summary>Applies an inserted row to the database.</summary>
-		public void ApplyInsert(DbConnection connection, SchemaMapping schema, Row row) {
+		public virtual void ApplyInsert(DbConnection connection, SchemaMapping schema, Row row) {
 			if (connection == null) throw new ArgumentNullException("connection");
 			if (schema == null) throw new ArgumentNullException("schema");
 			if (row == null) throw new ArgumentNullException("row");
@@ -96,7 +96,7 @@ namespace ShomreiTorah.Singularity.Sql {
 			}
 		}
 		///<summary>Applies an update row to the database.</summary>
-		public void ApplyUpdate(DbConnection connection, SchemaMapping schema, Row row) {
+		public virtual void ApplyUpdate(DbConnection connection, SchemaMapping schema, Row row) {
 			if (connection == null) throw new ArgumentNullException("connection");
 			if (schema == null) throw new ArgumentNullException("schema");
 			if (row == null) throw new ArgumentNullException("row");
@@ -175,7 +175,7 @@ namespace ShomreiTorah.Singularity.Sql {
 				"DELETE FROM " + QualifyTable(schema) + " WHERE " + schema.PrimaryKey.SqlName.EscapeSqlIdentifier() + " = @ID AND RowVersion = @version",
 				new { ID = row[row.Schema.PrimaryKey], version = row.RowVersion }
 			)) {
-				if (command.ExecuteNonQuery() != 1)
+				 if (command.ExecuteNonQuery() != 1)
 					throw new DBConcurrencyException("Concurrency FAIL!");
 			}
 		}
