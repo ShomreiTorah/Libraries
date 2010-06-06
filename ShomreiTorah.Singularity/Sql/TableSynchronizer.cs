@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using ShomreiTorah.Common;
+using System.Runtime.Serialization;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Synchronizes a Singularity table with a table in an SQL database.</summary>
@@ -187,15 +188,87 @@ namespace ShomreiTorah.Singularity.Sql {
 						default:
 							throw new InvalidOperationException("Unknown change type: " + change.ChangeType);
 					}
-				} catch (DBConcurrencyException) {
-					//TODO: Make my own exception class, and get the new values from the database.
+				} catch (RowDeletedException) {
+					if (change.ChangeType == RowChangeType.Removed)
+						continue;	//If two users delete the same row, don't complain
+
+					//If the row was previously deleted, we
+					//need to convert the change to an Add 
+					//change (which will itself be removed 
+					//if our user deletes the row).
+					changes.Remove(change);
+					changes.Add(new RowChange(change.Row, RowChangeType.Added));
 					throw;
+				} catch (RowException) {
+					throw;
+				} catch (Exception ex) {
+					throw new RowException(change.Row, ex);
 				}
 			}
 		}
 
 		internal void ClearChanges() { changes.Clear(); }
 		#endregion
+	}
+
+	//None of these exceptions can be serialized correctly,
+	//since it is not possible to serialize a Row instance.
+	//(Rows require TableSchemas and foreign keys)
+	//However, the Exceptions must be serializable so that 
+	//they can cross AppDomains.
+
+	///<summary>Thrown when an an error occurs while saving a row to the database.</summary>
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Specialized Exception")]
+	[Serializable]
+	public class RowException : Exception {
+		///<summary>Creates a new RowException instance.</summary>
+		public RowException(Row row, string message)
+			: base(message) {
+			if (row == null) throw new ArgumentNullException("row");
+			Row = row;
+		}
+		///<summary>Creates a new RowException instance.</summary>
+		public RowException(Row row, Exception inner)
+			: base((inner ?? new InvalidOperationException()).Message, inner) {
+			if (row == null) throw new ArgumentNullException("row");
+			if (inner == null) throw new ArgumentNullException("inner");
+
+			Row = row;
+		}
+
+		///<summary>Serialization constructor</summary>
+		protected RowException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+
+		///<summary>Gets the row that was modified in the database.</summary>
+		public Row Row { get; private set; }
+	}
+
+	///<summary>Thrown when an existing row was modified in the database.</summary>
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Specialized Exception")]
+	[Serializable]
+	public class RowModifiedException : RowException {
+		///<summary>Creates a new RowModifiedException instance.</summary>
+		public RowModifiedException(Row row, IDictionary<Column, object> dbValues)
+			: base(row, "The row was modified in the database") {
+			if (dbValues == null) throw new ArgumentNullException("dbValues");
+			DatabaseValues = new ReadOnlyDictionary<Column, object>(dbValues);
+		}
+
+		///<summary>Serialization constructor</summary>
+		protected RowModifiedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+
+		///<summary>Gets the current values of the row in the database.</summary>
+		public ReadOnlyDictionary<Column, object> DatabaseValues { get; private set; }
+	}
+	///<summary>Thrown when an existing row was deleted in the database.</summary>
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Specialized Exception")]
+	[Serializable]
+	public class RowDeletedException : RowException {
+		///<summary>Creates a new RowModifiedException instance.</summary>
+		public RowDeletedException(Row row) : base(row, "The row was deleted in the database") { }
+
+		///<summary>Serialization constructor</summary>
+		protected RowDeletedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 	}
 
 	///<summary>Represents a changed row that will be synchronized to an SQL database.</summary>

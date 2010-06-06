@@ -109,7 +109,6 @@ CREATE TABLE [Numbers](
 				using (var connection = SqlProvider.OpenConnection())
 					connection.ExecuteNonQuery(@"DROP TABLE Numbers;");
 			}
-
 		}
 
 		[TestMethod]
@@ -276,6 +275,116 @@ CREATE TABLE [Powers](
 					connection.ExecuteNonQuery(@"DROP TABLE Powers;");
 					connection.ExecuteNonQuery(@"DROP TABLE Numbers;");
 				}
+			}
+		}
+
+		[TestMethod]
+		public void ConflictsTest() {
+			using (var connection = SqlProvider.OpenConnection())
+				connection.ExecuteNonQuery(@"
+CREATE TABLE [ConflictsTest](
+	[ID]			UNIQUEIDENTIFIER	NOT NULL	ROWGUIDCOL	PRIMARY KEY DEFAULT(newid()),
+	[Key]			INTEGER				NOT NULL	UNIQUE,
+	[Value]			INTEGER				NULL,
+	[RowVersion]	RowVersion
+);");
+
+			try {
+				var schema = new TableSchema("ConflictsTest");
+				schema.PrimaryKey = schema.Columns.AddValueColumn("ID", typeof(Guid), null);
+				schema.Columns.AddValueColumn("Key", typeof(int), null).Unique = true;
+				schema.Columns.AddValueColumn("Value", typeof(int?), null);
+
+				var mapping = new SchemaMapping(schema);
+
+				var table1 = new Table(schema);
+				var syncer1 = new TableSynchronizer(table1, mapping, SqlProvider);
+
+				var table2 = new Table(schema);
+				var syncer2 = new TableSynchronizer(table2, mapping, SqlProvider);
+
+				Func<Table, int, Row> GetRow = (t, key) => t.Rows.SingleOrDefault(r => r.Field<int>("Key") == key);
+
+				Func<int, Row> R1 = k => GetRow(table1, k),
+							   R2 = k => GetRow(table2, k);
+
+				table1.Rows.AddFromValues(Guid.NewGuid(), 2, 67);
+
+				table2.Rows.AddFromValues(Guid.NewGuid(), 1, null);
+				table2.Rows.AddFromValues(Guid.NewGuid(), 2, 43);
+
+				syncer1.WriteData();
+
+				try {
+					syncer2.WriteData();
+					Assert.Fail("Conflict succeeded");
+				} catch (RowException ex) {
+					Assert.IsNotNull(ex.InnerException);
+					Assert.AreEqual(R2(2), ex.Row);
+				}
+				table2.Rows.Clear();
+				syncer2.ReadData();
+				AssertTablesEqual(table1, table2);
+
+				table1.Rows.AddFromValues(Guid.NewGuid(), 1, null);
+				syncer1.WriteData();
+				syncer2.ReadData();
+
+				R1(1)["Value"] = 100;
+				R2(1)["Value"] = 200;
+
+				syncer1.WriteData();
+
+				try {		
+					syncer2.WriteData();
+					Assert.Fail("Conflict succeeded - Update / Update");
+				} catch (RowModifiedException ex) {
+					Assert.IsNull(ex.InnerException);
+					Assert.AreEqual(R2(1), ex.Row);
+					Assert.AreEqual(R1(1)["Key"], ex.DatabaseValues[schema.Columns["Key"]]);
+					Assert.AreEqual(R1(1)["Value"], ex.DatabaseValues[schema.Columns["Value"]]);
+				}
+				syncer2.ReadData();
+				AssertTablesEqual(table1, table2);
+
+				R1(1)["Value"] = 123;
+				R2(1).RemoveRow();
+				syncer1.WriteData();
+				try {
+					syncer2.WriteData();
+					Assert.Fail("Conflict succeeded - Update / Delete");
+				} catch (RowModifiedException ex) {
+					Assert.IsNull(ex.InnerException);
+					Assert.AreEqual(1, ex.Row["Key"]);
+					Assert.AreEqual(R1(1)["Value"], ex.DatabaseValues[schema.Columns["Value"]]);
+				}
+				syncer2.ReadData();
+				AssertTablesEqual(table1, table2);
+
+				R1(1).RemoveRow();
+				R2(1)["Value"] = -1;
+				syncer1.WriteData();
+				try {
+					syncer2.WriteData();
+					Assert.Fail("Conflict succeeded - Delete / Update");
+				} catch (RowDeletedException ex) {
+					Assert.IsNull(ex.InnerException);
+					Assert.AreEqual(R2(1), ex.Row);
+				}
+				syncer2.ReadData();
+				AssertTablesEqual(table1, table2);
+
+				R1(2).RemoveRow();
+				R2(2).RemoveRow();
+				syncer1.WriteData();
+				syncer2.WriteData();		//Delete / Delete - should not throw
+
+				syncer1.ReadData();
+				Assert.AreEqual(0, table1.Rows.Count);
+
+			} finally {
+				using (var connection = SqlProvider.OpenConnection())
+					connection.ExecuteNonQuery(@"DROP TABLE ConflictsTest;");
 			}
 		}
 

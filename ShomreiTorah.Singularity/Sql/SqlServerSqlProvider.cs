@@ -44,8 +44,17 @@ namespace ShomreiTorah.Singularity.Sql {
 			if (connection == null) throw new ArgumentNullException("connection");
 			if (schema == null) throw new ArgumentNullException("schema");
 
-			//SELECT [FirstColumn], [SecondColumn], [RowVersion]
-			//FROM [SchemaName].[TableName]
+			return connection.CreateCommand(BuildSelectCommand(schema).ToString());
+		}
+
+		///<summary>Builds a SELECT command for the given schema.</summary>
+		///<returns>
+		///SELECT [FirstColumn], [SecondColumn], [RowVersion]
+		///FROM [SchemaName].[TableName]
+		///</returns>
+		protected StringBuilder BuildSelectCommand(SchemaMapping schema) {
+			if (schema == null) throw new ArgumentNullException("schema");
+
 			var sql = new StringBuilder();
 
 			sql.Append("SELECT ");
@@ -54,9 +63,40 @@ namespace ShomreiTorah.Singularity.Sql {
 			);
 			sql.AppendLine(", [RowVersion]");
 			sql.Append("FROM ").Append(QualifyTable(schema));
-			return connection.CreateCommand(sql.ToString());
+
+			return sql;
 		}
 
+		///<summary>Throws a RowModifiedException for a row, reading the row's current values from the database.</summary>
+		protected void ThrowRowModified(TransactionContext context, SchemaMapping schema, Row row) {
+			if (context == null) throw new ArgumentNullException("context");
+			if (schema == null) throw new ArgumentNullException("schema");
+			if (row == null) throw new ArgumentNullException("row");
+
+
+			//SELECT [FirstColumn], [SecondColumn], [RowVersion]
+			//FROM [SchemaName].[TableName]
+			//WHERE [IDColumnName] = @ID
+			var sql = BuildSelectCommand(schema);
+			sql.AppendLine().Append("WHERE ").Append(schema.PrimaryKey.SqlName.EscapeSqlIdentifier()).Append(" = @ID");
+
+			using (var command = context.CreateCommand(sql.ToString(), new { ID = row[schema.PrimaryKey.Column] }))
+			using (var reader = command.ExecuteReader()) {
+				if (!reader.Read()) {
+					row.RowVersion = null;	
+					throw new RowDeletedException(row);
+				}
+
+				var dict = schema.Columns.ToDictionary(cm => cm.Column, cm => reader[cm.SqlName]);
+
+				row.RowVersion = reader["RowVersion"];
+
+				if (reader.Read())
+					throw new InvalidOperationException("Duplicate ID");
+
+				throw new RowModifiedException(row, dict);
+			}
+		}
 
 		///<summary>Applies an inserted row to the database.</summary>
 		public virtual void ApplyInsert(TransactionContext context, SchemaMapping schema, Row row) {
@@ -87,11 +127,11 @@ namespace ShomreiTorah.Singularity.Sql {
 
 				using (var reader = command.ExecuteReader()) {
 					if (!reader.Read())
-						throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+						throw new DataException("INSERT command returned no rows");
 					row.RowVersion = reader.GetValue(0);
 
 					if (reader.Read())
-						throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+						throw new DataException("INSERT command returned multiple rows");
 				}
 			}
 		}
@@ -106,7 +146,7 @@ namespace ShomreiTorah.Singularity.Sql {
 			//UPDATE [SchemaName].[TableName]
 			//SET [FirstColumn] = @Col0, [SecondColumn] = @Col1
 			//OUTPUT INSERTED.RowVersionINTO @version
-			//WHERE @IDColumn = @ID AND RowVersion = @version;
+			//WHERE [IDColumnName] = @ColN AND RowVersion = @version;
 
 			sql.Append("UPDATE ").AppendLine(QualifyTable(schema));
 			sql.Append("SET").AppendJoin(
@@ -125,8 +165,10 @@ namespace ShomreiTorah.Singularity.Sql {
 				command.Parameters.Add(versionParameter);
 
 				using (var reader = command.ExecuteReader()) {
-					if (!reader.Read())
-						throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+					if (!reader.Read()) {
+						reader.Close();		//A single connection cannot have two DataReaders at once
+						ThrowRowModified(context, schema, row);
+					}
 					row.RowVersion = reader.GetValue(0);
 
 					if (reader.Read())
@@ -175,8 +217,8 @@ namespace ShomreiTorah.Singularity.Sql {
 				"DELETE FROM " + QualifyTable(schema) + " WHERE " + schema.PrimaryKey.SqlName.EscapeSqlIdentifier() + " = @ID AND RowVersion = @version",
 				new { ID = row[row.Schema.PrimaryKey], version = row.RowVersion }
 			)) {
-				 if (command.ExecuteNonQuery() != 1)
-					throw new DBConcurrencyException("Concurrency FAIL!");
+				if (command.ExecuteNonQuery() != 1)
+					ThrowRowModified(context, schema, row);
 			}
 		}
 

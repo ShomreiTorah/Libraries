@@ -48,7 +48,7 @@ namespace ShomreiTorah.Singularity.Sql {
 				PopulateParameters(command, schema, row);
 
 				if (command.ExecuteNonQuery() != 1)
-					throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+					throw new DataException("INSERT command didn't work");
 			}
 
 			QueueVersion(context, schema, row);
@@ -81,7 +81,7 @@ namespace ShomreiTorah.Singularity.Sql {
 				command.Parameters.Add(versionParameter);
 
 				if (command.ExecuteNonQuery() != 1)
-					throw new DBConcurrencyException("Concurrency FAIL!");	//Exception will be handled by TableSynchronizer
+					ThrowRowModified(context, schema, row);
 			}
 			QueueVersion(context, schema, row);
 		}
