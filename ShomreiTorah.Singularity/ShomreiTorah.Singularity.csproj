@@ -75,6 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Row Collections.cs" />
     <Compile Include="Row.cs" />
+    <Compile Include="Sql\SchemaMapping.Xml.cs" />
     <Compile Include="Sql\SqlCeSqlProvider.cs" />
     <Compile Include="Sql\TransactionContext.cs" />
     <Compile Include="Sql\Utils.cs" />

@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using ShomreiTorah.Singularity;
+using System.Xml.Linq;
 
 namespace ShomreiTorah.Singularity.Tests.Sql {
 	[TestClass]
@@ -118,6 +119,64 @@ namespace ShomreiTorah.Singularity.Tests.Sql {
 
 			Assert.AreEqual(mapping.SqlName, schema.Name);
 			Assert.IsNull(mapping.SqlSchemaName);
+		}
+
+		[Description("Tests XML persistence for the simple properties of SchemaMapping")]
+		[TestMethod]
+		public void XmlPropertiesTest() {
+			var schema = new TableSchema("XmlPropertiesTest");
+
+			var mapping = new SchemaMapping(schema);
+			var newMapping = SchemaMapping.FromXml(mapping.ToXml(), schema);
+
+			TestMapping(mapping);
+
+			mapping.SqlSchemaName = "ABC";
+			TestMapping(mapping);
+
+			mapping.SqlName = "DEF";
+			TestMapping(mapping);
+		}
+
+		[Description("Tests XML persistence for column mappings")]
+		[TestMethod]
+		public void XmlColumnsTest() {
+			var schema = new TableSchema("XmlColumnsTest");
+			var col1 = schema.Columns.AddValueColumn("Col1", typeof(int), null);
+			var col2 = schema.Columns.AddValueColumn("Col2", typeof(int), null);
+			var col3 = schema.Columns.AddValueColumn("Col3", typeof(int), null);
+
+			var mapping = new SchemaMapping(schema);
+
+			TestMapping(mapping);
+
+			mapping.Columns.RemoveMapping(col2);
+			TestMapping(mapping);
+
+			mapping.Columns[col3].SqlName = "Sql3";
+			TestMapping(mapping);
+
+			mapping.Columns.AddMapping(col2, "SSSSSSS");
+			TestMapping(mapping);
+		}
+
+		static void TestMapping(SchemaMapping mapping) {
+			AssertMappingsEqual(mapping, SchemaMapping.FromXml(mapping.ToXml(), mapping.Schema));
+		}
+		static void AssertMappingsEqual(SchemaMapping expected, SchemaMapping actual) {
+			Assert.AreEqual(expected.Schema, actual.Schema);
+			Assert.AreEqual(expected.SqlName, actual.SqlName);
+			Assert.AreEqual(expected.SqlSchemaName, actual.SqlSchemaName);
+
+			Assert.AreEqual(expected.Columns.Count, actual.Columns.Count);
+
+			for (int i = 0; i < expected.Columns.Count; i++) {
+				ColumnMapping e = expected.Columns[i], a = actual.Columns[i];
+				Assert.AreEqual(e.Column, a.Column);
+				Assert.AreEqual(e.SqlName, a.SqlName);
+			}
+
+			Assert.AreEqual(expected.ToXml().ToString(), actual.ToXml().ToString());
 		}
 	}
 }
