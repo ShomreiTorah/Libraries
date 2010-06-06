@@ -88,6 +88,8 @@ namespace ShomreiTorah.Singularity.Sql {
 		public void AddMapping(Column column, string sqlName) {
 			if (column == null) throw new ArgumentNullException("column");
 			if (column.Schema != SchemaMapping.Schema) throw new ArgumentException("Column must belong to parent schema", "column");
+			if (this.Any(c => c.Column == column)) throw new ArgumentException("A columns cannot be mapped twice");
+
 			Items.Add(new ColumnMapping(column, sqlName));
 		}
 		///<summary>Removes the mapping for the given column, preventing the column from being synchronized to the database.</summary>
