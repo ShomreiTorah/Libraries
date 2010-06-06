@@ -189,6 +189,7 @@ namespace ShomreiTorah.Singularity.Tests {
 				//    CalculatedColumn te = (CalculatedColumn)e, ta = (CalculatedColumn)a;
 				//}
 			}
+			Assert.AreEqual(expected.ToXml().ToString(), actual.ToXml().ToString());
 		}
 	}
 }
