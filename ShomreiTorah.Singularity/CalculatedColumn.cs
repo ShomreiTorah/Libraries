@@ -9,7 +9,7 @@ using ShomreiTorah.Singularity.Dependencies;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column containing a value that is calculated automatically.</summary>
-	public sealed class CalculatedColumn : Column {
+	public sealed partial class CalculatedColumn : Column {
 		///<summary>An instances used when a calculated column's value has not been calculated.</summary>
 		///<remarks>Calculated columns are lazy, and will only run the delegate if the column's
 		///value is this object.  The dependency manager will set the column's value to this object

@@ -2,6 +2,7 @@ using ShomreiTorah.Singularity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace ShomreiTorah.Singularity.Tests {
 	[TestClass]
@@ -94,6 +95,100 @@ namespace ShomreiTorah.Singularity.Tests {
 			Assert.AreEqual(0, parentSchema.Columns.Count);
 			Assert.AreEqual(0, childSchema.ChildRelations.Count);
 			Assert.AreEqual(0, parentSchema.ChildRelations.Count);
+		}
+
+		[Description("Tests XML persistence of empty schemas (without any columns)")]
+		[TestMethod]
+		public void XmlEmptyTest() {
+			var schema = new TableSchema("XmlEmptyTest");
+			Assert.AreEqual(new XElement("TableSchema", new XAttribute("Name", "XmlEmptyTest")).ToString(), schema.ToXml().ToString());
+			var newSchema = TableSchema.FromXml(schema.ToXml());
+
+			AssertSchemasEqual(schema, newSchema);
+		}
+		[Description("Tests XML persistence of simple schemas (without relations or calculated columns)")]
+		[TestMethod]
+		public void XmlSimpleTest() {
+			var schema = new TableSchema("XmlSimpleTest");
+
+			schema.Columns.AddValueColumn("Col1", typeof(DateTimeOffset?), null).Unique = true;
+			schema.Columns.AddValueColumn("Col2", typeof(int?), 57);
+			schema.Columns.AddValueColumn("Col3", typeof(int), null);
+			schema.Columns.AddValueColumn("Col4", typeof(string), null);
+			schema.Columns.AddValueColumn("Col5", typeof(string), "ABC").AllowNulls = false;
+			schema.Columns.AddValueColumn("Col6", typeof(double), Math.PI).Unique = true;
+			schema.Columns.AddValueColumn("Col7", typeof(DateTime), DateTime.Now).Unique = true;
+			schema.PrimaryKey = schema.Columns.AddValueColumn("Col8", typeof(byte?), (byte)7);
+
+
+			var newSchema = TableSchema.FromXml(schema.ToXml());
+			AssertSchemasEqual(schema, newSchema);
+		}
+		[Description("Tests XML persistence of schemas with relations")]
+		[TestMethod]
+		public void XmlRelationsTest() {
+			var parentSchema = new TableSchema("XmlRelationsTest - Parent");
+			parentSchema.Columns.AddValueColumn("ABC", typeof(string), "DEF");
+
+			var childSchema = new TableSchema("XmlRelationsTest - Child 1");
+			childSchema.Columns.AddValueColumn("Col1", typeof(uint), 35u);
+
+			childSchema.Columns.AddForeignKey("Parent1", parentSchema, "Child1");
+			childSchema.Columns.AddForeignKey("Parent2", parentSchema, "Child2");
+
+			var pLogsSchema = new TableSchema("XmlRelationsTest - Parent Logs");
+			pLogsSchema.Columns.AddForeignKey("Row", parentSchema, "History");
+			pLogsSchema.Columns.AddValueColumn("Timestamp", typeof(DateTime), null);
+			pLogsSchema.Columns.AddValueColumn("ABC", typeof(string), "DEF");
+
+			var cLogsSchema = new TableSchema("XmlRelationsTest - Child Logs");
+			cLogsSchema.Columns.AddForeignKey("Row", childSchema, "History");
+			cLogsSchema.Columns.AddValueColumn("Timestamp", typeof(DateTime), null);
+			cLogsSchema.Columns.AddValueColumn("Col1", typeof(uint), 35u);
+
+
+			var newSchemas = TableSchema.FromXml(parentSchema.ToXml(), childSchema.ToXml(), pLogsSchema.ToXml(), cLogsSchema.ToXml());
+
+			Func<TableSchema, TableSchema> NewSchema = oldSchema => newSchemas.Single(ts => ts.Name == oldSchema.Name);
+
+			AssertSchemasEqual(parentSchema, NewSchema(parentSchema));
+			AssertSchemasEqual(childSchema, NewSchema(childSchema));
+			AssertSchemasEqual(pLogsSchema, NewSchema(pLogsSchema));
+			AssertSchemasEqual(cLogsSchema, NewSchema(cLogsSchema));
+		}
+		static void AssertSchemasEqual(TableSchema expected, TableSchema actual) {
+			Assert.AreEqual(expected.Name, actual.Name);
+			Assert.AreEqual(expected.Columns.Count, actual.Columns.Count);
+			Assert.AreEqual(expected.ChildRelations.Count, actual.ChildRelations.Count);
+
+			if (expected.PrimaryKey == null)
+				Assert.IsNull(actual.PrimaryKey);
+			else
+				Assert.AreEqual(expected.PrimaryKey.Name, actual.PrimaryKey.Name);
+
+			for (int i = 0; i < expected.Columns.Count; i++) {
+				Column e = expected.Columns[i], a = actual.Columns[i];
+
+				Assert.AreEqual(e.GetType(), a.GetType());
+				Assert.AreEqual(e.DataType, a.DataType);
+				Assert.AreEqual(e.DefaultValue, a.DefaultValue);
+				Assert.AreEqual(e.Name, a.Name);
+
+				if (e is ValueColumn) {
+					ValueColumn te = (ValueColumn)e, ta = (ValueColumn)a;
+
+					Assert.AreEqual(te.Unique, ta.Unique);
+					Assert.AreEqual(te.AllowNulls, ta.AllowNulls);
+				}
+				if (e is ForeignKeyColumn) {	//Already checked ValueColumn properties
+					ForeignKeyColumn te = (ForeignKeyColumn)e, ta = (ForeignKeyColumn)a;
+					Assert.AreEqual(te.ChildRelation.Name, ta.ChildRelation.Name);
+					AssertSchemasEqual(te.ForeignSchema, ta.ForeignSchema);
+				}
+				//if (e is CalculatedColumn) {
+				//    CalculatedColumn te = (CalculatedColumn)e, ta = (CalculatedColumn)a;
+				//}
+			}
 		}
 	}
 }

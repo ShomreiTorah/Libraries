@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column in a Singularity table.</summary>
-	public abstract class Column : INamedObject {
+	public abstract partial class Column : INamedObject {
 		string name;
 		object defaultValue;
 
@@ -76,7 +76,7 @@ namespace ShomreiTorah.Singularity {
 		}
 	}
 	///<summary>Provides data for column events.</summary>
-	public class ColumnEventArgs : EventArgs {
+	public partial class ColumnEventArgs : EventArgs {
 		///<summary>Creates a new ColumnEventArgs instance.</summary>
 		public ColumnEventArgs(Column column) { Column = column; }
 
@@ -84,7 +84,7 @@ namespace ShomreiTorah.Singularity {
 		public Column Column { get; private set; }
 	}
 	///<summary>A column containing simple values.</summary>
-	public class ValueColumn : Column {
+	public partial class ValueColumn : Column {
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "DefaultValue is not overridden by this branch")]
 		internal ValueColumn(TableSchema schema, string name, Type dataType, object defaultValue)
 			: base(schema, name) {
@@ -156,7 +156,7 @@ namespace ShomreiTorah.Singularity {
 		}
 	}
 	///<summary>A column containing parent rows from a different table.</summary>
-	public sealed class ForeignKeyColumn : ValueColumn {
+	public sealed partial class ForeignKeyColumn : ValueColumn {
 		internal ForeignKeyColumn(TableSchema schema, string name, TableSchema foreignSchema, string foreignName)
 			: base(schema, name, typeof(Row), null) {
 			if (foreignSchema == null) throw new ArgumentNullException("foreignSchema");
