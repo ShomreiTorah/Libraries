@@ -114,7 +114,7 @@ namespace ShomreiTorah.Singularity {
 			}
 		}
 
-		///<summary>Clears the current value form a calculated column, causing it to be recalculated next time the value is retrieved.</summary>
+		///<summary>Clears the current value from a calculated column, causing it to be recalculated next time the value is retrieved.</summary>
 		internal void InvalidateCalculatedValue(CalculatedColumn column) {
 			values[column] = CalculatedColumn.UncalculatedValue;
 			RaiseValueChanged(column);
@@ -198,7 +198,7 @@ namespace ShomreiTorah.Singularity {
 	}
 	///<summary>Provides data for row events in a list.</summary>
 	public class RowListEventArgs : RowEventArgs {
-		///<summary>Creates a new RowEventArgs instance.</summary>
+		///<summary>Creates a new RowListEventArgs instance.</summary>
 		public RowListEventArgs(Row row, int index) : base(row) { Index = index; }
 
 		///<summary>Gets the index of the row in the collection.</summary>

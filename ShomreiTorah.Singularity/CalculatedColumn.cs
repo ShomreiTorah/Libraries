@@ -10,10 +10,10 @@ using ShomreiTorah.Singularity.Dependencies;
 namespace ShomreiTorah.Singularity {
 	///<summary>A column containing a value that is calculated automatically.</summary>
 	public sealed partial class CalculatedColumn : Column {
-		///<summary>An instances used when a calculated column's value has not been calculated.</summary>
+		///<summary>An instance used when a calculated column's value has not been calculated.</summary>
 		///<remarks>Calculated columns are lazy, and will only run the delegate if the column's
-		///value is this object.  The dependency manager will set the column's value to this object
-		///whenever a dependency changes, triggering a recalc when the value is next fetched.
+		///value equals this object.  The dependency manager will set the column's value to this 
+		///object whenever a dependency changes, triggering a recalc when the value is next fetched.
 		///
 		///Calculated columns are not supported in detached rows; any calculated column in a 
 		///detached row will equal the column's DefaultValue property.</remarks>
@@ -31,6 +31,7 @@ namespace ShomreiTorah.Singularity {
 			Dependency = dependency;
 			Dependency.RowInvalidated += Dependency_RowInvalidated;
 
+			//TODO: Loop over empty tables
 			foreach (var table in Schema.Rows.Select(r => r.Table).Distinct()) {
 				if (!Dependency.RequiresDataContext || table.Context != null)
 					Dependency.Register(table);
