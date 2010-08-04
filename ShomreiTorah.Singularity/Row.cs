@@ -106,8 +106,10 @@ namespace ShomreiTorah.Singularity {
 				//that changed is a ForeignKeyColumn, don't 
 				//raise a ValueChanged event for its parent 
 				//row (which just got a RowAdded event)
-				foreach (var parentCollection in Schema.Columns.OfType<ForeignKeyColumn>().Where(fkc => fkc != column)
-													   .Select(fkc => Field<Row>(fkc).ChildRows(fkc.ChildRelation, false))) {
+				foreach (var fkc in Schema.Columns.OfType<ForeignKeyColumn>().Where(fkc => fkc != column)) {
+					var childRow = Field<Row>(fkc);
+					if (childRow == null) continue;
+					var parentCollection = childRow.ChildRows(fkc.ChildRelation, false);
 					if (parentCollection != null)	//If the ChildRowCollection for this parent row has been created,
 						parentCollection.OnValueChanged(new ValueChangedEventArgs(this, column));
 				}
