@@ -134,7 +134,15 @@ namespace ShomreiTorah.Singularity.Tests {
 			public TypedTable<Number> Numbers { get; private set; }
 			public TypedTable<PowersRow> Powers { get; private set; }
 		}
-
+		[TestMethod]
+		public void SchemaAccessorTest() {
+			Assert.AreEqual(Number.Schema, TypedSchema<Number>.Instance);
+		}
+		[TestMethod]
+		public void TypedTableAccessorTest() {
+			var context = new NumbersPowersContext();
+			Assert.AreEqual(context.Powers, context.Table<PowersRow>());
+		}
 		[TestMethod]
 		public void RelatedTypedRowsTest() {
 			var context = new NumbersPowersContext();

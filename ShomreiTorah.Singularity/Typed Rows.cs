@@ -10,7 +10,16 @@ namespace ShomreiTorah.Singularity {
 	///<summary>A schema that contains strongly-typed rows.</summary>
 	public class TypedSchema<TRow> : TableSchema where TRow : Row {
 		///<summary>Initializes a new instance of the TypedSchema class.</summary>
-		public TypedSchema(string name) : base(name) { }
+		public TypedSchema(string name)
+			: base(name) {
+			if (Instance != null)
+				throw new InvalidOperationException("TypedSchema<" + typeof(TRow) + "> already exists.");
+			Instance = this;
+		}
+
+		///<summary>Gets the singleton instance of this typed schema.</summary>
+		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification="Static instance of closed generic type.")]
+		public static TypedSchema<TRow> Instance { get; private set; }
 
 		internal override void AddRow(Row row) {
 			if (!(row is TRow)) throw new InvalidOperationException("Typed schemas can only have typed rows");
@@ -18,7 +27,9 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		///<summary>Creates TypedSchema.</summary>
-		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes"), SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
+		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
+		//[Obsolete("This pattern is no longer used.  Please use a static constructor.")]
 		public static TypedSchema<TRow> Create(string name, Action<TypedSchema<TRow>> creator) {
 			if (creator == null) throw new ArgumentNullException("creator");
 			var retVal = new TypedSchema<TRow>(name);

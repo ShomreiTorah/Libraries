@@ -15,6 +15,14 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the tables in this context.</summary>
 		public TableCollection Tables { get; private set; }
 
+		///<summary>Gets the typed table in this context that holds the given typed row.</summary>
+		///<typeparam name="TRow">The typed rows in the table.</typeparam>
+		///<returns>A typed table, or null if this context does not contain the schema.</returns>
+		public TypedTable<TRow> Table<TRow>() where TRow : Row {
+			if (TypedSchema<TRow>.Instance == null) return null;
+			return (TypedTable<TRow>)Tables[TypedSchema<TRow>.Instance];
+		}
+
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		bool IListSource.ContainsListCollection { get { return true; } }
 		DataBinding.DataContextBinder binder;
