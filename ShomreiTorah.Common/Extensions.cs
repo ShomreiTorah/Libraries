@@ -144,7 +144,7 @@ namespace ShomreiTorah.Common {
 		///<returns>The number of bytes read.  If the end of the stream was reached, this will be less than the size of the array.</returns>
 		///<remarks>Stream.Read is not guaranteed to read length bytes even if it doesn't hit the end of the stream, so I wrote this method, which is.</remarks>
 		public static int ReadFill(this Stream stream, byte[] buffer) { return stream.ReadFill(buffer, buffer.Length); }
-		///<summary>Reads a givne number of bytes into a byte array from a stream.</summary>
+		///<summary>Reads a given number of bytes into a byte array from a stream.</summary>
 		///<returns>The number of bytes read.  If the end of the stream was reached, this will be less than the length.</returns>
 		///<remarks>Stream.Read is not guaranteed to read length bytes even if it doesn't hit the end of the stream, so I wrote this method, which is.</remarks>
 		public static int ReadFill(this Stream stream, byte[] buffer, int length) {
