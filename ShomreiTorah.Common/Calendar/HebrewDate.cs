@@ -17,7 +17,7 @@ namespace ShomreiTorah.Common.Calendar {
 		HebrewMonth hebrewMonth;
 
 		///<summary>Creates a Hebrew date from an English one.</summary>
-		///<param name="englishDate">The english date to convert.</param>
+		///<param name="englishDate">The English date to convert.</param>
 		public HebrewDate(DateTime englishDate) {
 			date = englishDate.Date;
 
@@ -176,7 +176,7 @@ namespace ShomreiTorah.Common.Calendar {
 		//I need overloads for all 3 combinations.
 		//If I don't have any, I can't use two HebrewDates
 		//If I only have the first, I can't use one HebrewDate
-		//and one DateTime becuase it can't figure out which
+		//and one DateTime because it can't figure out which
 		//way to cast.  I could also solve that by removing 
 		//one of the implicit casts, but I don't want to.
 		#region Comparison
