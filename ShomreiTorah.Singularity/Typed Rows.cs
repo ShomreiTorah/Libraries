@@ -18,7 +18,7 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		///<summary>Gets the singleton instance of this typed schema.</summary>
-		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification="Static instance of closed generic type.")]
+		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "Static instance of closed generic type.")]
 		public static TypedSchema<TRow> Instance { get; private set; }
 
 		internal override void AddRow(Row row) {
@@ -39,7 +39,7 @@ namespace ShomreiTorah.Singularity {
 	}
 
 	///<summary>A table that contains strongly-typed rows.</summary>
-	public class TypedTable<TRow> : Table where TRow : Row {
+	public class TypedTable<TRow> : Table, ITable<TRow> where TRow : Row {
 		readonly Func<TRow> rowCreator;
 
 		///<summary>Creates a typed table from its typed schema.</summary>

@@ -6,6 +6,18 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace ShomreiTorah.Singularity {
+	///<summary>A table containing a specific row type.</summary>
+	///<typeparam name="TRow">The type of the rows in the table.</typeparam>
+	///<remarks>This interface is implemented by both typed and untyped tables.
+	///Because events aren't covariant, it cannot (easily) contain strongly-typed row events.
+	///(Unless I change Table to use EventHandler&lt;RowEventArgs&lt;Row>>, which is cumbersome)</remarks>
+	public interface ITable<TRow> where TRow : Row {
+		///<summary>Gets the schema of this table.</summary>
+		TableSchema Schema { get; }
+		///<summary>Gets the rows in this table.</summary>
+		ITableRowCollection<TRow> Rows { get; }
+	}
+
 	///<summary>A collection of strongly-typed rows in a table.</summary>
 	public interface ITableRowCollection<TRow> : IList<TRow> where TRow : Row {
 		///<summary>Adds a row from an array of values.</summary>

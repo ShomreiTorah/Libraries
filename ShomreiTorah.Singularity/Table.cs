@@ -8,7 +8,7 @@ using System.ComponentModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
-	public partial class Table : IListSource, IRowEventProvider {
+	public partial class Table : ITable<Row>, IRowEventProvider, IListSource {
 		DataContext context;
 
 		///<summary>Creates an empty table.</summary>
