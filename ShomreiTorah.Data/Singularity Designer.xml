@@ -22,7 +22,7 @@
       </DefaultValue>
     </Column>
   </Schema>
-  <Schema Name="MasterDirectory" RowClassDescription="Describes a master directory." RowClassName="MasterDirectory" RowClassVisibility="Public" SqlName="MasterDirectory" SqlSchemaName="Data" PrimaryKeyName="Id">
+  <Schema Name="MasterDirectory" RowClassDescription="Describes a person." RowClassName="Person" RowClassVisibility="Public" SqlName="MasterDirectory" SqlSchemaName="Data" PrimaryKeyName="Id">
     <Column Name="Id" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the id of the master directory." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Id" PropertyVisibility="Public" SqlName="Id">
       <DefaultValue>
         <Null />
@@ -90,7 +90,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="PersonId" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person id of the pledge." Expression="" ForeignRelationName="Pledges" ForeignRelationPropertyDescription="Gets the pledges of the master directory." ForeignRelationPropertyName="Pledges" GenerateSqlMapping="true" IsUnique="false" PropertyName="PersonId" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who made the pledge." Expression="" ForeignRelationName="Pledges" ForeignRelationPropertyDescription="Gets the person's pledges." ForeignRelationPropertyName="Pledges" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -145,7 +145,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="ExternalID" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the external ID of the pledge." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ExternalID" PropertyVisibility="Public" SqlName="ExternalID">
+    <Column Name="ExternalId" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the external id of the pledge." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ExternalId" PropertyVisibility="Public" SqlName="ExternalID">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -157,7 +157,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="PersonId" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person id of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments of the master directory." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="PersonId" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who made the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the person's payments." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -212,12 +212,12 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="ExternalID" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the external ID of the payment." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ExternalID" PropertyVisibility="Public" SqlName="ExternalID">
+    <Column Name="ExternalId" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the external id of the payment." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ExternalId" PropertyVisibility="Public" SqlName="ExternalID">
       <DefaultValue>
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="DepositId" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the deposit id of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments of the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="DepositId" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
+    <Column Name="Deposit" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the deposit of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments in the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Deposit" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -316,7 +316,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="PersonId" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person id of the tbl ML member." Expression="" ForeignRelationName="tblMLMembers" ForeignRelationPropertyDescription="Gets the tbl ML members of the master directory." ForeignRelationPropertyName="tblMLMembers" GenerateSqlMapping="true" IsUnique="false" PropertyName="PersonId" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that uses the email address." Expression="" ForeignRelationName="EmailAddresses" ForeignRelationPropertyDescription="Gets the person's email addresses." ForeignRelationPropertyName="EmailAddresses" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
