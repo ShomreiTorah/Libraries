@@ -129,11 +129,11 @@
     <Compile Include="Controls\HebrewCalendar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\Lookup.cs">
+    <Compile Include="Controls\LookupControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\Lookup.designer.cs">
-      <DependentUpon>Lookup.cs</DependentUpon>
+    <Compile Include="Controls\LookupControl.Designer.cs">
+      <DependentUpon>LookupControl.cs</DependentUpon>
     </Compile>
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -162,8 +162,8 @@
       <DependentUpon>ProgressDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Images\Calendar.png" />
-    <EmbeddedResource Include="Controls\Lookup.resx">
-      <DependentUpon>Lookup.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\LookupControl.resx">
+      <DependentUpon>LookupControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">

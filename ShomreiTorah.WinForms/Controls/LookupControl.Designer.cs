@@ -1,7 +1,7 @@
 using DevExpress.XtraEditors;
 using System.Windows.Forms;
 namespace ShomreiTorah.WinForms.Controls {
-	partial class Lookup {
+	partial class LookupControl {
 		/// <summary> 
 		/// Required designer variable.
 		/// </summary>
@@ -101,7 +101,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			this.autoScrollTimer.Interval = 10;
 			this.autoScrollTimer.Tick += new System.EventHandler(this.autoScrollTimer_Tick);
 			// 
-			// Lookup
+			// LookupControl
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

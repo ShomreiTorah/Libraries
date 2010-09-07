@@ -23,7 +23,7 @@ namespace ShomreiTorah.WinForms.Controls {
 	///<summary>A control that allows the user to select an item from a list.</summary>
 	[DefaultEvent("ItemSelected")]
 	[Description("A control that allows the user to select an item from a list.")]
-	public partial class Lookup : XtraUserControl {
+	public partial class LookupControl : XtraUserControl {
 		DataView results = new DataView();
 		int pMaxPopupHeight = 400;
 		string pDefaultMessage = "Click here to see the directory, or type to search.";
@@ -45,8 +45,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		}
 
 
-		///<summary>Creates a new Lookup instance.</summary>
-		public Lookup() {
+		///<summary>Creates a new LookupControl instance.</summary>
+		public LookupControl() {
 			InitializeComponent();
 			RecreateBrushes(null, null);
 
@@ -408,8 +408,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		#region AutoScroll
 		static Bitmap autoScrollIcon = Properties.Resources.AutoScroll;
 		class AutoScrollWindow : TopFormBase {
-			Lookup parent;
-			public AutoScrollWindow(Lookup control) {
+			LookupControl parent;
+			public AutoScrollWindow(LookupControl control) {
 				Parent = null;
 				TopLevel = true;
 				ControlBox = false;
