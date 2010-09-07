@@ -236,4 +236,47 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			return true;
 		}
 	}
+	sealed class FilteredTableBinder<TRow> : RowCollectionBinder where TRow : Row {
+		public FilteredTable<TRow> FilteredTable { get; private set; }
+
+		public FilteredTableBinder(FilteredTable<TRow> ft)
+			: base(ft.Table.Schema, ft.Rows) {
+			FilteredTable = ft;
+
+			FilteredTable.RowAdded += Rows_RowAdded;
+			FilteredTable.ValueChanged += Rows_ValueChanged;
+			FilteredTable.RowRemoved += Rows_RowRemoved;
+		}
+
+		void Rows_RowAdded(object sender, RowListEventArgs<TRow> e) { OnRowAdded(new RowListEventArgs(e.Row, e.Index)); }
+		void Rows_ValueChanged(object sender, ValueChangedEventArgs<TRow> e) { OnValueChanged(e); }
+		void Rows_RowRemoved(object sender, RowListEventArgs<TRow> e) { OnRowRemoved(new RowListEventArgs(e.Row, e.Index)); }
+
+		protected override string ListName { get { return FilteredTable.Table.Schema.Name; } }
+
+		protected override Row CreateNewRow() {
+			var newRow = FilteredTable.Table.CreateRow();
+			return newRow;
+		}
+
+		//PhantomCollection wraps the original ChildRowCollection,
+		//which is read-only.  I override its mutation methods and
+		//modify the child table
+
+		public override void Add(Row item) {
+			if (item == null) throw new ArgumentNullException("item");
+
+			if (HasPhantomItem)
+				CommitPhantom();
+
+			FilteredTable.Table.Rows.Add(item);
+		}
+		protected override bool RemoveInner(Row item) {
+			if (HasPhantomItem)
+				CommitPhantom();
+			if (item == null) return false;
+			item.RemoveRow();
+			return true;
+		}
+	}
 }

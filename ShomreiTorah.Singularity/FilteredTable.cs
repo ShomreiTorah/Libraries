@@ -5,10 +5,12 @@ using System.Text;
 using System.Linq.Expressions;
 using ShomreiTorah.Singularity.Dependencies;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A filtered view of an existing table.</summary>
-	public class FilteredTable<TRow> : IDisposable where TRow : Row {
+	public class FilteredTable<TRow> : IListSource, IDisposable where TRow : Row {
 		readonly ITable<TRow> typedTable;
 		readonly Table untypedTable;
 		readonly Func<TRow, bool> filter;
@@ -146,6 +148,16 @@ namespace ShomreiTorah.Singularity {
 				ValueChanged(this, e);
 		}
 		#endregion
+
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
+		bool IListSource.ContainsListCollection { get { return false; } }
+		DataBinding.FilteredTableBinder<TRow> binder;
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
+		System.Collections.IList IListSource.GetList() {
+			if (binder == null) binder = new DataBinding.FilteredTableBinder<TRow>(this);
+			return binder;
+		}
+
 
 		///<summary>Releases all resources used by the FilteredTable.</summary>
 		public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
