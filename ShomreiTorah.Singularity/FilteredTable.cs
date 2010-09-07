@@ -28,7 +28,7 @@ namespace ShomreiTorah.Singularity {
 			dependency.Register(untypedTable);
 
 			writableRows = typedTable.Rows.Where(this.filter).ToList();
-			Rows = new ReadOnlyCollection<TRow>(writableRows);
+			Rows = new TypedReadOnlyRowCollection<TRow>(writableRows);
 
 			dependency.RowInvalidated += Dependency_RowInvalidated;
 			//The table handlers should be added after the dependency is created.
@@ -43,7 +43,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the table that this instance displays rows from.</summary>
 		public Table Table { get { return untypedTable; } }
 		///<summary>Gets the rows that meet the filter.</summary>
-		public ReadOnlyCollection<TRow> Rows { get; private set; }
+		public TypedReadOnlyRowCollection<TRow> Rows { get; private set; }
 
 		void Dependency_RowInvalidated(object sender, RowEventArgs e) {
 			var row = (TRow)e.Row;
@@ -66,7 +66,7 @@ namespace ShomreiTorah.Singularity {
 				RemoveRow(row);
 		}
 		void Table_ValueChanged(object sender, ValueChangedEventArgs e) {
-			if (Rows.Contains((TRow)e.Row)) OnValueChanged(e);
+			if (Rows.Contains((TRow)e.Row)) OnValueChanged(new ValueChangedEventArgs<TRow>((TRow)e.Row, e.Column));
 		}
 
 		void Table_RowRemoved(object sender, RowListEventArgs e) {
@@ -107,7 +107,7 @@ namespace ShomreiTorah.Singularity {
 				//Since we're adding the row, we know
 				//that it doesn't exist yet in the view.
 				//Therefore, the two indices cannot be equal.
-				if (tableIndex > targetTableIndex) 
+				if (tableIndex > targetTableIndex)
 					break;
 			}
 
@@ -119,7 +119,7 @@ namespace ShomreiTorah.Singularity {
 			writableRows.RemoveAt(index);
 			OnRowRemoved(new RowListEventArgs<TRow>(row, index));
 		}
-		
+
 		#region Typed Events
 		///<summary>Occurs when a row is added to the table.</summary>
 		public event EventHandler<RowListEventArgs<TRow>> RowAdded;
@@ -141,12 +141,12 @@ namespace ShomreiTorah.Singularity {
 		public event EventHandler<ValueChangedEventArgs<TRow>> ValueChanged;
 		///<summary>Raises the ValueChanged event.</summary>
 		///<param name="e">A ValueChangedEventArgs object that provides the event data.</param>
-		void OnValueChanged(ValueChangedEventArgs e) {
+		void OnValueChanged(ValueChangedEventArgs<TRow> e) {
 			if (ValueChanged != null)
-				ValueChanged(this, new ValueChangedEventArgs<TRow>((TRow)e.Row, e.Column));
+				ValueChanged(this, e);
 		}
 		#endregion
-		
+
 		///<summary>Releases all resources used by the FilteredTable.</summary>
 		public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
 		///<summary>Releases the unmanaged resources used by the FilteredTable and optionally releases the managed resources.</summary>
@@ -165,5 +165,31 @@ namespace ShomreiTorah.Singularity {
 	public class FilteredTable : FilteredTable<Row> {
 		///<summary>Creates a FilteredTable that wraps a table with the specified filter.</summary>
 		public FilteredTable(Table table, Expression<Func<Row, bool>> filter) : base(table, filter) { }
+	}
+
+	///<summary>A read-only collection of strongly-typed rows.</summary>
+	public sealed class TypedReadOnlyRowCollection<TRow> : ReadOnlyCollection<TRow>, IList<Row> where TRow : Row {
+		///<summary>Creates a new TypedReadOnlyRowCollection that wraps a typed list.</summary>
+		public TypedReadOnlyRowCollection(IList<TRow> list) : base(list) { }
+
+		int IList<Row>.IndexOf(Row item) { return IndexOf(item as TRow); }
+		bool ICollection<Row>.Contains(Row item) { return Contains(item as TRow); }
+
+		Row IList<Row>.this[int index] {
+			get { return this[index]; }
+			set { throw new NotSupportedException(); }
+		}
+
+		void IList<Row>.Insert(int index, Row item) { throw new NotSupportedException(); }
+		void ICollection<Row>.Add(Row item) { throw new NotSupportedException(); }
+		bool ICollection<Row>.Remove(Row item) { throw new NotSupportedException(); }
+		void IList<Row>.RemoveAt(int index) { throw new NotSupportedException(); }
+		void ICollection<Row>.Clear() { throw new NotSupportedException(); }
+
+		IEnumerator<Row> IEnumerable<Row>.GetEnumerator() { return this.Cast<Row>().GetEnumerator(); }
+
+		void ICollection<Row>.CopyTo(Row[] array, int arrayIndex) { CopyTo((TRow[])array, arrayIndex); }
+
+		bool ICollection<Row>.IsReadOnly { get { return true; } }
 	}
 }
