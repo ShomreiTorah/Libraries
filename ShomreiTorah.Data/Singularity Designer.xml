@@ -316,7 +316,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that uses the email address." Expression="" ForeignRelationName="EmailAddresss" ForeignRelationPropertyDescription="Gets the person's email addresses." ForeignRelationPropertyName="EmailAddresss" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that uses the email address." Expression="" ForeignRelationName="EmailAddresss" ForeignRelationPropertyDescription="Gets the person's email addresses." ForeignRelationPropertyName="EmailAddresses" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>

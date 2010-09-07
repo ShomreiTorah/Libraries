@@ -628,7 +628,7 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets the person's payments.</summary>
         public IChildRowCollection<Payment> Payments { get { return TypedChildRows<Payment>(Payment.PersonColumn); } }
         ///<summary>Gets the person's email addresses.</summary>
-        public IChildRowCollection<EmailAddress> EmailAddresss { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
+        public IChildRowCollection<EmailAddress> EmailAddresses { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
         ///<summary>Gets the statements sent to the person.</summary>
         public IChildRowCollection<LoggedStatement> StatementLogs { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         #endregion
