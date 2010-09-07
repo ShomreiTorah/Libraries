@@ -27,6 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeAnalysisRuleSet>..\..\ShomreiTorah Strict.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\ShomreiTorah.Data.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>..\ShomreiTorah Strict.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
+    <DocumentationFile>bin\Release\ShomreiTorah.Data.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
