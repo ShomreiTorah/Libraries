@@ -25,6 +25,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\..\ShomreiTorah Strict.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -53,9 +55,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Singularity Classes.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shul.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Singularity Designer.xml">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShomreiTorah.Common\ShomreiTorah.Common.csproj">
+      <Project>{1308A6E1-7787-49F6-A19C-8AF327DAF9B5}</Project>
+      <Name>ShomreiTorah.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ShomreiTorah.Singularity\ShomreiTorah.Singularity.csproj">
+      <Project>{53C1A3A0-B443-4C28-895B-5E4DFE803A1C}</Project>
+      <Name>ShomreiTorah.Singularity</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
