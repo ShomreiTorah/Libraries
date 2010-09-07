@@ -5,7 +5,7 @@ using System.Linq;
 using ShomreiTorah.Singularity;
 using ShomreiTorah.Singularity.Sql;
 
-namespace ShomreiTorah {
+namespace ShomreiTorah.Data {
     ///<summary>Describes a deposit.</summary>
     public partial class Deposit : Row {
         ///<summary>Creates a new Deposit instance.</summary>
@@ -229,7 +229,7 @@ namespace ShomreiTorah {
             UseHtmlColumn = Schema.Columns.AddValueColumn("UseHtml", typeof(Boolean), null);
             UseHtmlColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Person.Schema, "EmailAddresses");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresss");
             PersonColumn.AllowNulls = true;
             #endregion
             
@@ -628,9 +628,9 @@ namespace ShomreiTorah {
         ///<summary>Gets the person's payments.</summary>
         public IChildRowCollection<Payment> Payments { get { return TypedChildRows<Payment>(Payment.PersonColumn); } }
         ///<summary>Gets the person's email addresses.</summary>
-        public IChildRowCollection<EmailAddress> EmailAddresses { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
-        ///<summary>Gets the statement logs of the master directory.</summary>
-        public IChildRowCollection<StatementLog> StatementLogs { get { return TypedChildRows<StatementLog>(StatementLog.PersonIdColumn); } }
+        public IChildRowCollection<EmailAddress> EmailAddresss { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
+        ///<summary>Gets the statements sent to the person.</summary>
+        public IChildRowCollection<LoggedStatement> StatementLogs { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         #endregion
         
         #region Partial Methods
@@ -812,7 +812,7 @@ namespace ShomreiTorah {
             PaymentIdColumn.Unique = true;
             PaymentIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Person.Schema, "Payments");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Payments");
             PersonColumn.AllowNulls = false;
             
             DateColumn = Schema.Columns.AddValueColumn("Date", typeof(DateTime), null);
@@ -848,7 +848,7 @@ namespace ShomreiTorah {
             ExternalIdColumn = Schema.Columns.AddValueColumn("ExternalId", typeof(Int32), null);
             ExternalIdColumn.AllowNulls = true;
             
-            DepositColumn = Schema.Columns.AddForeignKey("Deposit", ShomreiTorah.Deposit.Schema, "Payments");
+            DepositColumn = Schema.Columns.AddForeignKey("Deposit", ShomreiTorah.Data.Deposit.Schema, "Payments");
             DepositColumn.AllowNulls = true;
             
             CheckIntegerColumn = Schema.Columns.AddValueColumn("CheckInteger", typeof(Int32), null);
@@ -1185,7 +1185,7 @@ namespace ShomreiTorah {
             PledgeIdColumn.Unique = true;
             PledgeIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Person.Schema, "Pledges");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Pledges");
             PersonColumn.AllowNulls = false;
             
             DateColumn = Schema.Columns.AddValueColumn("Date", typeof(DateTime), null);
@@ -1338,8 +1338,8 @@ namespace ShomreiTorah {
         #endregion
         
         #region ChildRows Properties
-        ///<summary>Gets the seating reservations of the pledge.</summary>
-        public IChildRowCollection<SeatingReservation> SeatingReservations { get { return TypedChildRows<SeatingReservation>(SeatingReservation.PledgeIdColumn); } }
+        ///<summary>Gets the seating reservations associated with the pledge.</summary>
+        public IChildRowCollection<SeatingReservation> SeatingReservations { get { return TypedChildRows<SeatingReservation>(SeatingReservation.PledgeColumn); } }
         #endregion
         
         #region Partial Methods
@@ -1474,7 +1474,7 @@ namespace ShomreiTorah {
         #endregion
     }
     
-    ///<summary>Describes a seating reservation.</summary>
+    ///<summary>Describes a ימים נוראים seating reservation.</summary>
     public partial class SeatingReservation : Row {
         ///<summary>Creates a new SeatingReservation instance.</summary>
         public SeatingReservation () : base(Schema) { Initialize(); }
@@ -1485,8 +1485,8 @@ namespace ShomreiTorah {
         
         ///<summary>Gets the schema's Id column.</summary>
         public static ValueColumn IdColumn { get; private set; }
-        ///<summary>Gets the schema's PledgeId column.</summary>
-        public static ForeignKeyColumn PledgeIdColumn { get; private set; }
+        ///<summary>Gets the schema's Pledge column.</summary>
+        public static ForeignKeyColumn PledgeColumn { get; private set; }
         ///<summary>Gets the schema's MensSeats column.</summary>
         public static ValueColumn MensSeatsColumn { get; private set; }
         ///<summary>Gets the schema's WomensSeats column.</summary>
@@ -1515,9 +1515,9 @@ namespace ShomreiTorah {
             IdColumn.Unique = true;
             IdColumn.AllowNulls = false;
             
-            PledgeIdColumn = Schema.Columns.AddForeignKey("PledgeId", ShomreiTorah.Pledge.Schema, "SeatingReservations");
-            PledgeIdColumn.Unique = true;
-            PledgeIdColumn.AllowNulls = false;
+            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", ShomreiTorah.Data.Pledge.Schema, "SeatingReservations");
+            PledgeColumn.Unique = true;
+            PledgeColumn.AllowNulls = false;
             
             MensSeatsColumn = Schema.Columns.AddValueColumn("MensSeats", typeof(Int32), null);
             MensSeatsColumn.AllowNulls = false;
@@ -1544,7 +1544,7 @@ namespace ShomreiTorah {
             SchemaMapping.SqlSchemaName = "Seating";
             
             SchemaMapping.Columns.AddMapping(IdColumn, "Id");
-            SchemaMapping.Columns.AddMapping(PledgeIdColumn, "PledgeId");
+            SchemaMapping.Columns.AddMapping(PledgeColumn, "PledgeId");
             SchemaMapping.Columns.AddMapping(MensSeatsColumn, "MensSeats");
             SchemaMapping.Columns.AddMapping(WomensSeatsColumn, "WomensSeats");
             SchemaMapping.Columns.AddMapping(BoysSeatsColumn, "BoysSeats");
@@ -1562,12 +1562,12 @@ namespace ShomreiTorah {
             get { return base.Field<Guid>(IdColumn); }
             set { base[IdColumn] = value; }
         }
-        ///<summary>Gets or sets the pledge id of the seating reservation.</summary>
+        ///<summary>Gets or sets the pledge associated with this reservation.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row PledgeId {
-            get { return base.Field<Row>(PledgeIdColumn); }
-            set { base[PledgeIdColumn] = value; }
+        public Row Pledge {
+            get { return base.Field<Row>(PledgeColumn); }
+            set { base[PledgeColumn] = value; }
         }
         ///<summary>Gets or sets the mens seats of the seating reservation.</summary>
         [DebuggerNonUserCode]
@@ -1617,8 +1617,8 @@ namespace ShomreiTorah {
         partial void ValidateId(Guid newValue, Action<string> error);
         partial void OnIdChanged(Guid oldValue, Guid newValue);
         
-        partial void ValidatePledgeId(Row newValue, Action<string> error);
-        partial void OnPledgeIdChanged(Row oldValue, Row newValue);
+        partial void ValidatePledge(Row newValue, Action<string> error);
+        partial void OnPledgeChanged(Row oldValue, Row newValue);
         
         partial void ValidateMensSeats(Int32 newValue, Action<string> error);
         partial void OnMensSeatsChanged(Int32 oldValue, Int32 newValue);
@@ -1655,8 +1655,8 @@ namespace ShomreiTorah {
             if (column == IdColumn) {
                 ValidateId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == PledgeIdColumn) {
-                ValidatePledgeId((Row)newValue, reporter);
+            } else if (column == PledgeColumn) {
+                ValidatePledge((Row)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == MensSeatsColumn) {
                 ValidateMensSeats((Int32)newValue, reporter);
@@ -1685,8 +1685,8 @@ namespace ShomreiTorah {
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
-            else if (column == PledgeIdColumn)
-            	OnPledgeIdChanged((Row)oldValue, (Row)newValue);
+            else if (column == PledgeColumn)
+            	OnPledgeChanged((Row)oldValue, (Row)newValue);
             else if (column == MensSeatsColumn)
             	OnMensSeatsChanged((Int32)oldValue, (Int32)newValue);
             else if (column == WomensSeatsColumn)
@@ -1705,19 +1705,19 @@ namespace ShomreiTorah {
         #endregion
     }
     
-    ///<summary>Describes a statement log.</summary>
-    public partial class StatementLog : Row {
-        ///<summary>Creates a new StatementLog instance.</summary>
-        public StatementLog () : base(Schema) { Initialize(); }
+    ///<summary>Describes a statement sent to a person.</summary>
+    public partial class LoggedStatement : Row {
+        ///<summary>Creates a new LoggedStatement instance.</summary>
+        public LoggedStatement () : base(Schema) { Initialize(); }
         partial void Initialize();
         
         ///<summary>Creates a strongly-typed StatementLog table.</summary>
-        public static TypedTable<StatementLog> CreateTable() { return new TypedTable<StatementLog>(Schema, () => new StatementLog()); }
+        public static TypedTable<LoggedStatement> CreateTable() { return new TypedTable<LoggedStatement>(Schema, () => new LoggedStatement()); }
         
         ///<summary>Gets the schema's Id column.</summary>
         public static ValueColumn IdColumn { get; private set; }
-        ///<summary>Gets the schema's PersonId column.</summary>
-        public static ForeignKeyColumn PersonIdColumn { get; private set; }
+        ///<summary>Gets the schema's Person column.</summary>
+        public static ForeignKeyColumn PersonColumn { get; private set; }
         ///<summary>Gets the schema's DateGenerated column.</summary>
         public static ValueColumn DateGeneratedColumn { get; private set; }
         ///<summary>Gets the schema's Media column.</summary>
@@ -1732,22 +1732,22 @@ namespace ShomreiTorah {
         public static ValueColumn UserNameColumn { get; private set; }
         
         ///<summary>Gets the StatementLog schema instance.</summary>
-        public static new TypedSchema<StatementLog> Schema { get; private set; }
+        public static new TypedSchema<LoggedStatement> Schema { get; private set; }
         ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server StatementLog table.</summary>
         public static SchemaMapping SchemaMapping { get; private set; }
         
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        static StatementLog() {
+        static LoggedStatement() {
             #region Create Schema
-            Schema = new TypedSchema<StatementLog>("StatementLog");
+            Schema = new TypedSchema<LoggedStatement>("StatementLog");
             
             Schema.PrimaryKey = IdColumn = Schema.Columns.AddValueColumn("Id", typeof(Guid), null);
             IdColumn.Unique = true;
             IdColumn.AllowNulls = false;
             
-            PersonIdColumn = Schema.Columns.AddForeignKey("PersonId", ShomreiTorah.Person.Schema, "StatementLogs");
-            PersonIdColumn.AllowNulls = false;
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "StatementLogs");
+            PersonColumn.AllowNulls = false;
             
             DateGeneratedColumn = Schema.Columns.AddValueColumn("DateGenerated", typeof(DateTime), null);
             DateGeneratedColumn.AllowNulls = false;
@@ -1774,7 +1774,7 @@ namespace ShomreiTorah {
             SchemaMapping.SqlSchemaName = "Billing";
             
             SchemaMapping.Columns.AddMapping(IdColumn, "Id");
-            SchemaMapping.Columns.AddMapping(PersonIdColumn, "PersonId");
+            SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
             SchemaMapping.Columns.AddMapping(DateGeneratedColumn, "DateGenerated");
             SchemaMapping.Columns.AddMapping(MediaColumn, "Media");
             SchemaMapping.Columns.AddMapping(StatementKindColumn, "StatementKind");
@@ -1792,12 +1792,12 @@ namespace ShomreiTorah {
             get { return base.Field<Guid>(IdColumn); }
             set { base[IdColumn] = value; }
         }
-        ///<summary>Gets or sets the person id of the statement log.</summary>
+        ///<summary>Gets or sets the person who received the statement.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row PersonId {
-            get { return base.Field<Row>(PersonIdColumn); }
-            set { base[PersonIdColumn] = value; }
+        public Row Person {
+            get { return base.Field<Row>(PersonColumn); }
+            set { base[PersonColumn] = value; }
         }
         ///<summary>Gets or sets the date generated of the statement log.</summary>
         [DebuggerNonUserCode]
@@ -1847,8 +1847,8 @@ namespace ShomreiTorah {
         partial void ValidateId(Guid newValue, Action<string> error);
         partial void OnIdChanged(Guid oldValue, Guid newValue);
         
-        partial void ValidatePersonId(Row newValue, Action<string> error);
-        partial void OnPersonIdChanged(Row oldValue, Row newValue);
+        partial void ValidatePerson(Row newValue, Action<string> error);
+        partial void OnPersonChanged(Row oldValue, Row newValue);
         
         partial void ValidateDateGenerated(DateTime newValue, Action<string> error);
         partial void OnDateGeneratedChanged(DateTime oldValue, DateTime newValue);
@@ -1885,8 +1885,8 @@ namespace ShomreiTorah {
             if (column == IdColumn) {
                 ValidateId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == PersonIdColumn) {
-                ValidatePersonId((Row)newValue, reporter);
+            } else if (column == PersonColumn) {
+                ValidatePerson((Row)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == DateGeneratedColumn) {
                 ValidateDateGenerated((DateTime)newValue, reporter);
@@ -1915,8 +1915,8 @@ namespace ShomreiTorah {
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
-            else if (column == PersonIdColumn)
-            	OnPersonIdChanged((Row)oldValue, (Row)newValue);
+            else if (column == PersonColumn)
+            	OnPersonChanged((Row)oldValue, (Row)newValue);
             else if (column == DateGeneratedColumn)
             	OnDateGeneratedChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == MediaColumn)
