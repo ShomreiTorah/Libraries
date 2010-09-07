@@ -7,7 +7,7 @@ using System.Collections;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.DataBinding {
-	///<summary>Implemented by PropertyDescriptors that return lists to expose the lists' proeprties.  This is called by ITypedList implementations.</summary>
+	///<summary>Implemented by PropertyDescriptors that return lists to expose the lists' properties.  This is called by ITypedList implementations.</summary>
 	interface ITypedListPropertyProvider {
 		string ChildListName { get; }
 		PropertyDescriptorCollection GetItemProperties();
