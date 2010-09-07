@@ -28,7 +28,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 			//or parent rows, returning a SameRowDependancy will cause
 			//extra handlers to be added, so I return the actual child
 			//dependencies instead.
-			if (info.DependantColumns.Any())
+			if (info.DependentColumns.Any())
 				return new SameRowDependency(setup);
 			else
 				return new AggregateDependency(setup.NestedDependencies);
@@ -71,8 +71,8 @@ namespace ShomreiTorah.Singularity.Dependencies {
 
 				var column = rowInfo.Schema.Columns[name];
 				if (column != null) {
-					if (!rowInfo.DependantColumns.Contains(column))
-						rowInfo.DependantColumns.Add(rowInfo.Schema.Columns[name]);
+					if (!rowInfo.DependentColumns.Contains(column))
+						rowInfo.DependentColumns.Add(rowInfo.Schema.Columns[name]);
 					return;
 				}
 
@@ -226,20 +226,20 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		sealed class RowInfo {
 			public RowInfo(TableSchema schema) {
 				Schema = schema;
-				DependantColumns = new SchemaColumnCollection(schema);
+				DependentColumns = new SchemaColumnCollection(schema);
 				ParentRows = new Dictionary<ForeignKeyColumn, RowInfo>();
 				ChildRows = new Dictionary<ChildRelation, RowInfo>();
 			}
 
 			public TableSchema Schema { get; private set; }
 
-			public Collection<Column> DependantColumns { get; private set; }
+			public Collection<Column> DependentColumns { get; private set; }
 			public Dictionary<ForeignKeyColumn, RowInfo> ParentRows { get; private set; }
 			public Dictionary<ChildRelation, RowInfo> ChildRows { get; private set; }
 
 			public RowDependencySetup CreateDependencySetup() {
 				var setup = new RowDependencySetup(Schema);
-				setup.DependantColumns.AddRange<Column, Column>(DependantColumns);
+				setup.DependentColumns.AddRange<Column, Column>(DependentColumns);
 
 				setup.NestedDependencies.AddRange(ParentRows.Select(kvp =>
 					new ParentRowDependency(kvp.Value.CreateDependencySetup(), kvp.Key)

@@ -13,7 +13,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		protected RowDependency(RowDependencySetup setup){
 			if (setup == null) throw new ArgumentNullException("setup");
 
-			DependantColumns = new ReadOnlyCollection<Column>(setup.DependantColumns.ToArray());
+			DependentColumns = new ReadOnlyCollection<Column>(setup.DependentColumns.ToArray());
 			NestedDependencies = new ReadOnlyCollection<Dependency>(setup.NestedDependencies.ToArray());
 
 			RequiresDataContext = NestedDependencies.Any(d => d.RequiresDataContext);
@@ -25,11 +25,11 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		///<summary>Registers event handlers for this dependency to track changes for a table.</summary>
 		public override void Register(Table table) {
 			var rc = GetRowCollection(table);
-			rc.RowAdded += DependantRowAdded;
-			rc.RowRemoved += DependantRowRemoved;
+			rc.RowAdded += DependentRowAdded;
+			rc.RowRemoved += DependentRowRemoved;
 
-			if (DependantColumns.Any())
-				rc.ValueChanged += DependantValueChanged;
+			if (DependentColumns.Any())
+				rc.ValueChanged += DependentValueChanged;
 
 			foreach (var child in NestedDependencies)
 				child.Register(table);
@@ -37,26 +37,26 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		///<summary>Unregisters event handlers registered in Register.</summary>
 		public override void Unregister(Table table) {
 			var rc = GetRowCollection(table);
-			rc.RowAdded -= DependantRowAdded;
-			rc.RowRemoved -= DependantRowRemoved;
+			rc.RowAdded -= DependentRowAdded;
+			rc.RowRemoved -= DependentRowRemoved;
 
-			if (DependantColumns.Any())
-				rc.ValueChanged -= DependantValueChanged;
+			if (DependentColumns.Any())
+				rc.ValueChanged -= DependentValueChanged;
 
 			foreach (var child in NestedDependencies)
 				child.Unregister(table);
 		}
-		void DependantValueChanged(object sender, ValueChangedEventArgs e) {
-			if (!DependantColumns.Contains(e.Column)) return;
+		void DependentValueChanged(object sender, ValueChangedEventArgs e) {
+			if (!DependentColumns.Contains(e.Column)) return;
 			foreach (var row in GetAffectedRows(e.Row))
 				OnRowInvalidated(row);
 		}
 
-		void DependantRowAdded(object sender, RowListEventArgs e) {
+		void DependentRowAdded(object sender, RowListEventArgs e) {
 			foreach (var row in GetAffectedRows(e.Row))
 				OnRowInvalidated(row);
 		}
-		void DependantRowRemoved(object sender, RowListEventArgs e) {
+		void DependentRowRemoved(object sender, RowListEventArgs e) {
 			foreach (var row in GetAffectedRows(e.Row))
 				OnRowInvalidated(row);
 		}
@@ -67,7 +67,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		}
 
 		///<summary>Gets the columns in the rows represented by this dependency that affect the calculated column.</summary>
-		public ReadOnlyCollection<Column> DependantColumns { get; private set; }
+		public ReadOnlyCollection<Column> DependentColumns { get; private set; }
 		///<summary>Gets the dependencies that depend on the rows represented by this dependency and affect the calculated column.</summary>
 		public ReadOnlyCollection<Dependency> NestedDependencies { get; private set; }
 
@@ -76,7 +76,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		protected abstract IRowEventProvider GetRowCollection(Table table);
 
 		///<summary>Gets the row(s) affected by a change in a row.</summary>
-		///<param name="modifiedRow">The dependant row that was changed.</param>
+		///<param name="modifiedRow">The dependent row that was changed.</param>
 		///<returns>The rows for which the calculated column was affected.</returns>
 		protected abstract IEnumerable<Row> GetAffectedRows(Row modifiedRow);
 	}
@@ -89,7 +89,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 
 			Schema = schema;
 
-			DependantColumns = new SchemaColumnCollection(Schema);
+			DependentColumns = new SchemaColumnCollection(Schema);
 			NestedDependencies = new Collection<Dependency>();
 		}
 
@@ -97,7 +97,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		public TableSchema Schema { get; private set; }
 
 		///<summary>Gets the columns that the dependency will listen for changes in.</summary>
-		public Collection<Column> DependantColumns { get; private set; }
+		public Collection<Column> DependentColumns { get; private set; }
 		///<summary>Gets the child dependencies that the dependency will depend on.</summary>
 		public Collection<Dependency> NestedDependencies { get; private set; }
 	}

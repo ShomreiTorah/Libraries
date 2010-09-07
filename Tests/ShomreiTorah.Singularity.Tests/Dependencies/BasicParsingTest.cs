@@ -69,7 +69,7 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 			Assert.IsInstanceOfType(dep, typeof(SameRowDependency));
 
 			var srd = (SameRowDependency)dep;
-			Assert.IsTrue(schema.Columns.SequenceEqual(srd.DependantColumns.OrderBy(c => c.Name)));
+			Assert.IsTrue(schema.Columns.SequenceEqual(srd.DependentColumns.OrderBy(c => c.Name)));
 		}
 	}
 }

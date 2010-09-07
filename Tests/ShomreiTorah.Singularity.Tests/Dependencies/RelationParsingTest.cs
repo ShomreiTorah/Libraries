@@ -69,8 +69,8 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 			var srd = (SameRowDependency)dep;
 
 			Assert.AreEqual(0, srd.NestedDependencies.Count);
-			Assert.AreEqual(1, srd.DependantColumns.Count);
-			Assert.AreEqual(PowersKeyColumn, srd.DependantColumns[0]);
+			Assert.AreEqual(1, srd.DependentColumns.Count);
+			Assert.AreEqual(PowersKeyColumn, srd.DependentColumns[0]);
 		}
 		[Description("Ensures that accessing columns in a parent row adds a ParentRowDependency.")]
 		[TestMethod]
@@ -84,14 +84,14 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 			var srd = (SameRowDependency)dep;
 
 			Assert.AreEqual(1, srd.NestedDependencies.Count);
-			Assert.AreEqual(1, srd.DependantColumns.Count);
-			Assert.AreEqual(PowersKeyColumn, srd.DependantColumns[0]);
+			Assert.AreEqual(1, srd.DependentColumns.Count);
+			Assert.AreEqual(PowersKeyColumn, srd.DependentColumns[0]);
 
 			var prd = (ParentRowDependency)srd.NestedDependencies[0];
 			Assert.AreEqual(0, prd.NestedDependencies.Count);
 			Assert.AreEqual(PowersKeyColumn, prd.ParentColumn);
 
-			Assert.IsTrue(NumbersSchema.Columns.SequenceEqual(prd.DependantColumns));
+			Assert.IsTrue(NumbersSchema.Columns.SequenceEqual(prd.DependentColumns));
 		}
 		[Description("Ensures that accessing a child row collection (without any columns) adds a ChildRowDependency.")]
 		[TestMethod]
@@ -108,7 +108,7 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 
 			var prd = (ChildRowDependency)ad.Dependencies[0];
 			Assert.AreEqual(0, prd.NestedDependencies.Count);
-			Assert.AreEqual(0, prd.DependantColumns.Count);
+			Assert.AreEqual(0, prd.DependentColumns.Count);
 			Assert.AreEqual(PowersKeyColumn.ChildRelation, prd.ChildRelation);
 		}
 		[Description("Ensures that aggregating a child row collection (without any columns) adds a ChildRowDependency.")]
@@ -126,7 +126,7 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 
 			var crd = (ChildRowDependency)ad.Dependencies[0];
 			Assert.AreEqual(0, crd.NestedDependencies.Count);
-			Assert.AreEqual(0, crd.DependantColumns.Count);
+			Assert.AreEqual(0, crd.DependentColumns.Count);
 			Assert.AreEqual(PowersKeyColumn.ChildRelation, crd.ChildRelation);
 		}
 
@@ -142,14 +142,14 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 			var srd = (SameRowDependency)dep;
 
 			Assert.AreEqual(1, srd.NestedDependencies.Count);
-			Assert.AreEqual(1, srd.DependantColumns.Count);
-			Assert.AreEqual(NumbersSchema.Columns[0], srd.DependantColumns[0]);
+			Assert.AreEqual(1, srd.DependentColumns.Count);
+			Assert.AreEqual(NumbersSchema.Columns[0], srd.DependentColumns[0]);
 
 			var crd = (ChildRowDependency)srd.NestedDependencies[0];
 			Assert.AreEqual(0, crd.NestedDependencies.Count);
 			Assert.AreEqual(PowersKeyColumn.ChildRelation, crd.ChildRelation);
 
-			Assert.IsTrue(PowersSchema.Columns.OrderBy(c => c.Name).SequenceEqual(crd.DependantColumns.OrderBy(c => c.Name)));
+			Assert.IsTrue(PowersSchema.Columns.OrderBy(c => c.Name).SequenceEqual(crd.DependentColumns.OrderBy(c => c.Name)));
 		}
 
 		[Description("Ensures that chained relations in lambdas are handled correctly.")]
@@ -167,11 +167,11 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 
 			var srd = (SameRowDependency)dep;
 			Assert.AreEqual(1, srd.NestedDependencies.Count);
-			Assert.AreEqual(1, srd.DependantColumns.Count);
-			Assert.AreEqual(PowersKeyColumn, srd.DependantColumns[0]);
+			Assert.AreEqual(1, srd.DependentColumns.Count);
+			Assert.AreEqual(PowersKeyColumn, srd.DependentColumns[0]);
 
 			var prd = (ParentRowDependency)srd.NestedDependencies[0];	// ((Row)r["Number"]).
-			Assert.AreEqual(0, prd.DependantColumns.Count);
+			Assert.AreEqual(0, prd.DependentColumns.Count);
 			Assert.AreEqual(1, prd.NestedDependencies.Count);
 			Assert.AreEqual(PowersKeyColumn, prd.ParentColumn);
 
@@ -179,20 +179,20 @@ namespace ShomreiTorah.Singularity.Tests.Dependencies {
 			Assert.AreEqual(1, crd.NestedDependencies.Count);
 			Assert.AreEqual(PowersKeyColumn.ChildRelation, crd.ChildRelation);
 
-			Assert.IsTrue(PowersSchema.Columns.OrderBy(c => c.Name).SequenceEqual(crd.DependantColumns.OrderBy(c => c.Name)));
+			Assert.IsTrue(PowersSchema.Columns.OrderBy(c => c.Name).SequenceEqual(crd.DependentColumns.OrderBy(c => c.Name)));
 
 			prd = (ParentRowDependency)crd.NestedDependencies[0];	// / power.Field<Row>("Number").
-			Assert.AreEqual(0, prd.DependantColumns.Count);
+			Assert.AreEqual(0, prd.DependentColumns.Count);
 			Assert.AreEqual(1, prd.NestedDependencies.Count);
 			Assert.AreEqual(PowersKeyColumn, prd.ParentColumn);
 
 
 			crd = (ChildRowDependency)prd.NestedDependencies[0];	// Field<Row>("Number").ChildRows("Powers") (in select clause)
 			Assert.AreEqual(0, crd.NestedDependencies.Count);
-			Assert.AreEqual(1, crd.DependantColumns.Count);
+			Assert.AreEqual(1, crd.DependentColumns.Count);
 			Assert.AreEqual(PowersKeyColumn.ChildRelation, crd.ChildRelation);
 
-			Assert.AreEqual(PowersSchema.Columns["Value"], crd.DependantColumns[0]);
+			Assert.AreEqual(PowersSchema.Columns["Value"], crd.DependentColumns[0]);
 		}
 	}
 }
