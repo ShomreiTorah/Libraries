@@ -92,24 +92,24 @@ namespace ShomreiTorah.Singularity {
 		//events as well.  (Events do not support covariance)
 		#region Typed Events
 		///<summary>Occurs when a row is added to the table.</summary>
-		public new event EventHandler<RowEventArgs<TRow>> RowAdded;
+		public new event EventHandler<RowListEventArgs<TRow>> RowAdded;
 		///<summary>Raises the RowAdded event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnRowAdded(RowListEventArgs e) {
 			base.OnRowAdded(e);
 			if (RowAdded != null)
-				RowAdded(this, new RowEventArgs<TRow>((TRow)e.Row));
+				RowAdded(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index));
 		}
 		///<summary>Occurs when a row is removed from the table.</summary>
-		public new event EventHandler<RowEventArgs<TRow>> RowRemoved;
+		public new event EventHandler<RowListEventArgs<TRow>> RowRemoved;
 		///<summary>Raises the RowRemoved event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnRowRemoved(RowListEventArgs e) {
 			base.OnRowRemoved(e);
 			if (RowRemoved != null)
-				RowRemoved(this, new RowEventArgs<TRow>((TRow)e.Row));
+				RowRemoved(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index));
 		}
 		///<summary>Occurs when a column value is changed.</summary>
 		public new event EventHandler<ValueChangedEventArgs<TRow>> ValueChanged;
@@ -131,6 +131,14 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Gets the row.</summary>
 		public TRow Row { get; private set; }
+	}
+	///<summary>Provides data for strongly-typed row events in a list.</summary>
+	public class RowListEventArgs<TRow> : RowEventArgs<TRow> where TRow : Row {
+		///<summary>Creates a new RowListEventArgs instance.</summary>
+		public RowListEventArgs(TRow row, int index) : base(row) { Index = index; }
+
+		///<summary>Gets the index of the row in the collection.</summary>
+		public int Index { get; private set; }
 	}
 	///<summary>Provides data for the strongly-typed ValueChanged event.</summary>
 	public class ValueChangedEventArgs<TRow> : ValueChangedEventArgs where TRow : Row {

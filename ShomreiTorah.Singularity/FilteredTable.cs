@@ -112,30 +112,30 @@ namespace ShomreiTorah.Singularity {
 			}
 
 			writableRows.Insert(ourIndex, row);
-			OnRowAdded(new RowListEventArgs(row, ourIndex));
+			OnRowAdded(new RowListEventArgs<TRow>(row, ourIndex));
 		}
 		void RemoveRow(TRow row) {
 			var index = writableRows.IndexOf(row);
 			writableRows.RemoveAt(index);
-			OnRowRemoved(new RowListEventArgs(row, index));
+			OnRowRemoved(new RowListEventArgs<TRow>(row, index));
 		}
 		
 		#region Typed Events
 		///<summary>Occurs when a row is added to the table.</summary>
-		public event EventHandler<RowEventArgs<TRow>> RowAdded;
+		public event EventHandler<RowListEventArgs<TRow>> RowAdded;
 		///<summary>Raises the RowAdded event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
-		void OnRowAdded(RowListEventArgs e) {
+		void OnRowAdded(RowListEventArgs<TRow> e) {
 			if (RowAdded != null)
-				RowAdded(this, new RowEventArgs<TRow>((TRow)e.Row));
+				RowAdded(this, e);
 		}
 		///<summary>Occurs when a row is removed from the table.</summary>
-		public event EventHandler<RowEventArgs<TRow>> RowRemoved;
+		public event EventHandler<RowListEventArgs<TRow>> RowRemoved;
 		///<summary>Raises the RowRemoved event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
-		void OnRowRemoved(RowListEventArgs e) {
+		void OnRowRemoved(RowListEventArgs<TRow> e) {
 			if (RowRemoved != null)
-				RowRemoved(this, new RowEventArgs<TRow>((TRow)e.Row));
+				RowRemoved(this, e);
 		}
 		///<summary>Occurs when a column value is changed.</summary>
 		public event EventHandler<ValueChangedEventArgs<TRow>> ValueChanged;
