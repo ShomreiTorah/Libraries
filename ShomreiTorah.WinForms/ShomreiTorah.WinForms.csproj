@@ -102,6 +102,13 @@
     <Compile Include="Controls\Canvas.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\Lookup\Columns.cs" />
+    <Compile Include="Controls\Lookup\ItemSelector.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Lookup\ResultsList.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Extensions.cs" />
     <Compile Include="Controls\GoogleMapControl.cs">
       <SubType>UserControl</SubType>
@@ -208,6 +215,7 @@
       <Link>CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
