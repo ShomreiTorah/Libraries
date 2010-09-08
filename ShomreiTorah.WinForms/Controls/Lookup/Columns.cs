@@ -11,7 +11,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		int width;
 		bool visible;
 
-		internal virtual void SetOwner(ItemSelector owner) {
+		internal virtual void SetOwner(RepositoryItemItemSelector owner) {
 			if (owner == null) throw new ArgumentNullException("owner");
 			Owner = owner;
 			if (Owner.DataSource != null) OnDataSourceSet();
@@ -21,7 +21,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Gets the ItemSelector that owns the column.</summary>
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public ItemSelector Owner { get; private set; }
+		public RepositoryItemItemSelector Owner { get; private set; }
 
 		///<summary>Gets or sets the width of the column.</summary>
 		[Description("Gets or sets the width of the column.")]

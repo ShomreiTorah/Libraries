@@ -5,24 +5,44 @@ using System.Text;
 using DevExpress.XtraEditors;
 using System.Collections;
 using System.Drawing;
+using DevExpress.XtraEditors.Popup;
+using System.Windows.Forms;
 
 namespace ShomreiTorah.WinForms.Controls.Lookup {
-	class ResultsList : SimpleControl {
-		readonly VScrollBar scrollBar;
+	class ItemSelectorPopupForm : CustomBlobPopupForm {
+		readonly DevExpress.XtraEditors.VScrollBar scrollBar;
 		readonly ItemSelector owner;
 
 		IList items;
 		int itemHeight;
 		int scrollOffset;
-		public ResultsList(ItemSelector owner) {
+		public ItemSelectorPopupForm(ItemSelector owner)
+			: base(owner) {
 			this.owner = owner;
-			scrollBar = new VScrollBar();
+			scrollBar = new DevExpress.XtraEditors.VScrollBar();
+			scrollBar.Scroll += ScrollBar_Scroll;
+			scrollBar.ScrollBarAutoSize = true;
+			scrollBar.LookAndFeel.Assign(Properties.LookAndFeel);
+			Controls.Add(scrollBar);
 
+		}
+
+		public new RepositoryItemItemSelector Properties { get { return (RepositoryItemItemSelector)base.Properties; } }
+
+		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) {
 		}
 
 		void SetItems(IList items) {
 			Refresh();
 		}
+		public override void ShowPopupForm() {
+			base.ShowPopupForm();
+		}
+		public override void ProcessKeyDown(KeyEventArgs e) {
+			base.ProcessKeyDown(e);
+			//TODO: Keyboard Navigation
+		}
+		//TODO: Mouse events (selection)
 
 		int ClientWidth {
 			get {
@@ -31,10 +51,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				return Width;
 			}
 		}
+		protected override void UpdateControlPositionsCore() {
+			base.UpdateControlPositionsCore();
+			//TODO: Handle scrollbar?
+		}
 
 		void DrawItem(Graphics g, int rowIndex) {
 			int x = Padding.Left;
-			foreach (var column in owner.Columns.Where(c => c.Visible)) {
+			foreach (var column in Properties.Columns.Where(c => c.Visible)) {
 				DrawCell(g, x, rowIndex, column);
 
 				x += column.Width + 4;
