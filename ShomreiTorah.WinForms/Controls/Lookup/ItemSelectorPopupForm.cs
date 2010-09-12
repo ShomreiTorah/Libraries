@@ -20,8 +20,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			: base(owner) {
 
 			ScrollBar = new DevExpress.XtraEditors.VScrollBar();
-			ScrollBar.Scroll += ScrollBar_Scroll;
 			ScrollBar.ScrollBarAutoSize = true;
+			ScrollBar.Scroll += ScrollBar_Scroll;
 			ScrollBar.LookAndFeel.Assign(Properties.LookAndFeel);
 			Controls.Add(ScrollBar);
 		}
@@ -89,17 +89,19 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 
+		public int ScrollTop { get { return Form.ScrollBar.Visible ? Form.ScrollBar.Value : 0; } }
+
 		public Rectangle RowsArea { get; private set; }
 		public Rectangle HeaderArea { get; private set; }
 		public int RowHeight { get; private set; }
 
-		public int FirstVisibleRow { get { return Form.ScrollBar.Value / RowHeight; } }
-		public int VisibleRows { get { return Math.Min(Form.Items.Count, (int)Math.Ceiling(RowsArea.Height / (double)RowHeight)); } }
+		public int FirstVisibleRow { get { return ScrollTop / RowHeight; } }
+		//public int VisibleRows { get { return Math.Min(Form.Items.Count,  RowsArea.Height / RowHeight); } }
 
 		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
 
 		public int GetRowCoordinate(int rowIndex) {
-			return (rowIndex * RowHeight) - Form.ScrollBar.Value;
+			return RowsArea.Top + (rowIndex * RowHeight) - ScrollTop;
 		}
 
 		protected override void CalcContentRect(Rectangle bounds) {
@@ -113,8 +115,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Form.ScrollBar.Visible = Form.ScrollBar.Maximum > rowAreaHeight;
 
 			int availableWidth = ContentRect.Width;
-			if (Form.ScrollBar.Visible)
+			if (Form.ScrollBar.Visible) {
 				availableWidth -= Form.ScrollBar.Width;
+
+				Form.ScrollBar.Left = ContentRect.Width - Form.ScrollBar.Width;
+				Form.ScrollBar.Top = ContentRect.Top + headerHeight;
+				Form.ScrollBar.Height = rowAreaHeight;
+			}
 
 			HeaderArea = new Rectangle(ContentRect.Location, new Size(availableWidth, headerHeight));
 			RowsArea = new Rectangle(HeaderArea.Left, HeaderArea.Bottom, availableWidth, rowAreaHeight);
@@ -134,11 +141,16 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 		}
 		void DrawRows(PopupFormGraphicsInfoArgs args) {
-			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			var lastRow = info.FirstVisibleRow + info.VisibleRows;
-			for (int rowIndex = info.FirstVisibleRow; rowIndex < lastRow; rowIndex++) {
-				DrawRow(args, rowIndex);
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+			using (args.Cache.ClipInfo.SaveAndSetClip(info.RowsArea)) {
+
+				for (int rowIndex = info.FirstVisibleRow; rowIndex < info.Form.Items.Count; rowIndex++) {
+					int y = info.GetRowCoordinate(rowIndex);		//TODO: Selection
+					if (y > info.RowsArea.Bottom) break;
+
+					DrawRow(args, rowIndex);
+				}
 			}
 		}
 		void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
