@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace ShomreiTorah.WinForms.Controls.Lookup {
 	///<summary>A column displayed in the results of an ItemSelector.</summary>
 	public abstract class ResultColumn {
-		int width;
-		bool visible;
+		int width = 100;
+		bool visible = true;
 
 		internal virtual void SetOwner(RepositoryItemItemSelector owner) {
 			if (owner == null) throw new ArgumentNullException("owner");
@@ -26,6 +27,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Gets or sets the width of the column.</summary>
 		[Description("Gets or sets the width of the column.")]
 		[Category("Appearance")]
+		[DefaultValue(100)]
 		public int Width {
 			get { return width; }
 			set { width = value; }
@@ -33,6 +35,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Gets or sets whether the column appears in the results grid.</summary>
 		[Description("Gets or sets whether the column appears in the results grid.")]
 		[Category("Appearance")]
+		[DefaultValue(true)]
 		public bool Visible {
 			get { return visible; }
 			set { visible = value; }
@@ -46,6 +49,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 	}
 	///<summary>A column that displays a property of the underlying data items.</summary>
 	public class DataSourceColumn : ResultColumn {
+		///<summary>Creates a new DataSourceColumn.</summary>
+		public DataSourceColumn() { }
+		///<summary>Creates a new DataSourceColumn that displays the data in the specified field.</summary>
+		public DataSourceColumn(string fieldName) { FieldName = fieldName; }
+		///<summary>Creates a new DataSourceColumn that displays the data in the specified field.</summary>
+		public DataSourceColumn(string fieldName, int width) { FieldName = fieldName; Width = width; }
+
 		string fieldName;
 		string formatString = "{0}";
 
@@ -75,7 +85,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public override string GetValue(object row) {
 			if (descriptor == null)
 				return "(No matching column)";
-			return String.Format(FormatString, descriptor.GetValue(row));
+			return String.Format(CultureInfo.CurrentCulture, FormatString, descriptor.GetValue(row));
 		}
 	}
 
