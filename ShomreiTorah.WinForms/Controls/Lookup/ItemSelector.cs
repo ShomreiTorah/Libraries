@@ -12,13 +12,18 @@ using DevExpress.XtraEditors.Popup;
 using DevExpress.XtraEditors.Registrator;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraEditors.ViewInfo;
+using DevExpress.Utils;
+using System.Drawing;
+using System.Collections;
 
+#pragma warning disable 1591
 namespace ShomreiTorah.WinForms.Controls.Lookup {
 	///<summary>A control that allows the user to select an item from a list.</summary>
 	[DefaultEvent("ItemSelected")]
 	[Description("A control that allows the user to select an item from a list.")]
 	[ComplexBindingProperties("DataSource", "DataMember")]
 	public class ItemSelector : PopupBaseEdit {
+		static ItemSelector() { RepositoryItemItemSelector.Register(); }
 
 		///<summary>Creates a new ItemSelector.</summary>
 		public ItemSelector() {
@@ -44,7 +49,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			set { base.Text = value; }
 		}
 
-
 		///<summary>Creates the editor's popup form.</summary>
 		protected override PopupBaseForm CreatePopupForm() {
 			return new ItemSelectorPopupForm(this);
@@ -66,6 +70,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override void SetEmptyEditValue(object emptyEditValue) {
 			base.SetEmptyEditValue(emptyEditValue);
 		}
+
+		internal IList AllItems { get; set; }
 	}
 
 
@@ -96,17 +102,64 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		object dataSource;
 		string dataMember = "";
+		bool showColumnHeaders = true;
 
 		///<summary>Creates a new RepositoryItemItemSelector.</summary>
 		public RepositoryItemItemSelector() {
 			Columns = new ItemSelectorColumnCollection(this);
+
+			AppearanceColumnHeader = CreateAppearance("ColumnHeader");
+			AppearanceResults = CreateAppearance("Results");
+			AppearanceMatch = CreateAppearance("Match");
 		}
+
+		#region Appearances
+		protected override void DestroyAppearances() {
+			DestroyAppearance(AppearanceColumnHeader);
+			DestroyAppearance(AppearanceResults);
+			DestroyAppearance(AppearanceMatch);
+			base.DestroyAppearances();
+		}
+
+		void ResetAppearanceMatch() { AppearanceMatch.Reset(); }
+		bool ShouldSerializeAppearanceMatch() { return AppearanceMatch.ShouldSerialize(); }
+		///<summary>Gets or sets the appearance of the matched prefixes in the results grid.</summary>
+		[Description("Gets or sets the appearance of the matched prefixes in the results grid.")]
+		[Category("Appearance")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		public AppearanceObject AppearanceMatch { get; private set; }
+
+		void ResetAppearanceResults() { AppearanceResults.Reset(); }
+		bool ShouldSerializeAppearanceResults() { return AppearanceResults.ShouldSerialize(); }
+		///<summary>Gets or sets the appearance of the results grid.</summary>
+		[Description("Gets or sets the appearance of the results grid.")]
+		[Category("Appearance")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		public AppearanceObject AppearanceResults { get; private set; }
+
+		void ResetAppearanceColumnHeader() { AppearanceColumnHeader.Reset(); }
+		bool ShouldSerializeAppearanceColumnHeader() { return AppearanceColumnHeader.ShouldSerialize(); }
+		///<summary>Gets or sets the appearance of the column headers.</summary>
+		[Description("Gets or sets the appearance of the column headers.")]
+		[Category("Appearance")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		public AppearanceObject AppearanceColumnHeader { get; private set; }
+		#endregion
 
 		///<summary>Gets the columns displayed in the results grid.</summary>
 		[Description("Gets the columns displayed in the results grid.")]
 		[Category("Data")]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 		public ItemSelectorColumnCollection Columns { get; private set; }
+
+		///<summary>Gets or sets whether the results grid will display column headers.</summary>
+		[Description("Gets or sets whether the results grid will display column headers.")]
+		[Category("Appearance")]
+		[DefaultValue(true)]
+		public bool ShowColumnHeaders {
+			get { return showColumnHeaders; }
+			set { showColumnHeaders = value; }
+		}
 
 		#region DataSource
 		///<summary>Gets or sets the name of the list or table in the data source to display data in.</summary>
@@ -144,6 +197,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ResultsBindingManager = OwnerEdit.BindingContext[DataSource, DataMember];
 			ItemProperties = ResultsBindingManager.GetItemProperties();
 			Columns.OnDataSourceSet();
+			OwnerEdit.AllItems = (IList)ListBindingHelper.GetList(DataSource, DataMember);
 		}
 		#endregion
 	}

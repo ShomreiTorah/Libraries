@@ -7,34 +7,34 @@ using System.Collections;
 using System.Drawing;
 using DevExpress.XtraEditors.Popup;
 using System.Windows.Forms;
+using DevExpress.Skins;
+using DevExpress.Utils;
+using DevExpress.LookAndFeel;
 
 namespace ShomreiTorah.WinForms.Controls.Lookup {
 	class ItemSelectorPopupForm : CustomBlobPopupForm {
-		readonly DevExpress.XtraEditors.VScrollBar scrollBar;
-		readonly ItemSelector owner;
+		public DevExpress.XtraEditors.VScrollBar ScrollBar { get; private set; }
+		public IList Items { get { return OwnerEdit.AllItems; } }
 
-		IList items;
-		int itemHeight;
-		int scrollOffset;
 		public ItemSelectorPopupForm(ItemSelector owner)
 			: base(owner) {
-			this.owner = owner;
-			scrollBar = new DevExpress.XtraEditors.VScrollBar();
-			scrollBar.Scroll += ScrollBar_Scroll;
-			scrollBar.ScrollBarAutoSize = true;
-			scrollBar.LookAndFeel.Assign(Properties.LookAndFeel);
-			Controls.Add(scrollBar);
 
+			ScrollBar = new DevExpress.XtraEditors.VScrollBar();
+			ScrollBar.Scroll += ScrollBar_Scroll;
+			ScrollBar.ScrollBarAutoSize = true;
+			ScrollBar.LookAndFeel.Assign(Properties.LookAndFeel);
+			Controls.Add(ScrollBar);
 		}
 
+		protected override PopupBaseFormPainter CreatePainter() { return new ItemSelectorPopupFormPainter(); }
+		protected override PopupBaseFormViewInfo CreateViewInfo() { return new ItemSelectorPopupFormViewInfo(this); }
 		public new RepositoryItemItemSelector Properties { get { return (RepositoryItemItemSelector)base.Properties; } }
+		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
 
 		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) {
+			Invalidate();
 		}
 
-		void SetItems(IList items) {
-			Refresh();
-		}
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
 		}
@@ -44,41 +44,126 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		//TODO: Mouse events (selection)
 
-		int ClientWidth {
-			get {
-				if (scrollBar.Visible)
-					return Width - scrollBar.Width;
-				return Width;
-			}
-		}
 		protected override void UpdateControlPositionsCore() {
 			base.UpdateControlPositionsCore();
 			//TODO: Handle scrollbar?
 		}
+	}
+	class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo {
+		public ItemSelectorPopupFormViewInfo(ItemSelectorPopupForm form)
+			: base(form) {
+			AppearanceColumnHeader = new AppearanceObject();
+			AppearanceResults = new AppearanceObject();
+		}
 
-		void DrawItem(Graphics g, int rowIndex) {
-			int x = Padding.Left;
-			foreach (var column in Properties.Columns.Where(c => c.Visible)) {
-				DrawCell(g, x, rowIndex, column);
+		public new ItemSelectorPopupForm Form { get { return (ItemSelectorPopupForm)base.Form; } }
+
+		#region Appearances
+		bool IsSkinned { get { return Form.Properties.LookAndFeel.ActiveStyle == ActiveLookAndFeelStyle.Skin; } }
+
+		public AppearanceObject AppearanceColumnHeader { get; private set; }
+		AppearanceDefault ColumnHeadersDefault {
+			get {
+				if (IsSkinned)
+					return GridSkins.GetSkin(Form.LookAndFeel)[GridSkins.SkinHeader].GetAppearanceDefault();
+
+				return new AppearanceDefault(GetSystemColor(SystemColors.ControlText), GetSystemColor(SystemColors.Control), HorzAlignment.Center, VertAlignment.Center);
+			}
+		}
+		public AppearanceObject AppearanceResults { get; private set; }
+		AppearanceObject ResultsDefault {
+			get {
+				var retVal = new AppearanceObject {
+					ForeColor = GetSystemColor(SystemColors.ControlText),
+					BackColor = GetSystemColor(SystemColors.Control)
+				};
+				retVal.TextOptions.Trimming = Trimming.EllipsisCharacter;
+				return retVal;
+			}
+		}
+		public override void UpdatePaintAppearance() {
+			base.UpdatePaintAppearance();
+			AppearanceHelper.Combine(AppearanceColumnHeader, new[] { Form.Properties.AppearanceColumnHeader, StyleController == null ? null :
+																						  StyleController.AppearanceDropDownHeader }, ColumnHeadersDefault);
+			AppearanceHelper.Combine(AppearanceResults, Form.Properties.AppearanceResults, ResultsDefault);
+		}
+		#endregion
+
+		public Rectangle RowsArea { get; private set; }
+		public Rectangle HeaderArea { get; private set; }
+		public int RowHeight { get; private set; }
+
+		public int FirstVisibleRow { get { return Form.ScrollBar.Value / RowHeight; } }
+		public int VisibleRows { get { return Math.Min(Form.Items.Count, (int)Math.Ceiling(RowsArea.Height / (double)RowHeight)); } }
+
+		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
+
+		public int GetRowCoordinate(int rowIndex) {
+			return (rowIndex * RowHeight) - Form.ScrollBar.Value;
+		}
+
+		protected override void CalcContentRect(Rectangle bounds) {
+			base.CalcContentRect(bounds);
+
+			var headerHeight = Form.Properties.ShowColumnHeaders ? 20 : 0;
+			RowHeight = 20;	//TODO: Calculate
+			var rowAreaHeight = ContentRect.Height - headerHeight;
+
+			Form.ScrollBar.Maximum = RowHeight * Form.Items.Count;
+			Form.ScrollBar.Visible = Form.ScrollBar.Maximum > rowAreaHeight;
+
+			int availableWidth = ContentRect.Width;
+			if (Form.ScrollBar.Visible)
+				availableWidth -= Form.ScrollBar.Width;
+
+			HeaderArea = new Rectangle(ContentRect.Location, new Size(availableWidth, headerHeight));
+			RowsArea = new Rectangle(HeaderArea.Left, HeaderArea.Bottom, availableWidth, rowAreaHeight);
+		}
+	}
+	class ItemSelectorPopupFormPainter : PopupBaseSizeableFormPainter {
+		protected override void DrawContent(PopupFormGraphicsInfoArgs info) {
+			base.DrawContent(info);
+
+			var vi = (ItemSelectorPopupFormViewInfo)info.ViewInfo;
+			if (vi.Form.Properties.ShowColumnHeaders)
+				DrawColumnHeaders(info);
+			DrawRows(info);
+		}
+
+		void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+		}
+		void DrawRows(PopupFormGraphicsInfoArgs args) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
+			var lastRow = info.FirstVisibleRow + info.VisibleRows;
+			for (int rowIndex = info.FirstVisibleRow; rowIndex < lastRow; rowIndex++) {
+				DrawRow(args, rowIndex);
+			}
+		}
+		void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
+			int y = info.GetRowCoordinate(rowIndex);		//TODO: Selection
+
+			int x = info.RowsArea.X;
+			foreach (var column in info.VisibleColumns) {
+				DrawCell(args, rowIndex, column, x);
 
 				x += column.Width + 4;
 			}
 		}
 
-		readonly StringFormat cellFormat = new StringFormat { Trimming = StringTrimming.EllipsisCharacter, LineAlignment = StringAlignment.Center };
-		void DrawCell(Graphics g, int x, int rowIndex, ResultColumn column) {
-			var location = new PointF(x, itemHeight * rowIndex - scrollOffset);
-			var cellWidth = Math.Min(column.Width, ClientWidth - Padding.Right - x);
-			g.DrawString(column.GetValue(items[rowIndex]), Font, SystemBrushes.ControlText, new RectangleF(location, new SizeF(itemHeight, cellWidth)), cellFormat);
-		}
+		void DrawCell(PopupFormGraphicsInfoArgs args, int rowIndex, ResultColumn column, int x) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-		///<summary>Releases the unmanaged resources used by the ResultsList and optionally releases the managed resources.</summary>
-		///<param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-		protected override void Dispose(bool disposing) {
-			if (disposing) {
-				cellFormat.Dispose();
-			}
-			base.Dispose();
+			var location = new Point(x, info.GetRowCoordinate(rowIndex));
+			var cellWidth = Math.Min(column.Width, info.RowsArea.Right - x);
+			var cellBounds = new Rectangle(location, new Size(cellWidth, info.RowHeight));
+
+			var text = column.GetValue(info.Form.Items[rowIndex]);
+
+			info.AppearanceResults.DrawString(args.Cache, text, cellBounds);
 		}
 	}
 }
