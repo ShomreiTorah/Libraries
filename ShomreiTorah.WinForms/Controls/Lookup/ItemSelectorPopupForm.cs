@@ -48,12 +48,39 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
+			ViewInfo.SelectedIndex = null;
 		}
 		public override void ProcessKeyDown(KeyEventArgs e) {
 			base.ProcessKeyDown(e);
 			//TODO: Keyboard Navigation
 		}
-		//TODO: Mouse events (selection)
+
+		protected override void OnMouseMove(MouseEventArgs e) {
+			base.OnMouseMove(e);
+
+			var index = ViewInfo.GetRowIndex(e.Y);
+
+			if (index.HasValue)
+				ViewInfo.SelectedIndex = index.Value;
+		}
+
+		protected override void OnMouseDown(MouseEventArgs e) {
+			base.OnMouseDown(e);
+			if (e.Button == MouseButtons.Left) {
+				var index = ViewInfo.GetRowIndex(e.Y);
+
+				if (index.HasValue) {
+					ViewInfo.SelectedIndex = index.Value;
+					ViewInfo.SelectionState = ObjectState.Pressed;
+				}
+			}
+			//TODO: Drag-scroll timer
+		}
+		protected override void OnMouseUp(MouseEventArgs e) {
+			base.OnMouseUp(e);
+			if (e.Button == MouseButtons.Left && ViewInfo.SelectedIndex.HasValue)
+				ViewInfo.SelectionState = ObjectState.Hot;
+		}
 	}
 	class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo {
 		public ItemSelectorPopupFormViewInfo(ItemSelectorPopupForm form)
@@ -98,19 +125,46 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 
-		public int ScrollTop { get { return Form.ScrollBar.Visible ? Form.ScrollBar.Value : 0; } }
+		#region Layout
+		public int ScrollTop {
+			get { return Form.ScrollBar.Visible ? Form.ScrollBar.Value : 0; }
+			set {
+				if (ScrollTop == value) return;
+				if (!Form.ScrollBar.Visible) throw new InvalidOperationException("Scrollbar is hidden");
+				Form.ScrollBar.Value = value;
+			}
+		}
 
 		public Rectangle RowsArea { get; private set; }
 		public Rectangle HeaderArea { get; private set; }
 		public int RowHeight { get; private set; }
 
 		public int FirstVisibleRow { get { return ScrollTop / RowHeight; } }
-		//public int VisibleRows { get { return Math.Min(Form.Items.Count,  RowsArea.Height / RowHeight); } }
 
 		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
 
 		public int GetRowCoordinate(int rowIndex) {
 			return RowsArea.Top + (rowIndex * RowHeight) - ScrollTop;
+		}
+
+		///<summary>Gets the index of the row at the specified Y coordinate in pixels.</summary>
+		public int? GetRowIndex(int y) {
+			if (y < RowsArea.Top || y > RowsArea.Bottom) return null;
+
+			var index = (y + ScrollTop - RowsArea.Top) / RowHeight;
+			if (index < 0 || index >= Form.Items.Count)
+				return null;
+			return index;
+		}
+
+		///<summary>Ensures that a row is completely visible in the current viewport.</summary>	
+		public void EnsureVisible(int rowIndex) {
+			var top = GetRowCoordinate(rowIndex);
+			//ScrollTop does not include the height of the header row.
+			if (top < RowsArea.Top)
+				ScrollTop = rowIndex * RowHeight;
+			else if (top + RowHeight > RowsArea.Bottom)
+				ScrollTop = (rowIndex + 1) * RowHeight - RowsArea.Height - 1;	//Ensure that the bottom of the row is visible
 		}
 
 		protected override void CalcContentRect(Rectangle bounds) {
@@ -128,7 +182,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (Form.ScrollBar.Visible) {
 				availableWidth -= Form.ScrollBar.Width;
 
-				Form.ScrollBar.Left = ContentRect.Width - Form.ScrollBar.Width;
+				Form.ScrollBar.Left = ContentRect.Right - Form.ScrollBar.Width;
 				Form.ScrollBar.Top = ContentRect.Top + headerHeight;
 				Form.ScrollBar.Height = rowAreaHeight;
 			}
@@ -145,7 +199,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//space)
 			Form.SetScrollPos(Form.ScrollBar.Value);
 		}
+		#endregion
 
+		#region Column Headers
 		public HeaderObjectPainter HeaderPainter { get; private set; }
 		public List<HeaderObjectInfoArgs> ColumnHeaderArgs { get; private set; }
 		void CreateColumnHeaderArgs() {
@@ -166,12 +222,41 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			//Stretch the last header to fill the entire width
 			var last = ColumnHeaderArgs.Last();
-			last.Bounds = new Rectangle(last.Bounds.X, last.Bounds.Y, HeaderArea.Width - last.Bounds.X, HeaderArea.Height);
+			last.Bounds = new Rectangle(last.Bounds.X, last.Bounds.Y, HeaderArea.Right - last.Bounds.X, HeaderArea.Height);
 			last.HeaderPosition = HeaderPositionKind.Right;
 
 			foreach (var header in ColumnHeaderArgs)
 				HeaderPainter.CalcObjectBounds(header);
 		}
+		#endregion
+
+		#region Selection
+		int? selectedIndex;
+		ObjectState selectionState;
+
+		public int? SelectedIndex {
+			get { return selectedIndex; }
+			set {
+				if (selectedIndex == value) return;
+				if (value < 0 || value >= Form.Items.Count) throw new ArgumentOutOfRangeException("value");
+
+				selectedIndex = value;
+
+				if (SelectedIndex.HasValue)
+					EnsureVisible(SelectedIndex.Value);
+
+				Form.Invalidate();
+			}
+		}
+		public ObjectState SelectionState {
+			get { return selectionState; }
+			set {
+				if (SelectionState == value) return;
+				selectionState = value;
+				Form.Invalidate();
+			}
+		}
+		#endregion
 	}
 	class ItemSelectorPopupFormPainter : PopupBaseSizeableFormPainter {
 		protected override void DrawContent(PopupFormGraphicsInfoArgs info) {
@@ -180,6 +265,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var vi = (ItemSelectorPopupFormViewInfo)info.ViewInfo;
 			if (vi.Form.Properties.ShowColumnHeaders)
 				DrawColumnHeaders(info);
+
+
 			DrawRows(info);
 			if (vi.Form.Properties.ShowVerticalLines)
 				DrawVertLines(info);
@@ -214,6 +301,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			using (args.Cache.ClipInfo.SaveAndSetClip(info.RowsArea)) {
+				DrawSelectionHighlight(args);	//The selection highlight should be clipped
 
 				for (int rowIndex = info.FirstVisibleRow; rowIndex < info.Form.Items.Count; rowIndex++) {
 					int y = info.GetRowCoordinate(rowIndex);		//TODO: Selection
@@ -225,8 +313,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		static void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
-
-			int y = info.GetRowCoordinate(rowIndex);		//TODO: Selection
 
 			int x = info.RowsArea.X;
 			foreach (var column in info.VisibleColumns) {
@@ -246,6 +332,28 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var text = column.GetValue(info.Form.Items[rowIndex]);
 
 			info.AppearanceResults.DrawString(args.Cache, text, cellBounds);
+		}
+
+		static void DrawSelectionHighlight(PopupFormGraphicsInfoArgs args) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
+			if (info.SelectedIndex == null) return;
+
+			//Alternatives:
+			//Ribbon/Button
+			//Ribbon/ButtonGroupButton
+			//Editors/NavigatorButton
+			SkinElement skinElem = NavPaneSkins.GetSkin(info.Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
+
+			SkinElementInfo elemInfo = new SkinElementInfo(skinElem,
+				new Rectangle(info.RowsArea.X, info.GetRowCoordinate(info.SelectedIndex.Value), info.RowsArea.Width, info.RowHeight)
+			);
+
+			elemInfo.Cache = args.Cache;
+			elemInfo.State = info.SelectionState;
+			elemInfo.ImageIndex = info.SelectionState == ObjectState.Pressed ? 2 : 1;
+
+			SkinElementPainter.Default.DrawObject(elemInfo);
 		}
 	}
 }
