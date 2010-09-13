@@ -85,17 +85,38 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (e.Button == MouseButtons.Left && ViewInfo.SelectedIndex.HasValue)
 				ViewInfo.SelectionState = ObjectState.Hot;
 		}
+
+		///<summary>Releases the unmanaged resources used by the ItemSelectorPopupForm and optionally releases the managed resources.</summary>
+		///<param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+		protected override void Dispose(bool disposing) {
+			if (disposing) {
+				if (ViewInfo != null) ViewInfo.Dispose();
+			}
+			base.Dispose(disposing);
+		}
 	}
-	class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo {
+	class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo, IDisposable {
 		public ItemSelectorPopupFormViewInfo(ItemSelectorPopupForm form)
 			: base(form) {
 			AppearanceColumnHeader = new AppearanceObject();
 			AppearanceResults = new AppearanceObject();
 
-			HeaderPainter = Form.Properties.LookAndFeel.Painter.Header;
 			ColumnHeaderArgs = new List<HeaderObjectInfoArgs>();
+			HeaderPainter = Form.Properties.LookAndFeel.Painter.Header;
+
+			var image = (Bitmap)((SkinHeaderObjectPainter)HeaderPainter).Element.Image.GetImages().Images[0];
+			LinePen = new Pen(image.GetPixel(image.Width - 1, image.Height - 1));
 		}
 
+		///<summary>Releases all resources used by the ItemSelectorPopupFormViewInfo.</summary>
+		public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
+		///<summary>Releases the unmanaged resources used by the ItemSelectorPopupFormViewInfo and optionally releases the managed resources.</summary>
+		///<param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing) {
+			if (disposing) {
+				if (LinePen != null) LinePen.Dispose();
+			}
+		}
 		public new ItemSelectorPopupForm Form { get { return (ItemSelectorPopupForm)base.Form; } }
 
 		#region Appearances
@@ -206,6 +227,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#endregion
 
 		#region Column Headers
+		public Pen LinePen { get; private set; }
 		public HeaderObjectPainter HeaderPainter { get; private set; }
 		public List<HeaderObjectInfoArgs> ColumnHeaderArgs { get; private set; }
 		void CreateColumnHeaderArgs() {
@@ -239,6 +261,17 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		protected override void UpdatePainters() {
 			base.UpdatePainters();
+
+			//var gridLineElem = GridSkins.GetSkin(Form.Properties.LookAndFeel)[GridSkins.SkinGridLine];
+			//var lineColor = gridLineElem.Color.GetForeColor();
+			//if (LinePen != null && LinePen != Pens.DarkGray)
+			//    LinePen.Dispose();
+
+			//if (lineColor.IsEmpty)
+			//    LinePen = Pens.DarkGray;
+			//else
+			//    LinePen = new Pen(lineColor);
+
 			//Alternatives:
 			//Ribbon/Button
 			//Ribbon/ButtonGroupButton
@@ -304,7 +337,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var x = info.RowsArea.X + cols.First().Width - 1;
 
 			for (int i = 1; i < cols.Length; i++) {
-				args.Graphics.DrawLine(Pens.DarkGray,
+				args.Graphics.DrawLine(info.LinePen,
 					x, info.RowsArea.Top,
 					x, info.RowsArea.Top + Math.Min(info.RowsArea.Height, info.Form.Items.Count * info.RowHeight)
 				);
