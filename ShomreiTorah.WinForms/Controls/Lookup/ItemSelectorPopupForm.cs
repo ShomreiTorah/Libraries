@@ -165,19 +165,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				if (x > HeaderArea.Right) break;
 			}
 
-			//Force the headers to fill the entire width
-			if (x < HeaderArea.Right - 16) {			//If there's a lot of room, create a dummy header.
-				var header = new HeaderObjectInfoArgs {
-					Bounds = new Rectangle(x, HeaderArea.Y, HeaderArea.Width - x, HeaderArea.Height),
-					Caption = ""
-				};
-				header.SetAppearance(AppearanceColumnHeader);
-				ColumnHeaderArgs.Add(header);
-			} else if (x < HeaderArea.Right) {			//If there's a little room, stretch the last header.
-				var last = ColumnHeaderArgs.Last();
-				last.Bounds = new Rectangle(last.Bounds.X, last.Bounds.Y, HeaderArea.Width - last.Bounds.X, HeaderArea.Height);
-			}
-			ColumnHeaderArgs.Last().HeaderPosition = HeaderPositionKind.Right;
+			//Stretch the last header to fill the entire width
+			var last = ColumnHeaderArgs.Last();
+			last.Bounds = new Rectangle(last.Bounds.X, last.Bounds.Y, HeaderArea.Width - last.Bounds.X, HeaderArea.Height);
+			last.HeaderPosition = HeaderPositionKind.Right;
 
 			foreach (var header in ColumnHeaderArgs)
 				HeaderPainter.CalcObjectBounds(header);
