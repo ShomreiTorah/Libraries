@@ -370,9 +370,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				DrawColumnHeaders(info);
 
 
-			DrawRows(info);
-			if (vi.Form.Properties.ShowVerticalLines)
-				DrawVertLines(info);
+			using (info.Cache.ClipInfo.SaveAndSetClip(vi.RowsArea)) {
+				DrawSelectionHighlight(info);
+
+				if (vi.Form.Properties.ShowVerticalLines)
+					DrawVertLines(info);
+				DrawRows(info);
+			}
 		}
 
 		static void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
@@ -403,15 +407,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawRows(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			using (args.Cache.ClipInfo.SaveAndSetClip(info.RowsArea)) {
-				DrawSelectionHighlight(args);	//The selection highlight should be clipped
+			for (int rowIndex = info.FirstVisibleRow; rowIndex < info.Form.Items.Count; rowIndex++) {
+				int y = info.GetRowCoordinate(rowIndex);
+				if (y > info.RowsArea.Bottom) break;
 
-				for (int rowIndex = info.FirstVisibleRow; rowIndex < info.Form.Items.Count; rowIndex++) {
-					int y = info.GetRowCoordinate(rowIndex);		//TODO: Selection
-					if (y > info.RowsArea.Bottom) break;
-
-					DrawRow(args, rowIndex);
-				}
+				DrawRow(args, rowIndex);
 			}
 		}
 		static void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
