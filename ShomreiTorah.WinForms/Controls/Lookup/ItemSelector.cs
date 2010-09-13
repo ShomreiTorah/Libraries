@@ -77,6 +77,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		internal IList AllItems { get; set; }
+
+		protected internal virtual void SelectItem(object item) {
+			ClosePopup(PopupCloseMode.Normal);
+			EditValue = item;
+		}
 	}
 
 

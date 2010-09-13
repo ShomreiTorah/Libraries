@@ -52,11 +52,52 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		public override void ProcessKeyDown(KeyEventArgs e) {
 			base.ProcessKeyDown(e);
-			//TODO: Keyboard Navigation
+
+			int currentIndex = ViewInfo.SelectedIndex ?? -1;
+			int? newIndex = null;
+			switch (e.KeyCode) {
+				case Keys.Enter:
+					if (ViewInfo.SelectedIndex.HasValue) {
+						OwnerEdit.SelectItem(Items[currentIndex]);
+						e.Handled = true;
+						return;
+					}
+					break;
+
+				#region Navigation
+				case Keys.Up: newIndex = currentIndex - 1; break;
+				case Keys.Down: newIndex = currentIndex + 1; break;
+
+				case Keys.PageUp:
+					newIndex = currentIndex - ViewInfo.MaxVisibleRows;
+					break;
+				case Keys.PageDown:
+					newIndex = currentIndex + ViewInfo.MaxVisibleRows;
+					break;
+
+				case Keys.Home:
+					if (e.Control) newIndex = 0;
+					break;
+				case Keys.End:
+					if (e.Control) newIndex = Items.Count - 1;
+					break;
+				#endregion
+			}
+			if (newIndex.HasValue) {
+				if (newIndex < 0)
+					ViewInfo.SelectedIndex = 0;
+				else if (newIndex >= Items.Count)
+					ViewInfo.SelectedIndex = Items.Count - 1;
+				else
+					ViewInfo.SelectedIndex = newIndex.Value;
+				e.Handled = true;
+			}
 		}
 
 		bool SelectByCoordinate(int y) {
-			var index = ViewInfo.GetRowIndex(y);
+			//When selecting a row by point, we should ignore the X coordinate.
+			//This allows the user to drag next to the popup.
+			var index = ViewInfo.GetRowIndex(new Point(ViewInfo.RowsArea.X + 1, y));
 			if (index.HasValue)
 				ViewInfo.SelectedIndex = index.Value;
 			return index.HasValue;
@@ -82,8 +123,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		protected override void OnMouseUp(MouseEventArgs e) {
 			base.OnMouseUp(e);
-			if (e.Button == MouseButtons.Left && ViewInfo.SelectedIndex.HasValue)
-				ViewInfo.SelectionState = ObjectState.Hot;
+			if (e.Button == MouseButtons.Left) {
+				if (ViewInfo.SelectedIndex.HasValue) {
+					ViewInfo.SelectionState = ObjectState.Hot;
+					if (ViewInfo.SelectedIndex == ViewInfo.GetRowIndex(e.Location))
+						OwnerEdit.SelectItem(Items[ViewInfo.SelectedIndex.Value]);
+				}
+			}
 		}
 
 		///<summary>Releases the unmanaged resources used by the ItemSelectorPopupForm and optionally releases the managed resources.</summary>
@@ -165,6 +211,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public int RowHeight { get; private set; }
 
 		public int FirstVisibleRow { get { return ScrollTop / RowHeight; } }
+		public int MaxVisibleRows { get { return RowsArea.Height / RowHeight; } }	//This property is not completely accurate; if half the the top row is scrolled off-screen, one additional row will be visible.
+
 
 		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
 
@@ -172,11 +220,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			return RowsArea.Top + (rowIndex * RowHeight) - ScrollTop;
 		}
 
-		///<summary>Gets the index of the row at the specified Y coordinate in pixels.</summary>
-		public int? GetRowIndex(int y) {
-			if (y < RowsArea.Top || y > RowsArea.Bottom) return null;
+		///<summary>Gets the index of the row at the specified location (relative to the popup form).</summary>
+		public int? GetRowIndex(Point pt) {
+			if (!RowsArea.Contains(pt)) return null;
 
-			var index = (y + ScrollTop - RowsArea.Top) / RowHeight;
+			var index = (pt.Y + ScrollTop - RowsArea.Top) / RowHeight;
 			if (index < 0 || index >= Form.Items.Count)
 				return null;
 			return index;
