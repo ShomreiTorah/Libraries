@@ -235,6 +235,17 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#endregion
 
 		#region Selection
+		public SkinElement SelectionElement { get; private set; }
+
+		protected override void UpdatePainters() {
+			base.UpdatePainters();
+			//Alternatives:
+			//Ribbon/Button
+			//Ribbon/ButtonGroupButton
+			//Editors/NavigatorButton
+			SelectionElement = NavPaneSkins.GetSkin(Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
+		}
+
 		int? selectedIndex;
 		ObjectState selectionState;
 
@@ -318,11 +329,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			int x = info.RowsArea.X;
+			int x = info.RowsArea.X + info.SelectionElement.ContentMargins.Left + 1;
 			foreach (var column in info.VisibleColumns) {
 				DrawCell(args, rowIndex, column, x);
 
 				x += column.Width + 4;
+				if (x > info.RowsArea.Right) break;
 			}
 		}
 
@@ -330,7 +342,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			var location = new Point(x, info.GetRowCoordinate(rowIndex));
-			var cellWidth = Math.Min(column.Width, info.RowsArea.Right - x);
+			var cellWidth = Math.Min(column.Width, info.RowsArea.Right - info.SelectionElement.ContentMargins.Right - x);
 			var cellBounds = new Rectangle(location, new Size(cellWidth, info.RowHeight));
 
 			var text = column.GetValue(info.Form.Items[rowIndex]);
@@ -343,13 +355,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			if (info.SelectedIndex == null) return;
 
-			//Alternatives:
-			//Ribbon/Button
-			//Ribbon/ButtonGroupButton
-			//Editors/NavigatorButton
-			SkinElement skinElem = NavPaneSkins.GetSkin(info.Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
-
-			SkinElementInfo elemInfo = new SkinElementInfo(skinElem,
+			SkinElementInfo elemInfo = new SkinElementInfo(info.SelectionElement,
 				new Rectangle(info.RowsArea.X, info.GetRowCoordinate(info.SelectedIndex.Value), info.RowsArea.Width, info.RowHeight)
 			);
 
