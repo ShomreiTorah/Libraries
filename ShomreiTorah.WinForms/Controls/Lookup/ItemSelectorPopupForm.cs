@@ -35,7 +35,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) {
 			Invalidate();
 		}
-
+		
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
 		}
@@ -44,11 +44,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//TODO: Keyboard Navigation
 		}
 		//TODO: Mouse events (selection)
-
-		protected override void UpdateControlPositionsCore() {
-			base.UpdateControlPositionsCore();
-			//TODO: Handle scrollbar?
-		}
 	}
 	class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo {
 		public ItemSelectorPopupFormViewInfo(ItemSelectorPopupForm form)
@@ -116,6 +111,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var rowAreaHeight = ContentRect.Height - headerHeight;
 
 			Form.ScrollBar.Maximum = RowHeight * Form.Items.Count;
+			Form.ScrollBar.LargeChange = rowAreaHeight;
 			Form.ScrollBar.Visible = Form.ScrollBar.Maximum > rowAreaHeight;
 
 			int availableWidth = ContentRect.Width;
@@ -125,6 +121,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				Form.ScrollBar.Left = ContentRect.Width - Form.ScrollBar.Width;
 				Form.ScrollBar.Top = ContentRect.Top + headerHeight;
 				Form.ScrollBar.Height = rowAreaHeight;
+
+				//If the scroll range shrunk enough that the 
+				//current position is past the end, update it
+				//(the scrollbar will only constrain Value to
+				//Maximum, so that there might be some blank 
+				//space)
+				Form.ScrollBar.Value = Math.Min(Form.ScrollBar.Value, Form.ScrollBar.Maximum - rowAreaHeight);
 			}
 
 			HeaderArea = new Rectangle(ContentRect.Location, new Size(ContentRect.Width, headerHeight));	//The header should go over the scrollbar
