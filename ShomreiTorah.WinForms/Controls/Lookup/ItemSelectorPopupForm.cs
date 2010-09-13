@@ -31,11 +31,21 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override PopupBaseFormViewInfo CreateViewInfo() { return new ItemSelectorPopupFormViewInfo(this); }
 		public new RepositoryItemItemSelector Properties { get { return (RepositoryItemItemSelector)base.Properties; } }
 		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
+		public new ItemSelectorPopupFormViewInfo ViewInfo { get { return (ItemSelectorPopupFormViewInfo)base.ViewInfo; } }
 
 		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) {
 			Invalidate();
 		}
-		
+
+		public void ScrollBy(int rows) {
+			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
+		}
+		public void SetScrollPos(int pos) {
+			if (pos < 0) pos = 0;
+			ScrollBar.Value = Math.Min(pos, ScrollBar.Maximum - ViewInfo.RowsArea.Height + 1);	//Subtract the height of the thumb so that the last row is on the bottom
+			Invalidate();
+		}
+
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
 		}
@@ -122,18 +132,19 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				Form.ScrollBar.Top = ContentRect.Top + headerHeight;
 				Form.ScrollBar.Height = rowAreaHeight;
 
-				//If the scroll range shrunk enough that the 
-				//current position is past the end, update it
-				//(the scrollbar will only constrain Value to
-				//Maximum, so that there might be some blank 
-				//space)
-				Form.ScrollBar.Value = Math.Min(Form.ScrollBar.Value, Form.ScrollBar.Maximum - rowAreaHeight);
 			}
 
 			HeaderArea = new Rectangle(ContentRect.Location, new Size(ContentRect.Width, headerHeight));	//The header should go over the scrollbar
 			RowsArea = new Rectangle(HeaderArea.Left, HeaderArea.Bottom, availableWidth, rowAreaHeight);
 
 			CreateColumnHeaderArgs();
+
+			//If the scroll range shrunk enough that the 
+			//current position is past the end, update it
+			//(the scrollbar will only constrain Value to
+			//Maximum, so that there might be some blank 
+			//space)
+			Form.SetScrollPos(Form.ScrollBar.Value);
 		}
 
 		public HeaderObjectPainter HeaderPainter { get; private set; }

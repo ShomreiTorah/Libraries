@@ -61,11 +61,16 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.OnPopupClosed(closeMode);
 		}
 		protected override void OnMouseWheel(MouseEventArgs e) {
-			base.OnMouseWheel(e);
-			//TODO: Scroll popup
-		}
-		protected override bool DoSpin(bool isUp) {
-			return base.DoSpin(isUp);
+			DXMouseEventArgs ee = DXMouseEventArgs.GetMouseArgs(e);
+			try {
+				base.OnMouseWheel(ee);
+				if (ee.Handled) return;
+
+				if (IsPopupOpen) {
+					PopupForm.ScrollBy(-SystemInformation.MouseWheelScrollLines * Math.Sign(e.Delta));
+					ee.Handled = true;
+				}
+			} finally { ee.Sync(); }
 		}
 		protected override void SetEmptyEditValue(object emptyEditValue) {
 			base.SetEmptyEditValue(emptyEditValue);
