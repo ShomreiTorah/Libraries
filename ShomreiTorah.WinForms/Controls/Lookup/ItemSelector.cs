@@ -1,20 +1,21 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using DevExpress.Accessibility;
+using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Drawing;
 using DevExpress.XtraEditors.Popup;
 using DevExpress.XtraEditors.Registrator;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraEditors.ViewInfo;
-using DevExpress.Utils;
-using System.Drawing;
-using System.Collections;
 
 #pragma warning disable 1591
 namespace ShomreiTorah.WinForms.Controls.Lookup {
@@ -38,6 +39,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 		public new RepositoryItemItemSelector Properties { get { return (RepositoryItemItemSelector)base.Properties; } }
 
+		[SuppressMessage("Microsoft.Usage", "CA2222:DoNotDecreaseInheritedMemberVisibility", Justification = "For internal use only")]
 		internal new ItemSelectorPopupForm PopupForm { get { return (ItemSelectorPopupForm)base.PopupForm; } }
 
 		///<summary>Gets or sets the text displayed in the textbox.</summary>

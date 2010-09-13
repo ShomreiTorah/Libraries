@@ -185,7 +185,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				DrawVertLines(info);
 		}
 
-		void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
+		static void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			foreach (var header in info.ColumnHeaderArgs) {
@@ -195,7 +195,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 		}
 
-		void DrawVertLines(PopupFormGraphicsInfoArgs args) {
+		static void DrawVertLines(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			var cols = info.VisibleColumns.ToArray();
@@ -210,7 +210,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 		}
 
-		void DrawRows(PopupFormGraphicsInfoArgs args) {
+		static void DrawRows(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			using (args.Cache.ClipInfo.SaveAndSetClip(info.RowsArea)) {
@@ -223,7 +223,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				}
 			}
 		}
-		void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
+		static void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			int y = info.GetRowCoordinate(rowIndex);		//TODO: Selection
@@ -236,7 +236,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 		}
 
-		void DrawCell(PopupFormGraphicsInfoArgs args, int rowIndex, ResultColumn column, int x) {
+		static void DrawCell(PopupFormGraphicsInfoArgs args, int rowIndex, ResultColumn column, int x) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			var location = new Point(x, info.GetRowCoordinate(rowIndex));
