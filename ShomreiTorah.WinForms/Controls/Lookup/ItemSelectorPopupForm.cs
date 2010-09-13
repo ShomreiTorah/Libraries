@@ -1,15 +1,16 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using DevExpress.XtraEditors;
-using System.Collections;
-using System.Drawing;
-using DevExpress.XtraEditors.Popup;
 using System.Windows.Forms;
+using DevExpress.LookAndFeel;
 using DevExpress.Skins;
 using DevExpress.Utils;
-using DevExpress.LookAndFeel;
+using DevExpress.Utils.Drawing;
+using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Popup;
 
 namespace ShomreiTorah.WinForms.Controls.Lookup {
 	class ItemSelectorPopupForm : CustomBlobPopupForm {
@@ -54,6 +55,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			: base(form) {
 			AppearanceColumnHeader = new AppearanceObject();
 			AppearanceResults = new AppearanceObject();
+
+			HeaderPainter = Form.Properties.LookAndFeel.Painter.Header;
+			ColumnHeaderArgs = new List<HeaderObjectInfoArgs>();
 		}
 
 		public new ItemSelectorPopupForm Form { get { return (ItemSelectorPopupForm)base.Form; } }
@@ -123,8 +127,33 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				Form.ScrollBar.Height = rowAreaHeight;
 			}
 
-			HeaderArea = new Rectangle(ContentRect.Location, new Size(availableWidth, headerHeight));
+			HeaderArea = new Rectangle(ContentRect.Location, new Size(ContentRect.Width, headerHeight));	//The header should go over the scrollbar
 			RowsArea = new Rectangle(HeaderArea.Left, HeaderArea.Bottom, availableWidth, rowAreaHeight);
+
+			CreateColumnHeaderArgs();
+		}
+
+		public HeaderObjectPainter HeaderPainter { get; private set; }
+		public List<HeaderObjectInfoArgs> ColumnHeaderArgs { get; private set; }
+		void CreateColumnHeaderArgs() {
+			ColumnHeaderArgs.Clear();
+			int x = HeaderArea.X;
+
+			foreach (var column in VisibleColumns) {
+				var header = new HeaderObjectInfoArgs {
+					Bounds = new Rectangle(x, HeaderArea.Y, Math.Min(column.Width, HeaderArea.Width - x), HeaderArea.Height),
+					Caption = column.Caption,
+				};
+				if (ColumnHeaderArgs.Count == 0) header.HeaderPosition = HeaderPositionKind.Left;
+				header.SetAppearance(AppearanceColumnHeader);
+				ColumnHeaderArgs.Add(header);
+				x += column.Width;
+				if (x > HeaderArea.Right) break;
+			}
+			ColumnHeaderArgs.Last().HeaderPosition = HeaderPositionKind.Right;
+
+			foreach (var header in ColumnHeaderArgs)
+				HeaderPainter.CalcObjectBounds(header);
 		}
 	}
 	class ItemSelectorPopupFormPainter : PopupBaseSizeableFormPainter {
@@ -139,6 +168,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
+			foreach (var header in info.ColumnHeaderArgs) {
+				header.Cache = args.Cache;
+				info.HeaderPainter.DrawObject(header);
+				header.Cache = null;
+			}
 		}
 		void DrawRows(PopupFormGraphicsInfoArgs args) {
 

@@ -11,6 +11,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 	public abstract class ResultColumn {
 		int width = 100;
 		bool visible = true;
+		string caption;
 
 		internal virtual void SetOwner(RepositoryItemItemSelector owner) {
 			if (owner == null) throw new ArgumentNullException("owner");
@@ -40,6 +41,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			get { return visible; }
 			set { visible = value; }
 		}
+		///<summary>Gets or sets the caption displayed in the column header.</summary>
+		[Description("Gets or sets the caption displayed in the column header.")]
+		[Category("Appearance")]
+		public string Caption {
+			get { return caption; }
+			set { caption = value; }
+		}
 
 		///<summary>Gets the string displayed in this column for the given row.</summary>
 		public abstract string GetValue(object row);
@@ -64,7 +72,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		[Category("Data")]
 		public string FieldName {
 			get { return fieldName; }
-			set { fieldName = value; }
+			set {
+				if (Caption == FieldName) Caption = null;
+				fieldName = value;
+				if (String.IsNullOrEmpty(Caption)) Caption = value;
+			}
 		}
 		///<summary>Gets or sets a string used to format the column's value.</summary>
 		[Description("Gets or sets a string used to format the column's value.")]
