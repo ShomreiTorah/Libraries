@@ -108,28 +108,35 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			SelectByCoordinate(PointToClient(MousePosition).Y);		//e.Y is relative to the editor
 		}
 
+		bool isTrackingMouseDown;
 		protected override void OnMouseMove(MouseEventArgs e) {
 			base.OnMouseMove(e);
-			SelectByCoordinate(e.Y);
+			//If the user started dragging elsewhere (eg, resize), ignore it.
+			if (isTrackingMouseDown || e.Button == MouseButtons.None)
+				SelectByCoordinate(e.Y);
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e) {
 			base.OnMouseDown(e);
 			if (e.Button == MouseButtons.Left) {
-				if (SelectByCoordinate(e.Y))
+				if (SelectByCoordinate(e.Y)) {
+					isTrackingMouseDown = true;
 					ViewInfo.SelectionState = ObjectState.Pressed;
+
+					//TODO: Drag-scroll timer
+				}
 			}
-			//TODO: Drag-scroll timer
 		}
 		protected override void OnMouseUp(MouseEventArgs e) {
 			base.OnMouseUp(e);
-			if (e.Button == MouseButtons.Left) {
-				if (ViewInfo.SelectedIndex.HasValue) {
-					ViewInfo.SelectionState = ObjectState.Hot;
-					if (ViewInfo.SelectedIndex == ViewInfo.GetRowIndex(e.Location))
-						OwnerEdit.SelectItem(Items[ViewInfo.SelectedIndex.Value]);
-				}
+			if (e.Button == MouseButtons.Left && isTrackingMouseDown) {
+				ViewInfo.SelectionState = ObjectState.Hot;
+
+				//If the mouseup happened exactly on a row, select the row.
+				if (ViewInfo.SelectedIndex == ViewInfo.GetRowIndex(e.Location))
+					OwnerEdit.SelectItem(Items[ViewInfo.SelectedIndex.Value]);
 			}
+			isTrackingMouseDown = false;
 		}
 
 		///<summary>Releases the unmanaged resources used by the ItemSelectorPopupForm and optionally releases the managed resources.</summary>
