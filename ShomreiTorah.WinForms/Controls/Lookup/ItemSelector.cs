@@ -68,10 +68,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				base.OnMouseWheel(ee);
 				if (ee.Handled) return;
 
-				if (IsPopupOpen) {
-					PopupForm.ScrollBy(-SystemInformation.MouseWheelScrollLines * Math.Sign(e.Delta));
-					ee.Handled = true;
-				}
+				if (IsPopupOpen)
+					PopupForm.OnEditorMouseWheel(ee);
 			} finally { ee.Sync(); }
 		}
 		protected override void SetEmptyEditValue(object emptyEditValue) {

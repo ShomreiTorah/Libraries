@@ -55,24 +55,28 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//TODO: Keyboard Navigation
 		}
 
-		protected override void OnMouseMove(MouseEventArgs e) {
-			base.OnMouseMove(e);
-
-			var index = ViewInfo.GetRowIndex(e.Y);
-
+		bool SelectByCoordinate(int y) {
+			var index = ViewInfo.GetRowIndex(y);
 			if (index.HasValue)
 				ViewInfo.SelectedIndex = index.Value;
+			return index.HasValue;
+		}
+		internal void OnEditorMouseWheel(DXMouseEventArgs e) {
+			ScrollBy(-SystemInformation.MouseWheelScrollLines * Math.Sign(e.Delta));
+			e.Handled = true;
+			SelectByCoordinate(PointToClient(MousePosition).Y);		//e.Y is relative to the editor
+		}
+
+		protected override void OnMouseMove(MouseEventArgs e) {
+			base.OnMouseMove(e);
+			SelectByCoordinate(e.Y);
 		}
 
 		protected override void OnMouseDown(MouseEventArgs e) {
 			base.OnMouseDown(e);
 			if (e.Button == MouseButtons.Left) {
-				var index = ViewInfo.GetRowIndex(e.Y);
-
-				if (index.HasValue) {
-					ViewInfo.SelectedIndex = index.Value;
+				if (SelectByCoordinate(e.Y))
 					ViewInfo.SelectionState = ObjectState.Pressed;
-				}
 			}
 			//TODO: Drag-scroll timer
 		}
