@@ -108,6 +108,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		object dataSource;
 		string dataMember = "";
 		bool showColumnHeaders = true;
+		bool showVerticalLines = true;
 
 		///<summary>Creates a new RepositoryItemItemSelector.</summary>
 		public RepositoryItemItemSelector() {
@@ -164,6 +165,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public bool ShowColumnHeaders {
 			get { return showColumnHeaders; }
 			set { showColumnHeaders = value; }
+		}
+		///<summary>Gets or sets whether to draw vertical gridlines in the results grid.</summary>
+		[Description("Gets or sets whether to draw vertical gridlines in the results grid.")]
+		[Category("Appearance")]
+		[DefaultValue(true)]
+		public bool ShowVerticalLines {
+			get { return showVerticalLines; }
+			set { showVerticalLines = value; }
 		}
 
 		#region DataSource

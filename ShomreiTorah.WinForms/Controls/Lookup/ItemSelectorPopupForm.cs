@@ -131,7 +131,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				Form.ScrollBar.Left = ContentRect.Width - Form.ScrollBar.Width;
 				Form.ScrollBar.Top = ContentRect.Top + headerHeight;
 				Form.ScrollBar.Height = rowAreaHeight;
-
 			}
 
 			HeaderArea = new Rectangle(ContentRect.Location, new Size(ContentRect.Width, headerHeight));	//The header should go over the scrollbar
@@ -182,6 +181,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (vi.Form.Properties.ShowColumnHeaders)
 				DrawColumnHeaders(info);
 			DrawRows(info);
+			if (vi.Form.Properties.ShowVerticalLines)
+				DrawVertLines(info);
 		}
 
 		void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
@@ -193,9 +194,25 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				header.Cache = null;
 			}
 		}
-		void DrawRows(PopupFormGraphicsInfoArgs args) {
 
+		void DrawVertLines(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
+			var cols = info.VisibleColumns.ToArray();
+			var x = info.RowsArea.X + cols.First().Width - 1;
+
+			for (int i = 1; i < cols.Length; i++) {
+				args.Graphics.DrawLine(Pens.DarkGray,
+					x, info.RowsArea.Top,
+					x, info.RowsArea.Top + Math.Min(info.RowsArea.Height, info.Form.Items.Count * info.RowHeight)
+				);
+				x += cols[i].Width;
+			}
+		}
+
+		void DrawRows(PopupFormGraphicsInfoArgs args) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
 			using (args.Cache.ClipInfo.SaveAndSetClip(info.RowsArea)) {
 
 				for (int rowIndex = info.FirstVisibleRow; rowIndex < info.Form.Items.Count; rowIndex++) {
