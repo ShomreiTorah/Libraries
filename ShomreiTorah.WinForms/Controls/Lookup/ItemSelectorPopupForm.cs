@@ -333,7 +333,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			foreach (var column in info.VisibleColumns) {
 				DrawCell(args, rowIndex, column, x);
 
-				x += column.Width + 4;
+				x += column.Width;
 				if (x > info.RowsArea.Right) break;
 			}
 		}
