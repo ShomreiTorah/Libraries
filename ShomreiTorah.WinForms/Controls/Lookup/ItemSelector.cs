@@ -33,7 +33,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		///<summary>Creates a new ItemSelector.</summary>
 		public ItemSelector() {
-			MaskBox.Click += MaskBox_Click;
 			FilterWords = EmptyStrings;
 		}
 
@@ -63,15 +62,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			return new ItemSelectorPopupForm(this);
 		}
 
-		void MaskBox_Click(object sender, EventArgs e) {
-			ShowPopup();
-		}
-
 		protected override void DoShowPopup() {
+			MaskBox.SetEditValue("", "", true);
 			RunFilter(force: true);
 			base.DoShowPopup();
 		}
 		protected override void OnPopupClosed(PopupCloseMode closeMode) {
+			UpdateDisplayText();	//Clear the filter text
 			base.OnPopupClosed(closeMode);
 		}
 		protected override void OnMouseWheel(MouseEventArgs e) {
@@ -91,11 +88,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		internal IList AllItems { get; set; }
-
-		protected internal virtual void SelectItem(object item) {
-			ClosePopup(PopupCloseMode.Normal);
-			EditValue = item;
-		}
 
 		#region Filter
 		protected override void OnEditorKeyDown(KeyEventArgs e) {
@@ -145,7 +137,20 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//the painter will need to be made aware of the difference in lengths.
 			return columnValue.Replace(' ', '-').StartsWith(filterWord, StringComparison.CurrentCultureIgnoreCase);
 		}
-		#endregion 
+		#endregion
+
+		protected override void OnMaskBox_ValueChanged(object sender, EventArgs e) {
+			//Suppress EditValue changes
+			//base.OnMaskBox_ValueChanged(sender, e);
+		}
+		protected override void OnMaskBox_ValueChanging(object sender, ChangingEventArgs e) {
+			//Suppress EditValue changes
+			//base.OnMaskBox_ValueChanging(sender, e);
+		}
+		protected override void OnMaskBox_Click(object sender, EventArgs e) {
+			base.OnMaskBox_Click(sender, e);
+			ShowPopup();
+		}
 	}
 
 
@@ -338,6 +343,34 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			set { }
 		}
 		#endregion
+
+		#region Events
+		///<summary>Raises the ItemSelecting event.</summary>
+		///<param name="newVal">The item that is being selected.</param>
+		///<returns>False if the selection was cancelled.</returns>
+		internal bool RaiseItemSelecting(object newVal) {
+			var args = new ItemSelectingEventArgs(newVal);
+			OnItemSelecting(args);
+			return !args.Cancel;
+		}
+
+		///<summary>Occurs when the user selects an item in the results grid.</summary>
+		public event EventHandler<ItemSelectingEventArgs> ItemSelecting;
+		///<summary>Raises the ItemSelecting event.</summary>
+		///<param name="e">A ItemSelectingEventArgs object that provides the event data.</param>
+		internal protected virtual void OnItemSelecting(ItemSelectingEventArgs e) {
+			if (ItemSelecting != null)
+				ItemSelecting(GetEventSender(), e);
+		}
+		#endregion
+	}
+	///<summary>Provides data for ItemSelecting events.</summary>
+	public class ItemSelectingEventArgs : CancelEventArgs {
+		///<summary>Creates a new ItemSelectingEventArgs instance.</summary>
+		public ItemSelectingEventArgs(object newItem) { NewItem = newItem; }
+
+		///<summary>Gets the item that was selected in the results grid.</summary>
+		public object NewItem { get; private set; }
 	}
 
 	///<summary>Contains the columns in an ItemSelector.</summary>

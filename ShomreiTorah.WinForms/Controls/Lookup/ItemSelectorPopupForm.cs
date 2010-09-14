@@ -67,6 +67,22 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.HidePopupForm();
 		}
 
+		///<summary>Sets the result of the popup to the currently selected item.</summary>
+		void SetResult() {
+			if (!ViewInfo.SelectedIndex.HasValue)
+				throw new InvalidOperationException("No item is selected");
+
+			var item = Items[ViewInfo.SelectedIndex.Value];
+			if (!Properties.RaiseItemSelecting(ResultValue))
+				return;
+			popupResultValue = item;
+			ClosePopup(PopupCloseMode.Normal);
+		}
+		object popupResultValue;
+		///<summary>Gets the final result of the popup.</summary>
+		///<remarks>This is only set when the user clicks an item.</remarks>
+		public override object ResultValue { get { return popupResultValue; } }
+
 		public void ScrollBy(int rows) {
 			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
 		}
@@ -94,7 +110,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			switch (e.KeyCode) {
 				case Keys.Enter:
 					if (ViewInfo.SelectedIndex.HasValue) {
-						OwnerEdit.SelectItem(Items[currentIndex]);
+						SetResult();
 						e.Handled = true;
 						return;
 					}
@@ -185,7 +201,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 				//If the mouseup happened exactly on a row, select the row.
 				if (ViewInfo.SelectedIndex == ViewInfo.GetRowIndex(e.Location))
-					OwnerEdit.SelectItem(Items[ViewInfo.SelectedIndex.Value]);
+					SetResult();
 			}
 			isTrackingMouseDown = false;
 		}
