@@ -32,7 +32,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			dragScrollTimer = new Timer();
 			dragScrollTimer.Tick += DragScrollTimer_Tick;
 		}
-		
+
 		protected override PopupBaseFormPainter CreatePainter() { return new ItemSelectorPopupFormPainter(); }
 		protected override PopupBaseFormViewInfo CreateViewInfo() { return new ItemSelectorPopupFormViewInfo(this); }
 
@@ -199,6 +199,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			AppearanceColumnHeader = new AppearanceObject();
 			AppearanceResults = new AppearanceObject();
+			AppearanceMatch = new AppearanceObject();
 
 			ColumnHeaderArgs = new List<HeaderObjectInfoArgs>();
 			HeaderPainter = Form.Properties.LookAndFeel.Painter.Header;
@@ -218,11 +219,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		public new ItemSelectorPopupForm Form { get { return (ItemSelectorPopupForm)base.Form; } }
 
+		public IEnumerable<string> FilterWords { get { return Form.OwnerEdit.FilterWords; } }
+
 		#region Appearances
 		bool IsSkinned { get { return Form.Properties.LookAndFeel.ActiveStyle == ActiveLookAndFeelStyle.Skin; } }
 
 		public AppearanceObject AppearanceColumnHeader { get; private set; }
-		AppearanceDefault ColumnHeadersDefault {
+		AppearanceDefault ColumnHeaderDefault {
 			get {
 				if (IsSkinned)
 					return GridSkins.GetSkin(Form.LookAndFeel)[GridSkins.SkinHeader].GetAppearanceDefault();
@@ -241,12 +244,183 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				return retVal;
 			}
 		}
+		public AppearanceObject AppearanceMatch { get; private set; }
+		AppearanceObject MatchDefault {
+			get {
+				var defaultColor = AppearanceResults.GetForeColor();
+				var newColor = new HSL(2 / 3.0, 1, defaultColor.GetBrightness());
+				return new AppearanceObject { ForeColor = newColor.GetColor(), Font = new Font(AppearanceResults.GetFont(), FontStyle.Bold) };
+			}
+		}
 		public override void UpdatePaintAppearance() {
 			base.UpdatePaintAppearance();
-			AppearanceHelper.Combine(AppearanceColumnHeader, new[] { Form.Properties.AppearanceColumnHeader, StyleController == null ? null :
-																						  StyleController.AppearanceDropDownHeader }, ColumnHeadersDefault);
+			AppearanceHelper.Combine(AppearanceColumnHeader,
+				new[] { Form.Properties.AppearanceColumnHeader, StyleController == null ? null : StyleController.AppearanceDropDownHeader }, ColumnHeaderDefault);
+
 			AppearanceHelper.Combine(AppearanceResults, Form.Properties.AppearanceResults, ResultsDefault);
+
+			AppearanceHelper.Combine(AppearanceMatch, new[] { Form.Properties.AppearanceMatch, MatchDefault, AppearanceResults });
 		}
+
+		#region HSL
+		class HSL {
+			public HSL(double h, double s, double l) { H = h; S = s; L = l; }
+			public HSL(Color c) : this(c.GetHue() / 360.0, c.GetSaturation(), c.GetBrightness()) { }
+
+			double _h;
+			double _s;
+			double _l;
+
+			public double H {
+				get { return _h; }
+				set { _h = Constrain(value); }
+			}
+
+			public double S {
+				get { return _s; }
+				set { _s = Constrain(value); }
+			}
+
+			public double L {
+				get { return _l; }
+				set { _l = Constrain(value); }
+			}
+
+			static double Constrain(double val) {
+				if (val < 0) return 0;
+				if (val > 1) return 1;
+				return val;
+			}
+
+			/// <summary>
+			/// Sets the absolute brightness of a color
+			/// </summary>
+			/// <param name="c">Original color</param>
+			/// <param name="brightness">The luminance level to impose</param>
+			/// <returns>an adjusted color</returns>
+			public static Color SetBrightness(Color c, double brightness) {
+				HSL hsl = new HSL(c);
+				hsl.L = brightness;
+				return hsl.GetColor();
+			}
+
+			/// <summary>
+			/// Modifies an existing brightness level
+			/// </summary>
+			/// <remarks>
+			/// To reduce brightness use a number smaller than 1. To increase brightness use a number larger tnan 1
+			/// </remarks>
+			/// <param name="c">The original color</param>
+			/// <param name="brightness">The luminance delta</param>
+			/// <returns>An adjusted color</returns>
+			public static Color ModifyBrightness(Color c, double brightness) {
+				HSL hsl = new HSL(c);
+				hsl.L *= brightness;
+				return hsl.GetColor();
+			}
+
+			/// <summary>
+			/// Sets the absolute saturation level
+			/// </summary>
+			/// <remarks>Accepted values 0-1</remarks>
+			/// <param name="c">An original color</param>
+			/// <param name="Saturation">The saturation value to impose</param>
+			/// <returns>An adjusted color</returns>
+			public static Color SetSaturation(Color c, double Saturation) {
+				HSL hsl = new HSL(c);
+				hsl.S = Saturation;
+				return hsl.GetColor();
+			}
+
+			/// <summary>
+			/// Modifies an existing Saturation level
+			/// </summary>
+			/// <remarks>
+			/// To reduce Saturation use a number smaller than 1. To increase Saturation use a number larger tnan 1
+			/// </remarks>
+			/// <param name="c">The original color</param>
+			/// <param name="Saturation">The saturation delta</param>
+			/// <returns>An adjusted color</returns>
+			public static Color ModifySaturation(Color c, double Saturation) {
+				HSL hsl = new HSL(c);
+				hsl.S *= Saturation;
+				return hsl.GetColor();
+			}
+
+			/// <summary>
+			/// Sets the absolute Hue level
+			/// </summary>
+			/// <remarks>Accepted values 0-1</remarks>
+			/// <param name="c">An original color</param>
+			/// <param name="Hue">The Hue value to impose</param>
+			/// <returns>An adjusted color</returns>
+			public static Color SetHue(Color c, double Hue) {
+				HSL hsl = new HSL(c);
+				hsl.H = Hue;
+				return hsl.GetColor();
+			}
+
+			/// <summary>
+			/// Modifies an existing Hue level
+			/// </summary>
+			/// <remarks>
+			/// To reduce Hue use a number smaller than 1. To increase Hue use a number larger than 1
+			/// </remarks>
+			/// <param name="c">The original color</param>
+			/// <param name="Hue">The Hue delta</param>
+			/// <returns>An adjusted color</returns>
+			public static Color ModifyHue(Color c, double Hue) {
+				HSL hsl = new HSL(c);
+				hsl.H *= Hue;
+				return hsl.GetColor();
+			}
+
+			/// <summary>
+			/// Converts a color from HSL to RGB
+			/// </summary>
+			/// <remarks>Adapted from the algorithm in Foley and Van-Dam</remarks>
+			/// <returns>A Color structure containing the equivalent RGB values</returns>
+			public Color GetColor() {
+				double r = 0, g = 0, b = 0;
+				double temp1, temp2;
+
+				if (L == 0) {
+					r = g = b = 0;
+				} else {
+					if (S == 0) {
+						r = g = b = L;
+					} else {
+						temp2 = ((L <= 0.5) ? L * (1.0 + S) : L + S - (L * S));
+						temp1 = 2.0 * L - temp2;
+
+						double[] t3 = new double[] { H + 1.0 / 3.0, H, H - 1.0 / 3.0 };
+						double[] clr = new double[] { 0, 0, 0 };
+						for (int i = 0; i < 3; i++) {
+							if (t3[i] < 0)
+								t3[i] += 1.0;
+							if (t3[i] > 1)
+								t3[i] -= 1.0;
+
+							if (6.0 * t3[i] < 1.0)
+								clr[i] = temp1 + (temp2 - temp1) * t3[i] * 6.0;
+							else if (2.0 * t3[i] < 1.0)
+								clr[i] = temp2;
+							else if (3.0 * t3[i] < 2.0)
+								clr[i] = (temp1 + (temp2 - temp1) * ((2.0 / 3.0) - t3[i]) * 6.0);
+							else
+								clr[i] = temp1;
+						}
+						r = clr[0];
+						g = clr[1];
+						b = clr[2];
+					}
+				}
+
+				return Color.FromArgb((int)(255 * r), (int)(255 * g), (int)(255 * b));
+
+			}
+		}
+		#endregion
 		#endregion
 
 		#region Layout
@@ -481,7 +655,28 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			var text = column.GetValue(info.Form.Items[rowIndex]);
 
-			info.AppearanceResults.DrawString(args.Cache, text, cellBounds);
+			//If this cell matched the filter, find the matching prefix. 
+			//I take the prefix from the cell value instead of the actual
+			//word to allow for variations in case and hyphens.
+			string matchedPart = null;
+			if (column.ShouldFilter && info.FilterWords.Any()) {
+				var match = info.FilterWords.FirstOrDefault(fw => ItemSelector.ValueMatches(filterWord: fw, columnValue: text));
+				if (match != null)
+					matchedPart = text.Substring(0, match.Length);	//The match might be the entire value
+			}
+
+			if (String.IsNullOrEmpty(matchedPart))
+				info.AppearanceResults.DrawString(args.Cache, text, cellBounds);
+			else {
+				info.AppearanceMatch.DrawString(args.Cache, matchedPart, cellBounds);
+
+				var matchSize = Size.Ceiling(info.AppearanceMatch.CalcTextSize(args.Cache, matchedPart, cellWidth));
+				matchSize.Width++;	//DevExpress measures very aggressively
+				cellBounds.X += matchSize.Width;
+				cellBounds.Width -= matchSize.Width;
+
+				info.AppearanceResults.DrawString(args.Cache, text.Substring(matchedPart.Length), cellBounds);
+			}
 		}
 
 		static void DrawSelectionHighlight(PopupFormGraphicsInfoArgs args) {
