@@ -26,11 +26,15 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 	[Description("A control that allows the user to select an item from a list.")]
 	[ComplexBindingProperties("DataSource", "DataMember")]
 	public class ItemSelector : PopupBaseEdit {
+		static readonly ReadOnlyCollection<string> EmptyStrings = new ReadOnlyCollection<string>(new string[0]);
+
+		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
 		static ItemSelector() { RepositoryItemItemSelector.Register(); }
 
 		///<summary>Creates a new ItemSelector.</summary>
 		public ItemSelector() {
 			MaskBox.Click += MaskBox_Click;
+			FilterWords = EmptyStrings;
 		}
 
 		///<summary>Gets the editor's type name.</summary>
@@ -64,6 +68,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		protected override void DoShowPopup() {
+			RunFilter(force: true);
 			base.DoShowPopup();
 		}
 		protected override void OnPopupClosed(PopupCloseMode closeMode) {
@@ -98,7 +103,49 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (e.Handled) return;
 			ShowPopup();
 		}
-		#endregion
+		protected override void OnEditorKeyUp(KeyEventArgs e) {
+			base.OnEditorKeyUp(e);
+			RunFilter();
+		}
+
+		internal IList CurrentItems { get; private set; }
+		internal ReadOnlyCollection<string> FilterWords { get; private set; }
+
+		static readonly char[] filterSplitChars = new[] { ' ' };
+		string lastFilterText;
+		void RunFilter(bool force = false) {
+			if (!force && Text.Equals(lastFilterText, StringComparison.CurrentCultureIgnoreCase)) return;
+			if (String.IsNullOrEmpty(Text)) {
+				FilterWords = EmptyStrings;
+				CurrentItems = AllItems;
+			} else {
+				FilterWords = new ReadOnlyCollection<string>(Text.Split(filterSplitChars, StringSplitOptions.RemoveEmptyEntries).OrderByDescending(w => w.Length).ToArray());
+				CurrentItems = AllItems.Cast<object>().Where(MeetsFilter).ToArray();
+			}
+
+			lastFilterText = Text;
+			if (PopupForm != null)	//This function is called just before the popup is shown
+				PopupForm.RefreshItems();
+		}
+		bool MeetsFilter(object item) {
+			//For each column, remove the longest word that matches the column.
+			//If every word was matched, the item passes.
+
+			var unmetStrings = new List<string>(FilterWords);
+
+			foreach (var column in Properties.Columns.Where(c => c.ShouldFilter)) {
+				var columnValue = column.GetValue(item);
+				unmetStrings.Remove(unmetStrings.FirstOrDefault(fw => ValueMatches(filterWord: fw, columnValue: columnValue)));
+			}
+
+			return unmetStrings.Count == 0;
+		}
+		internal static bool ValueMatches(string filterWord, string columnValue) {
+			//If it ever becomes possible to match a different number of characters,
+			//the painter will need to be made aware of the difference in lengths.
+			return columnValue.Replace(' ', '-').StartsWith(filterWord, StringComparison.CurrentCultureIgnoreCase);
+		}
+		#endregion 
 	}
 
 

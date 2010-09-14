@@ -13,15 +13,15 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Popup;
 
 namespace ShomreiTorah.WinForms.Controls.Lookup {
-	class ItemSelectorPopupForm : CustomBlobPopupForm {
+	sealed class ItemSelectorPopupForm : CustomBlobPopupForm {
 		public DevExpress.XtraEditors.VScrollBar ScrollBar { get; private set; }
-		public IList Items { get { return OwnerEdit.AllItems; } }
+		public IList Items { get { return OwnerEdit.CurrentItems; } }
 
 		readonly Timer dragScrollTimer;
 
 		public ItemSelectorPopupForm(ItemSelector owner)
 			: base(owner) {
-			base.fCloseButtonStyle = BlobCloseButtonStyle.None;	
+			base.fCloseButtonStyle = BlobCloseButtonStyle.None;
 
 			ScrollBar = new DevExpress.XtraEditors.VScrollBar();
 			ScrollBar.ScrollBarAutoSize = true;
@@ -32,8 +32,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			dragScrollTimer = new Timer();
 			dragScrollTimer.Tick += DragScrollTimer_Tick;
 		}
-
-
+		
 		protected override PopupBaseFormPainter CreatePainter() { return new ItemSelectorPopupFormPainter(); }
 		protected override PopupBaseFormViewInfo CreateViewInfo() { return new ItemSelectorPopupFormViewInfo(this); }
 
@@ -41,7 +40,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public new RepositoryItemItemSelector Properties { get { return (RepositoryItemItemSelector)base.Properties; } }
 		public new ItemSelectorPopupFormViewInfo ViewInfo { get { return (ItemSelectorPopupFormViewInfo)base.ViewInfo; } }
 
-		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) { Invalidate(); }
+		void ScrollBar_Scroll(object sender, ScrollEventArgs e) { Invalidate(); }
 
 		protected override Size DefaultMinFormSize { get { return new Size(OwnerEdit.Width, 100); } }
 		public override Size CalcFormSize(Size contentSize) {
@@ -49,6 +48,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (!Properties.AllowResize)
 				size.Width = OwnerEdit.Width;
 			return size;
+		}
+
+		public void RefreshItems() {
+			ViewInfo.SelectedIndex = null;
+			ViewInfo.ScrollTop = 0;
+			LayoutChanged();		//This call recalculates the ViewInfo.
 		}
 
 		public override void ShowPopupForm() {
@@ -187,7 +192,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.Dispose(disposing);
 		}
 	}
-	class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo, IDisposable {
+	sealed class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo, IDisposable {
 		public ItemSelectorPopupFormViewInfo(ItemSelectorPopupForm form)
 			: base(form) {
 			ShowSizeBar = Form.Properties.AllowResize;
@@ -206,7 +211,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
 		///<summary>Releases the unmanaged resources used by the ItemSelectorPopupFormViewInfo and optionally releases the managed resources.</summary>
 		///<param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-		protected virtual void Dispose(bool disposing) {
+		void Dispose(bool disposing) {
 			if (disposing) {
 				if (LinePen != null) LinePen.Dispose();
 			}

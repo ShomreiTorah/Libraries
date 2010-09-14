@@ -12,6 +12,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		int width = 100;
 		bool visible = true;
 		string caption;
+		bool shouldFilter;
 
 		internal virtual void SetOwner(RepositoryItemItemSelector owner) {
 			if (owner == null) throw new ArgumentNullException("owner");
@@ -47,6 +48,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public string Caption {
 			get { return caption; }
 			set { caption = value; }
+		}
+		///<summary>Gets or sets whether typing in the ItemSelector's textbox should filter by this column.</summary>
+		[Description("Gets or sets whether typing in the ItemSelector's textbox should filter by this column.")]
+		[Category("Behavior")]
+		public bool ShouldFilter {
+			get { return shouldFilter; }
+			set { shouldFilter = value; }
 		}
 
 		///<summary>Gets the string displayed in this column for the given row.</summary>
@@ -109,6 +117,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				Caption = Caption,
 				FieldName = FieldName,
 				FormatString = FormatString,
+				ShouldFilter = ShouldFilter,
 				Visible = Visible,
 				Width = Width
 			};
@@ -130,7 +139,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		///<summary>Creates a copy of this column that can be used with a different ItemSelector.</summary>
 		protected internal override ResultColumn Copy() {
-			return new CustomColumn(getter) { Caption = Caption, Visible = Visible, Width = Width };
+			return new CustomColumn(getter) { Caption = Caption, ShouldFilter = ShouldFilter, Visible = Visible, Width = Width };
 		}
 	}
 	///<summary>A column that displays a value from an arbitrary strongly-typed function.</summary>
