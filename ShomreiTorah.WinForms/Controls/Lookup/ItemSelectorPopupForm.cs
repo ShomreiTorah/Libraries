@@ -251,8 +251,15 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ColumnHeaderArgs = new List<HeaderObjectInfoArgs>();
 			HeaderPainter = Form.Properties.LookAndFeel.Painter.Header;
 
-			var image = (Bitmap)((SkinHeaderObjectPainter)HeaderPainter).Element.Image.GetImages().Images[0];
-			LinePen = new Pen(image.GetPixel(image.Width - 1, image.Height - 1));
+			//This looks nicer in many skins, but has bad padding.
+			//HoverElement = NavPaneSkins.GetSkin(Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
+			HoverElement = RibbonSkins.GetSkin(Form.Properties.LookAndFeel)[RibbonSkins.SkinButton];
+
+			if (IsSkinned) {
+				var image = (Bitmap)((SkinHeaderObjectPainter)HeaderPainter).Element.Image.GetImages().Images[0];
+				LinePen = new Pen(image.GetPixel(image.Width - 1, image.Height - 1));
+			} else
+				LinePen = new Pen(Color.DarkGray);	//Don't use a shared pen because I need to dispose it later
 		}
 
 		///<summary>Releases all resources used by the ItemSelectorPopupFormViewInfo.</summary>
@@ -489,8 +496,22 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public Rectangle RowsArea { get; private set; }
 		///<summary>Gets the bounds of the header row.</summary>
 		public Rectangle HeaderArea { get; private set; }
+
+		private void CalcRowHeight() {
+			GInfo.AddGraphics(null);
+			try {
+				rowHeight = AppearanceMatch.CalcTextSize(GInfo.Graphics, "Wg", 0).ToSize().Height + HoverElement.ContentMargins.Height;
+			} finally { GInfo.ReleaseGraphics(); }
+		}
+
+		int? rowHeight;
 		///<summary>Gets the height of a single row.</summary>
-		public int RowHeight { get; private set; }
+		public int RowHeight {
+			get {
+				if (!rowHeight.HasValue) CalcRowHeight();
+				return rowHeight.Value;
+			}
+		}
 
 		///<summary>Gets the index of the first row that intersects the viewport.</summary>
 		///<remarks>The row might not be entirely visible.</remarks>
@@ -532,7 +553,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.CalcContentRect(bounds);
 
 			var headerHeight = Form.Properties.ShowColumnHeaders ? 20 : 0;
-			RowHeight = 20;	//TODO: Calculate
 			var rowAreaHeight = ContentRect.Height - headerHeight;
 
 			Form.ScrollBar.Maximum = RowHeight * Form.Items.Count;
@@ -596,17 +616,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#region Item Hovering
 		///<summary>Gets the SkinElement used to paint the background of the hovered row.</summary>
 		public SkinElement HoverElement { get; private set; }
-
-		protected override void UpdatePainters() {
-			base.UpdatePainters();
-
-			//Alternatives:
-			//Ribbon/Button
-			//Ribbon/ButtonGroupButton
-			//Editors/NavigatorButton
-			HoverElement = NavPaneSkins.GetSkin(Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
-		}
-
 		int? hoveredIndex;
 		ObjectState hoveredItemState;
 
