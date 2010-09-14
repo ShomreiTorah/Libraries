@@ -63,10 +63,31 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public override void HidePopupForm() {
 			dragScrollTimer.Stop();
 			isTrackingMouseDown = false;
+			isKeyDown = false;
 			base.HidePopupForm();
 		}
+
+		public void ScrollBy(int rows) {
+			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
+		}
+		public void SetScrollPos(int pos) {
+			if (pos < 0) pos = 0;
+			ScrollBar.Value = Math.Min(pos, ScrollBar.Maximum - ViewInfo.RowsArea.Height + 1);	//Subtract the height of the thumb so that the last row is on the bottom
+			Invalidate();
+		}
+		void SelectRow(int rowIndex) {
+			if (rowIndex < 0)
+				ViewInfo.SelectedIndex = 0;
+			else if (rowIndex >= Items.Count)
+				ViewInfo.SelectedIndex = Items.Count - 1;
+			else
+				ViewInfo.SelectedIndex = rowIndex;
+		}
+
+		bool isKeyDown;
 		public override void ProcessKeyDown(KeyEventArgs e) {
 			base.ProcessKeyDown(e);
+			isKeyDown = true;
 
 			int currentIndex = ViewInfo.SelectedIndex ?? -1;
 			int? newIndex = null;
@@ -103,24 +124,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				e.Handled = true;
 			}
 		}
-
-		public void ScrollBy(int rows) {
-			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
+		public override void ProcessKeyUp(KeyEventArgs e) {
+			base.ProcessKeyUp(e);
+			isKeyDown = false;
 		}
-		public void SetScrollPos(int pos) {
-			if (pos < 0) pos = 0;
-			ScrollBar.Value = Math.Min(pos, ScrollBar.Maximum - ViewInfo.RowsArea.Height + 1);	//Subtract the height of the thumb so that the last row is on the bottom
-			Invalidate();
-		}
-		void SelectRow(int rowIndex) {
-			if (rowIndex < 0)
-				ViewInfo.SelectedIndex = 0;
-			else if (rowIndex >= Items.Count)
-				ViewInfo.SelectedIndex = Items.Count - 1;
-			else
-				ViewInfo.SelectedIndex = rowIndex;
-		}
-
 		#region Mouse Handling
 		bool SelectByCoordinate(int y) {
 			//When selecting a row by point, we should ignore the X coordinate.
@@ -133,7 +140,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		internal void OnEditorMouseWheel(DXMouseEventArgs e) {
 			ScrollBy(-SystemInformation.MouseWheelScrollLines * Math.Sign(e.Delta));
 			e.Handled = true;
-			SelectByCoordinate(PointToClient(MousePosition).Y);		//e.Y is relative to the editor
+
+			if (!isKeyDown)
+				SelectByCoordinate(PointToClient(MousePosition).Y);		//e.Y is relative to the editor
 		}
 
 		bool isTrackingMouseDown;
@@ -149,7 +158,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override void OnMouseMove(MouseEventArgs e) {
 			base.OnMouseMove(e);
 			//If the user started dragging elsewhere (eg, resize), ignore it.
-			if (isTrackingMouseDown || e.Button == MouseButtons.None)
+			if (isTrackingMouseDown || (!isKeyDown && e.Button == MouseButtons.None))
 				SelectByCoordinate(e.Y);
 
 			if (isTrackingMouseDown && (e.Y < ViewInfo.RowsArea.Top || e.Y > ViewInfo.RowsArea.Bottom)) {
