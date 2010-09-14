@@ -51,14 +51,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		public void RefreshItems() {
-			ViewInfo.SelectedIndex = null;
+			ViewInfo.HoveredIndex = null;
 			ViewInfo.ScrollTop = 0;
 			LayoutChanged();		//This call recalculates the ViewInfo.
 		}
 
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
-			ViewInfo.SelectedIndex = null;
+			ViewInfo.HoveredIndex = null;
 		}
 		public override void HidePopupForm() {
 			dragScrollTimer.Stop();
@@ -67,12 +67,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.HidePopupForm();
 		}
 
-		///<summary>Sets the result of the popup to the currently selected item.</summary>
+		///<summary>Sets the result of the popup to the currently hovered item.</summary>
 		void SetResult() {
-			if (!ViewInfo.SelectedIndex.HasValue)
-				throw new InvalidOperationException("No item is selected");
+			if (!ViewInfo.HoveredIndex.HasValue)
+				throw new InvalidOperationException("No item is hovered");
 
-			var item = Items[ViewInfo.SelectedIndex.Value];
+			var item = Items[ViewInfo.HoveredIndex.Value];
 			if (!Properties.RaiseItemSelecting(ResultValue))
 				return;
 			popupResultValue = item;
@@ -91,13 +91,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ScrollBar.Value = Math.Min(pos, ScrollBar.Maximum - ViewInfo.RowsArea.Height + 1);	//Subtract the height of the thumb so that the last row is on the bottom
 			Invalidate();
 		}
-		void SelectRow(int rowIndex) {
+		void SetHoveredRow(int rowIndex) {
 			if (rowIndex < 0)
-				ViewInfo.SelectedIndex = 0;
+				ViewInfo.HoveredIndex = 0;
 			else if (rowIndex >= Items.Count)
-				ViewInfo.SelectedIndex = Items.Count - 1;
+				ViewInfo.HoveredIndex = Items.Count - 1;
 			else
-				ViewInfo.SelectedIndex = rowIndex;
+				ViewInfo.HoveredIndex = rowIndex;
 		}
 
 		bool isKeyDown;
@@ -105,11 +105,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.ProcessKeyDown(e);
 			isKeyDown = true;
 
-			int currentIndex = ViewInfo.SelectedIndex ?? -1;
+			int currentIndex = ViewInfo.HoveredIndex ?? -1;
 			int? newIndex = null;
 			switch (e.KeyCode) {
 				case Keys.Enter:
-					if (ViewInfo.SelectedIndex.HasValue) {
+					if (ViewInfo.HoveredIndex.HasValue) {
 						SetResult();
 						e.Handled = true;
 						return;
@@ -136,7 +136,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				#endregion
 			}
 			if (newIndex.HasValue) {
-				SelectRow(newIndex.Value);
+				SetHoveredRow(newIndex.Value);
 				e.Handled = true;
 			}
 		}
@@ -145,12 +145,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			isKeyDown = false;
 		}
 		#region Mouse Handling
-		bool SelectByCoordinate(int y) {
+		bool HoverByCoordinate(int y) {
 			//When selecting a row by point, we should ignore the X coordinate.
 			//This allows the user to drag next to the popup.
 			var index = ViewInfo.GetRowIndex(new Point(ViewInfo.RowsArea.X + 1, y));
 			if (index.HasValue)
-				ViewInfo.SelectedIndex = index.Value;
+				ViewInfo.HoveredIndex = index.Value;
 			return index.HasValue;
 		}
 		internal void OnEditorMouseWheel(DXMouseEventArgs e) {
@@ -158,16 +158,16 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			e.Handled = true;
 
 			if (!isKeyDown)
-				SelectByCoordinate(PointToClient(MousePosition).Y);		//e.Y is relative to the editor
+				HoverByCoordinate(PointToClient(MousePosition).Y);		//e.Y is relative to the editor
 		}
 
 		bool isTrackingMouseDown;
 		protected override void OnMouseDown(MouseEventArgs e) {
 			base.OnMouseDown(e);
 			if (e.Button == MouseButtons.Left) {
-				if (SelectByCoordinate(e.Y)) {
+				if (HoverByCoordinate(e.Y)) {
 					isTrackingMouseDown = true;
-					ViewInfo.SelectionState = ObjectState.Pressed;
+					ViewInfo.HoveredItemState = ObjectState.Pressed;
 				}
 			}
 		}
@@ -175,7 +175,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.OnMouseMove(e);
 			//If the user started dragging elsewhere (eg, resize), ignore it.
 			if (isTrackingMouseDown || (!isKeyDown && e.Button == MouseButtons.None))
-				SelectByCoordinate(e.Y);
+				HoverByCoordinate(e.Y);
 
 			if (isTrackingMouseDown && (e.Y < ViewInfo.RowsArea.Top || e.Y > ViewInfo.RowsArea.Bottom)) {
 				dragScrollTimer.Enabled = true;
@@ -191,16 +191,16 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var y = PointToClient(MousePosition).Y;
 
 			//If y is lower than the rows area, scroll down.
-			SelectRow((ViewInfo.SelectedIndex ?? 0) + Math.Sign(y - ViewInfo.RowsArea.Bottom));
+			SetHoveredRow((ViewInfo.HoveredIndex ?? 0) + Math.Sign(y - ViewInfo.RowsArea.Bottom));
 		}
 		protected override void OnMouseUp(MouseEventArgs e) {
 			base.OnMouseUp(e);
 			dragScrollTimer.Stop();
 			if (e.Button == MouseButtons.Left && isTrackingMouseDown) {
-				ViewInfo.SelectionState = ObjectState.Hot;
+				ViewInfo.HoveredItemState = ObjectState.Hot;
 
 				//If the mouseup happened exactly on a row, select the row.
-				if (ViewInfo.SelectedIndex == ViewInfo.GetRowIndex(e.Location))
+				if (ViewInfo.HoveredIndex == ViewInfo.GetRowIndex(e.Location))
 					SetResult();
 			}
 			isTrackingMouseDown = false;
@@ -556,8 +556,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 
-		#region Selection
-		public SkinElement SelectionElement { get; private set; }
+		#region Item Hovering
+		public SkinElement HoverElement { get; private set; }
 
 		protected override void UpdatePainters() {
 			base.UpdatePainters();
@@ -576,31 +576,31 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//Ribbon/Button
 			//Ribbon/ButtonGroupButton
 			//Editors/NavigatorButton
-			SelectionElement = NavPaneSkins.GetSkin(Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
+			HoverElement = NavPaneSkins.GetSkin(Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
 		}
 
-		int? selectedIndex;
-		ObjectState selectionState;
+		int? hoveredIndex;
+		ObjectState hoveredItemState;
 
-		public int? SelectedIndex {
-			get { return selectedIndex; }
+		public int? HoveredIndex {
+			get { return hoveredIndex; }
 			set {
-				if (selectedIndex == value) return;
+				if (hoveredIndex == value) return;
 				if (value < 0 || value >= Form.Items.Count) throw new ArgumentOutOfRangeException("value");
 
-				selectedIndex = value;
+				hoveredIndex = value;
 
-				if (SelectedIndex.HasValue)
-					EnsureVisible(SelectedIndex.Value);
+				if (HoveredIndex.HasValue)
+					EnsureVisible(HoveredIndex.Value);
 
 				Form.Invalidate();
 			}
 		}
-		public ObjectState SelectionState {
-			get { return selectionState; }
+		public ObjectState HoveredItemState {
+			get { return hoveredItemState; }
 			set {
-				if (SelectionState == value) return;
-				selectionState = value;
+				if (HoveredItemState == value) return;
+				hoveredItemState = value;
 				Form.Invalidate();
 			}
 		}
@@ -616,7 +616,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 
 			using (info.Cache.ClipInfo.SaveAndSetClip(vi.RowsArea)) {
-				DrawSelectionHighlight(info);
+				DrawHoverBackground(info);
 
 				if (vi.Form.Properties.ShowVerticalLines)
 					DrawVertLines(info);
@@ -662,7 +662,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			int x = info.RowsArea.X + info.SelectionElement.ContentMargins.Left + 1;
+			int x = info.RowsArea.X + info.HoverElement.ContentMargins.Left + 1;
 			foreach (var column in info.VisibleColumns) {
 				DrawCell(args, rowIndex, column, x);
 
@@ -675,7 +675,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
 			var location = new Point(x, info.GetRowCoordinate(rowIndex));
-			var cellWidth = Math.Min(column.Width, info.RowsArea.Right - info.SelectionElement.ContentMargins.Right - x);
+			var cellWidth = Math.Min(column.Width, info.RowsArea.Right - info.HoverElement.ContentMargins.Right - x);
 			var cellBounds = new Rectangle(location, new Size(cellWidth, info.RowHeight));
 
 			var text = column.GetValue(info.Form.Items[rowIndex]);
@@ -704,18 +704,18 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 		}
 
-		static void DrawSelectionHighlight(PopupFormGraphicsInfoArgs args) {
+		static void DrawHoverBackground(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			if (info.SelectedIndex == null) return;
+			if (info.HoveredIndex == null) return;
 
-			SkinElementInfo elemInfo = new SkinElementInfo(info.SelectionElement,
-				new Rectangle(info.RowsArea.X, info.GetRowCoordinate(info.SelectedIndex.Value), info.RowsArea.Width, info.RowHeight)
+			SkinElementInfo elemInfo = new SkinElementInfo(info.HoverElement,
+				new Rectangle(info.RowsArea.X, info.GetRowCoordinate(info.HoveredIndex.Value), info.RowsArea.Width, info.RowHeight)
 			);
 
 			elemInfo.Cache = args.Cache;
-			elemInfo.State = info.SelectionState;
-			elemInfo.ImageIndex = info.SelectionState == ObjectState.Pressed ? 2 : 1;
+			elemInfo.State = info.HoveredItemState;
+			elemInfo.ImageIndex = info.HoveredItemState == ObjectState.Pressed ? 2 : 1;
 
 			SkinElementPainter.Default.DrawObject(elemInfo);
 		}
