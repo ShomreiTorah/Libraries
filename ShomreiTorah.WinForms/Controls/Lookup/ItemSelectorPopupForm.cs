@@ -17,6 +17,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public DevExpress.XtraEditors.VScrollBar ScrollBar { get; private set; }
 		public IList Items { get { return OwnerEdit.AllItems; } }
 
+		readonly Timer dragScrollTimer;
+
 		public ItemSelectorPopupForm(ItemSelector owner)
 			: base(owner) {
 
@@ -25,30 +27,30 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ScrollBar.Scroll += ScrollBar_Scroll;
 			ScrollBar.LookAndFeel.Assign(Properties.LookAndFeel);
 			Controls.Add(ScrollBar);
+
+			dragScrollTimer = new Timer();
+			dragScrollTimer.Tick += DragScrollTimer_Tick;
 		}
+
 
 		protected override PopupBaseFormPainter CreatePainter() { return new ItemSelectorPopupFormPainter(); }
 		protected override PopupBaseFormViewInfo CreateViewInfo() { return new ItemSelectorPopupFormViewInfo(this); }
-		public new RepositoryItemItemSelector Properties { get { return (RepositoryItemItemSelector)base.Properties; } }
+
 		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
+		public new RepositoryItemItemSelector Properties { get { return (RepositoryItemItemSelector)base.Properties; } }
 		public new ItemSelectorPopupFormViewInfo ViewInfo { get { return (ItemSelectorPopupFormViewInfo)base.ViewInfo; } }
 
-		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) {
-			Invalidate();
-		}
+		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) { Invalidate(); }
 
-		public void ScrollBy(int rows) {
-			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
-		}
-		public void SetScrollPos(int pos) {
-			if (pos < 0) pos = 0;
-			ScrollBar.Value = Math.Min(pos, ScrollBar.Maximum - ViewInfo.RowsArea.Height + 1);	//Subtract the height of the thumb so that the last row is on the bottom
-			Invalidate();
-		}
 
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
 			ViewInfo.SelectedIndex = null;
+		}
+		public override void HidePopupForm() {
+			dragScrollTimer.Stop();
+			isTrackingMouseDown = false;
+			base.HidePopupForm();
 		}
 		public override void ProcessKeyDown(KeyEventArgs e) {
 			base.ProcessKeyDown(e);
@@ -84,16 +86,30 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				#endregion
 			}
 			if (newIndex.HasValue) {
-				if (newIndex < 0)
-					ViewInfo.SelectedIndex = 0;
-				else if (newIndex >= Items.Count)
-					ViewInfo.SelectedIndex = Items.Count - 1;
-				else
-					ViewInfo.SelectedIndex = newIndex.Value;
+				SelectRow(newIndex.Value);
 				e.Handled = true;
 			}
 		}
 
+
+		public void ScrollBy(int rows) {
+			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
+		}
+		public void SetScrollPos(int pos) {
+			if (pos < 0) pos = 0;
+			ScrollBar.Value = Math.Min(pos, ScrollBar.Maximum - ViewInfo.RowsArea.Height + 1);	//Subtract the height of the thumb so that the last row is on the bottom
+			Invalidate();
+		}
+		void SelectRow(int rowIndex) {
+			if (rowIndex < 0)
+				ViewInfo.SelectedIndex = 0;
+			else if (rowIndex >= Items.Count)
+				ViewInfo.SelectedIndex = Items.Count - 1;
+			else
+				ViewInfo.SelectedIndex = rowIndex;
+		}
+
+		#region Mouse Handling
 		bool SelectByCoordinate(int y) {
 			//When selecting a row by point, we should ignore the X coordinate.
 			//This allows the user to drag next to the popup.
@@ -109,26 +125,40 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		bool isTrackingMouseDown;
-		protected override void OnMouseMove(MouseEventArgs e) {
-			base.OnMouseMove(e);
-			//If the user started dragging elsewhere (eg, resize), ignore it.
-			if (isTrackingMouseDown || e.Button == MouseButtons.None)
-				SelectByCoordinate(e.Y);
-		}
-
 		protected override void OnMouseDown(MouseEventArgs e) {
 			base.OnMouseDown(e);
 			if (e.Button == MouseButtons.Left) {
 				if (SelectByCoordinate(e.Y)) {
 					isTrackingMouseDown = true;
 					ViewInfo.SelectionState = ObjectState.Pressed;
-
-					//TODO: Drag-scroll timer
 				}
 			}
 		}
+		protected override void OnMouseMove(MouseEventArgs e) {
+			base.OnMouseMove(e);
+			//If the user started dragging elsewhere (eg, resize), ignore it.
+			if (isTrackingMouseDown || e.Button == MouseButtons.None)
+				SelectByCoordinate(e.Y);
+
+			if (isTrackingMouseDown && (e.Y < ViewInfo.RowsArea.Top || e.Y > ViewInfo.RowsArea.Bottom)) {
+				dragScrollTimer.Enabled = true;
+
+				//Depending whether the mouse is below or above the grid, select the correct distance
+				int distance = Math.Max(ViewInfo.RowsArea.Top - e.Y, e.Y - ViewInfo.RowsArea.Bottom);
+				dragScrollTimer.Interval = 100 / Math.Max(1, (distance / ViewInfo.RowHeight));
+			} else
+				dragScrollTimer.Enabled = false;
+		}
+
+		void DragScrollTimer_Tick(object sender, EventArgs e) {
+			var y = PointToClient(MousePosition).Y;
+
+			//If y is lower than the rows area, scroll down.
+			SelectRow((ViewInfo.SelectedIndex ?? 0) + Math.Sign(y - ViewInfo.RowsArea.Bottom));
+		}
 		protected override void OnMouseUp(MouseEventArgs e) {
 			base.OnMouseUp(e);
+			dragScrollTimer.Stop();
 			if (e.Button == MouseButtons.Left && isTrackingMouseDown) {
 				ViewInfo.SelectionState = ObjectState.Hot;
 
@@ -138,12 +168,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 			isTrackingMouseDown = false;
 		}
+		#endregion
 
 		///<summary>Releases the unmanaged resources used by the ItemSelectorPopupForm and optionally releases the managed resources.</summary>
 		///<param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
 		protected override void Dispose(bool disposing) {
 			if (disposing) {
 				if (ViewInfo != null) ViewInfo.Dispose();
+				dragScrollTimer.Dispose();
 			}
 			base.Dispose(disposing);
 		}
