@@ -11,11 +11,13 @@ using System.Windows.Forms;
 using DevExpress.Accessibility;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Drawing;
 using DevExpress.XtraEditors.Popup;
 using DevExpress.XtraEditors.Registrator;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraEditors.ViewInfo;
+using ShomreiTorah.Common;
 
 #pragma warning disable 1591
 namespace ShomreiTorah.WinForms.Controls.Lookup {
@@ -28,6 +30,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		///<summary>Creates a new ItemSelector.</summary>
 		public ItemSelector() {
+			MaskBox.Click += MaskBox_Click;
 		}
 
 		///<summary>Gets the editor's type name.</summary>
@@ -56,6 +59,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			return new ItemSelectorPopupForm(this);
 		}
 
+		void MaskBox_Click(object sender, EventArgs e) {
+			ShowPopup();
+		}
+
 		protected override void DoShowPopup() {
 			base.DoShowPopup();
 		}
@@ -72,8 +79,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 					PopupForm.OnEditorMouseWheel(ee);
 			} finally { ee.Sync(); }
 		}
+
 		protected override void SetEmptyEditValue(object emptyEditValue) {
 			base.SetEmptyEditValue(emptyEditValue);
+			//TODO: Draw selected item.  (ViewInfo / Painter?)
 		}
 
 		internal IList AllItems { get; set; }
@@ -82,6 +91,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ClosePopup(PopupCloseMode.Normal);
 			EditValue = item;
 		}
+
+		#region Filter
+		protected override void OnEditorKeyDown(KeyEventArgs e) {
+			base.OnEditorKeyDown(e);
+			if (e.Handled) return;
+			ShowPopup();
+		}
+		#endregion
 	}
 
 
@@ -122,6 +139,22 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			AppearanceColumnHeader = CreateAppearance("ColumnHeader");
 			AppearanceResults = CreateAppearance("Results");
 			AppearanceMatch = CreateAppearance("Match");
+		}
+
+		public override void Assign(RepositoryItem item) {
+			base.Assign(item);
+			var source = (RepositoryItemItemSelector)item;
+
+			Columns.Clear();
+			Columns.AddRange(source.Columns.Select(c => c.Copy()));	//The InsertItem overload will set the source.
+
+			ShowColumnHeaders = source.ShowColumnHeaders;
+			ShowVerticalLines = source.ShowVerticalLines;
+
+			AppearanceColumnHeader.Assign(source.AppearanceColumnHeader);
+			AppearanceResults.Assign(source.AppearanceResults);
+			AppearanceMatch.Assign(source.AppearanceMatch);
+			UpdateDataSource(source.DataSource, source.DataMember);
 		}
 
 		#region Appearances
@@ -217,6 +250,31 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ItemProperties = ResultsBindingManager.GetItemProperties();
 			Columns.OnDataSourceSet();
 			OwnerEdit.AllItems = (IList)ListBindingHelper.GetList(DataSource, DataMember);
+		}
+		#endregion
+		#region Suppressed Properties
+		///<summary>This property is irrelevant for this control.</summary>
+		[Browsable(false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public override DevExpress.XtraEditors.Mask.MaskProperties Mask {
+			get { return base.Mask; }
+		}
+		///<summary>This property is irrelevant for this control.</summary>
+		[Browsable(false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public override EditValueChangedFiringMode EditValueChangedFiringMode {
+			get { return EditValueChangedFiringMode.Default; }
+			set { }
+		}
+		///<summary>This property is irrelevant for this control.</summary>
+		[Browsable(false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public override TextEditStyles TextEditStyle {
+			get { return TextEditStyles.Standard; }
+			set { }
 		}
 		#endregion
 	}
