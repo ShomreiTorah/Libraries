@@ -13,8 +13,15 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Popup;
 
 namespace ShomreiTorah.WinForms.Controls.Lookup {
+	///<summary>The popup form that displays the results of an ItemSelector control.</summary>
+	///<remarks>
+	/// This class handles interaction; the ViewInfo tracks layout, and the Painter draws the form.
+	/// Since I don't have InfoArgs objects for each row and cell, the Painter also needs to do some layout calculation.
+	///</remarks>
 	sealed class ItemSelectorPopupForm : CustomBlobPopupForm {
 		public DevExpress.XtraEditors.VScrollBar ScrollBar { get; private set; }
+		///<summary>Gets the items currently displayed in the results grid.</summary>
+		///<remarks>This is a filtered list maintained by ItemSelector.</remarks>
 		public IList Items { get { return OwnerEdit.CurrentItems; } }
 
 		readonly Timer dragScrollTimer;
@@ -50,6 +57,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			return size;
 		}
 
+		///<summary>Recalculates and redraws the grid in response to a change in the displayed items.</summary>
 		public void RefreshItems() {
 			ViewInfo.HoveredIndex = null;
 			ViewInfo.ScrollTop = 0;
@@ -58,13 +66,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
+			//Reset the popup's state
 			ViewInfo.HoveredIndex = null;
-		}
-		public override void HidePopupForm() {
 			dragScrollTimer.Stop();
 			isTrackingMouseDown = false;
 			isKeyDown = false;
-			base.HidePopupForm();
 		}
 
 		///<summary>Sets the result of the popup to the currently hovered item.</summary>
@@ -80,17 +86,19 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		object popupResultValue;
 		///<summary>Gets the final result of the popup.</summary>
-		///<remarks>This is only set when the user clicks an item.</remarks>
+		///<remarks>This is only set when the user clicks an item.
+		///Otherwise, clicking outside the popup would select this item, which would be undesirable.</remarks>
 		public override object ResultValue { get { return popupResultValue; } }
 
 		public void ScrollBy(int rows) {
-			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
+			ScrollTo(ScrollBar.Value + rows * ViewInfo.RowHeight);
 		}
-		public void SetScrollPos(int pos) {
+		public void ScrollTo(int pos) {
 			if (pos < 0) pos = 0;
 			ScrollBar.Value = Math.Min(pos, ScrollBar.Maximum - ViewInfo.RowsArea.Height + 1);	//Subtract the height of the thumb so that the last row is on the bottom
 			Invalidate();
 		}
+		///<summary>Sets the specified row to be drawn with a hover effect.</summary>
 		void SetHoveredRow(int rowIndex) {
 			if (rowIndex < 0)
 				ViewInfo.HoveredIndex = 0;
@@ -145,10 +153,17 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			isKeyDown = false;
 		}
 		#region Mouse Handling
+		///<summary>Applies the hover effect to the row at the given Y coordinate.</summary>
+		///<remarks>This method ignores the X coordinate.</remarks>
 		bool HoverByCoordinate(int y) {
 			//When selecting a row by point, we should ignore the X coordinate.
 			//This allows the user to drag next to the popup.
-			var index = ViewInfo.GetRowIndex(new Point(ViewInfo.RowsArea.X + 1, y));
+			return HoverByPoint(new Point(ViewInfo.RowsArea.X + 1, y));
+		}
+		///<summary>Applies the hover effect to the row at the given point.</summary>
+		///<remarks>If the point is next to (but not inside) the grid, nothing will happen.</remarks>
+		bool HoverByPoint(Point pt) {
+			var index = ViewInfo.GetRowIndex(pt);
 			if (index.HasValue)
 				ViewInfo.HoveredIndex = index.Value;
 			return index.HasValue;
@@ -157,15 +172,16 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ScrollBy(-SystemInformation.MouseWheelScrollLines * Math.Sign(e.Delta));
 			e.Handled = true;
 
+			//If the user turns the scroll wheel over a row, the row should be hovered.
 			if (!isKeyDown)
-				HoverByCoordinate(PointToClient(MousePosition).Y);		//e.Y is relative to the editor
+				HoverByPoint(PointToClient(MousePosition));		//e.Location is relative to the editor
 		}
 
 		bool isTrackingMouseDown;
 		protected override void OnMouseDown(MouseEventArgs e) {
 			base.OnMouseDown(e);
 			if (e.Button == MouseButtons.Left) {
-				if (HoverByCoordinate(e.Y)) {
+				if (HoverByPoint(e.Location)) {
 					isTrackingMouseDown = true;
 					ViewInfo.HoveredItemState = ObjectState.Pressed;
 				}
@@ -173,9 +189,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		protected override void OnMouseMove(MouseEventArgs e) {
 			base.OnMouseMove(e);
-			//If the user started dragging elsewhere (eg, resize), ignore it.
-			if (isTrackingMouseDown || (!isKeyDown && e.Button == MouseButtons.None))
+			//If the user started dragging on anything other than a row (eg, resize), ignore it.
+			//If the user is dragging a row, select the row level with the mouse, even if the mouse is to the side of the grid.
+			if (isTrackingMouseDown)
 				HoverByCoordinate(e.Y);
+			else if (!isKeyDown && e.Button == MouseButtons.None)	//If the mouse is directly over a row, hover the row.
+				HoverByPoint(e.Location);
 
 			if (isTrackingMouseDown && (e.Y < ViewInfo.RowsArea.Top || e.Y > ViewInfo.RowsArea.Bottom)) {
 				dragScrollTimer.Enabled = true;
@@ -190,7 +209,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		void DragScrollTimer_Tick(object sender, EventArgs e) {
 			var y = PointToClient(MousePosition).Y;
 
-			//If y is lower than the rows area, scroll down.
+			//If y is lower than the grid bounds, scroll down.
+			//The HoveredRow setter will automatically scroll.
 			SetHoveredRow((ViewInfo.HoveredIndex ?? 0) + Math.Sign(y - ViewInfo.RowsArea.Bottom));
 		}
 		protected override void OnMouseUp(MouseEventArgs e) {
@@ -199,7 +219,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (e.Button == MouseButtons.Left && isTrackingMouseDown) {
 				ViewInfo.HoveredItemState = ObjectState.Hot;
 
-				//If the mouseup happened exactly on a row, select the row.
+				//If the mouseup happened exactly on the row, select the row.
+				//(But not if the mouse is to the side of the grid)
 				if (ViewInfo.HoveredIndex == ViewInfo.GetRowIndex(e.Location))
 					SetResult();
 			}
@@ -217,6 +238,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.Dispose(disposing);
 		}
 	}
+	///<summary>Stores and manages the layout of the results popup.</summary>
 	sealed class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo, IDisposable {
 		public ItemSelectorPopupFormViewInfo(ItemSelectorPopupForm form)
 			: base(form) {
@@ -249,6 +271,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#region Appearances
 		bool IsSkinned { get { return Form.Properties.LookAndFeel.ActiveStyle == ActiveLookAndFeelStyle.Skin; } }
 
+		///<summary>Gets the appearance used to paint column headers.</summary>
 		public AppearanceObject AppearanceColumnHeader { get; private set; }
 		AppearanceDefault ColumnHeaderDefault {
 			get {
@@ -258,6 +281,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				return new AppearanceDefault(GetSystemColor(SystemColors.ControlText), GetSystemColor(SystemColors.Control), HorzAlignment.Center, VertAlignment.Center);
 			}
 		}
+		///<summary>Gets the appearance used to paint column values.</summary>
 		public AppearanceObject AppearanceResults { get; private set; }
 		AppearanceObject ResultsDefault {
 			get {
@@ -269,9 +293,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				return retVal;
 			}
 		}
+		///<summary>Gets the appearance used to paint the matched portion of a column value.</summary>
 		public AppearanceObject AppearanceMatch { get; private set; }
 		AppearanceObject MatchDefault {
 			get {
+				//I try to color the matches blue, without breaking dark skins.
 				var defaultColor = AppearanceResults.GetForeColor();
 				var newColor = new HSL(2 / 3.0, 1, defaultColor.GetBrightness());
 				return new AppearanceObject { ForeColor = newColor.GetColor(), Font = new Font(AppearanceResults.GetFont(), FontStyle.Bold) };
@@ -449,6 +475,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#endregion
 
 		#region Layout
+		///<summary>Gets the Y coordinate of the top of the viewport.</summary>
 		public int ScrollTop {
 			get { return Form.ScrollBar.Visible ? Form.ScrollBar.Value : 0; }
 			set {
@@ -458,16 +485,25 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 		}
 
+		///<summary>Gets the bounds of the portion of the results grid that displays rows.</summary>
 		public Rectangle RowsArea { get; private set; }
+		///<summary>Gets the bounds of the header row.</summary>
 		public Rectangle HeaderArea { get; private set; }
+		///<summary>Gets the height of a single row.</summary>
 		public int RowHeight { get; private set; }
 
+		///<summary>Gets the index of the first row that intersects the viewport.</summary>
+		///<remarks>The row might not be entirely visible.</remarks>
 		public int FirstVisibleRow { get { return ScrollTop / RowHeight; } }
+		///<summary>Gets the number of rows that fit in the viewport.</summary>
+		///<remarks>There may be more rows currently being displayed if the scroll position cuts off part of the top row.  (Allowing an additional row to be drawn below it)</remarks>
 		public int MaxVisibleRows { get { return RowsArea.Height / RowHeight; } }	//This property is not completely accurate; if half the the top row is scrolled off-screen, one additional row will be visible.
 
 
 		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
 
+		///<summary>Gets the onscreen Y coordinate of the given row index, relative to the popup form.</summary>
+		///<remarks>This method respects the scrollbar.</remarks>
 		public int GetRowCoordinate(int rowIndex) {
 			return RowsArea.Top + (rowIndex * RowHeight) - ScrollTop;
 		}
@@ -522,11 +558,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//(the scrollbar will only constrain Value to
 			//Maximum, so that there might be some blank 
 			//space)
-			Form.SetScrollPos(Form.ScrollBar.Value);
+			Form.ScrollTo(Form.ScrollBar.Value);
 		}
 		#endregion
 
 		#region Column Headers
+		///<summary>Gets the pen used to draw vertical grid lines.</summary>
 		public Pen LinePen { get; private set; }
 		public HeaderObjectPainter HeaderPainter { get; private set; }
 		public List<HeaderObjectInfoArgs> ColumnHeaderArgs { get; private set; }
@@ -557,20 +594,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#endregion
 
 		#region Item Hovering
+		///<summary>Gets the SkinElement used to paint the background of the hovered row.</summary>
 		public SkinElement HoverElement { get; private set; }
 
 		protected override void UpdatePainters() {
 			base.UpdatePainters();
-
-			//var gridLineElem = GridSkins.GetSkin(Form.Properties.LookAndFeel)[GridSkins.SkinGridLine];
-			//var lineColor = gridLineElem.Color.GetForeColor();
-			//if (LinePen != null && LinePen != Pens.DarkGray)
-			//    LinePen.Dispose();
-
-			//if (lineColor.IsEmpty)
-			//    LinePen = Pens.DarkGray;
-			//else
-			//    LinePen = new Pen(lineColor);
 
 			//Alternatives:
 			//Ribbon/Button
@@ -582,6 +610,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		int? hoveredIndex;
 		ObjectState hoveredItemState;
 
+		///<summary>Gets or sets the index of the currently hovered row.</summary>
+		///<remarks>This row can be set using the mouse or the keyboard.
+		///Clicking the row or pressing enter will select in as the popup's result.</remarks>
 		public int? HoveredIndex {
 			get { return hoveredIndex; }
 			set {
@@ -596,6 +627,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				Form.Invalidate();
 			}
 		}
+		///<summary>Gets or sets the state of the hovered row.</summary>
+		///<remarks>This is set by the mouse event handlers.</remarks>
 		public ObjectState HoveredItemState {
 			get { return hoveredItemState; }
 			set {
@@ -606,6 +639,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 	}
+	///<summary>Draws the ItemSelector's results popup.</summary>
 	class ItemSelectorPopupFormPainter : PopupBaseSizeableFormPainter {
 		protected override void DrawContent(PopupFormGraphicsInfoArgs info) {
 			base.DrawContent(info);
