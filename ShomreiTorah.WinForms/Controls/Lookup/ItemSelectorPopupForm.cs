@@ -21,6 +21,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		public ItemSelectorPopupForm(ItemSelector owner)
 			: base(owner) {
+			base.fCloseButtonStyle = BlobCloseButtonStyle.None;	
 
 			ScrollBar = new DevExpress.XtraEditors.VScrollBar();
 			ScrollBar.ScrollBarAutoSize = true;
@@ -42,6 +43,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		protected virtual void ScrollBar_Scroll(object sender, ScrollEventArgs e) { Invalidate(); }
 
+		protected override Size DefaultMinFormSize { get { return new Size(OwnerEdit.Width, 100); } }
+		public override Size CalcFormSize(Size contentSize) {
+			var size = base.CalcFormSize(contentSize);
+			if (!Properties.AllowResize)
+				size.Width = OwnerEdit.Width;
+			return size;
+		}
 
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
@@ -90,7 +98,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				e.Handled = true;
 			}
 		}
-
 
 		public void ScrollBy(int rows) {
 			SetScrollPos(ScrollBar.Value + rows * ViewInfo.RowHeight);
@@ -183,6 +190,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 	class ItemSelectorPopupFormViewInfo : CustomBlobPopupFormViewInfo, IDisposable {
 		public ItemSelectorPopupFormViewInfo(ItemSelectorPopupForm form)
 			: base(form) {
+			ShowSizeBar = Form.Properties.AllowResize;
+
 			AppearanceColumnHeader = new AppearanceObject();
 			AppearanceResults = new AppearanceObject();
 

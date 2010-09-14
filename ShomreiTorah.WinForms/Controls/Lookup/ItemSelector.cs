@@ -131,6 +131,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		string dataMember = "";
 		bool showColumnHeaders = true;
 		bool showVerticalLines = true;
+		bool allowResize = true;
 
 		///<summary>Creates a new RepositoryItemItemSelector.</summary>
 		public RepositoryItemItemSelector() {
@@ -148,6 +149,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Columns.Clear();
 			Columns.AddRange(source.Columns.Select(c => c.Copy()));	//The InsertItem overload will set the source.
 
+			AllowResize = source.AllowResize;
 			ShowColumnHeaders = source.ShowColumnHeaders;
 			ShowVerticalLines = source.ShowVerticalLines;
 
@@ -211,6 +213,18 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public bool ShowVerticalLines {
 			get { return showVerticalLines; }
 			set { showVerticalLines = value; }
+		}
+		///<summary>Gets or sets whether the end-user can resize the popup form.</summary>
+		[Description("Gets or sets whether the end-user can resize the popup form.")]
+		[Category("Behavior")]
+		[DefaultValue(true)]
+		public bool AllowResize {
+			get { return allowResize; }
+			set {
+				if (AllowResize == value) return;
+				allowResize = value;
+				OnPropertiesChanged();	//Force a new ViewInfo, since I read this property in the constructor.
+			}
 		}
 
 		#region DataSource
