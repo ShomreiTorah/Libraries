@@ -54,6 +54,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		///<summary>Indicates whether the code is running in design mode.</summary>
 		protected bool IsDesignMode { get { return Owner == null || Owner.IsDesignMode; } }
+
+		///<summary>Creates a copy of this column for a new repository item.</summary>
+		protected internal abstract ResultColumn Copy();
 	}
 	///<summary>A column that displays a property of the underlying data items.</summary>
 	public class DataSourceColumn : ResultColumn {
@@ -99,6 +102,17 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				return "(No matching column)";
 			return String.Format(CultureInfo.CurrentCulture, FormatString, descriptor.GetValue(row));
 		}
+
+		///<summary>Creates a copy of this column that can be used with a different ItemSelector.</summary>
+		protected internal override ResultColumn Copy() {
+			return new DataSourceColumn {
+				Caption = Caption,
+				FieldName = FieldName,
+				FormatString = FormatString,
+				Visible = Visible,
+				Width = Width
+			};
+		}
 	}
 
 	///<summary>A column that displays a value from an arbitrary function.</summary>
@@ -113,6 +127,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		///<summary>Gets the string displayed in this column for the given row.</summary>
 		public override string GetValue(object row) { return getter(row); }
+
+		///<summary>Creates a copy of this column that can be used with a different ItemSelector.</summary>
+		protected internal override ResultColumn Copy() {
+			return new CustomColumn(getter) { Caption = Caption, Visible = Visible, Width = Width };
+		}
 	}
 	///<summary>A column that displays a value from an arbitrary strongly-typed function.</summary>
 	///<typeparam name="TItem">The type of the items displayed.</typeparam>
