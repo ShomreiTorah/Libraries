@@ -49,20 +49,46 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		void ScrollBar_Scroll(object sender, ScrollEventArgs e) { Invalidate(); }
 
-		protected override Size DefaultMinFormSize { get { return new Size(OwnerEdit.Width, 100); } }
-		public override Size CalcFormSize(Size contentSize) {
-			var size = base.CalcFormSize(contentSize);
-			if (!Properties.AllowResize)
-				size.Width = OwnerEdit.Width;
-			return size;
-		}
 
 		///<summary>Recalculates and redraws the grid in response to a change in the displayed items.</summary>
 		public void RefreshItems() {
 			ViewInfo.HoveredIndex = null;
 			ViewInfo.ScrollTop = 0;
+
+			var newHeight = Math.Min(NaturalHeight, Properties.UserPopupHeight);
+			if (ViewInfo.IsTopSizeBar)
+				Top += Height - newHeight;
+			Height = newHeight;
+
 			LayoutChanged();		//This call recalculates the ViewInfo.
 		}
+
+		#region Sizing control
+		///<summary>Gets the natural height of the popup that would not require a scrollbar.</summary>
+		int NaturalHeight { get { return Items.Count * ViewInfo.RowHeight + ViewInfo.VerticalFrameHeight; } }
+
+		///<summary>Gets the bounds of the form as the user resizes it.</summary>
+		///<remarks>The base class sets this property as the user drags.</remarks>
+		protected override Rectangle SizingBounds {
+			get { return base.SizingBounds; }
+			set {
+				if (value.Height > NaturalHeight) {
+					if (ViewInfo.IsTopSizeBar)
+						value.Y += value.Height - NaturalHeight;
+					value.Height = NaturalHeight;
+				} else if (NaturalHeight > Properties.UserPopupHeight)
+					Properties.UserPopupHeight = value.Height;
+
+				base.SizingBounds = value;
+			}
+		}
+		protected override Size MinFormSize { get { return new Size(OwnerEdit.Width, ViewInfo.VerticalFrameHeight + ViewInfo.RowHeight); } }
+
+		///<summary>Gets the popup's initial size.</summary>
+		protected override Size CalcFormSizeCore() {
+			return new Size(OwnerEdit.Width, Math.Min(NaturalHeight, Properties.UserPopupHeight));
+		}
+		#endregion
 
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
@@ -512,6 +538,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///If the popup is too tall, this will be above the bottom of the row area.</remarks>
 		public int RowsBottom { get { return RowsArea.Top + Math.Min(RowsArea.Height, Form.Items.Count * RowHeight); } }
 
+		///<summary>Gets the height occupied by portions outside the results grid.</summary>
+		public int VerticalFrameHeight { get; private set; }
+
 		private void CalcRowHeight() {
 			GInfo.AddGraphics(null);
 			try {
@@ -573,6 +602,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Form.ScrollBar.Maximum = RowHeight * Form.Items.Count;
 			Form.ScrollBar.LargeChange = rowAreaHeight;
 			Form.ScrollBar.Visible = Form.ScrollBar.Maximum > rowAreaHeight;
+
+			VerticalFrameHeight = (Form.Height - rowAreaHeight);
 
 			int availableWidth = ContentRect.Width;
 			if (Form.ScrollBar.Visible) {
@@ -697,7 +728,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawVertLines(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			var x = info.RowsArea.X;// +cols.First().Width - 1;
+			var x = info.RowsArea.X;
 
 			args.Graphics.DrawLine(info.LinePen,
 				x, info.RowsArea.Top,

@@ -194,6 +194,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			AppearanceColumnHeader = CreateAppearance("ColumnHeader");
 			AppearanceMatch = CreateAppearance("Match");
 			NullValuePrompt = DefaultNullValuePrompt;
+
+			UserPopupHeight = 300;
 		}
 
 		public override void Assign(RepositoryItem item) {
@@ -203,6 +205,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Columns.Clear();
 			Columns.AddRange(source.Columns.Select(c => c.Copy()));	//The InsertItem overload will set the source.
 
+			UserPopupHeight = source.UserPopupHeight;
 			AllowResize = source.AllowResize;
 			ShowColumnHeaders = source.ShowColumnHeaders;
 			ShowVerticalLines = source.ShowVerticalLines;
@@ -211,6 +214,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			AppearanceMatch.Assign(source.AppearanceMatch);
 			UpdateDataSource(source.DataSource, source.DataMember);
 		}
+
+		///<summary>Gets or sets the popup form's desired height, as set by the user.</summary>
+		internal int UserPopupHeight { get; set; }
+		//    get { return PopupFormSize.Height; }
+		//    set { PopupFormSize = new Size(PopupFormSize.Width, value); }
+		//}
 
 		#region Appearances
 		protected override void DestroyAppearances() {
