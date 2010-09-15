@@ -253,7 +253,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			//This looks nicer in many skins, but has bad padding.
 			//HoverElement = NavPaneSkins.GetSkin(Form.Properties.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
-			HoverElement = RibbonSkins.GetSkin(Form.Properties.LookAndFeel)[RibbonSkins.SkinButton];
+			switch (Form.Properties.LookAndFeel.ActiveSkinName) {
+				case "Darkroom":	//Workaround for unsolveable issue - their ribbon button is transparent
+					HoverElement = CommonSkins.GetSkin(Form.Properties.LookAndFeel)[CommonSkins.SkinButton];
+					break;
+				default:
+					HoverElement = RibbonSkins.GetSkin(Form.Properties.LookAndFeel)[RibbonSkins.SkinButton];
+					break;
+			}
 
 			if (IsSkinned) {
 				var image = (Bitmap)((SkinHeaderObjectPainter)HeaderPainter).Element.Image.GetImages().Images[0];
@@ -738,17 +745,22 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 					matchedPart = text.Substring(0, match.Length);	//The match might be the entire value
 			}
 
+			Brush colorOverride = null;
+			if (rowIndex == info.HoveredIndex
+			 && info.HoverElement.Color.ForeColor != info.AppearanceResults.GetForeColor())
+				colorOverride = args.Cache.GetSolidBrush(info.HoverElement.Color.ForeColor);
+
 			if (String.IsNullOrEmpty(matchedPart))
-				info.AppearanceResults.DrawString(args.Cache, text, cellBounds);
+				info.AppearanceResults.DrawStringDefaultColor(args.Cache, text, cellBounds, colorOverride);
 			else {
-				info.AppearanceMatch.DrawString(args.Cache, matchedPart, cellBounds);
+				info.AppearanceMatch.DrawStringDefaultColor(args.Cache, matchedPart, cellBounds, colorOverride);
 
 				var matchSize = Size.Ceiling(info.AppearanceMatch.CalcTextSize(args.Cache, matchedPart, cellWidth));
 				matchSize.Width++;	//DevExpress measures very aggressively
 				cellBounds.X += matchSize.Width;
 				cellBounds.Width -= matchSize.Width;
 
-				info.AppearanceResults.DrawString(args.Cache, text.Substring(matchedPart.Length), cellBounds);
+				info.AppearanceResults.DrawStringDefaultColor(args.Cache, text.Substring(matchedPart.Length), cellBounds, colorOverride);
 			}
 		}
 
@@ -766,6 +778,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			elemInfo.ImageIndex = info.HoveredItemState == ObjectState.Pressed ? 2 : 1;
 
 			SkinElementPainter.Default.DrawObject(elemInfo);
+		}
+	}
+	static class Extensions {
+		public static void DrawStringDefaultColor(this AppearanceObject app, GraphicsCache cache, string text, Rectangle bounds, Brush foreground) {
+			if (foreground != null)
+				app.DrawString(cache, text, bounds, foreground);
+			else
+				app.DrawString(cache, text, bounds);
 		}
 	}
 }
