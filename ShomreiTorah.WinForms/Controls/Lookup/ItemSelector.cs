@@ -192,7 +192,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Columns = new ItemSelectorColumnCollection(this);
 
 			AppearanceColumnHeader = CreateAppearance("ColumnHeader");
-			AppearanceResults = CreateAppearance("Results");
 			AppearanceMatch = CreateAppearance("Match");
 			NullValuePrompt = DefaultNullValuePrompt;
 		}
@@ -209,7 +208,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ShowVerticalLines = source.ShowVerticalLines;
 
 			AppearanceColumnHeader.Assign(source.AppearanceColumnHeader);
-			AppearanceResults.Assign(source.AppearanceResults);
 			AppearanceMatch.Assign(source.AppearanceMatch);
 			UpdateDataSource(source.DataSource, source.DataMember);
 		}
@@ -217,7 +215,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#region Appearances
 		protected override void DestroyAppearances() {
 			DestroyAppearance(AppearanceColumnHeader);
-			DestroyAppearance(AppearanceResults);
 			DestroyAppearance(AppearanceMatch);
 			base.DestroyAppearances();
 		}
@@ -229,14 +226,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		[Category("Appearance")]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
 		public AppearanceObject AppearanceMatch { get; private set; }
-
-		void ResetAppearanceResults() { AppearanceResults.Reset(); }
-		bool ShouldSerializeAppearanceResults() { return AppearanceResults.ShouldSerialize(); }
-		///<summary>Gets or sets the appearance of the results grid.</summary>
-		[Description("Gets or sets the appearance of the results grid.")]
-		[Category("Appearance")]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-		public AppearanceObject AppearanceResults { get; private set; }
 
 		void ResetAppearanceColumnHeader() { AppearanceColumnHeader.Reset(); }
 		bool ShouldSerializeAppearanceColumnHeader() { return AppearanceColumnHeader.ShouldSerialize(); }

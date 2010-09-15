@@ -300,8 +300,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		AppearanceObject ResultsDefault {
 			get {
 				var retVal = new AppearanceObject {
-					ForeColor = GetSystemColor(SystemColors.ControlText),
-					BackColor = GetSystemColor(SystemColors.Control)
+					BackColor = Form.BackColor,
+					ForeColor = Form.ForeColor
 				};
 				retVal.TextOptions.Trimming = Trimming.EllipsisCharacter;
 				return retVal;
@@ -322,7 +322,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			AppearanceHelper.Combine(AppearanceColumnHeader,
 				new[] { Form.Properties.AppearanceColumnHeader, StyleController == null ? null : StyleController.AppearanceDropDownHeader }, ColumnHeaderDefault);
 
-			AppearanceHelper.Combine(AppearanceResults, Form.Properties.AppearanceResults, ResultsDefault);
+			AppearanceHelper.Combine(AppearanceResults, Form.Properties.AppearanceDropDown, ResultsDefault);
 
 			AppearanceHelper.Combine(AppearanceMatch, new[] { Form.Properties.AppearanceMatch, MatchDefault, AppearanceResults });
 		}
