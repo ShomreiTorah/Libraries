@@ -179,6 +179,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
 		#endregion
 
+		const string DefaultNullValuePrompt = "Click here to select an item, or type to search";
+
 		object dataSource;
 		string dataMember = "";
 		bool showColumnHeaders = true;
@@ -192,6 +194,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			AppearanceColumnHeader = CreateAppearance("ColumnHeader");
 			AppearanceResults = CreateAppearance("Results");
 			AppearanceMatch = CreateAppearance("Match");
+			NullValuePrompt = DefaultNullValuePrompt;
 		}
 
 		public override void Assign(RepositoryItem item) {
@@ -277,6 +280,16 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				allowResize = value;
 				OnPropertiesChanged();	//Force a new ViewInfo, since I read this property in the constructor.
 			}
+		}
+
+		///<summary>Gets or sets the text displayed grayed out when the editor doesn't have focus, and its edit value is not set to a valid value.</summary>
+		[Description("Gets or sets the text displayed grayed out when the editor doesn't have focus, and its edit value is not set to a valid value.")]
+		[Category("Behavior")]
+		[DefaultValue(DefaultNullValuePrompt)]
+		[Localizable(true)]
+		public override string NullValuePrompt {
+			get { return base.NullValuePrompt; }
+			set { base.NullValuePrompt = value; }
 		}
 
 		#region DataSource
