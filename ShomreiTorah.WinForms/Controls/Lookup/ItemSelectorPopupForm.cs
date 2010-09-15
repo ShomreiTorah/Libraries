@@ -507,6 +507,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Gets the padding applied to each cell.</summary>
 		public int CellPaddingLeft { get { return HoverElement.ContentMargins.Left + 1; } }
 
+		///<summary>Gets the bottom of the last visible row.</summary>
+		///<remarks>If the last visible row is cut off, this will be in the middle of the row.
+		///If the popup is too tall, this will be above the bottom of the row area.</remarks>
+		public int RowsBottom { get { return RowsArea.Top + Math.Min(RowsArea.Height, Form.Items.Count * RowHeight); } }
+
 		private void CalcRowHeight() {
 			GInfo.AddGraphics(null);
 			try {
@@ -556,7 +561,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (top < RowsArea.Top)
 				ScrollTop = rowIndex * RowHeight;
 			else if (top + RowHeight > RowsArea.Bottom)
-				ScrollTop = (rowIndex + 1) * RowHeight - RowsArea.Height - 1;	//Ensure that the bottom of the row is visible
+				ScrollTop = (rowIndex + 1) * RowHeight - RowsArea.Height;	//Ensure that the bottom of the hover element is visible
 		}
 
 		protected override void CalcContentRect(Rectangle bounds) {
@@ -668,6 +673,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				DrawColumnHeaders(info);
 
 
+			if (vi.Form.Properties.AllowResize)
+				DrawInnerBorders(info);
 			using (info.Cache.ClipInfo.SaveAndSetClip(vi.RowsArea)) {
 				DrawHoverBackground(info);
 
@@ -690,16 +697,36 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawVertLines(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			var cols = info.VisibleColumns.ToArray();
-			var x = info.RowsArea.X + cols.First().Width - 1;
+			var x = info.RowsArea.X;// +cols.First().Width - 1;
 
-			for (int i = 1; i < cols.Length; i++) {
+			args.Graphics.DrawLine(info.LinePen,
+				x, info.RowsArea.Top,
+				x, info.RowsBottom
+			);
+			x--;
+			for (int i = 0; i < info.ColumnHeaderArgs.Count; i++) {
+				x += info.ColumnHeaderArgs[i].Bounds.Width;
 				args.Graphics.DrawLine(info.LinePen,
 					x, info.RowsArea.Top,
-					x, info.RowsArea.Top + Math.Min(info.RowsArea.Height, info.Form.Items.Count * info.RowHeight)
+					x, info.RowsBottom
 				);
-				x += cols[i].Width;
 			}
+		}
+
+		static void DrawHoverBackground(PopupFormGraphicsInfoArgs args) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
+			if (info.HoveredIndex == null) return;
+
+			SkinElementInfo elemInfo = new SkinElementInfo(info.HoverElement,
+				new Rectangle(info.RowsArea.X, info.GetRowCoordinate(info.HoveredIndex.Value), info.RowsArea.Width, info.RowHeight)
+			);
+
+			elemInfo.Cache = args.Cache;
+			elemInfo.State = info.HoveredItemState;
+			elemInfo.ImageIndex = info.HoveredItemState == ObjectState.Pressed ? 2 : 1;
+
+			SkinElementPainter.Default.DrawObject(elemInfo);
 		}
 
 		static void DrawRows(PopupFormGraphicsInfoArgs args) {
@@ -764,20 +791,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 		}
 
-		static void DrawHoverBackground(PopupFormGraphicsInfoArgs args) {
+		static void DrawInnerBorders(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			if (info.HoveredIndex == null) return;
-
-			SkinElementInfo elemInfo = new SkinElementInfo(info.HoverElement,
-				new Rectangle(info.RowsArea.X, info.GetRowCoordinate(info.HoveredIndex.Value), info.RowsArea.Width, info.RowHeight)
+			args.Graphics.DrawLine(info.LinePen,
+				info.ContentRect.Left, info.RowsBottom,
+				info.ContentRect.Right - 1, info.RowsBottom
 			);
-
-			elemInfo.Cache = args.Cache;
-			elemInfo.State = info.HoveredItemState;
-			elemInfo.ImageIndex = info.HoveredItemState == ObjectState.Pressed ? 2 : 1;
-
-			SkinElementPainter.Default.DrawObject(elemInfo);
 		}
 	}
 	static class Extensions {
