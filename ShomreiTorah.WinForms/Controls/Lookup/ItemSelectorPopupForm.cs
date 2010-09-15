@@ -497,6 +497,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Gets the bounds of the header row.</summary>
 		public Rectangle HeaderArea { get; private set; }
 
+		///<summary>Gets the padding applied to each cell.</summary>
+		public int CellPaddingLeft { get { return HoverElement.ContentMargins.Left + 1; } }
+
 		private void CalcRowHeight() {
 			GInfo.AddGraphics(null);
 			try {
@@ -705,7 +708,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawRow(PopupFormGraphicsInfoArgs args, int rowIndex) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			int x = info.RowsArea.X + info.HoverElement.ContentMargins.Left + 1;
+			int x = info.RowsArea.X;
 			foreach (var column in info.VisibleColumns) {
 				DrawCell(args, rowIndex, column, x);
 
@@ -717,8 +720,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawCell(PopupFormGraphicsInfoArgs args, int rowIndex, ResultColumn column, int x) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
+			//Subtract the padding from the left edge and the width.  (To preserve the right edge)
+			x += info.CellPaddingLeft;
 			var location = new Point(x, info.GetRowCoordinate(rowIndex));
-			var cellWidth = Math.Min(column.Width, info.RowsArea.Right - info.HoverElement.ContentMargins.Right - x);
+			var cellWidth = Math.Min(column.Width - info.CellPaddingLeft, info.RowsArea.Right - info.HoverElement.ContentMargins.Right - x);
 			var cellBounds = new Rectangle(location, new Size(cellWidth, info.RowHeight));
 
 			var text = column.GetValue(info.Form.Items[rowIndex]);
