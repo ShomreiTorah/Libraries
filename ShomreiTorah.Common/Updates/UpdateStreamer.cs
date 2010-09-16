@@ -8,11 +8,13 @@ using System.IO.Compression;
 
 namespace ShomreiTorah.Common.Updates {
 	///<summary>Manipulates update archives.</summary>
+	[Obsolete("Archives are no longer used")]
 	public static class UpdateStreamer {
 		///<summary>Recursively writes all of files in a directory to an update archive.</summary>
 		///<param name="target">The stream to write the archive to.  This stream should be encrypted.</param>
 		///<param name="folder">The directory containing the files to put in the archive.</param>
 		///<param name="progress">An optional IProgressReporter implementation to report progress.</param>
+		[Obsolete("Archives are no longer used")]
 		public static void WriteArchive(Stream target, string folder, IProgressReporter progress) {
 			WriteArchive(target, folder, progress, Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories));
 		}
@@ -22,6 +24,7 @@ namespace ShomreiTorah.Common.Updates {
 		///<param name="rootPath">The root path that the files in the archive will be made relative to.</param>
 		///<param name="progress">An optional IProgressReporter implementation to report progress.</param>
 		///<param name="paths">The full paths of the files to put in the archive.</param>
+		[Obsolete("Archives are no longer used")]
 		public static void WriteArchive(Stream target, string rootPath, IProgressReporter progress, params string[] paths) {
 			if (target == null) throw new ArgumentNullException("target");
 			if (rootPath == null) throw new ArgumentNullException("rootPath");
@@ -67,6 +70,7 @@ namespace ShomreiTorah.Common.Updates {
 		///<param name="source">The stream to read the archive from.</param>
 		///<param name="destination">The folder to extract the files to.  If the folder does not exist, it will be created.</param>
 		///<param name="progress">An optional IProgressReporter implementation to report progress.</param>
+		[Obsolete("Archives are no longer used")]
 		public static void ExtractArchive(Stream source, string destination, IProgressReporter progress) {
 			if (source == null) throw new ArgumentNullException("source");
 			if (destination == null) throw new ArgumentNullException("destination");
