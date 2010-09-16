@@ -97,5 +97,20 @@ namespace ShomreiTorah.Common {
 			if (!progress.WasCanceled)
 				request.GetResponse().Close();
 		}
+
+		///<summary>Creates a new directory on the server.</summary>
+		///<param name="relativePath">The relative path on the server of the new directory.</param>
+		public void CreateDirectory(Uri relativePath) {
+			var request = CreateRequest(relativePath);
+			request.Method = WebRequestMethods.Ftp.MakeDirectory;
+			request.GetResponse().Close();
+		}
+		///<summary>Deletes an existing file on the server.</summary>
+		///<param name="relativePath">The relative path on the server of the file.</param>
+		public void DeleteFile(Uri relativePath) {
+			var request = CreateRequest(relativePath);
+			request.Method = WebRequestMethods.Ftp.DeleteFile;
+			request.GetResponse().Close();
+		}
 	}
 }
