@@ -20,11 +20,10 @@ namespace ShomreiTorah.Common.Updates {
 	public class UpdateChecker {
 		#region Read ShomreiTorahConfig
 		static SymmetricAlgorithm CreateKD() {
-			//This originally encrypted blobs, and I don't want to change ShomreiTorahConfig.
-			var retVal = SymmetricAlgorithm.Create(Config.ReadAttribute("Updates", "Cryptography", "BlobDecryptor", "Algorithm"));
+			var retVal = SymmetricAlgorithm.Create(Config.ReadAttribute("Updates", "Cryptography", "FileDecryptor", "Algorithm"));
 
-			var key = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "BlobDecryptor", "Key").Value);
-			var iv = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "BlobDecryptor", "IV").Value);
+			var key = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "FileDecryptor", "Key").Value);
+			var iv = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "FileDecryptor", "IV").Value);
 
 			retVal.KeySize = key.Length * 8;
 			retVal.BlockSize = iv.Length * 8;
