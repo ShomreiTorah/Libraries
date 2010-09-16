@@ -62,13 +62,14 @@ namespace ShomreiTorah.WinForms.Forms {
 				set { MyInvoke(() => base.Caption = value); }
 			}
 
-			public new int Maximum {
+			//TODO: Scale longs to int ranges; maintain private actual values
+			public new long Maximum {
 				get { return base.Maximum; }
-				set { MyInvoke(() => base.Maximum = value); }
+				set { MyInvoke(() => base.Maximum = (int)value); }
 			}
-			public int Progress {
+			public long Progress {
 				get { return base.Value; }
-				set { MyInvoke(() => base.Value = value); }
+				set { MyInvoke(() => base.Value = (int)value); }
 			}
 			void MyInvoke(Action method) {
 				if (IsHandleCreated && InvokeRequired)

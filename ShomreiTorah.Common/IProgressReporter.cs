@@ -9,9 +9,9 @@ namespace ShomreiTorah.Common {
 		///<summary>Gets or sets the caption to display above the progress bar.</summary>
 		string Caption { get; set; }
 		///<summary>Gets or sets the current progress of the operation.</summary>
-		int Progress { get; set; }
+		long Progress { get; set; }
 		///<summary>Gets or sets the maximum progress of the operation.</summary>
-		int Maximum { get; set; }
+		long Maximum { get; set; }
 		///<summary>Gets whether the cancel button has been clicked.</summary>
 		bool WasCanceled { get; }
 		///<summary>Gets or sets whether the operation can be canceled.</summary>
@@ -25,9 +25,49 @@ namespace ShomreiTorah.Common {
 		public EmptyProgressReporter() { ((IProgressReporter)this).Maximum = -1; }
 
 		string IProgressReporter.Caption { get; set; }
-		int IProgressReporter.Progress { get; set; }
-		int IProgressReporter.Maximum { get; set; }
+		long IProgressReporter.Progress { get; set; }
+		long IProgressReporter.Maximum { get; set; }
 		bool IProgressReporter.WasCanceled { get { return false; } }
 		bool IProgressReporter.CanCancel { get; set; }
+	}
+	///<summary>Contains extension methods for progress reporters.</summary>
+	public static class ProgressReporterExtensions {
+		class NonScalingOperationReporter : IProgressReporter {
+			public NonScalingOperationReporter(IProgressReporter parent) {
+				this.parent = parent;
+				baseProgress = parent.Progress;
+			}
+
+			readonly IProgressReporter parent;
+			readonly long baseProgress;
+
+			public string Caption {
+				get { return parent.Caption; }
+				set { parent.Caption = value; }
+			}
+
+			public long Progress {
+				get { return parent.Progress - baseProgress; }
+				set { parent.Progress = value + baseProgress; }
+			}
+
+			public long Maximum { get; set; }	//The caller is expected to have set the parent reporter's maximum in advance.
+
+			public bool WasCanceled { get { return parent.WasCanceled; } }
+
+			public bool CanCancel {
+				get { return parent.CanCancel; }
+				set { parent.CanCancel = value; }
+			}
+		}
+
+
+		///<summary>Returns an IProgressReporter that adds progress to an existing reporter without affecting the maximum.</summary>
+		///<remarks>The new reporter will add its progress directly to the existing reporter without scaling for the maximum; the
+		///maximum of the original reporter is expected to equal the sum of the maximums of the child operations.</remarks>
+		public static IProgressReporter ChildOperation(this IProgressReporter reporter) {
+			if (reporter == null) return new EmptyProgressReporter();
+			return new NonScalingOperationReporter(reporter);
+		}
 	}
 }
