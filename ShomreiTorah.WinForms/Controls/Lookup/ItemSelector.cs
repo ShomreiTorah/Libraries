@@ -319,7 +319,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			dataSource = source; dataMember = member;
 
 			if (source == null) {
-				//TODO: Set state?
+				OwnerEdit.AllItems = new object[0];
 				return;
 			}
 
