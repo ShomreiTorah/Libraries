@@ -103,7 +103,15 @@ namespace ShomreiTorah.Common {
 		public void CreateDirectory(Uri relativePath) {
 			var request = CreateRequest(relativePath);
 			request.Method = WebRequestMethods.Ftp.MakeDirectory;
-			request.GetResponse().Close();
+			try {
+				request.GetResponse().Close();
+			} catch (WebException ex) {
+				var response = (FtpWebResponse)ex.Response;
+				if (response.StatusCode == FtpStatusCode.ActionNotTakenFileUnavailable)
+					return;	//Directory already exists
+				else
+					throw;
+			}
 		}
 		///<summary>Deletes an existing file on the server.</summary>
 		///<param name="relativePath">The relative path on the server of the file.</param>
