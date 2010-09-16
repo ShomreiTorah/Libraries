@@ -337,7 +337,14 @@ namespace ShomreiTorah.Common {
 		///<param name="to">The stream to copy to.  This stream must be writable.</param>
 		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
 		///<returns>The number of bytes copied.</returns>
-		public static long CopyTo(this Stream from, Stream to, IProgressReporter progress) {
+		public static long CopyTo(this Stream from, Stream to, IProgressReporter progress) { return from.CopyTo(to, -1, progress); }
+		///<summary>Copies one stream to another.</summary>
+		///<param name="from">The stream to copy from.  This stream must be readable.</param>
+		///<param name="to">The stream to copy to.  This stream must be writable.</param>
+		///<param name="length">The length of the source stream.  This parameter is only used to report progress.</param>
+		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
+		///<returns>The number of bytes copied.</returns>
+		public static long CopyTo(this Stream from, Stream to, long length, IProgressReporter progress) {
 			if (from == null) throw new ArgumentNullException("from");
 			if (to == null) throw new ArgumentNullException("to");
 
@@ -345,9 +352,16 @@ namespace ShomreiTorah.Common {
 			if (!to.CanWrite) throw new ArgumentException("Destination stream must be writable", "to");
 
 			if (progress != null) {
-				try {
-					progress.Maximum = from.Length > int.MaxValue ? -1 : (int)from.Length;
-				} catch (NotSupportedException) { progress.Maximum = -1; }
+				if (length < 0) {
+					try {
+						length = from.Length;
+					} catch (NotSupportedException) { progress.Maximum = -1; }
+				}
+
+				if (length >= 0)
+					progress.Maximum = length;
+				else
+					progress.Maximum = -1;
 			}
 			progress = progress ?? new EmptyProgressReporter();
 
