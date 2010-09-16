@@ -55,10 +55,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			ViewInfo.HoveredIndex = null;
 			ViewInfo.ScrollTop = 0;
 
-			var newHeight = Math.Min(NaturalHeight, Properties.UserPopupHeight);
-			if (ViewInfo.IsTopSizeBar)
-				Top += Height - newHeight;
-			Height = newHeight;
+			Bounds = ConstrainHeight(Bounds, Properties.UserPopupHeight);
 
 			LayoutChanged();		//This call recalculates the ViewInfo.
 		}
@@ -68,25 +65,41 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		int NaturalHeight { get { return Items.Count * ViewInfo.RowHeight + ViewInfo.VerticalFrameHeight; } }
 
 		///<summary>Gets the bounds of the form as the user resizes it.</summary>
-		///<remarks>The base class sets this property as the user drags.</remarks>
+		///<remarks>The base class sets this property as the user drags</remarks>
 		protected override Rectangle SizingBounds {
 			get { return base.SizingBounds; }
 			set {
-				if (value.Height > NaturalHeight) {
-					if (ViewInfo.IsTopSizeBar)
-						value.Y += value.Height - NaturalHeight;
-					value.Height = NaturalHeight;
-				} else if (NaturalHeight > Properties.UserPopupHeight)
+				//If there are enough items that the user's preferred
+				//height isn't being overridden, update it.  If there
+				//are too few items, resizes are not persisted, since
+				//they are subject to the limiy.
+				if (value.Height < NaturalHeight && NaturalHeight > Properties.UserPopupHeight)
 					Properties.UserPopupHeight = value.Height;
 
-				base.SizingBounds = value;
+				base.SizingBounds = ConstrainHeight(value);
 			}
 		}
 		protected override Size MinFormSize { get { return new Size(OwnerEdit.Width, ViewInfo.VerticalFrameHeight + ViewInfo.RowHeight); } }
 
 		///<summary>Gets the popup's initial size.</summary>
 		protected override Size CalcFormSizeCore() {
-			return new Size(OwnerEdit.Width, Math.Min(NaturalHeight, Properties.UserPopupHeight));
+			var baseSize = base.CalcFormSizeCore();	//Read user-set width; the minimum will be applied by MinFormSize
+			return new Size(baseSize.Width, Math.Min(NaturalHeight, Properties.UserPopupHeight));
+		}
+
+		///<summary>Constrains the height of a rectangle to ensure that it is not taller than necessary to display all of the results.</summary>
+		Rectangle ConstrainHeight(Rectangle rect, int? heightOverride = null) {
+			var naturalHeight = NaturalHeight;
+			var desiredHeight = heightOverride ?? rect.Height;
+
+			if (desiredHeight > naturalHeight) {
+				if (ViewInfo.IsTopSizeBar)	//If the popup is above the editor, adjust the Y coordinate to preserve the bottom
+					rect.Y += desiredHeight - naturalHeight;
+				rect.Height = naturalHeight;
+			} else
+				rect.Height = desiredHeight;
+
+			return rect;
 		}
 		#endregion
 
