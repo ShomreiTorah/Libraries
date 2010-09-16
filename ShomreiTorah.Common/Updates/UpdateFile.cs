@@ -127,6 +127,8 @@ namespace ShomreiTorah.Common.Updates {
 			var filePath = Path.Combine(basePath, RelativePath);
 			if (File.Exists(filePath)) throw new InvalidOperationException(filePath + " already exists");
 
+			Directory.CreateDirectory(Path.GetDirectoryName(filePath));	//Won't throw
+
 			ui = ui ?? new EmptyProgressReporter();
 
 			long actualSize;
