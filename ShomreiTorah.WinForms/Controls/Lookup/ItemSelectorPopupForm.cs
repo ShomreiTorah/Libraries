@@ -713,19 +713,36 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.DrawContent(info);
 
 			var vi = (ItemSelectorPopupFormViewInfo)info.ViewInfo;
-			if (vi.Form.Properties.ShowColumnHeaders)
-				DrawColumnHeaders(info);
 
+			if (vi.Form.Items.Count == 0) {
+				DrawNoResults(info);
+			} else {
+				if (vi.Form.Properties.ShowColumnHeaders)
+					DrawColumnHeaders(info);
 
-			if (vi.Form.Properties.AllowResize)
-				DrawInnerBorders(info);
-			using (info.Cache.ClipInfo.SaveAndSetClip(vi.RowsArea)) {
-				DrawHoverBackground(info);
+				if (vi.Form.Properties.AllowResize)
+					DrawInnerBorders(info);
+				using (info.Cache.ClipInfo.SaveAndSetClip(vi.RowsArea)) {
+					DrawHoverBackground(info);
 
-				if (vi.Form.Properties.ShowVerticalLines)
-					DrawVertLines(info);
-				DrawRows(info);
+					if (vi.Form.Properties.ShowVerticalLines)
+						DrawVertLines(info);
+					DrawRows(info);
+				}
 			}
+		}
+
+		static readonly StringFormat messageFormat = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+		static void DrawNoResults(PopupFormGraphicsInfoArgs args) {
+			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
+
+			string message;
+			if (info.Form.OwnerEdit.AllItems.Count == 0)
+				message = "The list is empty";
+			else
+				message = "Your search has no results";
+
+			info.AppearanceResults.DrawString(args.Cache, message, info.ContentRect, messageFormat);
 		}
 
 		static void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
