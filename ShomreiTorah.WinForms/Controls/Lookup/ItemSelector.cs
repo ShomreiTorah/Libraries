@@ -388,24 +388,29 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public ItemSelectorViewInfo(RepositoryItem item) : base(item) { }
 		public new RepositoryItemItemSelector Item { get { return (RepositoryItemItemSelector)base.Item; } }
 
-		public Rectangle IconBounds { get; private set; }
+		///<summary>Gets the icon to draw in the editor area, if any.</summary>
+		public Image Image { get; private set; }
+		///<summary>Gets the bounds of the icon to draw in the editor area.</summary>
+		public Rectangle ImageBounds { get; private set; }
 
 		protected override void CalcContentRect(Rectangle bounds) {
 			base.CalcContentRect(bounds);
 
-			if (OwnerEdit.EditValue == null || Item.SelectionIcon == null)
-				IconBounds = new Rectangle(ContentRect.Location, Size.Empty);
-			else {
+			if (OwnerEdit.EditValue == null || Item.SelectionIcon == null) {
+				Image = null;
+				ImageBounds = new Rectangle(ContentRect.Location, Size.Empty);
+			} else {
+				Image = Item.SelectionIcon;
 				//TODO: Scale image to fit editor?
 				const int ImageHeight = 16;
-				IconBounds = new Rectangle(
+				ImageBounds = new Rectangle(
 					ContentRect.X,
 					ClientRect.Y + (ClientRect.Height - ImageHeight) / 2 - 1,
-					Item.SelectionIcon.Width * (Item.SelectionIcon.Height / ImageHeight),
+					Image.Width * (Image.Height / ImageHeight),
 					ImageHeight
 				);
-				fMaskBoxRect.X += IconBounds.Width + 2;
-				fMaskBoxRect.Width -= IconBounds.Width + 2;
+				fMaskBoxRect.X += ImageBounds.Width + 2;
+				fMaskBoxRect.Width -= ImageBounds.Width + 2;
 			}
 		}
 	}
@@ -420,13 +425,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public override void Draw(ControlGraphicsInfoArgs info) {
 			base.Draw(info);
 			var vi = (ItemSelectorViewInfo)info.ViewInfo;
-			if (!vi.IconBounds.Size.IsEmpty)
+			if (vi.Image != null)
 				DrawIcon(info);
 		}
 		static void DrawIcon(ControlGraphicsInfoArgs args) {
 			var info = (ItemSelectorViewInfo)args.ViewInfo;
 
-			args.Graphics.DrawImage(info.Item.SelectionIcon, info.IconBounds);
+			args.Graphics.DrawImage(info.Image, info.ImageBounds);
 		}
 	}
 
