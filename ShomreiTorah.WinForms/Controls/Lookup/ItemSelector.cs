@@ -19,7 +19,7 @@ using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraEditors.ViewInfo;
 using ShomreiTorah.Common;
 
-#pragma warning disable 1591
+#pragma warning disable 1591  //XML doc comments
 namespace ShomreiTorah.WinForms.Controls.Lookup {
 	///<summary>A control that allows the user to select an item from a list.</summary>
 	[DefaultEvent("ItemSelected")]
@@ -217,9 +217,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		///<summary>Gets or sets the popup form's desired height, as set by the user.</summary>
 		internal int UserPopupHeight { get; set; }
-		//    get { return PopupFormSize.Height; }
-		//    set { PopupFormSize = new Size(PopupFormSize.Width, value); }
-		//}
 
 		#region Appearances
 		protected override void DestroyAppearances() {
@@ -245,6 +242,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public AppearanceObject AppearanceColumnHeader { get; private set; }
 		#endregion
 
+		#region Basic Properties
 		///<summary>Gets the columns displayed in the results grid.</summary>
 		[Description("Gets the columns displayed in the results grid.")]
 		[Category("Data")]
@@ -289,6 +287,32 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			get { return base.NullValuePrompt; }
 			set { base.NullValuePrompt = value; }
 		}
+		#endregion
+		#region Suppressed Properties
+		///<summary>This property is irrelevant for this control.</summary>
+		[Browsable(false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public override DevExpress.XtraEditors.Mask.MaskProperties Mask {
+			get { return base.Mask; }
+		}
+		///<summary>This property is irrelevant for this control.</summary>
+		[Browsable(false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public override EditValueChangedFiringMode EditValueChangedFiringMode {
+			get { return EditValueChangedFiringMode.Default; }
+			set { }
+		}
+		///<summary>This property is irrelevant for this control.</summary>
+		[Browsable(false)]
+		[EditorBrowsable(EditorBrowsableState.Never)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public override TextEditStyles TextEditStyle {
+			get { return TextEditStyles.Standard; }
+			set { }
+		}
+		#endregion
 
 		#region DataSource
 		///<summary>Gets or sets the name of the list or table in the data source to display data in.</summary>
@@ -329,31 +353,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			OwnerEdit.AllItems = (IList)ListBindingHelper.GetList(DataSource, DataMember);
 		}
 		#endregion
-		#region Suppressed Properties
-		///<summary>This property is irrelevant for this control.</summary>
-		[Browsable(false)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override DevExpress.XtraEditors.Mask.MaskProperties Mask {
-			get { return base.Mask; }
-		}
-		///<summary>This property is irrelevant for this control.</summary>
-		[Browsable(false)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override EditValueChangedFiringMode EditValueChangedFiringMode {
-			get { return EditValueChangedFiringMode.Default; }
-			set { }
-		}
-		///<summary>This property is irrelevant for this control.</summary>
-		[Browsable(false)]
-		[EditorBrowsable(EditorBrowsableState.Never)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public override TextEditStyles TextEditStyle {
-			get { return TextEditStyles.Standard; }
-			set { }
-		}
-		#endregion
 
 		#region Events
 		///<summary>Raises the ItemSelecting event.</summary>
@@ -375,6 +374,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 	}
+
 	///<summary>Provides data for ItemSelecting events.</summary>
 	public class ItemSelectingEventArgs : CancelEventArgs {
 		///<summary>Creates a new ItemSelectingEventArgs instance.</summary>
