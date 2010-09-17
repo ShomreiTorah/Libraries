@@ -166,8 +166,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 					"ItemSelector",
 					typeof(ItemSelector),
 					typeof(RepositoryItemItemSelector),
-					typeof(PopupBaseEditViewInfo),		//TODO: ViewInfo
-					new ButtonEditPainter(),			//TODO: Painter
+					typeof(ItemSelectorViewInfo),
+					new ItemSelectorPainter(),
 					true, EditImageIndexes.ButtonEdit,	//TODO: Icon
 					typeof(PopupEditAccessible)
 				)
@@ -186,6 +186,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		bool showColumnHeaders = true;
 		bool showVerticalLines = true;
 		bool allowResize = true;
+		Image selectionIcon;
 
 		///<summary>Creates a new RepositoryItemItemSelector.</summary>
 		public RepositoryItemItemSelector() {
@@ -205,6 +206,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Columns.Clear();
 			Columns.AddRange(source.Columns.Select(c => c.Copy()));	//The InsertItem overload will set the source.
 
+			SelectionIcon = source.SelectionIcon;
 			UserPopupHeight = source.UserPopupHeight;
 			AllowResize = source.AllowResize;
 			ShowColumnHeaders = source.ShowColumnHeaders;
@@ -286,6 +288,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public override string NullValuePrompt {
 			get { return base.NullValuePrompt; }
 			set { base.NullValuePrompt = value; }
+		}
+		///<summary>Gets or sets the icon displayed in the editor when an item is selected.</summary>
+		[Description("Gets or sets the icon displayed in the editor when an item is selected.")]
+		[Category("Appearance")]
+		[DefaultValue(null)]
+		public Image SelectionIcon {
+			get { return selectionIcon; }
+			set { selectionIcon = value; }
 		}
 		#endregion
 		#region Suppressed Properties
@@ -373,6 +383,51 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				ItemSelecting(GetEventSender(), e);
 		}
 		#endregion
+	}
+	class ItemSelectorViewInfo : PopupBaseEditViewInfo {
+		public ItemSelectorViewInfo(RepositoryItem item) : base(item) { }
+		public new RepositoryItemItemSelector Item { get { return (RepositoryItemItemSelector)base.Item; } }
+
+		public Rectangle IconBounds { get; private set; }
+
+		protected override void CalcContentRect(Rectangle bounds) {
+			base.CalcContentRect(bounds);
+
+			if (OwnerEdit.EditValue == null || Item.SelectionIcon == null)
+				IconBounds = new Rectangle(ContentRect.Location, Size.Empty);
+			else {
+				//TODO: Scale image to fit editor?
+				const int ImageHeight = 16;
+				IconBounds = new Rectangle(
+					ContentRect.X,
+					ClientRect.Y + (ClientRect.Height - ImageHeight) / 2 - 1,
+					Item.SelectionIcon.Width * (Item.SelectionIcon.Height / ImageHeight),
+					ImageHeight
+				);
+				fMaskBoxRect.X += IconBounds.Width + 2;
+				fMaskBoxRect.Width -= IconBounds.Width + 2;
+			}
+		}
+	}
+	class ItemSelectorPainter : ButtonEditPainter {
+		protected override void DrawTextBoxArea(ControlGraphicsInfoArgs info) {
+			base.DrawTextBoxArea(info);
+
+		}
+		protected override void DrawContent(ControlGraphicsInfoArgs info) {
+			base.DrawContent(info);
+		}
+		public override void Draw(ControlGraphicsInfoArgs info) {
+			base.Draw(info);
+			var vi = (ItemSelectorViewInfo)info.ViewInfo;
+			if (!vi.IconBounds.Size.IsEmpty)
+				DrawIcon(info);
+		}
+		static void DrawIcon(ControlGraphicsInfoArgs args) {
+			var info = (ItemSelectorViewInfo)args.ViewInfo;
+
+			args.Graphics.DrawImage(info.Item.SelectionIcon, info.IconBounds);
+		}
 	}
 
 	///<summary>Provides data for ItemSelecting events.</summary>
