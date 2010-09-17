@@ -533,8 +533,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public int ScrollTop {
 			get { return Form.ScrollBar.Visible ? Form.ScrollBar.Value : 0; }
 			set {
-				if (ScrollTop == value) return;
-				if (!Form.ScrollBar.Visible) throw new InvalidOperationException("Scrollbar is hidden");
+				if (ScrollTop == value) return;	//The scroll timer can tick after hiding the form
+				if (!Form.ScrollBar.Visible && Form.Visible) throw new InvalidOperationException("Scrollbar is hidden");
 				Form.ScrollBar.Value = value;
 			}
 		}
