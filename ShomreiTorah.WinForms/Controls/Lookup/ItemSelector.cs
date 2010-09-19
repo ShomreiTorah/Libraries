@@ -5,10 +5,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using DevExpress.Accessibility;
+using DevExpress.Skins;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
@@ -67,26 +69,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			RunFilter(force: true);
 			base.DoShowPopup();
 		}
-		protected override void OnPopupClosed(PopupCloseMode closeMode) {
-			UpdateDisplayText();	//Clear the filter text
-			base.OnPopupClosed(closeMode);
-		}
-		protected override void OnMouseWheel(MouseEventArgs e) {
-			DXMouseEventArgs ee = DXMouseEventArgs.GetMouseArgs(e);
-			try {
-				base.OnMouseWheel(ee);
-				if (ee.Handled) return;
 
-				if (IsPopupOpen)
-					PopupForm.OnEditorMouseWheel(ee);
-			} finally { ee.Sync(); }
-		}
+		protected override void AcceptPopupValue(object val) {
+			if (val != null)
+				base.AcceptPopupValue(val);
 
-		protected override void SetEmptyEditValue(object emptyEditValue) {
-			base.SetEmptyEditValue(emptyEditValue);
-			//TODO: Draw selected item.  (ViewInfo / Painter?)
+			//TODO: Enter fake non-focused state
+			//Parent.SelectNextControl(this, true, true, true, true);
 		}
-
 		internal IList AllItems { get; set; }
 
 		#region Filter
@@ -139,6 +129,16 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 
+		protected override void OnMouseWheel(MouseEventArgs e) {
+			DXMouseEventArgs ee = DXMouseEventArgs.GetMouseArgs(e);
+			try {
+				base.OnMouseWheel(ee);
+				if (ee.Handled) return;
+
+				if (IsPopupOpen)
+					PopupForm.OnEditorMouseWheel(ee);
+			} finally { ee.Sync(); }
+		}
 		protected override void OnMaskBox_ValueChanged(object sender, EventArgs e) {
 			//Suppress EditValue changes
 			//base.OnMaskBox_ValueChanged(sender, e);
@@ -385,20 +385,34 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#endregion
 	}
 	class ItemSelectorViewInfo : PopupBaseEditViewInfo {
-		public ItemSelectorViewInfo(RepositoryItem item) : base(item) { }
 		public new RepositoryItemItemSelector Item { get { return (RepositoryItemItemSelector)base.Item; } }
+		public ItemSelectorViewInfo(RepositoryItem item)
+			: base(item) {
+		}
 
 		///<summary>Gets the icon to draw in the editor area, if any.</summary>
 		public Image Image { get; private set; }
 		///<summary>Gets the bounds of the icon to draw in the editor area.</summary>
 		public Rectangle ImageBounds { get; private set; }
 
+		///<summary>Indicates whether the editor should display the selected item or a normal textbox.</summary>
+		public bool DrawSelectedItem { get; private set; }
+		///<summary>Gets the SkinElement used to draw the selected item in the editor.</summary>
+		public SkinElement SelectionBackgroundElement { get; private set; }
+		///<summary>Gets the rectangle in which to draw the selected item.</summary>
+		public Rectangle SelectionBounds { get; private set; }
+
+		public string SelectionCaption { get; private set; }
+
 		protected override void CalcContentRect(Rectangle bounds) {
 			base.CalcContentRect(bounds);
+
+			SelectionBackgroundElement = CommonSkins.GetSkin(LookAndFeel)[CommonSkins.SkinLayoutItemBackground];
 
 			if (OwnerEdit.EditValue == null || Item.SelectionIcon == null) {
 				Image = null;
 				ImageBounds = new Rectangle(ContentRect.Location, Size.Empty);
+				DrawSelectedItem = false;
 			} else {
 				Image = Item.SelectionIcon;
 				//TODO: Scale image to fit editor?
@@ -412,26 +426,57 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				fMaskBoxRect.X += ImageBounds.Width + 2;
 				fMaskBoxRect.Width -= ImageBounds.Width + 2;
 			}
+
+			if (OwnerEdit.EditValue != null) {
+				DrawSelectedItem = true;
+				SelectionBounds = Rectangle.Inflate(base.MaskBoxRect, 0, 1);
+				SelectionCaption = OwnerEdit.EditValue.ToString();
+				fMaskBoxRect = Rectangle.Empty;
+			}
 		}
 	}
 	class ItemSelectorPainter : ButtonEditPainter {
 		protected override void DrawTextBoxArea(ControlGraphicsInfoArgs info) {
-			base.DrawTextBoxArea(info);
+			var vi = (ItemSelectorViewInfo)info.ViewInfo;
 
-		}
-		protected override void DrawContent(ControlGraphicsInfoArgs info) {
-			base.DrawContent(info);
+			vi.PaintAppearance.FillRectangle(info.Cache, vi.ContentRect);
+
+			if (!vi.DrawSelectedItem)
+				base.DrawTextBoxArea(info);
+
 		}
 		public override void Draw(ControlGraphicsInfoArgs info) {
 			base.Draw(info);
 			var vi = (ItemSelectorViewInfo)info.ViewInfo;
 			if (vi.Image != null)
 				DrawIcon(info);
+			if (vi.DrawSelectedItem)
+				DrawSelection(info);
 		}
 		static void DrawIcon(ControlGraphicsInfoArgs args) {
 			var info = (ItemSelectorViewInfo)args.ViewInfo;
 
 			args.Graphics.DrawImage(info.Image, info.ImageBounds);
+		}
+
+		static readonly StringFormat captionFormat = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter };
+		static void DrawSelection(ControlGraphicsInfoArgs args) {
+			var info = (ItemSelectorViewInfo)args.ViewInfo;
+
+
+			var selectionInfo = new SkinElementInfo(info.SelectionBackgroundElement, info.SelectionBounds) {
+				ImageIndex = 1,
+				Cache = args.Cache
+			};
+
+			SkinElementPainter.Default.DrawObject(selectionInfo);
+			args.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+			args.Graphics.DrawString(
+				info.SelectionCaption,
+				args.Cache.GetFont(SystemFonts.DefaultFont, FontStyle.Bold),
+				args.Cache.GetSolidBrush(info.PaintAppearance.ForeColor),
+				Rectangle.Inflate(info.SelectionBounds, -1, 0),
+				captionFormat);
 		}
 	}
 
