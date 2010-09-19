@@ -65,17 +65,18 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		protected override void DoShowPopup() {
+			//Clear the filter textbox without
+			//affecting the editor's EditValue
 			MaskBox.SetEditValue("", "", true);
 			RunFilter(force: true);
 			base.DoShowPopup();
 		}
 
 		protected override void AcceptPopupValue(object val) {
+			//DevExpress will occasionally close the popup
+			//and accept a null value.  I don't want that.
 			if (val != null)
 				base.AcceptPopupValue(val);
-
-			//TODO: Enter fake non-focused state
-			//Parent.SelectNextControl(this, true, true, true, true);
 		}
 		internal IList AllItems { get; set; }
 
@@ -427,11 +428,18 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				fMaskBoxRect.Width -= ImageBounds.Width + 2;
 			}
 
-			if (OwnerEdit.EditValue != null) {
+			//If an item is selected and the user is not in the middle
+			//of selecting another one, draw the selected item instead
+			//of the MaskBox.  Instead of hiding the maskbox, I shrink
+			//to not occupy any space, while leaving it focused.  This
+			//allows the user to start typing to re-show the popup.
+			if (OwnerEdit.EditValue != null && !OwnerEdit.IsPopupOpen) {
 				DrawSelectedItem = true;
 				SelectionBounds = Rectangle.Inflate(base.MaskBoxRect, 0, 1);
 				SelectionCaption = OwnerEdit.EditValue.ToString();
 				fMaskBoxRect = Rectangle.Empty;
+			} else {
+				DrawSelectedItem = false;
 			}
 		}
 	}
@@ -439,30 +447,33 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override void DrawTextBoxArea(ControlGraphicsInfoArgs info) {
 			var vi = (ItemSelectorViewInfo)info.ViewInfo;
 
-			vi.PaintAppearance.FillRectangle(info.Cache, vi.ContentRect);
-
-			if (!vi.DrawSelectedItem)
+			if (vi.DrawSelectedItem)
+				vi.PaintAppearance.FillRectangle(info.Cache, vi.ContentRect);	//The native painter won't paint any background, since it expects the MaskBox to be there
+			else
 				base.DrawTextBoxArea(info);
-
 		}
 		public override void Draw(ControlGraphicsInfoArgs info) {
 			base.Draw(info);
+			//I need to draw after the base draws everything, since I overlap some of the padding, which it fills with background.
 			var vi = (ItemSelectorViewInfo)info.ViewInfo;
+
 			if (vi.Image != null)
 				DrawIcon(info);
+
 			if (vi.DrawSelectedItem)
 				DrawSelection(info);
 		}
+
 		static void DrawIcon(ControlGraphicsInfoArgs args) {
 			var info = (ItemSelectorViewInfo)args.ViewInfo;
 
 			args.Graphics.DrawImage(info.Image, info.ImageBounds);
 		}
 
+		//TODO: Draw real content
 		static readonly StringFormat captionFormat = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter };
 		static void DrawSelection(ControlGraphicsInfoArgs args) {
 			var info = (ItemSelectorViewInfo)args.ViewInfo;
-
 
 			var selectionInfo = new SkinElementInfo(info.SelectionBackgroundElement, info.SelectionBounds) {
 				ImageIndex = 1,
@@ -476,7 +487,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				args.Cache.GetFont(SystemFonts.DefaultFont, FontStyle.Bold),
 				args.Cache.GetSolidBrush(info.PaintAppearance.ForeColor),
 				Rectangle.Inflate(info.SelectionBounds, -1, 0),
-				captionFormat);
+				captionFormat
+			);
 		}
 	}
 
