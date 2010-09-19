@@ -558,7 +558,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		private void CalcRowHeight() {
 			GInfo.AddGraphics(null);
 			try {
-				rowHeight = AppearanceMatch.CalcTextSize(GInfo.Graphics, "Wg", 0).ToSize().Height + HoverElement.ContentMargins.Height;
+				rowHeight = Form.ScrollBar.SmallChange = AppearanceMatch.CalcTextSize(GInfo.Graphics, "Wg", 0).ToSize().Height + HoverElement.ContentMargins.Height;
 			} finally { GInfo.ReleaseGraphics(); }
 		}
 
