@@ -24,7 +24,6 @@ using ShomreiTorah.Common;
 #pragma warning disable 1591  //XML doc comments
 namespace ShomreiTorah.WinForms.Controls.Lookup {
 	///<summary>A control that allows the user to select an item from a list.</summary>
-	[DefaultEvent("ItemSelected")]
 	[Description("A control that allows the user to select an item from a list.")]
 	[ComplexBindingProperties("DataSource", "DataMember")]
 	public class ItemSelector : PopupBaseEdit {
@@ -180,6 +179,29 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
 		#endregion
 
+		class InvalidatingColumnCollection : ItemSelectorColumnCollection {
+			public InvalidatingColumnCollection(RepositoryItemItemSelector owner) : base(owner) { }
+
+			void Invalidate() { Owner.OnPropertiesChanged(); }
+
+			protected override void ClearItems() {
+				base.ClearItems();
+				Invalidate();
+			}
+			protected override void InsertItem(int index, ResultColumn item) {
+				base.InsertItem(index, item);
+				Invalidate();
+			}
+			protected override void RemoveItem(int index) {
+				base.RemoveItem(index);
+				Invalidate();
+			}
+			protected override void SetItem(int index, ResultColumn item) {
+				base.SetItem(index, item);
+				Invalidate();
+			}
+		}
+
 		const string DefaultNullValuePrompt = "Click here to select an item, or type to search";
 
 		object dataSource;
@@ -189,9 +211,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		bool allowResize = true;
 		Image selectionIcon;
 
+		ResultColumn resultDisplayColumn;
+
 		///<summary>Creates a new RepositoryItemItemSelector.</summary>
 		public RepositoryItemItemSelector() {
 			Columns = new ItemSelectorColumnCollection(this);
+			AdditionalResultColumns = new InvalidatingColumnCollection(this);
 
 			AppearanceColumnHeader = CreateAppearance("ColumnHeader");
 			AppearanceMatch = CreateAppearance("Match");
@@ -206,6 +231,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			Columns.Clear();
 			Columns.AddRange(source.Columns.Select(c => c.Copy()));	//The InsertItem overload will set the source.
+
+			ResultDisplayColumn = source.ResultDisplayColumn.Copy();
+			AdditionalResultColumns.AddRange(source.AdditionalResultColumns.Select(c => c.Copy()));
 
 			SelectionIcon = source.SelectionIcon;
 			UserPopupHeight = source.UserPopupHeight;
@@ -296,8 +324,21 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		[DefaultValue(null)]
 		public Image SelectionIcon {
 			get { return selectionIcon; }
-			set { selectionIcon = value; }
+			set { selectionIcon = value; OnPropertiesChanged(); }
 		}
+
+		///<summary>Gets or sets the column to display in the editor when a value is selected.</summary>
+		[Description("Gets or sets the column to display in the editor when a value is selected.")]
+		[Category("Data")]
+		public ResultColumn ResultDisplayColumn {
+			get { return resultDisplayColumn; }
+			set { resultDisplayColumn = value; value.SetOwner(this); OnPropertiesChanged(); }
+		}
+		///<summary>Gets columns that display additional information about the selected item.</summary>
+		[Description("Gets columns that display additional information about the selected item.")]
+		[Category("Data")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		public ItemSelectorColumnCollection AdditionalResultColumns { get; private set; }
 		#endregion
 		#region Suppressed Properties
 		///<summary>This property is irrelevant for this control.</summary>
@@ -385,25 +426,56 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 	}
-	class ItemSelectorViewInfo : PopupBaseEditViewInfo {
+	sealed class ItemSelectorViewInfo : PopupBaseEditViewInfo {
 		public new RepositoryItemItemSelector Item { get { return (RepositoryItemItemSelector)base.Item; } }
 		public ItemSelectorViewInfo(RepositoryItem item)
 			: base(item) {
+			CreateAppearances();
 		}
 
-		///<summary>Gets the icon to draw in the editor area, if any.</summary>
-		public Image Image { get; private set; }
-		///<summary>Gets the bounds of the icon to draw in the editor area.</summary>
-		public Rectangle ImageBounds { get; private set; }
+		#region Appearances
+		///<summary>Gets the appearance used to paint the result value.</summary>
+		public AppearanceObject AppearanceResult { get; private set; }
+		///<summary>Gets the appearance used to paint additional columns of the result value.</summary>
+		public AppearanceObject AppearanceResultInfo { get; private set; }
+
+		///<summary>Creates appearance objects used by the editor.</summary>
+		///<remarks>Any properties that will never change (such as alignment) should be set here.</remarks>
+		void CreateAppearances() {
+			AppearanceResult = new AppearanceObject {
+				Font = new Font(Appearance.GetFont(), FontStyle.Bold)
+			};
+			AppearanceResult.TextOptions.VAlignment = VertAlignment.Center;
+
+			AppearanceResultInfo = new AppearanceObject();
+			AppearanceResultInfo.TextOptions.VAlignment = VertAlignment.Center;
+			AppearanceResultInfo.TextOptions.Trimming = Trimming.EllipsisCharacter;
+		}
+
+		public override void UpdatePaintAppearance() {
+			base.UpdatePaintAppearance();
+
+			//Update skin-dependant properties here.
+			AppearanceResult.ForeColor = OwnerEdit.ForeColor;
+			AppearanceResultInfo.ForeColor = base.NullValuePromptForeColor;
+		}
+		#endregion
 
 		///<summary>Indicates whether the editor should display the selected item or a normal textbox.</summary>
 		public bool DrawSelectedItem { get; private set; }
+		///<summary>Gets the icon to draw in the editor area, if any.</summary>
+		public Image Image { get; private set; }
+		///<summary>Gets the result value to display in the editor.</summary>
+		public string ResultCaption { get; private set; }
+		///<summary>Gets additional information about the result value.</summary>
+		public ReadOnlyCollection<string> AdditionalCaptions { get; private set; }
+
 		///<summary>Gets the SkinElement used to draw the selected item in the editor.</summary>
 		public SkinElement SelectionBackgroundElement { get; private set; }
+		///<summary>Gets the bounds of the icon to draw in the editor area.</summary>
+		public Rectangle ImageBounds { get; private set; }
 		///<summary>Gets the rectangle in which to draw the selected item.</summary>
 		public Rectangle SelectionBounds { get; private set; }
-
-		public string SelectionCaption { get; private set; }
 
 		protected override void CalcContentRect(Rectangle bounds) {
 			base.CalcContentRect(bounds);
@@ -436,8 +508,13 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (OwnerEdit.EditValue != null && !OwnerEdit.IsPopupOpen) {
 				DrawSelectedItem = true;
 				SelectionBounds = Rectangle.Inflate(base.MaskBoxRect, 0, 1);
-				SelectionCaption = OwnerEdit.EditValue.ToString();
 				fMaskBoxRect = Rectangle.Empty;
+
+				if (Item.ResultDisplayColumn == null)
+					ResultCaption = OwnerEdit.EditValue.ToString();
+				else
+					ResultCaption = Item.ResultDisplayColumn.GetValue(OwnerEdit.EditValue);
+				AdditionalCaptions = Item.AdditionalResultColumns.Select(c => c.GetValue(OwnerEdit.EditValue)).ReadOnlyCopy();
 			} else {
 				DrawSelectedItem = false;
 			}
@@ -448,7 +525,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var vi = (ItemSelectorViewInfo)info.ViewInfo;
 
 			if (vi.DrawSelectedItem)
-				vi.PaintAppearance.FillRectangle(info.Cache, vi.ContentRect);	//The native painter won't paint any background, since it expects the MaskBox to be there
+				vi.PaintAppearance.FillRectangle(info.Cache, vi.ContentRect);	//The native painter won't paint any background in the middle, since it expects the MaskBox to be there
 			else
 				base.DrawTextBoxArea(info);
 		}
@@ -470,8 +547,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			args.Graphics.DrawImage(info.Image, info.ImageBounds);
 		}
 
-		//TODO: Draw real content
-		static readonly StringFormat captionFormat = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Center, Trimming = StringTrimming.EllipsisCharacter };
 		static void DrawSelection(ControlGraphicsInfoArgs args) {
 			var info = (ItemSelectorViewInfo)args.ViewInfo;
 
@@ -482,13 +557,23 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			SkinElementPainter.Default.DrawObject(selectionInfo);
 			args.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-			args.Graphics.DrawString(
-				info.SelectionCaption,
-				args.Cache.GetFont(SystemFonts.DefaultFont, FontStyle.Bold),
-				args.Cache.GetSolidBrush(info.PaintAppearance.ForeColor),
-				Rectangle.Inflate(info.SelectionBounds, -1, 0),
-				captionFormat
-			);
+
+			Rectangle textArea = Rectangle.Inflate(info.SelectionBounds, -2, 0);
+
+			info.AppearanceResult.DrawString(args.Cache, info.ResultCaption, textArea);
+
+			var textWidth = 8 + (int)Math.Ceiling(info.AppearanceResult.CalcTextSize(args.Cache, info.ResultCaption, textArea.Width).Width);
+			textArea.Width -= textWidth;
+			textArea.X += textWidth;
+
+			foreach (var caption in info.AdditionalCaptions) {
+				info.AppearanceResultInfo.DrawString(args.Cache, caption, textArea);
+
+				textWidth = 4 + (int)Math.Ceiling(info.AppearanceResultInfo.CalcTextSize(args.Cache, caption, textArea.Width).Width);
+				if (textWidth > textArea.Width) break;
+				textArea.Width -= textWidth;
+				textArea.X += textWidth;
+			}
 		}
 	}
 
@@ -502,7 +587,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 	}
 
 	///<summary>Contains the columns in an ItemSelector.</summary>
-	public sealed class ItemSelectorColumnCollection : Collection<ResultColumn> {
+	public class ItemSelectorColumnCollection : Collection<ResultColumn> {
 		internal ItemSelectorColumnCollection(RepositoryItemItemSelector owner) {
 			Owner = owner;
 		}
