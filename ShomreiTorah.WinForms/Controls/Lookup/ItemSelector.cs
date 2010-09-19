@@ -63,20 +63,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			return new ItemSelectorPopupForm(this);
 		}
 
-		protected override void DoShowPopup() {
-			//Clear the filter textbox without
-			//affecting the editor's EditValue
-			MaskBox.SetEditValue("", "", true);
-			RunFilter(force: true);
-			base.DoShowPopup();
-		}
-
-		protected override void AcceptPopupValue(object val) {
-			//DevExpress will occasionally close the popup
-			//and accept a null value.  I don't want that.
-			if (val != null)
-				base.AcceptPopupValue(val);
-		}
 		internal IList AllItems { get; set; }
 
 		#region Filter
@@ -139,6 +125,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 					PopupForm.OnEditorMouseWheel(ee);
 			} finally { ee.Sync(); }
 		}
+
 		protected override void OnMaskBox_ValueChanged(object sender, EventArgs e) {
 			//Suppress EditValue changes
 			//base.OnMaskBox_ValueChanged(sender, e);
@@ -147,9 +134,27 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//Suppress EditValue changes
 			//base.OnMaskBox_ValueChanging(sender, e);
 		}
+		protected override void OnMouseDownClosePopup() {
+			//Don't close the popup
+			//base.OnMouseDownClosePopup();
+		}
 		protected override void OnMaskBox_Click(object sender, EventArgs e) {
 			base.OnMaskBox_Click(sender, e);
 			ShowPopup();
+		}
+		protected override void DoShowPopup() {
+			//Clear the filter textbox without
+			//affecting the editor's EditValue
+			MaskBox.SetEditValue("", "", true);
+			RunFilter(force: true);
+			base.DoShowPopup();
+		}
+
+		protected override void AcceptPopupValue(object val) {
+			//DevExpress will occasionally close the popup
+			//and accept a null value.  I don't want that.
+			if (val != null)
+				base.AcceptPopupValue(val);
 		}
 	}
 
