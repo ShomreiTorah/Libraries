@@ -538,7 +538,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<remarks>This property includes columns which are not displayed because the popup is too narrow.</remarks>
 		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
 		///<summary>Gets the rows displayed in the results grid.</summary>
-		public IList Rows { get; private set; }
+		public IList Rows { get { return Form.Items; } }
 
 		#region Layout
 		///<summary>Gets the Y coordinate of the top of the viewport.</summary>
