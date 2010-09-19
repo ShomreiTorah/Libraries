@@ -528,6 +528,18 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#endregion
 		#endregion
 
+		///<summary>Gets a message to display instead of the results area, or null to display the normal results grid.</summary>
+		public string Message { get; private set; }
+		///<summary>Indicates whether to draw column headers in the results grid.</summary>
+		public bool DrawColumnHeaders { get { return Form.Properties.ShowColumnHeaders; } }
+		///<summary>Indicates whether to draw vertical gridlines in the results grid.</summary>
+		public bool DrawVerticalLines { get { return Form.Properties.ShowVerticalLines; } }
+		///<summary>Gets the columns displayed in the results grid.</summary>
+		///<remarks>This property includes columns which are not displayed because the popup is too narrow.</remarks>
+		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
+		///<summary>Gets the rows displayed in the results grid.</summary>
+		public IList Rows { get; private set; }
+
 		#region Layout
 		///<summary>Gets the Y coordinate of the top of the viewport.</summary>
 		public int ScrollTop {
@@ -550,17 +562,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Gets the bottom of the last visible row.</summary>
 		///<remarks>If the last visible row is cut off, this will be in the middle of the row.
 		///If the popup is too tall, this will be above the bottom of the row area.</remarks>
-		public int RowsBottom { get { return RowsArea.Top + Math.Min(RowsArea.Height, Form.Items.Count * RowHeight); } }
+		public int RowsBottom { get { return RowsArea.Top + Math.Min(RowsArea.Height, Rows.Count * RowHeight); } }
 
 		///<summary>Gets the height occupied by portions outside the results grid.</summary>
 		public int VerticalFrameHeight { get; private set; }
-
-		private void CalcRowHeight() {
-			GInfo.AddGraphics(null);
-			try {
-				rowHeight = Form.ScrollBar.SmallChange = AppearanceMatch.CalcTextSize(GInfo.Graphics, "Wg", 0).ToSize().Height + HoverElement.ContentMargins.Height;
-			} finally { GInfo.ReleaseGraphics(); }
-		}
 
 		int? rowHeight;
 		///<summary>Gets the height of a single row.</summary>
@@ -570,6 +575,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				return rowHeight.Value;
 			}
 		}
+		private void CalcRowHeight() {
+			GInfo.AddGraphics(null);
+			try {
+				rowHeight = Form.ScrollBar.SmallChange = AppearanceMatch.CalcTextSize(GInfo.Graphics, "Wg", 0).ToSize().Height + HoverElement.ContentMargins.Height;
+			} finally { GInfo.ReleaseGraphics(); }
+		}
 
 		///<summary>Gets the index of the first row that intersects the viewport.</summary>
 		///<remarks>The row might not be entirely visible.</remarks>
@@ -578,8 +589,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<remarks>There may be more rows currently being displayed if the scroll position cuts off part of the top row.  (Allowing an additional row to be drawn below it)</remarks>
 		public int MaxVisibleRows { get { return RowsArea.Height / RowHeight; } }	//This property is not completely accurate; if half the the top row is scrolled off-screen, one additional row will be visible.
 
-
-		public IEnumerable<ResultColumn> VisibleColumns { get { return Form.Properties.Columns.Where(c => c.Visible); } }
 
 		///<summary>Gets the onscreen Y coordinate of the given row index, relative to the popup form.</summary>
 		///<remarks>This method respects the scrollbar.</remarks>
@@ -592,7 +601,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (!RowsArea.Contains(pt)) return null;
 
 			var index = (pt.Y + ScrollTop - RowsArea.Top) / RowHeight;
-			if (index < 0 || index >= Form.Items.Count)
+			if (index < 0 || index >= Rows.Count)
 				return null;
 			return index;
 		}
@@ -610,10 +619,19 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override void CalcContentRect(Rectangle bounds) {
 			base.CalcContentRect(bounds);
 
-			var headerHeight = Form.Properties.ShowColumnHeaders ? 20 : 0;
+			if (Rows.Count == 0) {
+				if (Form.OwnerEdit.AllItems.Count == 0)
+					Message = "The list is empty";
+				else
+					Message = "Your search has no results";
+				return;
+			} else
+				Message = null;
+
+			var headerHeight = DrawColumnHeaders ? 20 : 0;
 			var rowAreaHeight = ContentRect.Height - headerHeight;
 
-			Form.ScrollBar.Maximum = RowHeight * Form.Items.Count;
+			Form.ScrollBar.Maximum = RowHeight * Rows.Count;
 			Form.ScrollBar.LargeChange = rowAreaHeight;
 			Form.ScrollBar.Visible = Form.ScrollBar.Maximum > rowAreaHeight;
 
@@ -686,7 +704,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			get { return hoveredIndex; }
 			set {
 				if (hoveredIndex == value) return;
-				if (value < 0 || value >= Form.Items.Count) throw new ArgumentOutOfRangeException("value");
+				if (value < 0 || value >= Rows.Count) throw new ArgumentOutOfRangeException("value");
 
 				hoveredIndex = value;
 
@@ -709,24 +727,27 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		#endregion
 	}
 	///<summary>Draws the ItemSelector's results popup.</summary>
+	///<remarks>This class draws the information gathered by the ViewInfo.
+	///It is completely unaware of the popup or the editor.</remarks>
 	class ItemSelectorPopupFormPainter : PopupBaseSizeableFormPainter {
 		protected override void DrawContent(PopupFormGraphicsInfoArgs info) {
 			base.DrawContent(info);
 
 			var vi = (ItemSelectorPopupFormViewInfo)info.ViewInfo;
 
-			if (vi.Form.Items.Count == 0) {
-				DrawNoResults(info);
+			if (!String.IsNullOrEmpty(vi.Message)) {
+				DrawMessage(info);
 			} else {
-				if (vi.Form.Properties.ShowColumnHeaders)
+				if (vi.DrawColumnHeaders)
 					DrawColumnHeaders(info);
 
-				if (vi.Form.Properties.AllowResize)
+				if (vi.ShowSizeBar)
 					DrawInnerBorders(info);
+
 				using (info.Cache.ClipInfo.SaveAndSetClip(vi.RowsArea)) {
 					DrawHoverBackground(info);
 
-					if (vi.Form.Properties.ShowVerticalLines)
+					if (vi.DrawVerticalLines)
 						DrawVertLines(info);
 					DrawRows(info);
 				}
@@ -734,16 +755,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		static readonly StringFormat messageFormat = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-		static void DrawNoResults(PopupFormGraphicsInfoArgs args) {
+		static void DrawMessage(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			string message;
-			if (info.Form.OwnerEdit.AllItems.Count == 0)
-				message = "The list is empty";
-			else
-				message = "Your search has no results";
-
-			info.AppearanceResults.DrawString(args.Cache, message, info.ContentRect, messageFormat);
+			info.AppearanceResults.DrawString(args.Cache, info.Message, info.ContentRect, messageFormat);
 		}
 
 		static void DrawColumnHeaders(PopupFormGraphicsInfoArgs args) {
@@ -794,7 +809,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static void DrawRows(PopupFormGraphicsInfoArgs args) {
 			var info = (ItemSelectorPopupFormViewInfo)args.ViewInfo;
 
-			for (int rowIndex = info.FirstVisibleRow; rowIndex < info.Form.Items.Count; rowIndex++) {
+			for (int rowIndex = info.FirstVisibleRow; rowIndex < info.Rows.Count; rowIndex++) {
 				int y = info.GetRowCoordinate(rowIndex);
 				if (y > info.RowsArea.Bottom) break;
 
@@ -822,7 +837,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var cellWidth = Math.Min(column.Width - info.CellPaddingLeft, info.RowsArea.Right - info.HoverElement.ContentMargins.Right - x);
 			var cellBounds = new Rectangle(location, new Size(cellWidth, info.RowHeight));
 
-			var text = column.GetValue(info.Form.Items[rowIndex]);
+			var text = column.GetValue(info.Rows[rowIndex]);
 
 			//If this cell matched the filter, find the matching prefix. 
 			//I take the prefix from the cell value instead of the actual
