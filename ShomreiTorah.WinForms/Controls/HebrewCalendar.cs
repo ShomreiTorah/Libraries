@@ -41,7 +41,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				 true);
 
 			TodayFont = new Font(Font, FontStyle.Bold);
-			Painter = new SkinCalendarPainter(this);
+			Painter = new WhiteCalendarPainter(this);
 			ContentRenderer = new DefaultContentRenderer(Painter);
 			toolTipCreator = new DXToolTipCreator(this);
 
@@ -417,9 +417,9 @@ namespace ShomreiTorah.WinForms.Controls {
 			protected virtual void Dispose(bool disposing) { }
 		}
 
-		class SkinCalendarPainter : BaseCalendarPainter {
-			public SkinCalendarPainter(HebrewCalendar calendar) : base(calendar) { }
-
+		///<summary>Draws the UI elements of the calendar (everything except the date cells) using DevExpress skins.</summary>
+		abstract class SkinChromeCalendarPainter : BaseCalendarPainter {
+			protected SkinChromeCalendarPainter(HebrewCalendar calendar) : base(calendar) { }
 			protected override void DrawBackground(Graphics g) {
 				var skin = CommonSkins.GetSkin(Calendar.LookAndFeel);
 				var elemInfo = new SkinElementInfo(skin[CommonSkins.SkinToolTipWindow], CalendarBounds) { Cache = new GraphicsCache(g) };
@@ -429,23 +429,13 @@ namespace ShomreiTorah.WinForms.Controls {
 			protected override Padding CellPadding { get { return new Padding(2, 3, 2, 2); } }
 			public override Size ButtonSize { get { return new Size(18, 20); } }
 
-			public override void Render(Graphics g, Rectangle clipRectangle) {
-				base.Render(g, clipRectangle);
-
-				if (HoverItem.Date.HasValue)
-					RenderDay(g, HoverItem.Date.Value);
-
-				if (Calendar.SelectedDate.HasValue)
-					RenderDay(g, Calendar.SelectedDate.Value);
-			}
-
 			static readonly Font MonthHeaderFont = new Font("Segoe UI", 14, FontStyle.Bold);
 			protected override void DrawMonthHeader(Graphics g) {
 				if (Calendar.Mode == CalendarType.English)
-					TextRenderer.DrawText(g, Calendar.MonthStart.EnglishDate.ToString("MMMM  yyyy", Culture), MonthHeaderFont, MonthHeaderBounds, Color.Black,
+					TextRenderer.DrawText(g, Calendar.MonthStart.EnglishDate.ToString("MMMM  yyyy", Culture), MonthHeaderFont, MonthHeaderBounds, Calendar.ForeColor,
 										  TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
 				else
-					TextRenderer.DrawText(g, Calendar.MonthStart.ToString("MMMM  yyyy"), MonthHeaderFont, MonthHeaderBounds, Color.Black,
+					TextRenderer.DrawText(g, Calendar.MonthStart.ToString("MMMM  yyyy"), MonthHeaderFont, MonthHeaderBounds, Calendar.ForeColor,
 										  TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.RightToLeft);
 			}
 
@@ -502,6 +492,20 @@ namespace ShomreiTorah.WinForms.Controls {
 					TextRenderer.DrawText(g, dayNames[i], Calendar.Font, new Rectangle(x + 1, WeekHeaderBounds.Y, cellWidth, WeekHeaderBounds.Height), Color.Black, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
 				}
 			}
+		}
+		class SkinCalendarPainter : SkinChromeCalendarPainter {
+			public SkinCalendarPainter(HebrewCalendar calendar) : base(calendar) { }
+
+			public override void Render(Graphics g, Rectangle clipRectangle) {
+				base.Render(g, clipRectangle);
+
+				if (HoverItem.Date.HasValue)
+					RenderDay(g, HoverItem.Date.Value);
+
+				if (Calendar.SelectedDate.HasValue)
+					RenderDay(g, Calendar.SelectedDate.Value);
+			}
+
 			protected override void DrawDay(Graphics g, HebrewDate date, bool isSelected) {
 				SkinElementInfo elemInfo;
 
@@ -561,7 +565,51 @@ namespace ShomreiTorah.WinForms.Controls {
 				return null;
 			}
 		}
+		class WhiteCalendarPainter : SkinChromeCalendarPainter {
+			public WhiteCalendarPainter(HebrewCalendar calendar) : base(calendar) { }
 
+			readonly Brush daysAreaBackground = new SolidBrush(Color.FromArgb(128, Color.White));
+
+			public override void Render(Graphics g, Rectangle clipRectangle) {
+				base.Render(g, clipRectangle);
+
+				using (var pen = new Pen(SkinUtilities.GetHeaderLineColor(Calendar.LookAndFeel))) {
+					int x = GridArea.Left;
+					for (int c = 0; c <= 7; c++) {
+						g.DrawLine(pen, x, GridArea.Top, x, GridArea.Bottom);
+						x += DaySize.Width;	//I want lines on both edges of the grid.
+					}
+					int y = GridArea.Top;
+					for (int c = 0; c < RowCount; c++) {
+						y += DaySize.Height;
+						g.DrawLine(pen, GridArea.Left, y, GridArea.Right, y);
+					}
+				}
+			}
+			protected override void DrawBackground(Graphics g) {
+				base.DrawBackground(g);
+				g.FillRectangle(daysAreaBackground, GridArea);
+				g.DrawRectangle(Pens.Black, GridArea);
+			}
+			protected override void DrawDay(Graphics g, HebrewDate date, bool isSelected) {
+				SkinElementInfo elemInfo = null;
+
+				var bgRect = new Rectangle(DayBounds.X, DayBounds.Y, DayBounds.Width + 1, DayBounds.Height + 1);
+
+				var skin = NavPaneSkins.GetSkin(Calendar.LookAndFeel);
+				if (date == Calendar.selectedDate)
+					elemInfo = new SkinElementInfo(skin[NavPaneSkins.SkinOverflowPanelItem], bgRect) { Graphics = g, ImageIndex = (date == HoverItem.Date) ? 4 : 3 };
+				else if (date == Calendar.selectingDate)
+					elemInfo = new SkinElementInfo(skin[NavPaneSkins.SkinOverflowPanelItem], bgRect) { Graphics = g, ImageIndex = 2 };
+				else if (date == HoverItem.Date)
+					elemInfo = new SkinElementInfo(skin[NavPaneSkins.SkinOverflowPanelItem], bgRect) { Graphics = g, ImageIndex = 1 };
+
+				if (elemInfo != null)
+					SkinElementPainter.Default.DrawObject(elemInfo);
+
+				CellRenderer.DrawCell(g, date, isSelected);
+			}
+		}
 		sealed class DefaultContentRenderer : BaseContentRenderer {
 			public DefaultContentRenderer(BaseCalendarPainter painter) : base(painter) { }
 
