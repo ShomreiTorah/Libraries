@@ -627,7 +627,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			SkinElement dateHighlightElement;
 			protected override void OnStyleChanged() {
 				base.OnStyleChanged();
-				dateHighlightElement = NavPaneSkins.GetSkin(Calendar.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
+				dateHighlightElement = RibbonSkins.GetSkin(Calendar.LookAndFeel)[RibbonSkins.SkinButton];
 			}
 
 			protected override void DrawDay(Graphics g, HebrewDate date, bool isSelected) {
