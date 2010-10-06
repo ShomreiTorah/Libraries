@@ -18,6 +18,7 @@ using ShomreiTorah.Common.Calendar.Holidays;
 using DevExpress.XtraEditors.Drawing;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.Utils;
+using DevExpress.LookAndFeel;
 
 namespace ShomreiTorah.WinForms.Controls {
 	///<summary>An interactive Hebrew calendar.</summary>
@@ -419,7 +420,8 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		///<summary>Draws the UI elements of the calendar (everything except the date cells) using DevExpress skins.</summary>
 		abstract class SkinChromeCalendarPainter : BaseCalendarPainter {
-			protected SkinChromeCalendarPainter(HebrewCalendar calendar) : base(calendar) {
+			protected SkinChromeCalendarPainter(HebrewCalendar calendar)
+				: base(calendar) {
 				calendar.LookAndFeel.StyleChanged += delegate { OnStyleChanged(); };
 				OnStyleChanged();
 			}
@@ -508,6 +510,18 @@ namespace ShomreiTorah.WinForms.Controls {
 					args.Graphics = g;
 					Calendar.LookAndFeel.Painter.Header.DrawObject(args);
 					args.Graphics = null;
+				}
+				var lnf = Calendar.LookAndFeel;
+				//These skins have header elements with no outer border.
+				if (lnf.ActiveStyle == ActiveLookAndFeelStyle.Skin
+					&& (lnf.ActiveSkinName.StartsWith("Office 2010", StringComparison.OrdinalIgnoreCase)
+					 || lnf.ActiveSkinName.StartsWith("Seven", StringComparison.OrdinalIgnoreCase)
+					 || lnf.ActiveSkinName == "DevExpress Style")) {
+					using (var pen = new Pen(SkinUtilities.GetHeaderLineColor(lnf))) {
+						g.DrawLine(pen, WeekHeaderBounds.Left, WeekHeaderBounds.Top, WeekHeaderBounds.Left, WeekHeaderBounds.Bottom);
+						g.DrawLine(pen, WeekHeaderBounds.Left, WeekHeaderBounds.Top, WeekHeaderBounds.Right, WeekHeaderBounds.Top);
+						g.DrawLine(pen, WeekHeaderBounds.Right, WeekHeaderBounds.Top, WeekHeaderBounds.Right, WeekHeaderBounds.Bottom);
+					}
 				}
 			}
 		}
