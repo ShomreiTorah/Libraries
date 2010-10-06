@@ -960,7 +960,14 @@ namespace ShomreiTorah.WinForms.Controls {
 		readonly IToolTipCreator toolTipCreator;
 
 		sealed class DXToolTipCreator : IToolTipCreator {
-			public DXToolTipCreator(HebrewCalendar calendar) { this.calendar = calendar; }
+			public DXToolTipCreator(HebrewCalendar calendar) {
+				this.calendar = calendar;
+				controller.BeforeShow += controller_BeforeShow;
+			}
+
+			void controller_BeforeShow(object sender, ToolTipControllerShowEventArgs e) {
+				e.SelectedControl = calendar;	//Force tooltip to inherit calendar's LookAndFeel
+			}
 			readonly HebrewCalendar calendar;
 
 			readonly ToolTipController controller = new ToolTipController { ToolTipType = ToolTipType.SuperTip };
