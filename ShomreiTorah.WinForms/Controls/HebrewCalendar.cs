@@ -419,10 +419,19 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		///<summary>Draws the UI elements of the calendar (everything except the date cells) using DevExpress skins.</summary>
 		abstract class SkinChromeCalendarPainter : BaseCalendarPainter {
-			protected SkinChromeCalendarPainter(HebrewCalendar calendar) : base(calendar) { }
+			protected SkinChromeCalendarPainter(HebrewCalendar calendar) : base(calendar) {
+				calendar.LookAndFeel.StyleChanged += delegate { OnStyleChanged(); };
+				OnStyleChanged();
+			}
+			EditorButtonPainter buttonPainter;
+			SkinElement background;
+			protected virtual void OnStyleChanged() {
+				background = CommonSkins.GetSkin(Calendar.LookAndFeel)[CommonSkins.SkinToolTipWindow];
+				buttonPainter = new EditorButtonPainter(Calendar.LookAndFeel.Painter.Button);
+			}
+
 			protected override void DrawBackground(Graphics g) {
-				var skin = CommonSkins.GetSkin(Calendar.LookAndFeel);
-				var elemInfo = new SkinElementInfo(skin[CommonSkins.SkinToolTipWindow], CalendarBounds) { Cache = new GraphicsCache(g) };
+				var elemInfo = new SkinElementInfo(background, CalendarBounds) { Cache = new GraphicsCache(g) };
 				SkinElementPainter.Default.DrawObject(elemInfo);
 			}
 			protected override Padding ContentPadding { get { return new Padding(4, 4, 5, 5); } }
@@ -448,7 +457,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				} else if (HoverItem.Item == CalendarItem.PreviousButton)
 					args.State = ObjectState.Hot;
 
-				new EditorButtonPainter(Calendar.LookAndFeel.Painter.Button).DrawObject(args);
+				buttonPainter.DrawObject(args);
 			}
 
 			static readonly EditorButton ebNext = new EditorButton(ButtonPredefines.Right);
@@ -461,7 +470,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				} else if (HoverItem.Item == CalendarItem.NextButton)
 					args.State = ObjectState.Hot;
 
-				new EditorButtonPainter(Calendar.LookAndFeel.Painter.Button).DrawObject(args);
+				buttonPainter.DrawObject(args);
 			}
 
 			protected override void PerformLayout() {
@@ -599,18 +608,23 @@ namespace ShomreiTorah.WinForms.Controls {
 				base.DrawBackground(g);
 				g.FillRectangle(daysAreaBackground, GridArea);
 			}
+			SkinElement dateHighlightElement;
+			protected override void OnStyleChanged() {
+				base.OnStyleChanged();
+				dateHighlightElement = NavPaneSkins.GetSkin(Calendar.LookAndFeel)[NavPaneSkins.SkinOverflowPanelItem];
+			}
+
 			protected override void DrawDay(Graphics g, HebrewDate date, bool isSelected) {
 				SkinElementInfo elemInfo = null;
 
 				var bgRect = new Rectangle(DayBounds.X, DayBounds.Y, DayBounds.Width + 1, DayBounds.Height + 1);
 
-				var skin = NavPaneSkins.GetSkin(Calendar.LookAndFeel);
 				if (date == Calendar.selectedDate)
-					elemInfo = new SkinElementInfo(skin[NavPaneSkins.SkinOverflowPanelItem], bgRect) { Graphics = g, ImageIndex = (date == HoverItem.Date) ? 4 : 3 };
+					elemInfo = new SkinElementInfo(dateHighlightElement, bgRect) { Graphics = g, ImageIndex = (date == HoverItem.Date) ? 4 : 3 };
 				else if (date == Calendar.selectingDate)
-					elemInfo = new SkinElementInfo(skin[NavPaneSkins.SkinOverflowPanelItem], bgRect) { Graphics = g, ImageIndex = 2 };
+					elemInfo = new SkinElementInfo(dateHighlightElement, bgRect) { Graphics = g, ImageIndex = 2 };
 				else if (date == HoverItem.Date)
-					elemInfo = new SkinElementInfo(skin[NavPaneSkins.SkinOverflowPanelItem], bgRect) { Graphics = g, ImageIndex = 1 };
+					elemInfo = new SkinElementInfo(dateHighlightElement, bgRect) { Graphics = g, ImageIndex = 1 };
 
 				if (elemInfo != null)
 					SkinElementPainter.Default.DrawObject(elemInfo);
