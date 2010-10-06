@@ -103,7 +103,7 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		///<summary>Prevents the map from being downloaded until EndUpdate is called.</summary>
 		public void BeginUpdate() { updateCount++; }
-		///<summary>Re-enables autmatic downlaod after calling BeginUpdate.</summary>
+		///<summary>Re-enables automatic download after calling BeginUpdate.</summary>
 		public void EndUpdate() { if (--updateCount == 0 && updateQueued) DoUpdate(); }
 
 		bool updateQueued;
