@@ -281,7 +281,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			public Rectangle ContentBounds { get { return CalendarBounds.DeflateBy(ContentPadding); } }
 
 			public int MonthHeaderHeight { get; protected set; }
-			protected virtual int WeekHeaderHeight { get { return 18; } }
+			protected virtual int WeekHeaderHeight { get { return 20; } }
 			protected virtual int GridTop { get { return MonthHeaderHeight + WeekHeaderHeight; } }
 			protected virtual Padding ContentPadding { get { return Padding.Empty; } }
 
@@ -464,32 +464,41 @@ namespace ShomreiTorah.WinForms.Controls {
 				new EditorButtonPainter(Calendar.LookAndFeel.Painter.Button).DrawObject(args);
 			}
 
-			protected override void DrawWeekHeader(Graphics g) {
-				var cellWidth = WeekHeaderBounds.Width / 7;
+			protected override void PerformLayout() {
+				base.PerformLayout();
 
+				var cellWidth = WeekHeaderBounds.Width / 7;
+				var dayNames = cellWidth > 65 ? LongDayNames : ShortDayNames;
+
+				//For some reason, the first header is one pixel too narrow
+				weekHeaderArgs = dayNames.Select((c, i) => new HeaderObjectInfoArgs {
+					Caption = c,
+					Bounds = new Rectangle(WeekHeaderBounds.X + cellWidth * i + Math.Sign(i), WeekHeaderBounds.Y, cellWidth + 1 - Math.Sign(i), WeekHeaderBounds.Height)
+				}).ToArray();
+				weekHeaderArgs.First().HeaderPosition = HeaderPositionKind.Left;
+				weekHeaderArgs.Last().HeaderPosition = HeaderPositionKind.Right;
+
+				foreach (var header in weekHeaderArgs) {
+					header.Appearance.TextOptions.HAlignment = HorzAlignment.Center;
+					header.Appearance.TextOptions.VAlignment = VertAlignment.Top;
+					Calendar.LookAndFeel.Painter.Header.CalcObjectBounds(header);
+				}
+			}
+			HeaderObjectInfoArgs[] weekHeaderArgs;
+			protected override void DrawWeekHeader(Graphics g) {
 				var hoverDay = Calendar.selectingDate ?? HoverItem.Date;
 
-				var skin = GridSkins.GetSkin(Calendar.LookAndFeel);
-				var dayNames = cellWidth > 65 ? LongDayNames : ShortDayNames;
-				for (int i = 0; i < 7; i++) {
-					var x = WeekHeaderBounds.X + cellWidth * i;
-
-					SkinElementInfo header;
-
-					if (i == 0)
-						header = new SkinElementInfo(skin[GridSkins.SkinHeaderLeft]) { Graphics = g };
-					else if (i == 6)
-						header = new SkinElementInfo(skin[GridSkins.SkinHeaderRight]) { Graphics = g };
-					else
-						header = new SkinElementInfo(skin[GridSkins.SkinHeader]) { Graphics = g };
-
-					header.Bounds = new Rectangle(x, WeekHeaderBounds.Y + 1, cellWidth + 1, WeekHeaderBounds.Height);
+				for (int i = 0; i < weekHeaderArgs.Length; i++) {
+					var args = weekHeaderArgs[i];
 
 					if (hoverDay.HasValue && (int)hoverDay.Value.DayOfWeek == i)
-						header.ImageIndex = 1;
-					SkinElementPainter.Default.DrawObject(header);
+						args.State = ObjectState.Hot;
+					else
+						args.State = ObjectState.Normal;
 
-					TextRenderer.DrawText(g, dayNames[i], Calendar.Font, new Rectangle(x + 1, WeekHeaderBounds.Y, cellWidth, WeekHeaderBounds.Height), Color.Black, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+					args.Graphics = g;
+					Calendar.LookAndFeel.Painter.Header.DrawObject(args);
+					args.Graphics = null;
 				}
 			}
 		}
@@ -589,7 +598,6 @@ namespace ShomreiTorah.WinForms.Controls {
 			protected override void DrawBackground(Graphics g) {
 				base.DrawBackground(g);
 				g.FillRectangle(daysAreaBackground, GridArea);
-				g.DrawRectangle(Pens.Black, GridArea);
 			}
 			protected override void DrawDay(Graphics g, HebrewDate date, bool isSelected) {
 				SkinElementInfo elemInfo = null;
