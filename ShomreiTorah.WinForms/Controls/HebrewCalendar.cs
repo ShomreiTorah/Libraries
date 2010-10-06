@@ -427,9 +427,11 @@ namespace ShomreiTorah.WinForms.Controls {
 			}
 			EditorButtonPainter buttonPainter;
 			SkinElement background;
+			Color titleColor;
 			protected virtual void OnStyleChanged() {
 				background = CommonSkins.GetSkin(Calendar.LookAndFeel)[CommonSkins.SkinToolTipWindow];
 				buttonPainter = new EditorButtonPainter(Calendar.LookAndFeel.Painter.Button);
+				titleColor = LookAndFeelHelper.GetSystemColor(Calendar.LookAndFeel, SystemColors.InfoText);
 			}
 
 			protected override void DrawBackground(Graphics g) {
@@ -443,10 +445,10 @@ namespace ShomreiTorah.WinForms.Controls {
 			static readonly Font MonthHeaderFont = new Font("Segoe UI", 14, FontStyle.Bold);
 			protected override void DrawMonthHeader(Graphics g) {
 				if (Calendar.Mode == CalendarType.English)
-					TextRenderer.DrawText(g, Calendar.MonthStart.EnglishDate.ToString("MMMM  yyyy", Culture), MonthHeaderFont, MonthHeaderBounds, Calendar.ForeColor,
+					TextRenderer.DrawText(g, Calendar.MonthStart.EnglishDate.ToString("MMMM  yyyy", Culture), MonthHeaderFont, MonthHeaderBounds, titleColor,
 										  TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
 				else
-					TextRenderer.DrawText(g, Calendar.MonthStart.ToString("MMMM  yyyy"), MonthHeaderFont, MonthHeaderBounds, Calendar.ForeColor,
+					TextRenderer.DrawText(g, Calendar.MonthStart.ToString("MMMM  yyyy"), MonthHeaderFont, MonthHeaderBounds, titleColor,
 										  TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.RightToLeft);
 			}
 
