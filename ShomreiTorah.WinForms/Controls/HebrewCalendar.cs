@@ -630,6 +630,37 @@ namespace ShomreiTorah.WinForms.Controls {
 				dateHighlightElement = RibbonSkins.GetSkin(Calendar.LookAndFeel)[RibbonSkins.SkinButton];
 			}
 
+			class ResultSelector<TInput, TOutput> : Collection<KeyValuePair<Func<TInput, bool>, TOutput>> {
+				public void Add(Func<TInput, bool> predicate, TOutput value) {
+					if (predicate == null) throw new ArgumentNullException("predicate");
+					Add(new KeyValuePair<Func<TInput, bool>, TOutput>(predicate, value));
+				}
+				public TOutput GetValue(TInput input) {
+					return this.FirstOrDefault(kvp => kvp.Key(input)).Value;
+				}
+			}
+			sealed class BrushSelector<TInput> : ResultSelector<TInput, Brush>, IDisposable {
+				public void Add(Func<TInput, bool> predicate, int opacity, Color color) {
+					Add(predicate, new SolidBrush(Color.FromArgb(opacity, color)));
+				}
+
+				public void Dispose() {
+					foreach (var kvp in this) {
+						kvp.Value.Dispose();
+					}
+				}
+			}
+
+			readonly BrushSelector<HebrewDate> dateColorizers = new BrushSelector<HebrewDate> {
+				{ d => d.Info.Isשבת,							48, Color.Blue		},
+				{ d => d.Info.Is(HolidayCategory.דאריתא),		32, Color.Purple	},
+				{ d => d.Info.Is(HolidayCategory.חולהמועד),	16, Color.Purple	},
+				{ d => d.Info.Is(HolidayCategory.תענית),		32, Color.Red		},
+				{ d => d.Info.Isראשחודש,						32, Color.Yellow	},
+				{ d => d.Info.Is(HolidayCategory.דרבנן),		32, Color.Orange	},
+				{ d => d.Info.Is(HolidayCategory.Minor),		24, Color.Orange	},
+			};
+
 			protected override void DrawDay(Graphics g, HebrewDate date, bool isSelected) {
 				SkinElementInfo elemInfo = null;
 
@@ -644,8 +675,19 @@ namespace ShomreiTorah.WinForms.Controls {
 
 				if (elemInfo != null)
 					SkinElementPainter.Default.DrawObject(elemInfo);
-
+				else {
+					var brush = dateColorizers.GetValue(date);
+					if (brush != null)
+						g.FillRectangle(brush, DayBounds);
+				}
 				CellRenderer.DrawCell(g, date, isSelected);
+			}
+			protected override void Dispose(bool disposing) {
+				if (disposing) {
+					daysAreaBackground.Dispose();
+					dateColorizers.Dispose();
+				}
+				base.Dispose(disposing);
 			}
 		}
 		sealed class DefaultContentRenderer : BaseContentRenderer {
