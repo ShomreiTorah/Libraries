@@ -301,11 +301,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 					break;
 			}
 
-			if (IsSkinned) {
-				var image = (Bitmap)((SkinHeaderObjectPainter)HeaderPainter).Element.Image.GetImages().Images[0];
-				LinePen = new Pen(image.GetPixel(image.Width - 1, image.Height - 1));
-			} else
-				LinePen = new Pen(Color.DarkGray);	//Don't use a shared pen because I need to dispose it later
+			LinePen = new Pen(SkinUtilities.GetHeaderLineColor(form.Properties.LookAndFeel));
 		}
 
 		///<summary>Releases all resources used by the ItemSelectorPopupFormViewInfo.</summary>
