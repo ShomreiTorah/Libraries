@@ -15,7 +15,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			public override string ViewName { get { return "SmartGridView"; } }
 			public override BaseView CreateView(GridControl grid) { return new SmartGridView((SmartGrid)grid); }
 		}
-		internal static readonly SgvRegistrator Registrator = new SgvRegistrator();
+		internal static readonly GridInfoRegistrator Registrator = new SgvRegistrator();
 		protected override string ViewName { get { return "SmartGridView"; } }
 
 		public SmartGridView() : this(null) { }
