@@ -420,6 +420,7 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		///<summary>Draws the UI elements of the calendar (everything except the date cells) using DevExpress skins.</summary>
 		abstract class SkinChromeCalendarPainter : BaseCalendarPainter {
+			[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "By design")]
 			protected SkinChromeCalendarPainter(HebrewCalendar calendar)
 				: base(calendar) {
 				calendar.LookAndFeel.StyleChanged += delegate { OnStyleChanged(); };
@@ -527,6 +528,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				}
 			}
 		}
+#if UNUSED
 		class SkinCalendarPainter : SkinChromeCalendarPainter {
 			public SkinCalendarPainter(HebrewCalendar calendar) : base(calendar) { }
 
@@ -599,6 +601,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				return null;
 			}
 		}
+#endif
 		class WhiteCalendarPainter : SkinChromeCalendarPainter {
 			public WhiteCalendarPainter(HebrewCalendar calendar) : base(calendar) { }
 
