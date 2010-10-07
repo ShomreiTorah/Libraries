@@ -219,6 +219,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		ResultColumn resultDisplayColumn;
 
 		///<summary>Creates a new RepositoryItemItemSelector.</summary>
+		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "Simple property setter")]
 		public RepositoryItemItemSelector() {
 			Columns = new ItemSelectorColumnCollection(this);
 			AdditionalResultColumns = new InvalidatingColumnCollection(this);
