@@ -433,6 +433,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				background = CommonSkins.GetSkin(Calendar.LookAndFeel)[CommonSkins.SkinToolTipWindow];
 				buttonPainter = new EditorButtonPainter(Calendar.LookAndFeel.Painter.Button);
 				titleColor = LookAndFeelHelper.GetSystemColor(Calendar.LookAndFeel, SystemColors.InfoText);
+				CreateHeaders();
 			}
 
 			protected override void DrawBackground(Graphics g) {
@@ -480,6 +481,9 @@ namespace ShomreiTorah.WinForms.Controls {
 
 			protected override void PerformLayout() {
 				base.PerformLayout();
+				CreateHeaders();
+			}
+			void CreateHeaders() {
 
 				var cellWidth = WeekHeaderBounds.Width / 7;
 				var dayNames = cellWidth > 65 ? LongDayNames : ShortDayNames;
@@ -492,9 +496,12 @@ namespace ShomreiTorah.WinForms.Controls {
 				weekHeaderArgs.First().HeaderPosition = HeaderPositionKind.Left;
 				weekHeaderArgs.Last().HeaderPosition = HeaderPositionKind.Right;
 
+				var headerAppearance = new AppearanceObject(GridSkins.GetSkin(Calendar.LookAndFeel)[GridSkins.SkinHeader].GetAppearanceDefault());
+				headerAppearance.TextOptions.HAlignment = HorzAlignment.Center;
+				headerAppearance.TextOptions.VAlignment = VertAlignment.Top;
+
 				foreach (var header in weekHeaderArgs) {
-					header.Appearance.TextOptions.HAlignment = HorzAlignment.Center;
-					header.Appearance.TextOptions.VAlignment = VertAlignment.Top;
+					header.SetAppearance(headerAppearance);
 					Calendar.LookAndFeel.Painter.Header.CalcObjectBounds(header);
 				}
 			}
