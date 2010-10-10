@@ -40,15 +40,12 @@ namespace ShomreiTorah.Data {
             DepositIdColumn.AllowNulls = false;
             
             DateColumn = Schema.Columns.AddValueColumn("Date", typeof(DateTime), null);
-            DateColumn.Unique = true;
             DateColumn.AllowNulls = false;
             
             NumberColumn = Schema.Columns.AddValueColumn("Number", typeof(Int32), null);
-            NumberColumn.Unique = true;
             NumberColumn.AllowNulls = false;
             
             AccountColumn = Schema.Columns.AddValueColumn("Account", typeof(String), null);
-            AccountColumn.Unique = true;
             AccountColumn.AllowNulls = false;
             #endregion
             
@@ -630,7 +627,7 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets the person's email addresses.</summary>
         public IChildRowCollection<EmailAddress> EmailAddresses { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
         ///<summary>Gets the statements sent to the person.</summary>
-        public IChildRowCollection<LoggedStatement> StatementLogs { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
+        public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         #endregion
         
         #region Partial Methods
@@ -1746,7 +1743,7 @@ namespace ShomreiTorah.Data {
             IdColumn.Unique = true;
             IdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "StatementLogs");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "LoggedStatements");
             PersonColumn.AllowNulls = false;
             
             DateGeneratedColumn = Schema.Columns.AddValueColumn("DateGenerated", typeof(DateTime), null);

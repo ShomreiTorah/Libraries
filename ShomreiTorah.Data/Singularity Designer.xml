@@ -6,17 +6,17 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Date" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date of the deposit." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Date" PropertyVisibility="Public" SqlName="Date">
+    <Column Name="Date" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date of the deposit." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Date" PropertyVisibility="Public" SqlName="Date">
       <DefaultValue>
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Number" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the number of the deposit." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Number" PropertyVisibility="Public" SqlName="Number">
+    <Column Name="Number" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the number of the deposit." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Number" PropertyVisibility="Public" SqlName="Number">
       <DefaultValue>
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Account" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the account of the deposit." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Account" PropertyVisibility="Public" SqlName="Account">
+    <Column Name="Account" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the account of the deposit." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Account" PropertyVisibility="Public" SqlName="Account">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -328,7 +328,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who received the statement." Expression="" ForeignRelationName="StatementLogs" ForeignRelationPropertyDescription="Gets the statements sent to the person." ForeignRelationPropertyName="StatementLogs" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who received the statement." Expression="" ForeignRelationName="LoggedStatements" ForeignRelationPropertyDescription="Gets the statements sent to the person." ForeignRelationPropertyName="LoggedStatements" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
