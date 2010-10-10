@@ -59,6 +59,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(NumberColumn, "Number");
             SchemaMapping.Columns.AddMapping(AccountColumn, "Account");
             #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
         #region Value Properties
@@ -246,6 +247,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(UseHtmlColumn, "HTMLformat");
             SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
             #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
         #region Value Properties
@@ -530,6 +532,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(PhoneColumn, "Phone");
             SchemaMapping.Columns.AddMapping(SourceColumn, "Source");
             #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
         #region Value Properties
@@ -873,6 +876,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(DepositColumn, "DepositId");
             SchemaMapping.Columns.AddMapping(CheckIntegerColumn, "CheckInteger");
             #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
         #region Value Properties
@@ -1238,6 +1242,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(ExternalSourceColumn, "ExternalSource");
             SchemaMapping.Columns.AddMapping(ExternalIdColumn, "ExternalID");
             #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
         #region Value Properties
@@ -1549,6 +1554,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(NotesColumn, "Notes");
             SchemaMapping.Columns.AddMapping(StatusColumn, "Status");
             #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
         #region Value Properties
@@ -1779,6 +1785,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(EndDateColumn, "EndDate");
             SchemaMapping.Columns.AddMapping(UserNameColumn, "UserName");
             #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
         #region Value Properties
