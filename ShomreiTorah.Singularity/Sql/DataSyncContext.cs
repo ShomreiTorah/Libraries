@@ -101,12 +101,15 @@ namespace ShomreiTorah.Singularity.Sql {
 			foreach (var m in mappings)
 				AddMapping(m);
 		}
-		///<summary>Adds a synchronizer for a table.</summary>
+		///<summary>Adds a synchronizer for a table using the default SchemaMapping.</summary>
+		///<remarks>If a primary SchemaMapping has been registered by calling <see cref="SchemaMapping.SetPrimaryMapping"/>, it will be used.
+		///If not, a default mapping (which maps every column and preserves names) will be used.</remarks>
 		public void AddTable(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 			if (table.Context != SyncContext.DataContext) throw new ArgumentException("Table must belong to parent DataContext", "table");
 
-			Items.Add(new TableSynchronizer(table, new SchemaMapping(table.Schema), SyncContext.SqlProvider));
+			var mapping = SchemaMapping.GetPrimaryMapping(table.Schema) ?? new SchemaMapping(table.Schema);
+			Items.Add(new TableSynchronizer(table, mapping, SyncContext.SqlProvider));
 		}
 		///<summary>Inserts an item into the underlying collection.</summary>
 		protected override void InsertItem(int index, TableSynchronizer item) {

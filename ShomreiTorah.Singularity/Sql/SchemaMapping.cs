@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Maps a Singularity table to a table in an SQL database.</summary>
@@ -42,6 +44,29 @@ namespace ShomreiTorah.Singularity.Sql {
 
 		///<summary>Gets the column mapping for the table's primary key, if any.</summary>
 		public ColumnMapping PrimaryKey { get { return Schema.PrimaryKey == null ? null : Columns[Schema.PrimaryKey]; } }
+
+		static readonly ReaderWriterLockSlim primariesLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+		static readonly Dictionary<TableSchema, SchemaMapping> primaryMappings = new Dictionary<TableSchema, SchemaMapping>();
+
+		///<summary>Gets the primary SchemaMapping for a TableSchema, or null if no primary mapping has been registered.</summary>
+		///<returns>The registered SchemaMapping instance, which should not be modified.</returns>
+		public static SchemaMapping GetPrimaryMapping(TableSchema schema) {
+			if (schema == null) throw new ArgumentNullException("schema");
+			
+			SchemaMapping retVal;
+			using (primariesLock.ReadLock())
+				primaryMappings.TryGetValue(schema, out retVal);
+			return retVal;
+		}
+		///<summary>Sets a SchemaMapping as the default for its table.</summary>
+		///<remarks>Both the schema and the mapping will be held in memory forever.
+		///The same (mutable) SchemaMapping instance will be returned.</remarks>
+		public static void SetPrimaryMapping(SchemaMapping mapping) {
+			if (mapping == null) throw new ArgumentNullException("mapping");
+
+			using (primariesLock.WriteLock())
+				primaryMappings[mapping.Schema] = mapping;
+		}
 	}
 
 	///<summary>Maps a column in a Singularity table to a column in an SQL database.</summary>
