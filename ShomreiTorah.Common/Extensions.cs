@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace ShomreiTorah.Common {
 	///<summary>Contains miscellaneous extension methods.</summary>
@@ -616,6 +617,31 @@ namespace ShomreiTorah.Common {
 
 			return (TAttribute[])provider.GetCustomAttributes(typeof(TAttribute), inherit);
 		}
+		#endregion
+
+		#region ReaderWriterLock
+		///<summary>Gets a disposable read lock from a ReaderWriterLockSlim.</summary>
+		///<returns>An IDispoable instance, which must be disposed to exit the lock.</returns>
+		public static IDisposable ReadLock(this ReaderWriterLockSlim rwl) {
+			if (rwl == null) throw new ArgumentNullException("rwl");
+			rwl.EnterReadLock();
+			return new Disposable(rwl.ExitReadLock);
+		}
+		///<summary>Gets a disposable write lock from a ReaderWriterLockSlim.</summary>
+		///<returns>An IDispoable instance, which must be disposed to exit the lock.</returns>
+		public static IDisposable WriteLock(this ReaderWriterLockSlim rwl) {
+			if (rwl == null) throw new ArgumentNullException("rwl");
+			rwl.EnterWriteLock();
+			return new Disposable(rwl.ExitWriteLock);
+		}
+
+		/////<summary>Gets a disposable upgradeable read lock from a ReaderWriterLockSlim.</summary>
+		/////<returns>An IDispoable instance, which must be disposed to exit the lock.</returns>
+		//public static IDisposable UpgradeableReadLock(this ReaderWriterLockSlim rwl) {
+		//    if (rwl == null) throw new ArgumentNullException("rwl");
+		//    rwl.EnterUpgradeableReadLock();
+		//    return new Disposable(rwl.ExitUpgradeableReadLock);
+		//}
 		#endregion
 
 		///<summary>Reports nulls in an enumerable.</summary>
