@@ -18,9 +18,6 @@ namespace ShomreiTorah.Singularity.Sql {
 			SqlProvider = sqlProvider;
 
 			Tables = new TableSynchronizerCollection(this);
-
-			foreach (var table in context.Tables)
-				Tables.AddMapping(table);
 		}
 
 		///<summary>Gets the Singularity DataContext that this instance synchronizes.</summary>
@@ -66,7 +63,7 @@ namespace ShomreiTorah.Singularity.Sql {
 	}
 
 	///<summary>A collection of TableSynchronizer objects.</summary>
-	public class TableSynchronizerCollection : ReadOnlyCollection<TableSynchronizer> {
+	public class TableSynchronizerCollection : Collection<TableSynchronizer> {
 		///<summary>Creates a TableSynchronizerCollection that wraps a list of TableSynchronizer objects.</summary>
 		internal TableSynchronizerCollection(DataSyncContext context) : base(new List<TableSynchronizer>()) { SyncContext = context; }
 		///<summary>Gets the DataSyncContext that contains TableSynchronizers.</summary>
@@ -78,14 +75,51 @@ namespace ShomreiTorah.Singularity.Sql {
 		[SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
 		public TableSynchronizer this[Table table] { get { return this.FirstOrDefault(t => t.Table == table); } }
 
+		///<summary>Adds default mappings for every unmapped table in the context.</summary>
+		public void AddDefaultMappings() {
+			foreach (var table in SyncContext.DataContext.Tables) {
+				if (this[table] == null)
+					AddTable(table);
+			}
+		}
+		///<summary>Adds a SchemaMapping for a table in the DataContext to the collection.</summary>
+		public TableSynchronizer AddMapping(SchemaMapping mapping) {
+			if (mapping == null) throw new ArgumentNullException("mapping");
+			var table = SyncContext.DataContext.Tables[mapping.Schema];
+			if (table == null) throw new ArgumentException("Mapping must map a table in the DataContext");
+
+			var retVal = new TableSynchronizer(table, mapping, SyncContext.SqlProvider);
+			Add(retVal);
+			return retVal;
+		}
+		///<summary>Adds SchemaMappings for tables in the DataContext to the collection.</summary>
+		public void AddMappings(params SchemaMapping[] mappings) { AddMappings((IEnumerable<SchemaMapping>)mappings); }
+		///<summary>Adds SchemaMappings for tables in the DataContext to the collection.</summary>
+		public void AddMappings(IEnumerable<SchemaMapping> mappings) {
+			if (mappings == null) throw new ArgumentNullException("mappings");
+
+			foreach (var m in mappings)
+				AddMapping(m);
+		}
 		///<summary>Adds a synchronizer for a table.</summary>
-		public void AddMapping(Table table) {
+		public void AddTable(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 			if (table.Context != SyncContext.DataContext) throw new ArgumentException("Table must belong to parent DataContext", "table");
 
 			Items.Add(new TableSynchronizer(table, new SchemaMapping(table.Schema), SyncContext.SqlProvider));
 		}
-		///<summary>Removes the synchronizer for the given table, preventing the table from being synchronized to the database.</summary>
-		public void RemoveMapping(Table table) { Items.Remove(this[table]); }
+		///<summary>Inserts an item into the underlying collection.</summary>
+		protected override void InsertItem(int index, TableSynchronizer item) {
+			if (item == null) throw new ArgumentNullException("item");
+			if (item.Table.Context != SyncContext.DataContext) throw new ArgumentException("Table must belong to parent DataContext", "item");
+
+			base.InsertItem(index, item);
+		}
+		///<summary>Sets an item into the underlying collection.</summary>
+		protected override void SetItem(int index, TableSynchronizer item) {
+			if (item == null) throw new ArgumentNullException("item");
+			if (item.Table.Context != SyncContext.DataContext) throw new ArgumentException("Table must belong to parent DataContext", "item");
+			base.SetItem(index, item);
+		}
 	}
 }
