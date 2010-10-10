@@ -33,6 +33,9 @@ namespace ShomreiTorah.Data.UI.Grid {
 		protected override GridColumnCollection CreateColumnCollection() { return new SmartGridColumnCollection(this); }
 
 		///<summary>Gets the columns in the view.</summary>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		[XtraSerializableProperty(XtraSerializationVisibility.Collection, true, true, true, 0, XtraSerializationFlags.DefaultValue), XtraSerializablePropertyId(LayoutIdColumns)]
 		public new SmartGridColumnCollection Columns { get { return (SmartGridColumnCollection)base.Columns; } }
 		private new MyHandler Handler { get { return (MyHandler)base.Handler; } }
 
@@ -140,6 +143,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			for (int i = 0; i < Count; i++)		//Avoid recursion
 				yield return this[i];
 		}
+		///<summary>Copies the contents of the collection to an array.</summary>
 		public void CopyTo(SmartGridColumn[] array, int index) {
 			if (array == null) throw new ArgumentNullException("array");
 
