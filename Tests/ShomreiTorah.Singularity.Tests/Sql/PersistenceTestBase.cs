@@ -202,12 +202,14 @@ CREATE TABLE [Powers](
 				context.Tables.AddTable(powersTable = new Table(powersSchema));
 
 				var syncContext = new DataSyncContext(context, SqlProvider);
+				syncContext.Tables.AddDefaultMappings();
 
 				Action verify = delegate {
 					var newContext = new DataContext();
 					newContext.Tables.AddTable(new Table(numbersSchema));
 					newContext.Tables.AddTable(new Table(powersSchema));
 					var newSyncContext = new DataSyncContext(newContext, SqlProvider);
+					newSyncContext.Tables.AddDefaultMappings();
 					newSyncContext.ReadData();
 
 					AssertTablesEqual(context.Tables[numbersSchema], newContext.Tables[numbersSchema]);

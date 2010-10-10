@@ -79,7 +79,14 @@ namespace ShomreiTorah.Singularity.Sql {
 		public void AddDefaultMappings() {
 			foreach (var table in SyncContext.DataContext.Tables) {
 				if (this[table] == null)
-					AddTable(table);
+					AddTableDefault(table);
+			}
+		}
+		///<summary>Adds primary mappings for every unmapped table in the context.</summary>
+		public void AddPrimaryMappings() {
+			foreach (var table in SyncContext.DataContext.Tables) {
+				if (this[table] == null)
+					AddTablePrimary(table);
 			}
 		}
 		///<summary>Adds a SchemaMapping for a table in the DataContext to the collection.</summary>
@@ -101,15 +108,24 @@ namespace ShomreiTorah.Singularity.Sql {
 			foreach (var m in mappings)
 				AddMapping(m);
 		}
-		///<summary>Adds a synchronizer for a table using the default SchemaMapping.</summary>
-		///<remarks>If a primary SchemaMapping has been registered by calling <see cref="SchemaMapping.SetPrimaryMapping"/>, it will be used.
-		///If not, a default mapping (which maps every column and preserves names) will be used.</remarks>
-		public void AddTable(Table table) {
+		///<summary>Adds a synchronizer for a table using the primary SchemaMapping.</summary>
+		///<remarks>If no primary SchemaMapping has been registered by calling <see cref="SchemaMapping.SetPrimaryMapping"/>, an exception will be thrown.</remarks>
+		public void AddTablePrimary(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 			if (table.Context != SyncContext.DataContext) throw new ArgumentException("Table must belong to parent DataContext", "table");
 
-			var mapping = SchemaMapping.GetPrimaryMapping(table.Schema) ?? new SchemaMapping(table.Schema);
+			var mapping = SchemaMapping.GetPrimaryMapping(table.Schema);
+			if (mapping == null)
+				throw new InvalidOperationException("The " + table.Schema.Name + " schema has no primary mapping");
 			Items.Add(new TableSynchronizer(table, mapping, SyncContext.SqlProvider));
+		}
+		///<summary>Adds a synchronizer for a table using the default SchemaMapping.</summary>
+		///<remarks>Every column will be mapped using the existing names.</remarks>
+		public void AddTableDefault(Table table) {
+			if (table == null) throw new ArgumentNullException("table");
+			if (table.Context != SyncContext.DataContext) throw new ArgumentException("Table must belong to parent DataContext", "table");
+
+			Items.Add(new TableSynchronizer(table, new SchemaMapping(table.Schema), SyncContext.SqlProvider));
 		}
 		///<summary>Inserts an item into the underlying collection.</summary>
 		protected override void InsertItem(int index, TableSynchronizer item) {
