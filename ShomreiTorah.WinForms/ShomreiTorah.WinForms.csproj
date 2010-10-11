@@ -109,6 +109,7 @@
     <Compile Include="Controls\Lookup\ItemSelectorPopupForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Dialog.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Controls\GoogleMapControl.cs">
       <SubType>UserControl</SubType>
