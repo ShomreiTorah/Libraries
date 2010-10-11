@@ -151,8 +151,4 @@ namespace ShomreiTorah.Data.UI.Grid {
 				array[index + i] = this[i];
 		}
 	}
-	///<summary>A grid column that automatically reads column settings from metadata.</summary>
-	public class SmartGridColumn : GridColumn {
-
-	}
 }
