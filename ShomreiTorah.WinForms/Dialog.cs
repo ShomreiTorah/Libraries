@@ -16,6 +16,11 @@ namespace ShomreiTorah.WinForms {
 		///<summary>Displays an informative message box.</summary>
 		public static void Inform(string text, string title) { Show(text, title, MessageBoxButtons.OK, MessageBoxIcon.Information); }
 
+		///<summary>Displays an error message.</summary>
+		public static void ShowError(string text) { ShowError(text, DefaultTitle); }
+		///<summary>Displays an error message.</summary>
+		public static void ShowError(string text, string title) { Show(text, title, MessageBoxButtons.OK, MessageBoxIcon.Error); }
+
 		///<summary>Displays a confirmation message.</summary>
 		///<returns>True if the user clicked Yes.</returns>
 		public static bool Confirm(string text) { return Confirm(text, DefaultTitle); }
