@@ -61,6 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisplaySettings\DeletionBehavior.cs" />
+    <Compile Include="DisplaySettings\GridManager.cs" />
+    <Compile Include="Grid\IGridBehavior.cs" />
     <Compile Include="Grid\SmartGrid.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -85,11 +88,20 @@
       <Project>{1308A6E1-7787-49F6-A19C-8AF327DAF9B5}</Project>
       <Name>ShomreiTorah.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ShomreiTorah.Data\ShomreiTorah.Data.csproj">
+      <Project>{88D62EF0-7A6C-403E-80EF-6CEFE734DD53}</Project>
+      <Name>ShomreiTorah.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ShomreiTorah.Singularity\ShomreiTorah.Singularity.csproj">
+      <Project>{53C1A3A0-B443-4C28-895B-5E4DFE803A1C}</Project>
+      <Name>ShomreiTorah.Singularity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ShomreiTorah.WinForms\ShomreiTorah.WinForms.csproj">
       <Project>{0B927F97-8CDD-47CB-B775-CA1E0AB2409C}</Project>
       <Name>ShomreiTorah.WinForms</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

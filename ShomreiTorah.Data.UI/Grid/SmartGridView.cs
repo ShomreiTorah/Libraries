@@ -14,6 +14,7 @@ using DevExpress.XtraGrid.Views.Grid.Handler;
 using DevExpress.Utils.Serializing;
 using DevExpress.XtraGrid.Views.Base.Handler;
 using DevExpress.XtraEditors;
+using System.Diagnostics;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>A grid view that automatically reads column settings from metadata.</summary>
@@ -44,6 +45,33 @@ namespace ShomreiTorah.Data.UI.Grid {
 			: base(grid) {
 		}
 
+		#region Behaviors
+#if DEBUG
+		object lastAppliedDataSource;
+		void CheckDoubleApplication() {
+			if (IsDesignMode)
+				Debug.Assert(lastAppliedDataSource != DataSource, "DataSource behaviors applied twice!");
+			else
+				Debug.Assert(lastAppliedDataSource == null, "Two datasources applied");
+			lastAppliedDataSource = DataSource;
+		}
+#endif
+		protected override void SetDataSource(BindingContext context, object dataSource, string dataMember) {
+			base.SetDataSource(context, dataSource, dataMember);
+			if (DataSource != null)
+				ApplyBehaviors();
+		}
+
+		void ApplyBehaviors() {
+#if DEBUG
+			CheckDoubleApplication();
+#endif
+			foreach (var behavior in DisplaySettings.GridManager.GetBehaviors(DataSource)) {
+				behavior.Apply(this);
+			}
+		}
+		#endregion
+
 		///<summary>Copies the settings of a view object to the current one.</summary>
 		public override void Assign(BaseView v, bool copyEvents) {
 			base.Assign(v, copyEvents);
@@ -54,6 +82,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			}
 		}
 
+		#region MouseWheel suppression
 		bool allowEditorWheel;
 		///<summary>Gets or sets whether the view mouse wheel events will be processed by the active editor.</summary>
 		[Description("Gets or sets whether the view mouse wheel events will be processed by the active editor.")]
@@ -65,7 +94,6 @@ namespace ShomreiTorah.Data.UI.Grid {
 			set { allowEditorWheel = value; }
 		}
 
-		#region MouseWheel suppression
 		protected override void UpdateEditor(DevExpress.XtraEditors.Repository.RepositoryItem ritem, DevExpress.XtraEditors.Container.UpdateEditorInfoArgs args) {
 			base.UpdateEditor(ritem, args);
 			if (ActiveEditor != null) {
