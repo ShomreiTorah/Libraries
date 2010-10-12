@@ -81,7 +81,6 @@ namespace ShomreiTorah.Singularity {
 		///<typeparam name="TValue">The type of the column's value.</typeparam>
 		///<param name="name">The name of the column.</param>
 		///<param name="expression">An expression used to calculate the column's value.</param>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Expression tree")]
 		public CalculatedColumn AddCalculatedColumn<TValue>(string name, Expression<Func<Row, TValue>> expression) {
 			if (expression == null) throw new ArgumentNullException("expression");
 			var compiled = expression.Compile();
@@ -93,7 +92,6 @@ namespace ShomreiTorah.Singularity {
 		///<typeparam name="TRow">The strongly-typed row used to calculate the column's value.</typeparam>
 		///<param name="name">The name of the column.</param>
 		///<param name="expression">An expression used to calculate the column's value.</param>
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Expression tree")]
 		public CalculatedColumn AddCalculatedColumn<TRow, TValue>(string name, Expression<Func<TRow, TValue>> expression) where TRow : Row {
 			if (expression == null) throw new ArgumentNullException("expression");
 			var compiled = expression.Compile();

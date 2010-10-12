@@ -28,7 +28,6 @@ namespace ShomreiTorah.Singularity {
 
 		///<summary>Creates TypedSchema.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
-		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures")]
 		//[Obsolete("This pattern is no longer used.  Please use a static constructor.")]
 		public static TypedSchema<TRow> Create(string name, Action<TypedSchema<TRow>> creator) {
 			if (creator == null) throw new ArgumentNullException("creator");
