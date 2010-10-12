@@ -622,6 +622,7 @@ namespace ShomreiTorah.Common {
 		#region ReaderWriterLock
 		///<summary>Gets a disposable read lock from a ReaderWriterLockSlim.</summary>
 		///<returns>An IDispoable instance, which must be disposed to exit the lock.</returns>
+		[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "rwl")]
 		public static IDisposable ReadLock(this ReaderWriterLockSlim rwl) {
 			if (rwl == null) throw new ArgumentNullException("rwl");
 			rwl.EnterReadLock();
@@ -629,6 +630,7 @@ namespace ShomreiTorah.Common {
 		}
 		///<summary>Gets a disposable write lock from a ReaderWriterLockSlim.</summary>
 		///<returns>An IDispoable instance, which must be disposed to exit the lock.</returns>
+		[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "rwl")]
 		public static IDisposable WriteLock(this ReaderWriterLockSlim rwl) {
 			if (rwl == null) throw new ArgumentNullException("rwl");
 			rwl.EnterWriteLock();
@@ -637,6 +639,7 @@ namespace ShomreiTorah.Common {
 
 		/////<summary>Gets a disposable upgradeable read lock from a ReaderWriterLockSlim.</summary>
 		/////<returns>An IDispoable instance, which must be disposed to exit the lock.</returns>
+		//[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "rwl")]
 		//public static IDisposable UpgradeableReadLock(this ReaderWriterLockSlim rwl) {
 		//    if (rwl == null) throw new ArgumentNullException("rwl");
 		//    rwl.EnterUpgradeableReadLock();
