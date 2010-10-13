@@ -36,6 +36,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			return new DeletionBehavior(s => Dialog.Warn(messageGetter((IEnumerable<T>)s)));
 		}
 
+		///<summary>Creates a DeletionBehavior that disallows deletion.</summary>
+		///<param name="message">The error message to display when the user attempts to delete a row.</param>
 		public static DeletionBehavior Disallow(string message) {
 			return new DeletionBehavior(_ => { Dialog.ShowError(message); return false; });
 		}
