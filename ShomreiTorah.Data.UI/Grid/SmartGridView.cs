@@ -14,7 +14,7 @@ using DevExpress.XtraGrid.Views.Grid.Handler;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>A grid view that automatically reads column settings from metadata.</summary>
-	public  sealed partial class SmartGridView : GridView {
+	public sealed partial class SmartGridView : GridView {
 		sealed class MyRegistrator : GridInfoRegistrator {
 			public override string ViewName { get { return "SmartGridView"; } }
 			public override BaseViewHandler CreateHandler(BaseView view) { return new MyHandler((SmartGridView)view); }
@@ -86,6 +86,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			public MyHandler(SmartGridView view) : base(view) { }
 
 			public new SmartGridView View { get { return (SmartGridView)base.View; } }
+			public SmartGrid GridControl { get { return (SmartGrid)base.View.GridControl; } }
 		}
 	}
 	///<summary>Contains the columns in a SmartGridView.</summary>

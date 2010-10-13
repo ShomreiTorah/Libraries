@@ -9,7 +9,16 @@ using System.Windows.Forms;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>A grid column that automatically reads column settings from metadata.</summary>
-	public class SmartGridColumn : GridColumn {
+	public partial class SmartGridColumn : GridColumn {
+		protected override void Assign(GridColumn column) {
+			base.Assign(column);
+			var col = column as SmartGridColumn;
+			if (col != null) {
+				ShowEditorOnMouseDown = col.ShowEditorOnMouseDown;
+			}
+		}
+
+
 		internal RepositoryItem DefaultEditor { get; set; }
 
 		public bool ShouldSerializeColumnEditor() { return ColumnEdit != DefaultEditor; }
