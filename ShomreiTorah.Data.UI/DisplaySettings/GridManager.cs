@@ -8,6 +8,11 @@ using ShomreiTorah.Singularity;
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Manages custom and built-in behaviors for grid views and columns.</summary>
 	public static class GridManager {
+		///<summary>Gets the number of behavior registrations,</summary>
+		///<remarks>This property is used y the grid to verify design-time
+		///registrations.  See <see cref="SmartGrid.RegistrationCount"/>.</remarks>
+		internal static int RegistrationCount { get { return behaviors.Count; } }
+
 		//Since all I need is insertion and in-order traversal, a linked list is best.
 		static readonly LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>> behaviors = new LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>>();
 
