@@ -35,14 +35,43 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			if (selector == null) throw new ArgumentNullException("selector");
 			if (behavior == null) throw new ArgumentNullException("behavior");
 
-			behaviors.AddLast(new KeyValuePair<Func<object, bool>, IGridBehavior>(selector, behavior));
+			behaviors.AddFirst(new KeyValuePair<Func<object, bool>, IGridBehavior>(selector, behavior));
 		}
+
+		//If two IGridBehaviors of the same type match the same
+		//datasource, only the one added last will be used.  To
+		//do this, I maintain the behaviors set backwards, then
+		//call Distinct with a custom IEqualityComparer before 
+		//returning matching behaviors.  The Distinct() method 
+		//will return the first of each set of duplicates from 
+		//the original.  I cannot maintain the uniqueness when 
+		//adding the behaviors because I can't compare selector
+		//delegates.  This allows specific programs to override
+		//the built-in default schema settings.
+		//This means that behaviors will be applied in reverse.
+		//I want behaviors to be completely independent, so I'm
+		//keeping this behavior.  To change it, call .Reverse()
+		//after .Distinct().
 
 		///<summary>Gets the grid behaviors that should be applied to the given datasource.</summary>
 		public static IEnumerable<IGridBehavior> GetBehaviors(object dataSource) {
 			if (dataSource == null) throw new ArgumentNullException("dataSource");
 
-			return behaviors.Where(kvp => kvp.Key(dataSource)).Select(kvp => kvp.Value);
+			return behaviors.Where(kvp => kvp.Key(dataSource))
+							.Select(kvp => kvp.Value)
+							.Distinct(new TypeComparer<IGridBehavior>());
+		}
+		class TypeComparer<T> : IEqualityComparer<T> where T : class {
+			public bool Equals(T x, T y) {
+				if (x == y) return true;
+				if (x == null || y == null) return false;
+				return x.GetType() == y.GetType();
+			}
+
+			public int GetHashCode(T obj) {
+				if (obj == null) return int.MinValue;
+				return obj.GetType().GetHashCode();
+			}
 		}
 	}
 }
