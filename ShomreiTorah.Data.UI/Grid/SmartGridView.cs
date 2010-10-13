@@ -86,7 +86,9 @@ namespace ShomreiTorah.Data.UI.Grid {
 			public MyHandler(SmartGridView view) : base(view) { }
 
 			public new SmartGridView View { get { return (SmartGridView)base.View; } }
-			public SmartGrid GridControl { get { return (SmartGrid)base.View.GridControl; } }
+			///<summary>Gets the SmartGrid control that owns the view, if any.</summary>
+			///<remarks>In the grid designer's feature browser, this will be null, since it uses a special designer grid control.</remarks>
+			public SmartGrid SmartOwner { get { return base.View.GridControl as SmartGrid; } }
 		}
 	}
 	///<summary>Contains the columns in a SmartGridView.</summary>

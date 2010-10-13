@@ -37,8 +37,11 @@ namespace ShomreiTorah.Data.UI.Grid {
 					if (col != null && DownPointHitInfo.InRowCell) {
 						if (col.ShowEditorOnMouseDown && View.GetShowEditorMode() != EditorShowMode.MouseDown) {
 							View.ShowEditorByMouse();
-							if (View.IsEditing)
-								GridControl.MouseCaptureOwner = null;
+
+							if (SmartOwner != null) {	//The designer's feature browser uses a different control.
+								if (View.IsEditing)
+									SmartOwner.MouseCaptureOwner = null;
+							}
 						}
 					}
 				}
