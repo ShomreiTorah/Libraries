@@ -67,6 +67,9 @@
     <Compile Include="DisplaySettings\SettingsRegistrator.cs" />
     <Compile Include="DisplaySettings\UIThread.cs" />
     <Compile Include="Grid\IGridBehavior.cs" />
+    <Compile Include="Grid\MouseWheel Suppression.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Grid\SmartGrid.cs">
       <SubType>Component</SubType>
     </Compile>
