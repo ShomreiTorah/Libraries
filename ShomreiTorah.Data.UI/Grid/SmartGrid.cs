@@ -13,6 +13,11 @@ namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>A grid control that automatically reads column settings from metadata.</summary>
 	[Description("A grid control that automatically reads column settings from metadata.")]
 	public class SmartGrid : GridControl {
+		///<summary>Initializes a new SmartGrid instance.</summary>
+		public SmartGrid() {
+			DisplaySettings.SettingsRegistrator.EnsureRegistered();
+		}
+
 		protected override BaseView CreateDefaultView() {
 			return CreateView("SmartGridView");
 		}

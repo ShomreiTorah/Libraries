@@ -39,6 +39,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		public static void RegisterBehavior(Func<object, bool> selector, IGridBehavior behavior) {
 			if (selector == null) throw new ArgumentNullException("selector");
 			if (behavior == null) throw new ArgumentNullException("behavior");
+			UIThread.Verify();
 
 			behaviors.AddFirst(new KeyValuePair<Func<object, bool>, IGridBehavior>(selector, behavior));
 		}
@@ -61,6 +62,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<summary>Gets the grid behaviors that should be applied to the given datasource.</summary>
 		public static IEnumerable<IGridBehavior> GetBehaviors(object dataSource) {
 			if (dataSource == null) throw new ArgumentNullException("dataSource");
+			UIThread.Verify();
 
 			return behaviors.Where(kvp => kvp.Key(dataSource))
 							.Select(kvp => kvp.Value)
