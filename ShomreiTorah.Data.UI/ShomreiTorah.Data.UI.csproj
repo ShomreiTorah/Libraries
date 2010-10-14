@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="DisplaySettings\AdvancedColumnsBehavior.cs" />
     <Compile Include="DisplaySettings\DeletionBehavior.cs" />
+    <Compile Include="DisplaySettings\EditorRepository.cs" />
     <Compile Include="DisplaySettings\GridManager.cs" />
     <Compile Include="DisplaySettings\SettingsRegistrator.cs" />
     <Compile Include="DisplaySettings\UIThread.cs" />
