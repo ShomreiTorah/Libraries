@@ -1,17 +1,45 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using DevExpress.Utils;
+using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Repository;
+using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Contains RepositoryItem presets.</summary>
 	public static partial class EditorRepository {
-		//The static ctor is executed after all field initializers, so the linked list will exist
-		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Force deterministic initialization")]
-		static EditorRepository() { SettingsRegistrator.EnsureRegistered(); }
+		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Annoying")]
+		static EditorRepository() {
+			//This file should create reusable presets.
+			//Column registration is done in SettingsRegistrator.
+			#region Editor Presets
+			CurrencyEditor = new EditorSettings<RepositoryItemSpinEdit>(properties => {
+				properties.Increment = 10;
+				properties.DisplayFormat.FormatString = "c";
+				properties.DisplayFormat.FormatType = FormatType.Numeric;
+				properties.EditFormat.Assign(properties.DisplayFormat);
+				properties.Mask.EditMask = "c";
+			});
+
+			AccountEditor = new ComboBoxSettings(Names.AccountNames);
+			PaymentMethodEditor = new ComboBoxSettings(Names.PaymentMethods);
+			StateEditor = new ComboBoxSettings(Names.CommonStates.Concat(Names.StateAbbreviations));
+			#endregion
+		}
+
+		///<summary>Gets the EditorSettings for a currency field.</summary>
+		public static EditorSettings<RepositoryItemSpinEdit> CurrencyEditor { get; private set; }
+		///<summary>Gets the EditorSettings for the Billing Account field.</summary>
+		public static ComboBoxSettings AccountEditor { get; private set; }
+		///<summary>Gets the EditorSettings for the payment method field.</summary>
+		public static ComboBoxSettings PaymentMethodEditor { get; private set; }
+		///<summary>Gets the EditorSettings for a US State field.</summary>
+		public static ComboBoxSettings StateEditor { get; private set; }
 
 		static readonly Dictionary<Column, IEditorSettings> dictionary = new Dictionary<Column, IEditorSettings>();
 
@@ -68,5 +96,30 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		RepositoryItem IEditorSettings.CreateItem() { return CreateItem(); }
 		void IEditorSettings.Apply(RepositoryItem item) { Apply((TRepositoryItem)item); }
+	}
+
+	///<summary>Contains settings for a simple RepositoryItemComboBox.</summary>
+	public class ComboBoxSettings : EditorSettings<RepositoryItemComboBox> {
+		static readonly Action<RepositoryItemComboBox> emptyAction = _ => { };
+
+		///<summary>Creates a new ComboBoxSettings instance.</summary>
+		public ComboBoxSettings(params string[] items) : this((IEnumerable<string>)items) { }
+		///<summary>Creates a new ComboBoxSettings instance.</summary>
+		public ComboBoxSettings(IEnumerable<string> items, Action<RepositoryItemComboBox> configurator = null)
+			: base(configurator ?? emptyAction) {
+			Items = items.ReadOnlyCopy();
+		}
+
+		///<summary>Gets the items in the dropdown list.</summary>
+		public ReadOnlyCollection<string> Items { get; private set; }
+
+		public override void Apply(RepositoryItemComboBox item) {
+			item.Items.Clear();
+			item.Items.AddRange(Items);
+			item.DropDownRows = Math.Min(15, Items.Count);
+			item.HighlightedItemStyle = HighlightStyle.Skinned;
+
+			base.Apply(item);	//Call the optional configurator
+		}
 	}
 }
