@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using ShomreiTorah.Data.UI.Grid;
@@ -8,6 +9,10 @@ using ShomreiTorah.Singularity;
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Manages custom and built-in behaviors for grid views and columns.</summary>
 	public static class GridManager {
+		//The static ctor is executed after all field initializers, so the linked list will exist
+		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Force deterministic initialization")]
+		static GridManager() { SettingsRegistrator.EnsureRegistered(); }
+
 		///<summary>Gets the number of behavior registrations,</summary>
 		///<remarks>This property is used y the grid to verify design-time
 		///registrations.  See <see cref="SmartGrid.RegistrationCount"/>.</remarks>
