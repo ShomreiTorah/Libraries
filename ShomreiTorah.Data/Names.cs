@@ -19,7 +19,7 @@ namespace ShomreiTorah.Data {
 		public static string DefaultAccount { get { return AccountNames[0]; } }
 
 		///<summary>Gets the standard payment methods.</summary>
-		public static ReadOnlyCollection<string> PaymentMethods = Strings("Cash", "Check");
+		public static readonly ReadOnlyCollection<string> PaymentMethods = Strings("Cash", "Check");
 		#endregion
 
 		#region General
@@ -80,10 +80,10 @@ namespace ShomreiTorah.Data {
 		});
 
 		///<summary>Gets the abbreviations of the US states.</summary>
-		public static ReadOnlyCollection<string> StateAbbreviations = new ReadOnlyCollection<string>(States.Keys.ToArray());
+		public static readonly ReadOnlyCollection<string> StateAbbreviations = new ReadOnlyCollection<string>(States.Keys.ToArray());
 
 		///<summary>Gets the abbreviations of the states commonly found in the data.</summary>
-		public static ReadOnlyCollection<string> CommonStates = Strings("NJ", "NY");
+		public static readonly ReadOnlyCollection<string> CommonStates = Strings("NJ", "NY");
 		#endregion
 	}
 }
