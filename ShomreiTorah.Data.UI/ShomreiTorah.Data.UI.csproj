@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DisplaySettings\AdvancedColumnsBehavior.cs" />
+    <Compile Include="Grid\ColumnController.cs" />
     <Compile Include="DisplaySettings\DeletionBehavior.cs" />
     <Compile Include="DisplaySettings\EditorRepository.cs" />
     <Compile Include="DisplaySettings\GridManager.cs" />

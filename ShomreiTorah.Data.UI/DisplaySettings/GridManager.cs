@@ -18,6 +18,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///registrations.  See <see cref="SmartGrid.RegistrationCount"/>.</remarks>
 		internal static int RegistrationCount { get { return behaviors.Count; } }
 
+		#region Grid Behaviors
 		//Since all I need is insertion and in-order traversal, a linked list is best.
 		static readonly LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>> behaviors = new LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>>();
 
@@ -85,5 +86,37 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				return obj.GetType().GetHashCode();
 			}
 		}
+		#endregion
+
+		#region Column Controllers
+		//Since all I need is insertion and in-order traversal, a linked list is best.
+		static readonly LinkedList<KeyValuePair<FieldPredicate, ColumnController>> columnControllers = new LinkedList<KeyValuePair<FieldPredicate, ColumnController>>();
+
+		///<summary>Registers a column controller for a column in a Singularity schema.</summary>
+		///<param name="column">The column that should use the controller.</param>
+		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the column).</param>
+		public static void RegisterColumn(Column column, ColumnController controller) {
+			if (column == null) throw new ArgumentNullException("column");
+			RegisterColumn((ds, name) => name == column.Name && TableSchema.GetSchema(ds) == column.Schema, controller);
+		}
+		///<summary>Registers a column controller for fields that match a delegate.</summary>
+		///<param name="selector">A delegate that indicates which datasource/column-name pairs should use this controller.</param>
+		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the column).</param>
+		public static void RegisterColumn(FieldPredicate selector, ColumnController controller) {
+			if (selector == null) throw new ArgumentNullException("selector");
+			//controller can be null.
+
+			//By inserting each registration at the beginning of the list, I
+			//override any previous registrations that match the same field.
+			columnControllers.AddFirst(new KeyValuePair<FieldPredicate, ColumnController>(selector, controller));
+		}
+
+		///<summary>Gets the ColumnController instance for a field in a datasource.</summary>
+		public static ColumnController GetController(object dataSource, string fieldName) {
+			return columnControllers.FirstOrDefault(kvp => kvp.Key(dataSource, fieldName)).Value;
+		}
+		#endregion
 	}
+	///<summary>A method that determines whether a field in a datasource matches a condition.</summary>
+	public delegate bool FieldPredicate(object dataSource, string columnName);
 }
