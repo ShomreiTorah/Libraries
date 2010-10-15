@@ -41,6 +41,10 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<summary>Gets the EditorSettings for a US State field.</summary>
 		public static ComboBoxSettings StateEditor { get; private set; }
 
+		///<summary>Gets the number of behavior registrations,</summary>
+		///<remarks>This property is used by the grid to verify design-time
+		///registrations.  See <see cref="SmartGrid.RegistrationCount"/>.</remarks>
+		internal static int RegistrationCount { get { return dictionary.Count; } }
 		static readonly Dictionary<Column, IEditorSettings> dictionary = new Dictionary<Column, IEditorSettings>();
 
 		///<summary>Registers an IEditorSettings preset for a column in a Singularity schema.</summary>

@@ -14,9 +14,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		static GridManager() { SettingsRegistrator.EnsureRegistered(); }
 
 		///<summary>Gets the number of behavior registrations,</summary>
-		///<remarks>This property is used y the grid to verify design-time
+		///<remarks>This property is used by the grid to verify design-time
 		///registrations.  See <see cref="SmartGrid.RegistrationCount"/>.</remarks>
-		internal static int RegistrationCount { get { return behaviors.Count; } }
+		internal static int RegistrationCount { get { return behaviors.Count + columnControllers.Count + EditorRepository.RegistrationCount; } }
 
 		#region Grid Behaviors
 		//Since all I need is insertion and in-order traversal, a linked list is best.
