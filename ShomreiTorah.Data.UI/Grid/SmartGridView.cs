@@ -41,6 +41,13 @@ namespace ShomreiTorah.Data.UI.Grid {
 			: base(grid) {
 		}
 
+		protected override void SetDataSource(BindingContext context, object dataSource, string dataMember) {
+			base.SetDataSource(context, dataSource, dataMember);
+			if (DataSource != null) {
+				ApplyBehaviors();
+				ApplyColumnControllers(force: true);
+			}
+		}
 		#region Behaviors
 #if DEBUG
 		object lastAppliedDataSource;
@@ -52,11 +59,6 @@ namespace ShomreiTorah.Data.UI.Grid {
 			lastAppliedDataSource = DataSource;
 		}
 #endif
-		protected override void SetDataSource(BindingContext context, object dataSource, string dataMember) {
-			base.SetDataSource(context, dataSource, dataMember);
-			if (DataSource != null)
-				ApplyBehaviors();
-		}
 
 		void ApplyBehaviors() {
 #if DEBUG
