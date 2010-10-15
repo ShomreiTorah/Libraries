@@ -94,7 +94,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		}
 	}
 	///<summary>Contains the columns in a SmartGridView.</summary>
-	public class SmartGridColumnCollection : GridColumnCollection, IEnumerable<SmartGridColumn> {
+	public partial class SmartGridColumnCollection : GridColumnCollection, IEnumerable<SmartGridColumn> {
 		///<summary>Creates a new SmartGridColumnCollection for a SmartGridView.</summary>
 		public SmartGridColumnCollection(SmartGridView view) : base(view) { }
 		///<summary>Creates a new column for the collection.</summary>
