@@ -105,7 +105,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<summary>Creates a new ComboBoxSettings instance.</summary>
 		public ComboBoxSettings(params string[] items) : this((IEnumerable<string>)items) { }
 		///<summary>Creates a new ComboBoxSettings instance.</summary>
-		public ComboBoxSettings(IEnumerable<string> items, Action<RepositoryItemComboBox> configurator = null)
+		public ComboBoxSettings(IEnumerable<string> items) : this(items, null) { }
+		///<summary>Creates a new ComboBoxSettings instance with an additional configurator delegate.</summary>
+		public ComboBoxSettings(IEnumerable<string> items, Action<RepositoryItemComboBox> configurator)
 			: base(configurator ?? emptyAction) {
 			Items = items.ReadOnlyCopy();
 		}
