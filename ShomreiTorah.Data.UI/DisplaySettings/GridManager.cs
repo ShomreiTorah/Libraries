@@ -27,16 +27,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<param name="behavior">The IGridBehavior instance.</param>
 		public static void RegisterBehavior(TableSchema schema, IGridBehavior behavior) {
 			if (schema == null) throw new ArgumentNullException("schema");
-			RegisterBehavior<Table>(t => t.Schema == schema, behavior);
-		}
-
-		///<summary>Registers an IGridBehavior for matching typed datasources.</summary>
-		///<typeparam name="TDataSource">The type of datasource that the behavior can be applied to.</typeparam>
-		///<param name="selector">A delegate that determines which datasources the behavior should be applied to.</param>
-		///<param name="behavior">The IGridBehavior instance.</param>
-		public static void RegisterBehavior<TDataSource>(Func<TDataSource, bool> selector, IGridBehavior behavior) where TDataSource : class {
-			if (selector == null) throw new ArgumentNullException("selector");
-			RegisterBehavior(o => { var t = o as TDataSource; return t != null && selector(t); }, behavior);
+			RegisterBehavior(t => TableSchema.GetSchema(t) == schema, behavior);
 		}
 
 		///<summary>Registers an IGridBehavior for matching datasources.</summary>
