@@ -59,7 +59,7 @@ namespace ShomreiTorah.Singularity {
 		public new ITableRowCollection<TRow> Rows { get; private set; }
 
 		///<summary>A typed wrapper around an untyped row collection.</summary>
-		sealed class TypedRowCollection : ITableRowCollection<TRow>, IListSource {
+		sealed class TypedRowCollection : ITableRowCollection<TRow>, IListSource,ISchemaItem {
 			readonly ITableRowCollection<Row> inner;
 			internal TypedRowCollection(ITableRowCollection<Row> inner) { this.inner = inner; }
 
@@ -84,6 +84,8 @@ namespace ShomreiTorah.Singularity {
 
 			public bool ContainsListCollection { get { return false; } }
 			public IList GetList() { return ((IListSource)inner).GetList(); }
+
+			public TableSchema Schema { get { return Table.Schema; } }
 		}
 
 		//This class maintains separate backing fields for typed events, 
@@ -162,7 +164,7 @@ namespace ShomreiTorah.Singularity {
 			return (IChildRowCollection<TChildRow>)retVal;
 		}
 
-		sealed class TypedChildRowCollection<TChildRow> : IChildRowCollection<TChildRow>, IListSource where TChildRow : Row {
+		sealed class TypedChildRowCollection<TChildRow> : IChildRowCollection<TChildRow>, IListSource, ISchemaItem where TChildRow : Row {
 			readonly IChildRowCollection<Row> inner;
 			public TypedChildRowCollection(IChildRowCollection<Row> inner) { this.inner = inner; }
 
@@ -192,6 +194,8 @@ namespace ShomreiTorah.Singularity {
 
 			public bool ContainsListCollection { get { return false; } }
 			public IList GetList() { return ((IListSource)inner).GetList(); }
+
+			public TableSchema Schema { get { return ChildTable.Schema; } }
 		}
 	}
 }

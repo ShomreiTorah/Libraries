@@ -9,7 +9,7 @@ using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>An untyped row in a Singularity table.</summary>
-	public partial class Row {
+	public partial class Row : ISchemaItem {
 		///<summary>Initializes a new instance of the <see cref="Row"/> class for a given schema.</summary>
 		public Row(TableSchema schema) {
 			if (schema == null) throw new ArgumentNullException("schema");

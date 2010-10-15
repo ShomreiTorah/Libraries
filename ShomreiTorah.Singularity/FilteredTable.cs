@@ -10,7 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A filtered view of an existing table.</summary>
-	public class FilteredTable<TRow> : IListSource, IDisposable where TRow : Row {
+	public class FilteredTable<TRow> : IListSource, IDisposable, ISchemaItem where TRow : Row {
 		readonly ITable<TRow> typedTable;
 		readonly Table untypedTable;
 		readonly Func<TRow, bool> filter;
@@ -42,7 +42,7 @@ namespace ShomreiTorah.Singularity {
 			Table.RowRemoved += Table_RowRemoved;
 			Table.ValueChanged += Table_ValueChanged;
 		}
-		///<summary>Gets the table that this instance displays rows from.</summary>
+		///<summary>Gets the table that this instance contains rows from.</summary>
 		public Table Table { get { return untypedTable; } }
 		///<summary>Gets the rows that meet the filter.</summary>
 		public TypedReadOnlyRowCollection<TRow> Rows { get; private set; }
@@ -171,6 +171,8 @@ namespace ShomreiTorah.Singularity {
 				dependency.Unregister(untypedTable);
 			}
 		}
+
+		TableSchema ISchemaItem.Schema { get { return Table.Schema; } }
 	}
 
 	///<summary>A filtered view of an untyped table.</summary>

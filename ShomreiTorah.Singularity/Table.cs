@@ -8,7 +8,7 @@ using System.ComponentModel;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
-	public partial class Table : ITable<Row>, IRowEventProvider, IListSource {
+	public partial class Table : ITable<Row>, IRowEventProvider, IListSource, ISchemaItem {
 		DataContext context;
 
 		///<summary>Creates an empty table.</summary>
@@ -49,7 +49,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Table: " + Schema.Name; }
 
-		sealed class RowCollection : Collection<Row>, ITableRowCollection<Row>, IListSource {
+		sealed class RowCollection : Collection<Row>, ITableRowCollection<Row>, IListSource, ISchemaItem {
 			internal RowCollection(Table table) { Table = table; }
 
 			public Table Table { get; private set; }
@@ -94,6 +94,8 @@ namespace ShomreiTorah.Singularity {
 			public bool ContainsListCollection { get { return false; } }
 
 			public System.Collections.IList GetList() { return ((IListSource)Table).GetList(); }
+
+			public TableSchema Schema { get { return Table.Schema; } }
 		}
 
 		IList<Row> IRowEventProvider.Rows { get { return Rows; } }

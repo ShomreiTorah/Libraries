@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A column in a Singularity table.</summary>
-	public abstract partial class Column : INamedObject {
+	public abstract partial class Column : INamedObject, ISchemaItem {
 		string name;
 		object defaultValue;
 

@@ -66,7 +66,7 @@ namespace ShomreiTorah.Singularity {
 		event EventHandler<ValueChangedEventArgs> ValueChanged;
 	}
 
-	internal sealed class ChildRowCollection : ReadOnlyCollection<Row>, IChildRowCollection<Row>, IListSource, IRowEventProvider {
+	internal sealed class ChildRowCollection : ReadOnlyCollection<Row>, IChildRowCollection<Row>, IListSource, IRowEventProvider, ISchemaItem {
 		internal ChildRowCollection(Row parentRow, ChildRelation relation, Table childTable, IEnumerable<Row> childRows)
 			: base(childRows.ToList()) {
 			ParentRow = parentRow;
@@ -118,5 +118,7 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		IList<Row> IRowEventProvider.Rows { get { return this; } }
+
+		TableSchema ISchemaItem.Schema { get { return ChildTable.Schema; } }
 	}
 }

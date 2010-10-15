@@ -4,10 +4,25 @@ using System.Linq;
 using System.Text;
 using ShomreiTorah.Common;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>Contains the schema of a Singularity table.</summary>
 	public partial class TableSchema {
+		///<summary>Gets the schema describing an object.</summary>
+		///<param name="obj">A table, row, column, ChildRowCollection, or other object with a schema.</param>
+		///<returns>The schema instance used by the object, or null if the object doesn't have a schema.</returns>
+		[SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "obj")]
+		public static TableSchema GetSchema(object obj) {
+			var schema = obj as TableSchema;
+			if (schema != null) return schema;
+
+			var s = obj as ISchemaItem;
+			if (s != null) return s.Schema;
+
+			return null;
+		}
+
 		///<summary>Initializes a new instance of the <see cref="TableSchema"/> class.</summary>
 		public TableSchema(string name) {
 			if (String.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
@@ -130,5 +145,10 @@ namespace ShomreiTorah.Singularity {
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the child relation with the given name, or null if there is no column with that name.</summary>
 		public ChildRelation this[string name] { get { return this.FirstOrDefault(r => r.Name == name); } }
+	}
+
+	///<summary>An object that references a TableSchema.</summary>
+	interface ISchemaItem {
+		TableSchema Schema { get; }
 	}
 }

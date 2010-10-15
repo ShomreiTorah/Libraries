@@ -9,7 +9,7 @@ using System.Text;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.DataBinding {
-	abstract class RowCollectionBinder : PhantomCollection<Row>, IBindingList, ICancelAddNew, IRaiseItemChangedEvents, ITypedList {
+	abstract class RowCollectionBinder : PhantomCollection<Row>, IBindingList, ICancelAddNew, IRaiseItemChangedEvents, ITypedList, ISchemaItem {
 		public TableSchema Schema { get; protected set; }
 		protected abstract string ListName { get; }
 
@@ -259,7 +259,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			return newRow;
 		}
 
-		//PhantomCollection wraps the original ChildRowCollection,
+		//PhantomCollection wraps the original FilteredTable.Rows,
 		//which is read-only.  I override its mutation methods and
 		//modify the child table
 
