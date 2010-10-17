@@ -90,6 +90,16 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			if (column == null) throw new ArgumentNullException("column");
 			RegisterColumn((ds, name) => name == column.Name && TableSchema.GetSchema(ds) == column.Schema, controller);
 		}
+		///<summary>Registers a column controller for one or more columns in Singularity schemas.</summary>
+		///<param name="columns">The columns that should use the controller.</param>
+		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the column).</param>
+		public static void RegisterColumns(IEnumerable<Column> columns, ColumnController controller) {
+			if (columns == null) throw new ArgumentNullException("columns");
+			RegisterColumn(
+				(ds, name) => columns.Any(c => name == c.Name && TableSchema.GetSchema(ds) == c.Schema),
+				controller
+			);
+		}
 		///<summary>Registers a column controller for fields that match a delegate.</summary>
 		///<param name="selector">A delegate that indicates which datasource/column-name pairs should use this controller.</param>
 		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the column).</param>
