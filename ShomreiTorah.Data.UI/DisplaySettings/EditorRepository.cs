@@ -20,8 +20,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			#region Editor Presets
 			CurrencyEditor = new EditorSettings<RepositoryItemSpinEdit>(properties => {
 				properties.Increment = 10;
-				properties.DisplayFormat.FormatString = "c";
 				properties.DisplayFormat.FormatType = FormatType.Numeric;
+				properties.DisplayFormat.FormatString = "c";
 				properties.EditFormat.Assign(properties.DisplayFormat);
 				properties.Mask.EditMask = "c";
 			});
@@ -53,6 +53,13 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			if (settings == null) throw new ArgumentNullException("settings");
 			UIThread.Verify();
 			dictionary.Add(column, settings);
+		}
+		///<summary>Registers an IEditorSettings preset for one or more columns in Singularity schemas.</summary>
+		public static void Register(IEnumerable<Column> columns, IEditorSettings settings) {
+			if (columns == null) throw new ArgumentNullException("columns");
+
+			foreach (var column in columns)
+				Register(column, settings);
 		}
 
 		///<summary>Gets an IEditorSettings to use for the given column, or null if there is no preset for that column.</summary>
