@@ -34,7 +34,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		bool controllerActivated;
 		internal void ActivateController(bool force = false) {
 			if ((controllerActivated && !force)
-			 || !String.IsNullOrEmpty(FieldName)
+			 || String.IsNullOrEmpty(FieldName)
 			 || View == null
 			 || View.DataSource == null)
 				return;
