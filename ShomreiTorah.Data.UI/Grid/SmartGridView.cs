@@ -46,8 +46,9 @@ namespace ShomreiTorah.Data.UI.Grid {
 		object lastAppliedDataSource;
 		protected override void OnDataController_DataSourceChanged(object sender, EventArgs e) {
 			base.OnDataController_DataSourceChanged(sender, e);
-			if (DataSource != null) {
-				if (lastAppliedDataSource == DataSource)
+			if (DataSource != null || DesignMode) {
+				if (GridControl == null) return;
+				if (lastAppliedDataSource != null && lastAppliedDataSource == DataSource)
 					return;
 				ApplyBehaviors();
 				ApplyColumnControllers();

@@ -44,15 +44,15 @@ namespace ShomreiTorah.Data.UI.Grid {
 		internal void ActivateController(bool force = false) {
 			if (String.IsNullOrEmpty(FieldName)
 			 || View == null
-			 || View.DataSource == null
-			 || (controllerDataSource == View.DataSource && !force))	//Or the datasource hasn't changed since last time
+			 || (!DesignMode && View.DataSource == null) || View.GridControl == null
+			 || (controllerDataSource != null && controllerDataSource == View.DataSource && !force))	//Or the datasource hasn't changed since last time
 				return;
 
-			var editorSettings = DisplaySettings.EditorRepository.GetSettings(View.DataSource, FieldName);
+			var editorSettings = DisplaySettings.EditorRepository.GetSettings(this);
 			if (editorSettings != null)
 				SetDefaultEditor(editorSettings.CreateItem());
 
-			Controller = DisplaySettings.GridManager.GetController(View.DataSource, FieldName);
+			Controller = DisplaySettings.GridManager.GetController(this);
 			if (Controller != null)
 				Controller.Apply(this);
 			controllerDataSource = View.DataSource;

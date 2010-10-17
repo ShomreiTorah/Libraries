@@ -9,6 +9,7 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Repository;
 using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
+using DevExpress.XtraGrid.Columns;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Contains RepositoryItem presets.</summary>
@@ -69,6 +70,15 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			var schema = TableSchema.GetSchema(dataSource);
 			if (schema == null) return null;
 			var column = schema.Columns[columnName];
+			if (column == null) return null;	//eg, unbound columns
+
+			IEditorSettings retVal;
+			dictionary.TryGetValue(column, out retVal);
+			return retVal;
+		}
+		///<summary>Gets an IEditorSettings to use for the given grid column, or null if there is no preset for that column.</summary>
+		public static IEditorSettings GetSettings(GridColumn gridColumn) {
+			var column = gridColumn.GetSchemaColumn();
 			if (column == null) return null;	//eg, unbound columns
 
 			IEditorSettings retVal;

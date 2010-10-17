@@ -93,14 +93,14 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		#region Column Controllers
 		//Since all I need is insertion and in-order traversal, a linked list is best.
-		static readonly LinkedList<KeyValuePair<FieldPredicate, ColumnController>> columnControllers = new LinkedList<KeyValuePair<FieldPredicate, ColumnController>>();
+		static readonly LinkedList<KeyValuePair<Func<SmartGridColumn, bool>, ColumnController>> columnControllers = new LinkedList<KeyValuePair<Func<SmartGridColumn, bool>, ColumnController>>();
 
 		///<summary>Registers a column controller for a column in a Singularity schema.</summary>
 		///<param name="column">The column that should use the controller.</param>
 		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the column).</param>
 		public static void RegisterColumn(Column column, ColumnController controller) {
 			if (column == null) throw new ArgumentNullException("column");
-			RegisterColumn((ds, name) => name == column.Name && TableSchema.GetSchema(ds) == column.Schema, controller);
+			RegisterColumn(gc => gc.FieldName == column.Name && gc.View.GetSourceSchema() == column.Schema, controller);
 		}
 		///<summary>Registers a column controller for Singularity columns that match a predicate.</summary>
 		///<param name="columnPredicate">The delegate that determines which Singularity columns should use the controller.</param>
@@ -109,10 +109,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			if (columnPredicate == null) throw new ArgumentNullException("columnPredicate");
 
 			RegisterColumn(
-				(dataSource, fieldName) => {
-					var schema = TableSchema.GetSchema(dataSource);
-					if (schema == null) return false;
-					var column = schema.Columns[fieldName];
+				gc => {
+					var column = gc.GetSchemaColumn();
 					if (column == null) return false;
 					return columnPredicate(column);
 				},
@@ -125,25 +123,25 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		public static void RegisterColumns(IEnumerable<Column> columns, ColumnController controller) {
 			if (columns == null) throw new ArgumentNullException("columns");
 			RegisterColumn(
-				(ds, name) => columns.Any(c => name == c.Name && TableSchema.GetSchema(ds) == c.Schema),
+				gc => columns.Any(c => gc.FieldName == c.Name && gc.View.GetSourceSchema() == c.Schema),
 				controller
 			);
 		}
 		///<summary>Registers a column controller for fields that match a delegate.</summary>
 		///<param name="selector">A delegate that indicates which datasource/field-name pairs should use this controller.</param>
 		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the fields).</param>
-		public static void RegisterColumn(FieldPredicate selector, ColumnController controller) {
+		public static void RegisterColumn(Func<SmartGridColumn, bool> selector, ColumnController controller) {
 			if (selector == null) throw new ArgumentNullException("selector");
 			//controller can be null.
 
 			//By inserting each registration at the beginning of the list, I
 			//override any previous registrations that match the same field.
-			columnControllers.AddFirst(new KeyValuePair<FieldPredicate, ColumnController>(selector, controller));
+			columnControllers.AddFirst(new KeyValuePair<Func<SmartGridColumn, bool>, ColumnController>(selector, controller));
 		}
 
 		///<summary>Gets the ColumnController instance for a field in a datasource.</summary>
-		public static ColumnController GetController(object dataSource, string fieldName) {
-			return columnControllers.FirstOrDefault(kvp => kvp.Key(dataSource, fieldName)).Value;
+		public static ColumnController GetController(SmartGridColumn gridColumn) {
+			return columnControllers.FirstOrDefault(kvp => kvp.Key(gridColumn)).Value;
 		}
 		#endregion
 
@@ -247,6 +245,4 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		static readonly Func<GridLevelNode, GridControl> GridGetter = CreateGridGetter();
 		#endregion
 	}
-	///<summary>A method that determines whether a field in a datasource matches a condition.</summary>
-	public delegate bool FieldPredicate(object dataSource, string columnName);
 }
