@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using DevExpress.Utils.Serializing;
 using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraGrid.Views.Base;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>Controls the behavior of a column in a SmartGridView.</summary>
@@ -24,6 +25,11 @@ namespace ShomreiTorah.Data.UI.Grid {
 		///<summary>Applies this controller to a column.  This method should set the column's properties.</summary>
 		protected internal virtual void Apply(SmartGridColumn column) {
 			configurator(column);
+		}
+
+		///<summary>Allows the controller to provide a custom display text for its column.</summary>
+		protected internal virtual string GetDisplayText(object row, object value) {
+			return null;
 		}
 	}
 
@@ -77,6 +83,15 @@ namespace ShomreiTorah.Data.UI.Grid {
 		void ApplyColumnControllers(bool force) {
 			foreach (var column in Columns) {
 				column.ActivateController(force);
+			}
+		}
+
+		protected override void RaiseCustomColumnDisplayText(CustomColumnDisplayTextEventArgs e) {
+			base.RaiseCustomColumnDisplayText(e);
+			var column = e.Column as SmartGridColumn;
+			if (e.Column != null) {
+				if (column.Controller != null)
+					e.DisplayText = column.Controller.GetDisplayText(null, e.Value) ?? e.DisplayText;
 			}
 		}
 	}
