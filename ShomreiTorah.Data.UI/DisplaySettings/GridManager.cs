@@ -16,7 +16,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<summary>Gets the number of behavior registrations,</summary>
 		///<remarks>This property is used by the grid to verify design-time
 		///registrations.  See <see cref="SmartGrid.RegistrationCount"/>.</remarks>
-		internal static int RegistrationCount { get { return behaviors.Count + columnControllers.Count + EditorRepository.RegistrationCount; } }
+		internal static int RegistrationCount {
+			get { return behaviors.Count + columnControllers.Count + columnSuppressors.Count + EditorRepository.RegistrationCount; }
+		}
 
 		#region Grid Behaviors
 		//Since all I need is insertion and in-order traversal, a linked list is best.
@@ -115,6 +117,33 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<summary>Gets the ColumnController instance for a field in a datasource.</summary>
 		public static ColumnController GetController(object dataSource, string fieldName) {
 			return columnControllers.FirstOrDefault(kvp => kvp.Key(dataSource, fieldName)).Value;
+		}
+		#endregion
+
+		#region Column Suppression
+		//Since all I need is insertion and in-order traversal, a linked list is best.
+		static readonly LinkedList<Func<SmartGridColumn, bool>> columnSuppressors = new LinkedList<Func<SmartGridColumn, bool>>();
+
+		///<summary>Prevents columns in Singularity schemas from being automatically added to a SmartGridView.</summary>
+		public static void SuppressColumns(params Column[] columns) {
+			if (columns == null) throw new ArgumentNullException("columns");
+			foreach (var column in columns) SuppressColumn(column);
+		}
+		///<summary>Prevents a column in a Singularity schema from being automatically added to a SmartGridView.</summary>
+		public static void SuppressColumn(Column column) {
+			if (column == null) throw new ArgumentNullException("column");
+			SuppressColumn(c => TableSchema.GetSchema(c.View.DataSource) == column.Schema && c.FieldName == column.Name);
+		}
+		///<summary>Prevents columns matching a predicate from being automatically added to a SmartGridView.</summary>
+		public static void SuppressColumn(Func<SmartGridColumn, bool> predicate) {
+			if (predicate == null) throw new ArgumentNullException("predicate");
+			columnSuppressors.AddLast(predicate);
+		}
+
+		///<summary>Checks whether a column should be suppressed from automatic population.</summary>
+		public static bool IsSuppressed(SmartGridColumn column) {
+			if (column == null) throw new ArgumentNullException("column");
+			return columnSuppressors.Any(s => s(column));
 		}
 		#endregion
 	}

@@ -83,7 +83,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 
 		protected override void OnColumnPopulate(GridColumn column, int visibleIndex) {
 			base.OnColumnPopulate(column, visibleIndex);
-			if (column.ColumnType == typeof(Guid))
+			if (DisplaySettings.GridManager.IsSuppressed((SmartGridColumn)column))
 				Columns.Remove(column);
 		}
 
