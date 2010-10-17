@@ -66,7 +66,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		public static IEditorSettings GetSettings(object dataSource, string columnName) {
 			UIThread.Verify();
 
-			var schema = ((Table)dataSource).Schema;
+			var schema = TableSchema.GetSchema(dataSource);
 			IEditorSettings retVal;
 			dictionary.TryGetValue(schema.Columns[columnName], out retVal);
 			return retVal;
