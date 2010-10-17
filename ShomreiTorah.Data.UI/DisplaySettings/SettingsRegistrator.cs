@@ -38,6 +38,37 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				new[] { Payment.AccountColumn, Pledge.AccountColumn },
 				new ColumnController(c => { c.MaxWidth = 100; })
 			);
+
+			GridManager.RegisterColumns(
+				new[] { Pledge.PersonColumn, Payment.PersonColumn, EmailAddress.PersonColumn },
+				new PersonColumnController()
+			);
+			GridManager.RegisterColumn(Payment.DepositColumn, new DepositColumnController());
+		}
+
+		class PersonColumnController : ColumnController {
+			protected internal override void Apply(SmartGridColumn column) {
+				column.Caption = "Full Name";
+				column.SortIndex = 0;
+				column.SortOrder = ColumnSortOrder.Ascending;
+				column.OptionsColumn.ReadOnly = true;
+			}
+			protected internal override string GetDisplayText(object row, object value) {
+				var person = (Person)value;
+				return person.FullName;
+			}
+		}
+		class DepositColumnController : ColumnController {
+			protected internal override void Apply(SmartGridColumn column) {
+				column.OptionsColumn.AllowEdit = false;
+				column.OptionsColumn.ReadOnly = true;
+			}
+			protected internal override string GetDisplayText(object row, object value) {
+				var deposit = (Deposit)value;
+				if (deposit == null) 
+					return "Undeposited";
+				return deposit.Date.ToShortDateString() + " #" + deposit.Number;
+			}
 		}
 
 		static SettingsRegistrator() { InitializeStandardSettings(); }
