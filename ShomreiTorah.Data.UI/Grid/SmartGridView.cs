@@ -80,6 +80,11 @@ namespace ShomreiTorah.Data.UI.Grid {
 			}
 		}
 
+		protected override void OnLoaded() {
+			base.OnLoaded();
+			BestFitColumns();
+		}
+
 		protected override void PopulateColumnsCore(DevExpress.Data.DataColumnInfo[] columns) {
 			base.PopulateColumnsCore(columns);
 		}
