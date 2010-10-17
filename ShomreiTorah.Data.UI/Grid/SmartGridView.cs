@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Diagnostics;
 using System.Windows.Forms;
 using DevExpress.Utils.Serializing;
@@ -80,13 +81,10 @@ namespace ShomreiTorah.Data.UI.Grid {
 			}
 		}
 
-		protected override void OnLoaded() {
-			base.OnLoaded();
-			BestFitColumns();
-		}
-
-		protected override void PopulateColumnsCore(DevExpress.Data.DataColumnInfo[] columns) {
-			base.PopulateColumnsCore(columns);
+		protected override void OnColumnPopulate(GridColumn column, int visibleIndex) {
+			base.OnColumnPopulate(column, visibleIndex);
+			if (column.ColumnType == typeof(Guid))
+				Columns.Remove(column);
 		}
 
 		sealed partial class MyHandler : GridHandler {
