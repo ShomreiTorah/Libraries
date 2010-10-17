@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using ShomreiTorah.Data.UI.Grid;
 using DevExpress.Data;
-using ShomreiTorah.Singularity;
 using DevExpress.Utils;
 using DevExpress.XtraGrid.Views.Grid;
+using ShomreiTorah.Data.UI.Grid;
+using ShomreiTorah.Singularity;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Registers grid and column behaviors.</summary>
@@ -20,19 +18,24 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.SuppressColumns(Pledge.ExternalSourceColumn, Pledge.ExternalIdColumn);
 			GridManager.SuppressColumns(Payment.ExternalSourceColumn, Payment.ExternalIdColumn);
 
-			GridManager.SuppressColumn(c => c.ColumnType == typeof(Guid));
 			GridManager.SuppressColumn(c => {
-				if (c.View.ParentView == null) return false;
+				//Detail views in the designer won't have column types.
+				if (c.ColumnType != typeof(object))
+					return c.ColumnType == typeof(Guid);
 
-				var parentSchema = TableSchema.GetSchema(c.View.ParentView.DataSource);
-				var childSchema = TableSchema.GetSchema(c.View.DataSource);
+				var column = c.GetSchemaColumn();
+				return column != null && column.DataType == typeof(Guid);
+			});
+			GridManager.SuppressColumn(c => {
+				var parentSchema = c.View.GetParentSchema();
+				var childSchema = c.View.GetSourceSchema();
 
-				//If this column is a foreign key that references the schema of the parent view, hide it.
 				if (parentSchema == null || childSchema == null)
 					return false;
 				var fkc = childSchema.Columns[c.FieldName] as ForeignKeyColumn;
 
-				return fkc != null && fkc.ForeignSchema == parentSchema;
+				//If this column is a foreign key that references the schema of the parent view, hide it.
+				return fkc != null && fkc.ForeignSchema == parentSchema && fkc.ChildRelation.Name == c.View.LevelName;
 			});
 			#endregion
 

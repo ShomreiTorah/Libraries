@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
+using System.Linq.Expressions;
+using DevExpress.XtraGrid;
+using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraGrid.Views.Base;
 using ShomreiTorah.Data.UI.Grid;
 using ShomreiTorah.Singularity;
 
@@ -156,7 +159,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<summary>Prevents a column in a Singularity schema from being automatically added to a SmartGridView.</summary>
 		public static void SuppressColumn(Column column) {
 			if (column == null) throw new ArgumentNullException("column");
-			SuppressColumn(c => TableSchema.GetSchema(c.View.DataSource) == column.Schema && c.FieldName == column.Name);
+			SuppressColumn(c => c.View.GetSourceSchema() == column.Schema && c.FieldName == column.Name);
 		}
 		///<summary>Prevents columns matching a predicate from being automatically added to a SmartGridView.</summary>
 		public static void SuppressColumn(Func<SmartGridColumn, bool> predicate) {
@@ -169,6 +172,79 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			if (column == null) throw new ArgumentNullException("column");
 			return columnSuppressors.Any(s => s(column));
 		}
+		#endregion
+
+		#region Schema Extension Methods
+		///<summary>Gets the Singularity column bound to  grid column, if any.</summary>
+		public static Column GetSchemaColumn(this GridColumn gridColumn) {
+			var schema = gridColumn.View.GetSourceSchema();
+			if (schema == null)
+				return null;
+			return schema.Columns[gridColumn.FieldName];
+		}
+		///<summary>Gets the TableSchema for the table bound to a grid view.</summary>
+		///<remarks>This method even supports detail pattern views at design
+		///time.  (Even though they don't have a data source)</remarks>
+		public static TableSchema GetSourceSchema(this BaseView view) {
+			if (view == null) throw new ArgumentNullException("view");
+
+			if (view.DataSource != null)
+				return TableSchema.GetSchema(view.DataSource);
+			if (view == view.GridControl.MainView)	//And there's no datasource
+				return null;
+
+			return view.GetLevelNode().GetSchema();
+
+			//var parentSchema = view.ParentView.GetSourceSchema();
+			//if (parentSchema != null)
+			//    return parentSchema.ChildRelations[view.LevelName].ChildSchema;
+
+			//return null;
+		}
+		///<summary>Gets the GridLevelNode object for a view's level in its grid's detail tree.</summary>
+		public static GridLevelNode GetLevelNode(this BaseView view) {
+			if (view == null) throw new ArgumentNullException("view");
+
+			return view.GridControl.LevelTree.Find(view);
+		}
+
+		///<summary>Gets the schema bound to a view's parent view.</summary>
+		public static TableSchema GetParentSchema(this BaseView view) {
+			if (view.ParentView != null)
+				return view.ParentView.GetSourceSchema();
+
+			var parentLevel = view.GetLevelNode().Parent;
+			if (parentLevel == null) return null;
+
+			return parentLevel.GetSchema();
+		}
+
+		///<summary>Gets the TableSchema bound to a node in a grid's level tree.</summary>
+		public static TableSchema GetSchema(this GridLevelNode node) {
+			if (node == null) throw new ArgumentNullException("node");
+
+			var childPath = new Stack<string>();
+			while (!node.IsRootLevel) {
+				childPath.Push(node.RelationName);
+				node = node.Parent;
+			}
+
+			//Node now refers to the root node.
+			var schema = GridGetter(node).MainView.GetSourceSchema();
+			while (childPath.Count > 0) {
+				var cr = schema.ChildRelations[childPath.Pop()];
+				if (cr == null) return null;
+				schema = cr.ChildSchema;
+			}
+
+			return schema;
+		}
+
+		static Func<GridLevelNode, GridControl> CreateGridGetter() {
+			var parameter = Expression.Parameter(typeof(GridLevelNode));
+			return Expression.Lambda<Func<GridLevelNode, GridControl>>(Expression.Property(parameter, "Grid"), parameter).Compile();
+		}
+		static readonly Func<GridLevelNode, GridControl> GridGetter = CreateGridGetter();
 		#endregion
 	}
 	///<summary>A method that determines whether a field in a datasource matches a condition.</summary>
