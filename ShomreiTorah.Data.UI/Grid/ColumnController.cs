@@ -89,7 +89,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		protected override void RaiseCustomColumnDisplayText(CustomColumnDisplayTextEventArgs e) {
 			base.RaiseCustomColumnDisplayText(e);
 			var column = e.Column as SmartGridColumn;
-			if (e.Column != null) {
+			if (column != null) {
 				if (column.Controller != null)
 					e.DisplayText = column.Controller.GetDisplayText(null, e.Value) ?? e.DisplayText;
 			}
