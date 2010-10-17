@@ -187,6 +187,11 @@
         <Null />
       </DefaultValue>
     </Column>
+    <Column Name="Deposit" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the deposit of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments in the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Deposit" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
     <Column Name="Comments" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the comments of the payment." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Comments" PropertyVisibility="Public" SqlName="Comments">
       <DefaultValue>
         <Null />
@@ -198,11 +203,6 @@
       </DefaultValue>
     </Column>
     <Column Name="Modifier" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the modifier of the payment." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Modifier" PropertyVisibility="Public" SqlName="Modifier">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Deposit" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the deposit of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments in the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Deposit" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
       <DefaultValue>
         <Null />
       </DefaultValue>

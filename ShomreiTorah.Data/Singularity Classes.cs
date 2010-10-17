@@ -780,14 +780,14 @@ namespace ShomreiTorah.Data {
         public static ValueColumn AccountColumn { get; private set; }
         ///<summary>Gets the schema's Amount column.</summary>
         public static ValueColumn AmountColumn { get; private set; }
+        ///<summary>Gets the schema's Deposit column.</summary>
+        public static ForeignKeyColumn DepositColumn { get; private set; }
         ///<summary>Gets the schema's Comments column.</summary>
         public static ValueColumn CommentsColumn { get; private set; }
         ///<summary>Gets the schema's Modified column.</summary>
         public static ValueColumn ModifiedColumn { get; private set; }
         ///<summary>Gets the schema's Modifier column.</summary>
         public static ValueColumn ModifierColumn { get; private set; }
-        ///<summary>Gets the schema's Deposit column.</summary>
-        public static ForeignKeyColumn DepositColumn { get; private set; }
         ///<summary>Gets the schema's ExternalSource column.</summary>
         public static ValueColumn ExternalSourceColumn { get; private set; }
         ///<summary>Gets the schema's ExternalId column.</summary>
@@ -826,6 +826,9 @@ namespace ShomreiTorah.Data {
             AmountColumn = Schema.Columns.AddValueColumn("Amount", typeof(Decimal), null);
             AmountColumn.AllowNulls = false;
             
+            DepositColumn = Schema.Columns.AddForeignKey("Deposit", ShomreiTorah.Data.Deposit.Schema, "Payments");
+            DepositColumn.AllowNulls = true;
+            
             CommentsColumn = Schema.Columns.AddValueColumn("Comments", typeof(String), null);
             CommentsColumn.AllowNulls = true;
             
@@ -834,9 +837,6 @@ namespace ShomreiTorah.Data {
             
             ModifierColumn = Schema.Columns.AddValueColumn("Modifier", typeof(String), null);
             ModifierColumn.AllowNulls = false;
-            
-            DepositColumn = Schema.Columns.AddForeignKey("Deposit", ShomreiTorah.Data.Deposit.Schema, "Payments");
-            DepositColumn.AllowNulls = true;
             
             ExternalSourceColumn = Schema.Columns.AddValueColumn("ExternalSource", typeof(String), null);
             ExternalSourceColumn.AllowNulls = true;
@@ -857,10 +857,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(CheckNumberColumn, "CheckNumber");
             SchemaMapping.Columns.AddMapping(AccountColumn, "Account");
             SchemaMapping.Columns.AddMapping(AmountColumn, "Amount");
+            SchemaMapping.Columns.AddMapping(DepositColumn, "DepositId");
             SchemaMapping.Columns.AddMapping(CommentsColumn, "Comments");
             SchemaMapping.Columns.AddMapping(ModifiedColumn, "Modified");
             SchemaMapping.Columns.AddMapping(ModifierColumn, "Modifier");
-            SchemaMapping.Columns.AddMapping(DepositColumn, "DepositId");
             SchemaMapping.Columns.AddMapping(ExternalSourceColumn, "ExternalSource");
             SchemaMapping.Columns.AddMapping(ExternalIdColumn, "ExternalID");
             #endregion
@@ -917,6 +917,13 @@ namespace ShomreiTorah.Data {
             get { return base.Field<Decimal>(AmountColumn); }
             set { base[AmountColumn] = value; }
         }
+        ///<summary>Gets or sets the deposit of the payment.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Row Deposit {
+            get { return base.Field<Row>(DepositColumn); }
+            set { base[DepositColumn] = value; }
+        }
         ///<summary>Gets or sets the comments of the payment.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
@@ -937,13 +944,6 @@ namespace ShomreiTorah.Data {
         public String Modifier {
             get { return base.Field<String>(ModifierColumn); }
             set { base[ModifierColumn] = value; }
-        }
-        ///<summary>Gets or sets the deposit of the payment.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Deposit {
-            get { return base.Field<Row>(DepositColumn); }
-            set { base[DepositColumn] = value; }
         }
         ///<summary>Gets or sets the external source of the payment.</summary>
         [DebuggerNonUserCode]
@@ -983,6 +983,9 @@ namespace ShomreiTorah.Data {
         partial void ValidateAmount(Decimal newValue, Action<string> error);
         partial void OnAmountChanged(Decimal oldValue, Decimal newValue);
         
+        partial void ValidateDeposit(Row newValue, Action<string> error);
+        partial void OnDepositChanged(Row oldValue, Row newValue);
+        
         partial void ValidateComments(String newValue, Action<string> error);
         partial void OnCommentsChanged(String oldValue, String newValue);
         
@@ -991,9 +994,6 @@ namespace ShomreiTorah.Data {
         
         partial void ValidateModifier(String newValue, Action<string> error);
         partial void OnModifierChanged(String oldValue, String newValue);
-        
-        partial void ValidateDeposit(Row newValue, Action<string> error);
-        partial void OnDepositChanged(Row oldValue, Row newValue);
         
         partial void ValidateExternalSource(String newValue, Action<string> error);
         partial void OnExternalSourceChanged(String oldValue, String newValue);
@@ -1036,6 +1036,9 @@ namespace ShomreiTorah.Data {
             } else if (column == AmountColumn) {
                 ValidateAmount((Decimal)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == DepositColumn) {
+                ValidateDeposit((Row)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == CommentsColumn) {
                 ValidateComments((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
@@ -1044,9 +1047,6 @@ namespace ShomreiTorah.Data {
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == ModifierColumn) {
                 ValidateModifier((String)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == DepositColumn) {
-                ValidateDeposit((Row)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == ExternalSourceColumn) {
                 ValidateExternalSource((String)newValue, reporter);
@@ -1075,14 +1075,14 @@ namespace ShomreiTorah.Data {
             	OnAccountChanged((String)oldValue, (String)newValue);
             else if (column == AmountColumn)
             	OnAmountChanged((Decimal)oldValue, (Decimal)newValue);
+            else if (column == DepositColumn)
+            	OnDepositChanged((Row)oldValue, (Row)newValue);
             else if (column == CommentsColumn)
             	OnCommentsChanged((String)oldValue, (String)newValue);
             else if (column == ModifiedColumn)
             	OnModifiedChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == ModifierColumn)
             	OnModifierChanged((String)oldValue, (String)newValue);
-            else if (column == DepositColumn)
-            	OnDepositChanged((Row)oldValue, (Row)newValue);
             else if (column == ExternalSourceColumn)
             	OnExternalSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
