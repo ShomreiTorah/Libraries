@@ -99,9 +99,26 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			if (column == null) throw new ArgumentNullException("column");
 			RegisterColumn((ds, name) => name == column.Name && TableSchema.GetSchema(ds) == column.Schema, controller);
 		}
+		///<summary>Registers a column controller for Singularity columns that match a predicate.</summary>
+		///<param name="columnPredicate">The delegate that determines which Singularity columns should use the controller.</param>
+		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the columns).</param>
+		public static void RegisterColumn(Func<Column, bool> columnPredicate, ColumnController controller) {
+			if (columnPredicate == null) throw new ArgumentNullException("columnPredicate");
+
+			RegisterColumn(
+				(dataSource, fieldName) => {
+					var schema = TableSchema.GetSchema(dataSource);
+					if (schema == null) return false;
+					var column = schema.Columns[fieldName];
+					if (column == null) return false;
+					return columnPredicate(column);
+				},
+				controller
+			);
+		}
 		///<summary>Registers a column controller for one or more columns in Singularity schemas.</summary>
 		///<param name="columns">The columns that should use the controller.</param>
-		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the column).</param>
+		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the columns).</param>
 		public static void RegisterColumns(IEnumerable<Column> columns, ColumnController controller) {
 			if (columns == null) throw new ArgumentNullException("columns");
 			RegisterColumn(
@@ -110,8 +127,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			);
 		}
 		///<summary>Registers a column controller for fields that match a delegate.</summary>
-		///<param name="selector">A delegate that indicates which datasource/column-name pairs should use this controller.</param>
-		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the column).</param>
+		///<param name="selector">A delegate that indicates which datasource/field-name pairs should use this controller.</param>
+		///<param name="controller">A ColumnController instance, or null to use no controller (suppressing any existing registrations matching the fields).</param>
 		public static void RegisterColumn(FieldPredicate selector, ColumnController controller) {
 			if (selector == null) throw new ArgumentNullException("selector");
 			//controller can be null.
