@@ -18,8 +18,13 @@ namespace ShomreiTorah.Data.UI.Grid {
 			}
 		}
 
-
 		internal RepositoryItem DefaultEditor { get; set; }
+		///<summary>Sets the default editor for this column.</summary>
+		public void SetDefaultEditor(RepositoryItem editor) {
+			if (DefaultEditor == ColumnEditor)
+				ColumnEditor = editor;
+			DefaultEditor = editor;	//Must be set after if statement
+		}
 
 		public bool ShouldSerializeColumnEditor() { return ColumnEdit != DefaultEditor; }
 		public void ResetColumnEditor() { ColumnEdit = DefaultEditor; }
