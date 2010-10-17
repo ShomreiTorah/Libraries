@@ -16,6 +16,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			EditorRepository.Register(new[] { Pledge.AmountColumn, Payment.AmountColumn }, EditorRepository.CurrencyEditor);
 			EditorRepository.Register(new[] { Pledge.AccountColumn, Payment.AccountColumn }, EditorRepository.AccountEditor);
 
+			#region Column Suppressions
 			GridManager.SuppressColumns(Pledge.ExternalSourceColumn, Pledge.ExternalIdColumn);
 			GridManager.SuppressColumns(Payment.ExternalSourceColumn, Payment.ExternalIdColumn);
 
@@ -33,11 +34,14 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 				return fkc != null && fkc.ForeignSchema == parentSchema;
 			});
+			#endregion
 
+			#region Behaviors
 			GridManager.RegisterBehavior(
 				new TableSchema[] { Pledge.Schema, Payment.Schema },
 				new AdvancedColumnsBehavior("modifier columns", new[] { "Modified", "Modifier" })
 			);
+			#endregion
 
 			GridManager.RegisterColumn(
 				Pledge.AmountColumn,
