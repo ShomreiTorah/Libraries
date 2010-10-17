@@ -30,20 +30,5 @@ namespace ShomreiTorah.Data.UI.Grid {
 			get { return base.MouseCaptureOwner; }
 			set { base.MouseCaptureOwner = value; }
 		}
-
-		protected override void OnHandleCreated(EventArgs e) {
-			base.OnHandleCreated(e);
-			if (!DesignMode) {
-				var gridView = MainView as GridView;
-				if (gridView != null)
-					gridView.BestFitColumns();	//TODO: Move to SmartGridView
-			}
-		}
-		protected override void RegisterView(BaseView gv) {
-			base.RegisterView(gv);
-			var view = gv as GridView;
-			if (view != null)
-				view.BestFitColumns();	//For detail clones
-		}
 	}
 }

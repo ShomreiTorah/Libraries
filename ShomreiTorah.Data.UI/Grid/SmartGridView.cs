@@ -48,26 +48,21 @@ namespace ShomreiTorah.Data.UI.Grid {
 				ApplyBehaviors();
 				ApplyColumnControllers(force: true);
 			}
+			BestFitColumns();
 		}
 		#region Behaviors
-#if DEBUG
 		object lastAppliedDataSource;
-		void CheckDoubleApplication() {
-			if (IsDesignMode)
-				Debug.Assert(lastAppliedDataSource != DataSource, "DataSource behaviors applied twice!");
-			else
-				Debug.Assert(lastAppliedDataSource == null, "Two datasources applied");
-			lastAppliedDataSource = DataSource;
-		}
-#endif
-
 		void ApplyBehaviors() {
+			if (lastAppliedDataSource != null && lastAppliedDataSource == DataSource)
+				return;
 #if DEBUG
-			CheckDoubleApplication();
+			if (!IsDesignMode)
+				Debug.Assert(lastAppliedDataSource == null, "Two datasources applied");
 #endif
 			foreach (var behavior in DisplaySettings.GridManager.GetBehaviors(DataSource)) {
 				behavior.Apply(this);
 			}
+			lastAppliedDataSource = DataSource;
 		}
 		#endregion
 
