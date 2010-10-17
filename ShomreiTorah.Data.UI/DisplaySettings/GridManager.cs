@@ -24,6 +24,13 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		//Since all I need is insertion and in-order traversal, a linked list is best.
 		static readonly LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>> behaviors = new LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>>();
 
+		///<summary>Registers an IGridBehavior for one or more Singularity schemas.</summary>
+		///<param name="schema"s>The schemas to apply the behavior to.</param>
+		///<param name="behavior">The IGridBehavior instance.</param>
+		public static void RegisterBehavior(IEnumerable<TableSchema> schemas, IGridBehavior behavior) {
+			if (schemas == null) throw new ArgumentNullException("schemas");
+			RegisterBehavior(t => schemas.Contains(TableSchema.GetSchema(t)), behavior);
+		}
 		///<summary>Registers an IGridBehavior for a Singularity schema.</summary>
 		///<param name="schema">The schema to apply the behavior to.</param>
 		///<param name="behavior">The IGridBehavior instance.</param>
