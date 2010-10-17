@@ -39,7 +39,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				var view = (SmartGridView)sender;
 
 				var columns = FieldNames.Select(view.Columns.ColumnByFieldName);
-				var newVisiblity = columns.First().Visible;
+				var newVisiblity = !columns.First().Visible;
 				var caption = (newVisiblity ? "Show " : "Hide ") + Name;
 
 				var item = new DXMenuItem(caption, delegate {
