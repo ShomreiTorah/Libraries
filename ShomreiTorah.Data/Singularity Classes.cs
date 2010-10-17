@@ -786,16 +786,12 @@ namespace ShomreiTorah.Data {
         public static ValueColumn ModifiedColumn { get; private set; }
         ///<summary>Gets the schema's Modifier column.</summary>
         public static ValueColumn ModifierColumn { get; private set; }
-        ///<summary>Gets the schema's DepositDate column.</summary>
-        public static ValueColumn DepositDateColumn { get; private set; }
+        ///<summary>Gets the schema's Deposit column.</summary>
+        public static ForeignKeyColumn DepositColumn { get; private set; }
         ///<summary>Gets the schema's ExternalSource column.</summary>
         public static ValueColumn ExternalSourceColumn { get; private set; }
         ///<summary>Gets the schema's ExternalId column.</summary>
         public static ValueColumn ExternalIdColumn { get; private set; }
-        ///<summary>Gets the schema's Deposit column.</summary>
-        public static ForeignKeyColumn DepositColumn { get; private set; }
-        ///<summary>Gets the schema's CheckInteger column.</summary>
-        public static ValueColumn CheckIntegerColumn { get; private set; }
         
         ///<summary>Gets the Payments schema instance.</summary>
         public static new TypedSchema<Payment> Schema { get; private set; }
@@ -839,20 +835,14 @@ namespace ShomreiTorah.Data {
             ModifierColumn = Schema.Columns.AddValueColumn("Modifier", typeof(String), null);
             ModifierColumn.AllowNulls = false;
             
-            DepositDateColumn = Schema.Columns.AddValueColumn("DepositDate", typeof(DateTime), null);
-            DepositDateColumn.AllowNulls = true;
+            DepositColumn = Schema.Columns.AddForeignKey("Deposit", ShomreiTorah.Data.Deposit.Schema, "Payments");
+            DepositColumn.AllowNulls = true;
             
             ExternalSourceColumn = Schema.Columns.AddValueColumn("ExternalSource", typeof(String), null);
             ExternalSourceColumn.AllowNulls = true;
             
             ExternalIdColumn = Schema.Columns.AddValueColumn("ExternalId", typeof(Int32), null);
             ExternalIdColumn.AllowNulls = true;
-            
-            DepositColumn = Schema.Columns.AddForeignKey("Deposit", ShomreiTorah.Data.Deposit.Schema, "Payments");
-            DepositColumn.AllowNulls = true;
-            
-            CheckIntegerColumn = Schema.Columns.AddValueColumn("CheckInteger", typeof(Int32), null);
-            CheckIntegerColumn.AllowNulls = true;
             #endregion
             
             #region Create SchemaMapping
@@ -870,11 +860,9 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(CommentsColumn, "Comments");
             SchemaMapping.Columns.AddMapping(ModifiedColumn, "Modified");
             SchemaMapping.Columns.AddMapping(ModifierColumn, "Modifier");
-            SchemaMapping.Columns.AddMapping(DepositDateColumn, "DepositDate");
+            SchemaMapping.Columns.AddMapping(DepositColumn, "DepositId");
             SchemaMapping.Columns.AddMapping(ExternalSourceColumn, "ExternalSource");
             SchemaMapping.Columns.AddMapping(ExternalIdColumn, "ExternalID");
-            SchemaMapping.Columns.AddMapping(DepositColumn, "DepositId");
-            SchemaMapping.Columns.AddMapping(CheckIntegerColumn, "CheckInteger");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -950,12 +938,12 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(ModifierColumn); }
             set { base[ModifierColumn] = value; }
         }
-        ///<summary>Gets or sets the deposit date of the payment.</summary>
+        ///<summary>Gets or sets the deposit of the payment.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public DateTime? DepositDate {
-            get { return base.Field<DateTime?>(DepositDateColumn); }
-            set { base[DepositDateColumn] = value; }
+        public Row Deposit {
+            get { return base.Field<Row>(DepositColumn); }
+            set { base[DepositColumn] = value; }
         }
         ///<summary>Gets or sets the external source of the payment.</summary>
         [DebuggerNonUserCode]
@@ -970,20 +958,6 @@ namespace ShomreiTorah.Data {
         public Int32? ExternalId {
             get { return base.Field<Int32?>(ExternalIdColumn); }
             set { base[ExternalIdColumn] = value; }
-        }
-        ///<summary>Gets or sets the deposit of the payment.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Deposit {
-            get { return base.Field<Row>(DepositColumn); }
-            set { base[DepositColumn] = value; }
-        }
-        ///<summary>Gets or sets the check integer of the payment.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Int32? CheckInteger {
-            get { return base.Field<Int32?>(CheckIntegerColumn); }
-            set { base[CheckIntegerColumn] = value; }
         }
         #endregion
         
@@ -1018,20 +992,14 @@ namespace ShomreiTorah.Data {
         partial void ValidateModifier(String newValue, Action<string> error);
         partial void OnModifierChanged(String oldValue, String newValue);
         
-        partial void ValidateDepositDate(DateTime? newValue, Action<string> error);
-        partial void OnDepositDateChanged(DateTime? oldValue, DateTime? newValue);
+        partial void ValidateDeposit(Row newValue, Action<string> error);
+        partial void OnDepositChanged(Row oldValue, Row newValue);
         
         partial void ValidateExternalSource(String newValue, Action<string> error);
         partial void OnExternalSourceChanged(String oldValue, String newValue);
         
         partial void ValidateExternalId(Int32? newValue, Action<string> error);
         partial void OnExternalIdChanged(Int32? oldValue, Int32? newValue);
-        
-        partial void ValidateDeposit(Row newValue, Action<string> error);
-        partial void OnDepositChanged(Row oldValue, Row newValue);
-        
-        partial void ValidateCheckInteger(Int32? newValue, Action<string> error);
-        partial void OnCheckIntegerChanged(Int32? oldValue, Int32? newValue);
         #endregion
         
         #region Column Callbacks
@@ -1077,20 +1045,14 @@ namespace ShomreiTorah.Data {
             } else if (column == ModifierColumn) {
                 ValidateModifier((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == DepositDateColumn) {
-                ValidateDepositDate((DateTime?)newValue, reporter);
+            } else if (column == DepositColumn) {
+                ValidateDeposit((Row)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == ExternalSourceColumn) {
                 ValidateExternalSource((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == ExternalIdColumn) {
                 ValidateExternalId((Int32?)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == DepositColumn) {
-                ValidateDeposit((Row)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == CheckIntegerColumn) {
-                ValidateCheckInteger((Int32?)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
@@ -1119,16 +1081,12 @@ namespace ShomreiTorah.Data {
             	OnModifiedChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == ModifierColumn)
             	OnModifierChanged((String)oldValue, (String)newValue);
-            else if (column == DepositDateColumn)
-            	OnDepositDateChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == DepositColumn)
+            	OnDepositChanged((Row)oldValue, (Row)newValue);
             else if (column == ExternalSourceColumn)
             	OnExternalSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
             	OnExternalIdChanged((Int32?)oldValue, (Int32?)newValue);
-            else if (column == DepositColumn)
-            	OnDepositChanged((Row)oldValue, (Row)newValue);
-            else if (column == CheckIntegerColumn)
-            	OnCheckIntegerChanged((Int32?)oldValue, (Int32?)newValue);
             
             base.OnValueChanged(column, oldValue, newValue);
         }

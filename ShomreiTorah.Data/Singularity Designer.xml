@@ -202,7 +202,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="DepositDate" AllowNulls="true" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the deposit date of the payment." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DepositDate" PropertyVisibility="Public" SqlName="DepositDate">
+    <Column Name="Deposit" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the deposit of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments in the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Deposit" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -213,16 +213,6 @@
       </DefaultValue>
     </Column>
     <Column Name="ExternalId" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the external id of the payment." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ExternalId" PropertyVisibility="Public" SqlName="ExternalID">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Deposit" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the deposit of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments in the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Deposit" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="CheckInteger" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the check integer of the payment." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="CheckInteger" PropertyVisibility="Public" SqlName="CheckInteger">
       <DefaultValue>
         <Null />
       </DefaultValue>
