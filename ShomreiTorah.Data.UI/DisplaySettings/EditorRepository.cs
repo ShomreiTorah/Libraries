@@ -67,8 +67,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			UIThread.Verify();
 
 			var schema = TableSchema.GetSchema(dataSource);
+			if (schema == null) return null;
+			var column = schema.Columns[columnName];
+			if (column == null) return null;	//eg, unbound columns
+
 			IEditorSettings retVal;
-			dictionary.TryGetValue(schema.Columns[columnName], out retVal);
+			dictionary.TryGetValue(column, out retVal);
 			return retVal;
 		}
 	}
