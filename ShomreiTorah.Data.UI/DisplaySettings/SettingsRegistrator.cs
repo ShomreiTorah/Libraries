@@ -2,9 +2,15 @@ using System;
 using System.Linq;
 using DevExpress.Data;
 using DevExpress.Utils;
+using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
+using DevExpress.XtraEditors.Repository;
+using DevExpress.XtraGrid.Views.Base;
 using DevExpress.XtraGrid.Views.Grid;
 using ShomreiTorah.Data.UI.Grid;
+using ShomreiTorah.Data.UI.Properties;
 using ShomreiTorah.Singularity;
+using ShomreiTorah.WinForms;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Registers grid and column behaviors.</summary>
@@ -87,15 +93,43 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				column.OptionsColumn.ReadOnly = true;
 				column.OptionsColumn.AllowSort = DefaultBoolean.True;
 				column.OptionsColumn.AllowGroup = DefaultBoolean.True;
+				column.ShowButtonMode = ShowButtonModeEnum.ShowAlways;
 
+				column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
 				column.Caption = "Full Name";
-				column.SortIndex = 0;
-				column.SortOrder = ColumnSortOrder.Ascending;
 			}
 			protected internal override string GetDisplayText(object row, object value) {
 				var person = (Person)value;
 				if (person == null) return "";
 				return person.FullName;
+			}
+
+			class PersonEditSettings : EditorSettings<RepositoryItemButtonEdit> {
+				private PersonEditSettings() { }
+				public static readonly PersonEditSettings Instance = new PersonEditSettings();
+
+				public override void Apply(RepositoryItemButtonEdit item) {
+					item.TextEditStyle = TextEditStyles.DisableTextEditor;
+					item.Buttons.Clear();
+					item.Buttons.Add(new EditorButton(ButtonPredefines.Glyph) { Image = Resources.UserGrid, IsLeft = true, ToolTip = "Show Person" });
+
+					item.CustomDisplayText += (sender, e) => {
+						var person = e.Value as Person;
+						if (person != null) e.DisplayText = person.FullName;
+					};
+					item.ButtonClick += (sender, e) => {
+						var edit = sender as BaseEdit;
+
+						Dialog.Inform("Activate Person\r\n" + edit.EditValue);
+					};
+					item.DoubleClick += (sender, e) => {
+						var edit = sender as BaseEdit;
+						var grid = (SmartGrid)edit.Parent;
+						var view = (SmartGridView)grid.MainView;
+						var row = view.GetFocusedRow();
+						Dialog.Inform("Activate Row!\r\n" + row);
+					};
+				}
 			}
 		}
 		class DepositColumnController : ColumnController {
