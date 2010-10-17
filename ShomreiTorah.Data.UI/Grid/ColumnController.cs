@@ -39,6 +39,10 @@ namespace ShomreiTorah.Data.UI.Grid {
 			 || View.DataSource == null)
 				return;
 
+			var editorSettings = DisplaySettings.EditorRepository.GetSettings(View.DataSource, FieldName);
+			if (editorSettings != null)
+				SetDefaultEditor(editorSettings.CreateItem());
+
 			Controller = DisplaySettings.GridManager.GetController(View.DataSource, FieldName);
 			if (Controller != null)
 				Controller.Apply(this);
