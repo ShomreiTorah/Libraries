@@ -40,21 +40,23 @@ namespace ShomreiTorah.Data.UI.Grid {
 		public SmartGridView() : this(null) { }
 		public SmartGridView(SmartGrid grid)
 			: base(grid) {
+			this.AddControllerHandlers();	//See ColumnController.cs
 		}
 
-		protected override void SetDataSource(BindingContext context, object dataSource, string dataMember) {
-			base.SetDataSource(context, dataSource, dataMember);
+		object lastAppliedDataSource;
+		protected override void OnDataController_DataSourceChanged(object sender, EventArgs e) {
+			base.OnDataController_DataSourceChanged(sender, e);
 			if (DataSource != null) {
+				if (lastAppliedDataSource == DataSource)
+					return;
 				ApplyBehaviors();
-				ApplyColumnControllers(force: true);
+				ApplyColumnControllers();
+				BestFitColumns();
+				lastAppliedDataSource = DataSource;
 			}
-			BestFitColumns();
 		}
 		#region Behaviors
-		object lastAppliedDataSource;
 		void ApplyBehaviors() {
-			if (lastAppliedDataSource != null && lastAppliedDataSource == DataSource)
-				return;
 #if DEBUG
 			if (!IsDesignMode)
 				Debug.Assert(lastAppliedDataSource == null, "Two datasources applied");
@@ -62,7 +64,6 @@ namespace ShomreiTorah.Data.UI.Grid {
 			foreach (var behavior in DisplaySettings.GridManager.GetBehaviors(DataSource)) {
 				behavior.Apply(this);
 			}
-			lastAppliedDataSource = DataSource;
 		}
 		#endregion
 
