@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using DevExpress.Utils;
 using DevExpress.Utils.Serializing;
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Container;
+using DevExpress.XtraEditors.Repository;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	partial class SmartGridView {
-		#region MouseWheel suppression
 		bool allowEditorWheel;
 		///<summary>Gets or sets whether the view mouse wheel events will be processed by the active editor.</summary>
 		[Description("Gets or sets whether the view mouse wheel events will be processed by the active editor.")]
@@ -22,7 +24,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			set { allowEditorWheel = value; }
 		}
 
-		protected override void UpdateEditor(DevExpress.XtraEditors.Repository.RepositoryItem ritem, DevExpress.XtraEditors.Container.UpdateEditorInfoArgs args) {
+		protected override void UpdateEditor(RepositoryItem ritem, UpdateEditorInfoArgs args) {
 			base.UpdateEditor(ritem, args);
 			if (ActiveEditor != null) {
 				ActiveEditor.MouseWheel += ActiveEditor_MouseWheel;
@@ -33,13 +35,13 @@ namespace ShomreiTorah.Data.UI.Grid {
 		}
 		///<summary>Hides the currently active editor, discarding any changes.</summary>
 		public override void HideEditor() {
-			base.HideEditor();
 			if (ActiveEditor != null) {
 				ActiveEditor.MouseWheel -= ActiveEditor_MouseWheel;
 				var te = ActiveEditor as TextEdit;
 				if (te != null)
-					te.MaskBox.MouseWheel += ActiveEditor_MouseWheel;
+					te.MaskBox.MouseWheel -= ActiveEditor_MouseWheel;
 			}
+			base.HideEditor();
 		}
 
 		void ActiveEditor_MouseWheel(object sender, MouseEventArgs e) {
@@ -72,6 +74,5 @@ namespace ShomreiTorah.Data.UI.Grid {
 				return SystemInformation.MouseWheelScrollLines == -1 ? View.ScrollPageSize : SystemInformation.MouseWheelScrollLines;
 			}
 		}
-		#endregion
 	}
 }
