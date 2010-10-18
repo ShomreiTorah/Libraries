@@ -50,6 +50,15 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				new TableSchema[] { Pledge.Schema, Payment.Schema },
 				new AdvancedColumnsBehavior("modifier columns", new[] { "Modified", "Modifier" })
 			);
+			//The predicate will only be called after views are created,
+			//after the client application has registered its activators
+			GridManager.RegisterBehavior(
+				ds => {
+					var schema = TableSchema.GetSchema(ds);
+					return schema != null && AppFramework.Current.CanShowDetails(schema);
+				},
+				new RowDetailBehavior()
+			);
 			#endregion
 
 			GridManager.RegisterColumn(
@@ -95,7 +104,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				column.OptionsColumn.AllowGroup = DefaultBoolean.True;
 				column.ShowButtonMode = ShowButtonModeEnum.ShowAlways;
 
-				column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
+				if (AppFramework.Current.CanShowDetails<Person>())
+					column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
 				column.Caption = "Full Name";
 			}
 			protected internal override string GetDisplayText(object row, object value) {
@@ -119,15 +129,16 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					};
 					item.ButtonClick += (sender, e) => {
 						var edit = sender as BaseEdit;
-
-						Dialog.Inform("Activate Person\r\n" + edit.EditValue);
+						AppFramework.Current.ShowDetails((Row)edit.EditValue);
 					};
 					item.DoubleClick += (sender, e) => {
 						var edit = sender as BaseEdit;
 						var grid = (SmartGrid)edit.Parent;
 						var view = (SmartGridView)grid.MainView;
-						var row = view.GetFocusedRow();
-						Dialog.Inform("Activate Row!\r\n" + row);
+						var row = (Row)view.GetFocusedRow();
+
+						if (AppFramework.Current.CanShowDetails(row.Schema))
+							AppFramework.Current.ShowDetails(row);
 					};
 				}
 			}

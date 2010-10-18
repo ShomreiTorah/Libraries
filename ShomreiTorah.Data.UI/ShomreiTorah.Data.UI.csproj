@@ -66,6 +66,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DisplaySettings\AdvancedColumnsBehavior.cs" />
+    <Compile Include="DisplaySettings\RowDetailBehavior.cs" />
     <Compile Include="Forms\SplashForm.cs">
       <SubType>Form</SubType>
     </Compile>
