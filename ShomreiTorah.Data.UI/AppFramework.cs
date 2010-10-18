@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using ShomreiTorah.Singularity;
 using System.Windows.Forms;
+using ShomreiTorah.WinForms;
 
 namespace ShomreiTorah.Data.UI {
 	///<summary>The base class for a standard ShomreiTorah application.</summary>
@@ -93,6 +94,9 @@ namespace ShomreiTorah.Data.UI {
 			if (activator == null) throw new ArgumentNullException("activator");
 			RegisterRowDetail(TypedSchema<TRow>.Instance, r => activator((TRow)r));
 		}
+
+		///<summary>Checks whether the given row type has an associated details form.</summary>
+		public bool CanShowDetails<TRow>() where TRow : Row { return CanShowDetails(TypedSchema<TRow>.Instance); }
 		///<summary>Checks whether the given schema has an associated details form.</summary>
 		public bool CanShowDetails(TableSchema schema) {
 			if (schema == null) throw new ArgumentNullException("schema");
@@ -102,6 +106,8 @@ namespace ShomreiTorah.Data.UI {
 		///<summary>Shows a details form for a row in a Singularity table.</summary>
 		public void ShowDetails(Row row) {
 			if (row == null) throw new ArgumentNullException("row");
+			if (IsDesignTime)
+				Dialog.Inform("Not showing row details at design-time for\r\n" + row, "Singularity UI Framework");
 			rowActivators[row.Schema](row);
 		}
 		#endregion
