@@ -158,7 +158,7 @@ namespace ShomreiTorah.Singularity {
 	///<summary>A column containing parent rows from a different table.</summary>
 	public sealed partial class ForeignKeyColumn : ValueColumn {
 		internal ForeignKeyColumn(TableSchema schema, string name, TableSchema foreignSchema, string foreignName)
-			: base(schema, name, schema.RowType, null) {
+			: base(schema, name, foreignSchema.RowType, null) {
 			if (foreignSchema == null) throw new ArgumentNullException("foreignSchema");
 			ForeignSchema = foreignSchema;
 
