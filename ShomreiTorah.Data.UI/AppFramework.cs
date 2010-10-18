@@ -52,6 +52,9 @@ namespace ShomreiTorah.Data.UI {
 			isDesignTime = false;
 			Current = this;
 
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
+
 			StartSplash();
 			SetSplashCaption("Loading behavior configuration");
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
@@ -70,7 +73,8 @@ namespace ShomreiTorah.Data.UI {
 		void StartSplash() {
 			var splashThread = new Thread(delegate() {
 				splashScreen = CreateSplash();
-				splashScreen.RunSplash();
+				if (splashScreen != null)
+					splashScreen.RunSplash();
 			}) { IsBackground = true };
 			splashThread.SetApartmentState(ApartmentState.STA);
 			splashThread.Start();
