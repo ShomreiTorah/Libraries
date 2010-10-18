@@ -61,6 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\PersonSelector.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DisplaySettings\AdvancedColumnsBehavior.cs" />
     <Compile Include="Grid\ColumnController.cs" />
     <Compile Include="DisplaySettings\DeletionBehavior.cs" />
@@ -128,6 +131,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\UserGrid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Plus13.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\People16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
