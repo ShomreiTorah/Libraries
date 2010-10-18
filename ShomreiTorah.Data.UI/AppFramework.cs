@@ -6,6 +6,7 @@ using System.Threading;
 using ShomreiTorah.Singularity;
 using System.Windows.Forms;
 using ShomreiTorah.WinForms;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Data.UI {
 	///<summary>The base class for a standard ShomreiTorah application.</summary>
@@ -18,10 +19,10 @@ namespace ShomreiTorah.Data.UI {
 		///<summary>Indicates whether the code is running in the Visual Studio designer.</summary>
 		public bool IsDesignTime { get { return isDesignTime; } }
 
-		///<summary>Registers an AppFramework instance for design time.</summary>
+		///<summary>Registers an AppFramework instance for design time, if none is registered.</summary>
 		protected static void RegisterDesignTime(AppFramework instance) {
 			if (Current != null)
-				throw new InvalidOperationException("An application is already registered");
+				return;
 			Current = instance;
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 			instance.RegisterSettings();
@@ -96,6 +97,7 @@ namespace ShomreiTorah.Data.UI {
 		}
 
 		///<summary>Checks whether the given row type has an associated details form.</summary>
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Convenience")]
 		public bool CanShowDetails<TRow>() where TRow : Row { return CanShowDetails(TypedSchema<TRow>.Instance); }
 		///<summary>Checks whether the given schema has an associated details form.</summary>
 		public bool CanShowDetails(TableSchema schema) {
