@@ -26,6 +26,9 @@ namespace ShomreiTorah.Singularity {
 			base.AddRow(row);
 		}
 
+		///<summary>Gets the type of the rows using the schema.</summary>
+		public override Type RowType { get { return typeof(TRow); } }
+
 		///<summary>Creates TypedSchema.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
 		//[Obsolete("This pattern is no longer used.  Please use a static constructor.")]

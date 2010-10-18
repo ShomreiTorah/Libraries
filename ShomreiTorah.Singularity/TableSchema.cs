@@ -41,6 +41,10 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Schema: " + Name; }
 
+		///<summary>Gets the type of rows in tables of the schema.</summary>
+		///<remarks>This property is overridden by typed schema.</remarks>
+		public virtual Type RowType { get { return typeof(Row); } }
+
 		Column primaryKey;
 		///<summary>Gets or sets the column that serves as the primary key, or null if the schema has no primary key.</summary>
 		public Column PrimaryKey {
