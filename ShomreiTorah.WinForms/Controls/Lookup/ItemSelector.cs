@@ -166,11 +166,21 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		static RepositoryItemItemSelector() { Register(); }
 		///<summary>Registers the RepositoryItem.</summary>
 		public static void Register() {
+			RegisterDerived(typeof(ItemSelector), typeof(RepositoryItemItemSelector));
+		}
+
+		///<summary>Gets the owning editor's type name.</summary>
+		public override string EditorTypeName { get { return "ItemSelector"; } }
+		///<summary>Gets the owning ItemSelector.</summary>
+		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
+
+		///<summary>Registers an inherited RepositoryItemItemSelector editor.</summary>
+		protected static void RegisterDerived(Type editorType, Type repositoryType) {
 			EditorRegistrationInfo.Default.Editors.Add(
 				new EditorClassInfo(
-					"ItemSelector",
-					typeof(ItemSelector),
-					typeof(RepositoryItemItemSelector),
+					editorType.Name,
+					editorType,
+					repositoryType,
 					typeof(ItemSelectorViewInfo),
 					new ItemSelectorPainter(),
 					true, EditImageIndexes.ButtonEdit,	//TODO: Icon
@@ -178,10 +188,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				)
 			);
 		}
-		///<summary>Gets the owning editor's type name.</summary>
-		public override string EditorTypeName { get { return "ItemSelector"; } }
-		///<summary>Gets the owning ItemSelector.</summary>
-		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
 		#endregion
 
 		class InvalidatingColumnCollection : ItemSelectorColumnCollection {
