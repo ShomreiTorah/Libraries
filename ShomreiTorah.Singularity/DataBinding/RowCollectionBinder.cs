@@ -25,7 +25,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		PropertyDescriptorCollection PropertyDescriptors {
 			get {
 				if (propertyDescriptors == null)
-					propertyDescriptors = Schema.CreatePropertyDescriptors();
+					propertyDescriptors = SourceTable.CreatePropertyDescriptors();
 
 				return propertyDescriptors;
 			}

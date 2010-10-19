@@ -59,9 +59,13 @@ namespace ShomreiTorah.Singularity.DataBinding {
 	}
 
 	sealed class ChildRelationPropertyDescriptor : PropertyDescriptor<Row>, ITypedListPropertyProvider {
+		//The DataContext is necessary so that we can
+		//only return child relations for tables that
+		//exist in the context.
+		public DataContext Context { get; private set; }
 		public ChildRelation Relation { get; private set; }
 
-		public ChildRelationPropertyDescriptor(ChildRelation relation) : base(relation.Name) { this.Relation = relation; }
+		public ChildRelationPropertyDescriptor(ChildRelation relation, DataContext context) : base(relation.Name) { this.Relation = relation; this.Context = context; }
 
 		protected override object GetValue(Row component) {
 			if (component.Table == null)	//If the row is detached, it cannot have child rows.
@@ -81,6 +85,8 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		public string ChildListName { get { return Relation.ChildSchema.Name; } }
 
-		public PropertyDescriptorCollection GetItemProperties() { return Relation.ChildSchema.CreatePropertyDescriptors(); }
+		public PropertyDescriptorCollection GetItemProperties() {
+			return Context.Tables[Relation.ChildSchema].CreatePropertyDescriptors();
+		}
 	}
 }

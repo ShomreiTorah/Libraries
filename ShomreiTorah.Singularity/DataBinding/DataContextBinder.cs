@@ -32,7 +32,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 			public string ChildListName { get { return table.Schema.Name; } }
 			public PropertyDescriptorCollection GetItemProperties() {
-				return table.Schema.CreatePropertyDescriptors();
+				return table.CreatePropertyDescriptors();
 			}
 		}
 

@@ -13,11 +13,20 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		PropertyDescriptorCollection GetItemProperties();
 	}
 	static class TypedListUtils {
-		public static PropertyDescriptorCollection CreatePropertyDescriptors(this TableSchema schema) {
-			var descriptors = new List<PropertyDescriptor>(schema.Columns.Count + schema.ChildRelations.Count);
+		public static PropertyDescriptorCollection CreatePropertyDescriptors(this Table table) {
+			var descriptors = new List<PropertyDescriptor>(table.Schema.Columns.Count + table.Schema.ChildRelations.Count);
 
-			descriptors.AddRange(schema.Columns.Select(c => new ColumnPropertyDescriptor(c)));
-			descriptors.AddRange(schema.ChildRelations.Select(c => new ChildRelationPropertyDescriptor(c)));
+			descriptors.AddRange(table.Schema.Columns.Select(c => new ColumnPropertyDescriptor(c)));
+
+			//Only return child relations for schemas
+			//that are available in the DataContext. 
+			//This allows programs to use typed rows 
+			//without using every child table.
+			if (table.Context != null) {
+				descriptors.AddRange(table.Schema.ChildRelations
+					.Where(cr => table.Context.Tables[cr.ChildSchema] != null)
+					.Select(c => new ChildRelationPropertyDescriptor(c, table.Context)));
+			}
 
 			return new PropertyDescriptorCollection(descriptors.ToArray(), true);
 		}
