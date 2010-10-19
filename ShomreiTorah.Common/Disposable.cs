@@ -12,7 +12,7 @@ namespace ShomreiTorah.Common {
 		///<summary>Creates a non-repeatable Disposable instance.</summary>
 		///<param name="disposer">The delegate to be called by the Dispose method.  The delegate will only be called once.</param>
 		public Disposable(Action disposer) : this(disposer, false) { }
-		///<summary>Creates a non-repeatable Disposable instance.</summary>
+		///<summary>Creates a Disposable instance.</summary>
 		///<param name="disposer">The delegate to be called by the Dispose method.</param>
 		///<param name="repeatable">Indicates whether the underlying delegate should be called multiple times if this instance is disposed multiple times.</param>
 		public Disposable(Action disposer, bool repeatable) {
