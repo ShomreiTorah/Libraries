@@ -8,10 +8,8 @@ using System.Collections;
 
 namespace ShomreiTorah.Singularity.DataBinding {
 	///<summary>A base class for a wrapper around a typed DataContext for use in a designer.</summary>
-	public abstract class BindableDataContextBase<TDataContext> : Component, IListSource where TDataContext : DataContext, new() {
-
+	public abstract class BindableDataContextBase<TDataContext> : Component, IListSource where TDataContext : DataContext {
 		///<summary>Gets the DataContext instance to bind to at runtime.</summary>
-		///<remarks>This method will not be called at design-time.</remarks>
 		protected abstract TDataContext FindDataContext();
 
 		TDataContext dataContext;
@@ -19,7 +17,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public TDataContext DataContext {
 			get {
 				if (dataContext == null)
-					dataContext = DesignMode ? new TDataContext() : FindDataContext();
+					dataContext = FindDataContext();
 				return dataContext;
 			}
 		}
