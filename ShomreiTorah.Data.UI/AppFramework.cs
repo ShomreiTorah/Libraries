@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using ShomreiTorah.Singularity;
 using System.Windows.Forms;
+using ShomreiTorah.Singularity;
+using ShomreiTorah.Singularity.Sql;
 using ShomreiTorah.WinForms;
-using System.Diagnostics.CodeAnalysis;
+using ShomreiTorah.WinForms.Forms;
+using System.Diagnostics;
 
 namespace ShomreiTorah.Data.UI {
 	///<summary>The base class for a standard ShomreiTorah application.</summary>
@@ -20,18 +23,27 @@ namespace ShomreiTorah.Data.UI {
 		public bool IsDesignTime { get { return isDesignTime; } }
 
 		///<summary>Registers an AppFramework instance for design time, if none is registered.</summary>
-		protected static void RegisterDesignTime(AppFramework instance) {
+		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Ignore design-time SQL errors")]
+		protected static void CheckDesignTime(AppFramework instance) {
 			if (Current != null)
 				return;
 			Current = instance;
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 			instance.RegisterSettings();
+			instance.SyncContext = instance.CreateDataContext();
+
+			try {
+				instance.SyncContext.ReadData();
+			} catch { instance.SyncContext = instance.CreateDataContext(); }	//Ignore SQL errors at design time
 		}
 
 		///<summary>Gets the application's main form.</summary>
 		public Form MainForm { get; private set; }
+		///<summary>Gets the Singularity DataContext used by the application.</summary>
+		public DataContext DataContext { get { return SyncContext.DataContext; } }
+		///<summary>Gets the DataSyncContext used to synchronize with a database server.</summary>
+		public DataSyncContext SyncContext { get; private set; }
 
-		ISplashScreen splashScreen;
 
 		///<summary>Overridden by derived classes to create the application's splash screen.</summary>
 		protected abstract ISplashScreen CreateSplash();
@@ -39,13 +51,10 @@ namespace ShomreiTorah.Data.UI {
 		protected abstract void RegisterSettings();
 		///<summary>Creates the application's main form.</summary>
 		protected abstract Form CreateMainForm();
+		///<summary>Creates the main DataContext used by the application.</summary>
+		///<returns>A DataSyncContext used to synchronize with a database server.</returns>
+		protected abstract DataSyncContext CreateDataContext();
 
-		///<summary>Sets the splash screen's loading message, if supported.</summary>
-		///<param name="message">A message to display on the splash screen.</param>
-		protected void SetSplashCaption(string message) {
-			if (splashScreen != null)
-				splashScreen.SetCaption(message);
-		}
 
 		///<summary>Runs the application.</summary>
 		protected void Run() {
@@ -61,7 +70,12 @@ namespace ShomreiTorah.Data.UI {
 			SetSplashCaption("Loading behavior configuration");
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 			RegisterSettings();
-			//TODO: Updates, DataContext, Error handling
+			Debug.Assert(!String.IsNullOrWhiteSpace(Dialog.DefaultTitle), "Please set a dialog title");
+
+			//TODO: Updates, Error handling
+			SetSplashCaption("Reading database");
+			SyncContext = CreateDataContext();
+			SyncContext.ReadData();
 
 			MainForm = CreateMainForm();
 			MainForm.Shown += delegate {
@@ -71,6 +85,10 @@ namespace ShomreiTorah.Data.UI {
 			};
 			Application.Run(MainForm);
 		}
+
+		#region Splash
+		ISplashScreen splashScreen;
+
 		///<summary>Shows the splash screen on a background thread.</summary>
 		void StartSplash() {
 			var splashThread = new Thread(delegate() {
@@ -81,6 +99,38 @@ namespace ShomreiTorah.Data.UI {
 			splashThread.SetApartmentState(ApartmentState.STA);
 			splashThread.Start();
 		}
+		///<summary>Sets the splash screen's loading message, if supported.</summary>
+		///<param name="message">A message to display on the splash screen.</param>
+		protected void SetSplashCaption(string message) {
+			if (splashScreen != null)
+				splashScreen.SetCaption(message);
+		}
+		#endregion
+
+		#region Database
+		///<summary>Indicates whether there are any unsaved changes in the Singularity DataContext.</summary>
+		public bool HasDataChanged {
+			get { return SyncContext.Tables.Any(t => t.Changes.Count > 0); }
+		}
+
+		///<summary>Saves any changes made to the Singularity DataContext.</summary>
+		public void SaveDatabase() {
+			ProgressWorker.Execute(SyncContext.WriteData, cancellable: false);
+		}
+
+		///<summary>Reads any changes from the database server.</summary>
+		public void RefreshDatabase() {
+			var threadContext = SynchronizationContext.Current;
+			ProgressWorker.Execute(progress => {
+				if (HasDataChanged)
+					SyncContext.WriteData(progress);
+
+				progress.Caption = "Reading database";
+				progress.Maximum = -1;
+				SyncContext.ReadData(threadContext);
+			}, cancellable: false);
+		}
+		#endregion
 
 		#region Row Activators
 		readonly Dictionary<TableSchema, Action<Row>> rowActivators = new Dictionary<TableSchema, Action<Row>>();
@@ -110,7 +160,8 @@ namespace ShomreiTorah.Data.UI {
 			if (row == null) throw new ArgumentNullException("row");
 			if (IsDesignTime)
 				Dialog.Inform("Not showing row details at design-time for\r\n" + row, "Singularity UI Framework");
-			rowActivators[row.Schema](row);
+			else
+				rowActivators[row.Schema](row);
 		}
 		#endregion
 	}
