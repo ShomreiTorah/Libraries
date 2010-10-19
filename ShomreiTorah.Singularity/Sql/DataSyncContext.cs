@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Synchronizes a Singularity database with an SQL database.</summary>	
@@ -37,21 +37,29 @@ namespace ShomreiTorah.Singularity.Sql {
 			}
 		}
 		///<summary>Saves changes in the tables to the database.</summary>
-		public void WriteData() {
+		public void WriteData() { WriteData(progress: null); }
+		///<summary>Saves changes in the tables to the database.</summary>
+		public void WriteData(IProgressReporter progress) {
 			using (var connection = SqlProvider.OpenConnection())
-				WriteData(connection);
+				WriteData(connection, progress);
 		}
 		///<summary>Saves changes in the tables to the database.</summary>
-		public void WriteData(DbConnection connection) {
+		public void WriteData(DbConnection connection) { WriteData(connection, null); }
+		///<summary>Saves changes in the tables to the database.</summary>
+		public void WriteData(DbConnection connection, IProgressReporter progress) {
+			progress = progress ?? new EmptyProgressReporter();
+			progress.Caption = "Saving changes";
+			progress.Maximum = Tables.Sum(t => t.Changes.Count);
+
 			using (var transactionContext = new TransactionContext(connection)) {
 				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
-					table.WriteChanges(transactionContext, RowChangeType.Added);
+					table.WriteChanges(transactionContext, RowChangeType.Added, progress.ChildOperation());
 
 				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
-					table.WriteChanges(transactionContext, RowChangeType.Changed);
+					table.WriteChanges(transactionContext, RowChangeType.Changed, progress.ChildOperation());
 
 				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema).Reverse())
-					table.WriteChanges(transactionContext, RowChangeType.Removed);
+					table.WriteChanges(transactionContext, RowChangeType.Removed, progress.ChildOperation());
 
 				transactionContext.Commit();
 			}
