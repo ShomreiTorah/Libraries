@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.Sql {
@@ -29,10 +30,13 @@ namespace ShomreiTorah.Singularity.Sql {
 		public TableSynchronizerCollection Tables { get; private set; }
 
 		///<summary>Populates the tables from the database.</summary>
-		public void ReadData() {
+		public void ReadData() { ReadData(null); }
+		///<summary>Populates the tables from the database.</summary>
+		///<param name="threadContext">An optional SynchronizationContext for the thread to raise the LoadCompleted event on.</param>
+		public void ReadData(SynchronizationContext threadContext) {
 			using (var connection = SqlProvider.OpenConnection()) {
 				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema)) {
-					table.ReadData(connection);
+					table.ReadData(connection, threadContext);
 				}
 			}
 		}

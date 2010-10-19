@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.Sql {
@@ -46,7 +47,12 @@ namespace ShomreiTorah.Singularity.Sql {
 				ReadData(connection);
 		}
 		///<summary>Populates this instance's table from the database.</summary>
-		public void ReadData(DbConnection connection) {
+		public void ReadData(DbConnection connection) { ReadData(connection, null); }
+		///<summary>Populates this instance's table from the database.</summary>
+		///<param name="connection">A connection to the database.</param>
+		///<param name="threadContext">An optional SynchronizationContext for the thread to raise the LoadCompleted event on.</param>
+		public void ReadData(DbConnection connection, SynchronizationContext threadContext) {
+			using (Table.BeginLoadData())
 			using (var command = SqlProvider.CreateSelectCommand(connection, Mapping)) {
 				try {
 					isReadingDB = true;
@@ -57,6 +63,10 @@ namespace ShomreiTorah.Singularity.Sql {
 					changes.Clear();
 				} finally { isReadingDB = false; }
 			}
+			if (threadContext == null)
+				Table.OnLoadCompleted();
+			else
+				threadContext.Post(delegate { Table.OnLoadCompleted(); }, null);
 		}
 		sealed class DataReaderTablePopulator : TablePopulator<IDataRecord> {
 			readonly DbDataReader reader;

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table in a Singularity database.</summary>
@@ -39,6 +39,15 @@ namespace ShomreiTorah.Singularity {
 						cc.Dependency.Register(this);
 				}
 			}
+		}
+
+		int loadDataCount;
+		///<summary>Indicates whether the table is currently being populated.</summary>
+		public bool IsLoadingData { get { return loadDataCount != 0; } }
+
+		internal IDisposable BeginLoadData() {
+			loadDataCount++;
+			return new Disposable(() => loadDataCount--);
 		}
 
 		///<summary>Gets the schema of this table.</summary>
@@ -165,6 +174,17 @@ namespace ShomreiTorah.Singularity {
 		protected virtual void OnValueChanged(ValueChangedEventArgs e) {
 			if (ValueChanged != null)
 				ValueChanged(this, e);
+		}
+
+		///<summary>Occurs after the table is populated from a datasource.</summary>
+		public event EventHandler LoadCompleted;
+		///<summary>Raises the LoadCompleted event.</summary>
+		internal protected virtual void OnLoadCompleted() { OnLoadCompleted(EventArgs.Empty); }
+		///<summary>Raises the LoadCompleted event.</summary>
+		///<param name="e">An EventArgs object that provides the event data.</param>
+		internal protected virtual void OnLoadCompleted(EventArgs e) {
+			if (LoadCompleted != null)
+				LoadCompleted(this, e);
 		}
 		#endregion
 	}

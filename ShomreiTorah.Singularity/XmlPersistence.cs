@@ -58,7 +58,9 @@ namespace ShomreiTorah.Singularity {
 		public void ReadXml(XElement element) {
 			if (element == null) throw new ArgumentNullException("element");
 
-			new XmlTablePopulator(this, element).FillTable();
+			using (BeginLoadData())
+				new XmlTablePopulator(this, element).FillTable();
+			OnLoadCompleted();
 		}
 		sealed class XmlTablePopulator : TablePopulator<XElement> {
 			readonly XElement tableElement;

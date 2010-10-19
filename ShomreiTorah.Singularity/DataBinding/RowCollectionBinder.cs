@@ -1,17 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.DataBinding {
 	abstract class RowCollectionBinder : PhantomCollection<Row>, IBindingList, ICancelAddNew, IRaiseItemChangedEvents, ITypedList, ISchemaItem {
 		public TableSchema Schema { get; protected set; }
 		protected abstract string ListName { get; }
+		///<summary>Gets the table that contains the rows in the collection.</summary>
+		protected abstract Table SourceTable { get; }
 
 		protected RowCollectionBinder(TableSchema schema, IList<Row> wrappedList)
 			: base(wrappedList) {
@@ -50,14 +50,32 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public bool RaisesItemChangedEvents { get { return true; } }
 
 		#region Change Events
+		//If the source table is loading, don't raise any events.
+		//Once it finishes loading, only raise a reset if we saw 
+		//some actual changes.
+		bool loadChangePending;
 		protected void OnValueChanged(ValueChangedEventArgs args) {
-			OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, IndexOf(args.Row), new ColumnPropertyDescriptor(args.Column)));
+			if (SourceTable.IsLoadingData)
+				loadChangePending = true;
+			else
+				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, IndexOf(args.Row), new ColumnPropertyDescriptor(args.Column)));
 		}
 		protected void OnRowAdded(RowListEventArgs args) {
-			OnListChanged(new ListChangedEventArgs(ListChangedType.ItemAdded, args.Index));
+			if (SourceTable.IsLoadingData)
+				loadChangePending = true;
+			else
+				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemAdded, args.Index));
 		}
 		protected void OnRowRemoved(RowListEventArgs args) {
-			OnListChanged(new ListChangedEventArgs(ListChangedType.ItemDeleted, args.Index));
+			if (SourceTable.IsLoadingData)
+				loadChangePending = true;
+			else
+				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemDeleted, args.Index));
+		}
+		protected void OnLoadCompleted() {
+			if (loadChangePending)
+				OnListChanged(new ListChangedEventArgs(ListChangedType.Reset, -1));
+			loadChangePending = false;
 		}
 
 		///<summary>Occurs when the list is changed.</summary>
@@ -70,7 +88,6 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		}
 
 		#endregion
-
 
 		//All change events are forwarded from the wrapped
 		//table or ChildRowCollection by derived classes. 
@@ -179,13 +196,17 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			Table.RowAdded += Table_RowAdded;
 			Table.RowRemoved += Table_RowRemoved;
 			Table.ValueChanged += Table_ValueChanged;
+			Table.LoadCompleted += Table_LoadCompleted;
 		}
+
+		void Table_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
 
 		void Table_RowRemoved(object sender, RowListEventArgs e) { OnRowRemoved(e); }
 		void Table_ValueChanged(object sender, ValueChangedEventArgs e) { OnValueChanged(e); }
 		void Table_RowAdded(object sender, RowListEventArgs e) { OnRowAdded(e); }
 
 		public Table Table { get; private set; }
+		protected override Table SourceTable { get { return Table; } }
 
 		protected override string ListName { get { return Schema.Name; } }
 
@@ -198,16 +219,20 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			: base(rows.ChildTable.Schema, rows) {
 			ChildRows = rows;
 
+			ChildRows.ChildTable.LoadCompleted += ChildTable_LoadCompleted;
 			ChildRows.RowAdded += Rows_RowAdded;
 			ChildRows.ValueChanged += Rows_ValueChanged;
 			ChildRows.RowRemoved += Rows_RowRemoved;
 		}
+
+		void ChildTable_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
 
 		void Rows_RowAdded(object sender, RowListEventArgs e) { OnRowAdded(e); }
 		void Rows_ValueChanged(object sender, ValueChangedEventArgs e) { OnValueChanged(e); }
 		void Rows_RowRemoved(object sender, RowListEventArgs e) { OnRowRemoved(e); }
 
 		protected override string ListName { get { return ChildRows.Relation.Name; } }
+		protected override Table SourceTable { get { return ChildRows.ChildTable; } }
 
 		protected override Row CreateNewRow() {
 			var newRow = ChildRows.ChildTable.CreateRow();
@@ -243,16 +268,20 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			: base(ft.Table.Schema, ft.Rows) {
 			FilteredTable = ft;
 
+			FilteredTable.Table.LoadCompleted += Table_LoadCompleted;
 			FilteredTable.RowAdded += Rows_RowAdded;
 			FilteredTable.ValueChanged += Rows_ValueChanged;
 			FilteredTable.RowRemoved += Rows_RowRemoved;
 		}
+
+		void Table_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
 
 		void Rows_RowAdded(object sender, RowListEventArgs<TRow> e) { OnRowAdded(new RowListEventArgs(e.Row, e.Index)); }
 		void Rows_ValueChanged(object sender, ValueChangedEventArgs<TRow> e) { OnValueChanged(e); }
 		void Rows_RowRemoved(object sender, RowListEventArgs<TRow> e) { OnRowRemoved(new RowListEventArgs(e.Row, e.Index)); }
 
 		protected override string ListName { get { return FilteredTable.Table.Schema.Name; } }
+		protected override Table SourceTable { get { return FilteredTable.Table; } }
 
 		protected override Row CreateNewRow() {
 			var newRow = FilteredTable.Table.CreateRow();
@@ -261,7 +290,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		//PhantomCollection wraps the original FilteredTable.Rows,
 		//which is read-only.  I override its mutation methods and
-		//modify the child table
+		//modify the underlying table.
 
 		public override void Add(Row item) {
 			if (item == null) throw new ArgumentNullException("item");
