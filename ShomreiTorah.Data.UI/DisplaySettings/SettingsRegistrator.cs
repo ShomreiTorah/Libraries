@@ -5,12 +5,12 @@ using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Repository;
+using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Base;
 using DevExpress.XtraGrid.Views.Grid;
 using ShomreiTorah.Data.UI.Grid;
 using ShomreiTorah.Data.UI.Properties;
 using ShomreiTorah.Singularity;
-using ShomreiTorah.WinForms;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Registers grid and column behaviors.</summary>
@@ -129,15 +129,17 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					};
 					item.ButtonClick += (sender, e) => {
 						var edit = sender as BaseEdit;
-						AppFramework.Current.ShowDetails((Row)edit.EditValue);
+						var row = edit.EditValue as Row;
+						if (row != null)
+							AppFramework.Current.ShowDetails(row);
 					};
 					item.DoubleClick += (sender, e) => {
 						var edit = sender as BaseEdit;
-						var grid = (SmartGrid)edit.Parent;
+						var grid = (GridControl)edit.Parent;
 						var view = (SmartGridView)grid.MainView;
-						var row = (Row)view.GetFocusedRow();
+						var row = view.GetFocusedRow() as Row;	//In the designer, there might not be actual rows.
 
-						if (AppFramework.Current.CanShowDetails(row.Schema))
+						if (row != null && AppFramework.Current.CanShowDetails(row.Schema))
 							AppFramework.Current.ShowDetails(row);
 					};
 				}
