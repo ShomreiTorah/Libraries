@@ -51,7 +51,7 @@ namespace ShomreiTorah.Singularity.Sql {
 					throw new DataException("INSERT command didn't work");
 			}
 
-			QueueVersion(context, schema, row);
+			RefreshVersion(context, schema, row);
 		}
 		///<summary>Applies an update row to the database.</summary>
 		public override void ApplyUpdate(TransactionContext context, SchemaMapping schema, Row row) {
@@ -83,10 +83,17 @@ namespace ShomreiTorah.Singularity.Sql {
 				if (command.ExecuteNonQuery() != 1)
 					ThrowRowModified(context, schema, row);
 			}
-			QueueVersion(context, schema, row);
+			RefreshVersion(context, schema, row);
 		}
 
-		void QueueVersion(TransactionContext context, SchemaMapping schema, Row row) {
+		///<summary>Refreshes a row's RowVersion.</summary>
+		///<remarks>.Net's SQL CE client doesn't 
+		///support multiple SQL statements in a 
+		///single command.  Therefore, I need to
+		///use a separate command to update the 
+		///RowVersion after updating or adding a
+		///row. This method will update the field.</remarks>
+		void RefreshVersion(TransactionContext context, SchemaMapping schema, Row row) {
 			using (var command = context.CreateCommand(
 					"SELECT RowVersion FROM " + QualifyTable(schema) + " WHERE " + schema.PrimaryKey.SqlName.EscapeSqlIdentifier() + " = @ID",
 					new { ID = row[schema.PrimaryKey.Column] }
