@@ -102,6 +102,9 @@
     <Compile Include="Controls\Canvas.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\LoadingCircle.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\Lookup\Columns.cs" />
     <Compile Include="Controls\Lookup\ItemSelector.cs">
       <SubType>Component</SubType>
