@@ -527,7 +527,7 @@ namespace ShomreiTorah.WinForms.Controls {
 					&& (lnf.ActiveSkinName.StartsWith("Office 2010", StringComparison.OrdinalIgnoreCase)
 					 || lnf.ActiveSkinName.StartsWith("Seven", StringComparison.OrdinalIgnoreCase)
 					 || lnf.ActiveSkinName == "DevExpress Style")) {
-					using (var pen = new Pen(SkinUtilities.GetHeaderLineColor(lnf))) {
+						 using (var pen = new Pen(Utilities.GetHeaderLineColor(lnf))) {
 						g.DrawLine(pen, WeekHeaderBounds.Left, WeekHeaderBounds.Top, WeekHeaderBounds.Left, WeekHeaderBounds.Bottom);
 						g.DrawLine(pen, WeekHeaderBounds.Left, WeekHeaderBounds.Top, WeekHeaderBounds.Right, WeekHeaderBounds.Top);
 						g.DrawLine(pen, WeekHeaderBounds.Right, WeekHeaderBounds.Top, WeekHeaderBounds.Right, WeekHeaderBounds.Bottom);
@@ -617,7 +617,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			public override void Render(Graphics g, Rectangle clipRectangle) {
 				base.Render(g, clipRectangle);
 
-				using (var pen = new Pen(SkinUtilities.GetHeaderLineColor(Calendar.LookAndFeel))) {
+				using (var pen = new Pen(Utilities.GetHeaderLineColor(Calendar.LookAndFeel))) {
 					int x = GridArea.Left;
 					for (int c = 0; c <= 7; c++) {
 						g.DrawLine(pen, x, GridArea.Top, x, GridArea.Bottom);

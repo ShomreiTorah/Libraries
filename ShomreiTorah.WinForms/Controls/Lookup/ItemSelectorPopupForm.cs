@@ -301,7 +301,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 					break;
 			}
 
-			LinePen = new Pen(SkinUtilities.GetHeaderLineColor(form.Properties.LookAndFeel));
+			LinePen = new Pen(Utilities.GetHeaderLineColor(form.Properties.LookAndFeel));
 		}
 
 		///<summary>Releases all resources used by the ItemSelectorPopupFormViewInfo.</summary>

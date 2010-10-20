@@ -10,3 +10,4 @@
 
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "MaxPopupHeight", Scope = "member", Target = "ShomreiTorah.WinForms.Controls.Lookup.#PopupOpen")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions", Scope = "member", Target = "ShomreiTorah.WinForms.Controls.GoogleMapControl.#pictureBox_Click(System.Object,System.EventArgs)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "lnf", Scope = "member", Target = "ShomreiTorah.WinForms.Utilities.#GetHeaderLineColor(DevExpress.LookAndFeel.UserLookAndFeel)")]
