@@ -1,5 +1,5 @@
 //
-// Copyright ©2006, 2007, Martin R. Gagné (martingagne@gmail.com)
+// Copyright Â©2006, 2007, Martin R. GagnÃ© (martingagne@gmail.com)
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, 
@@ -25,18 +25,17 @@
 //
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text;
 using System.Windows.Forms;
 
 namespace ShomreiTorah.WinForms.Controls {
 	///<summary>A built-in style for a loading circle.</summary>
 	public enum PresetLoadingStyle {
 		///<summary>The animation used by Mac OSX; a gradient sequence of lines.</summary>
+		[SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "OSX")]
 		MacOSX,
 		///<summary>The animation used by Firefox; a gradient sequence of circles.</summary>
 		Firefox,
@@ -82,9 +81,9 @@ namespace ShomreiTorah.WinForms.Controls {
 		private int m_ProgressValue;
 		private int m_OuterCircleRadius;
 		private int m_InnerCircleRadius;
-		private PointF m_CenterPoint;
-		private Color m_Color;
-		private Color[] m_Colors;
+		private Point center;
+		private Color baseColor;
+		private Color[] spokeColors;
 		private double[] m_Angles;
 		private PresetLoadingStyle m_StylePreset;
 
@@ -98,10 +97,10 @@ namespace ShomreiTorah.WinForms.Controls {
 		[Description("Gets or sets the base color of the circle.")]
 		public Color Color {
 			get {
-				return m_Color;
+				return baseColor;
 			}
 			set {
-				m_Color = value;
+				baseColor = value;
 
 				GenerateColorsPallete();
 				Invalidate();
@@ -182,7 +181,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			}
 			set {
 				m_IsTimerActive = value;
-				ActiveTimer();
+				UpdateTimer();
 			}
 		}
 
@@ -269,7 +268,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			SetStyle(ControlStyles.ResizeRedraw, true);
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 
-			m_Color = DefaultColor;
+			baseColor = DefaultColor;
 
 			GenerateColorsPallete();
 			UpdateSpokesAngles();
@@ -277,7 +276,7 @@ namespace ShomreiTorah.WinForms.Controls {
 
 			m_Timer = new Timer();
 			m_Timer.Tick += aTimer_Tick;
-			ActiveTimer();
+			UpdateTimer();
 		}
 
 		///<summary>Raises the Resize event.</summary>
@@ -310,9 +309,9 @@ namespace ShomreiTorah.WinForms.Controls {
 				for (int intCounter = 0; intCounter < m_NumberOfSpoke; intCounter++) {
 					intPosition = intPosition % m_NumberOfSpoke;
 					DrawLine(e.Graphics,
-							 GetCoordinate(m_CenterPoint, m_InnerCircleRadius, m_Angles[intPosition]),
-							 GetCoordinate(m_CenterPoint, m_OuterCircleRadius, m_Angles[intPosition]),
-							 m_Colors[intCounter], m_SpokeThickness);
+							 GetCoordinate(center, m_InnerCircleRadius, m_Angles[intPosition]),
+							 GetCoordinate(center, m_OuterCircleRadius, m_Angles[intPosition]),
+							 spokeColors[intCounter], m_SpokeThickness);
 					intPosition++;
 				}
 			}
@@ -329,8 +328,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// An ordered pair of type <see cref="T:System.Drawing.Size"></see> representing the width and height of a rectangle.
 		/// </returns>
 		public override Size GetPreferredSize(Size proposedSize) {
-			proposedSize.Width =
-				(m_OuterCircleRadius + m_SpokeThickness) * 2;
+			proposedSize.Width = proposedSize.Height = (m_OuterCircleRadius + m_SpokeThickness) * 2;
 
 			return proposedSize;
 		}
@@ -339,109 +337,92 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// <summary>
 		/// Darkens a specified color.
 		/// </summary>
-		/// <param name="_objColor">Color to darken.</param>
-		/// <param name="_intPercent">The percent of darken.</param>
+		/// <param name="color">Color to darken.</param>
+		/// <param name="percent">The percent of darken.</param>
 		/// <returns>The new darker color.</returns>
-		private static Color Darken(Color _objColor, int _intPercent) {
-			int intRed = _objColor.R;
-			int intGreen = _objColor.G;
-			int intBlue = _objColor.B;
-			return Color.FromArgb(_intPercent, Math.Min(intRed, byte.MaxValue), Math.Min(intGreen, byte.MaxValue), Math.Min(intBlue, byte.MaxValue));
+		private static Color Darken(Color color, int percent) {
+			return Color.FromArgb(percent, Math.Min(color.R, byte.MaxValue), Math.Min(color.G, byte.MaxValue), Math.Min(color.B, byte.MaxValue));
 		}
 
 		/// <summary>
 		/// Generates the colors pallet.
 		/// </summary>
 		private void GenerateColorsPallete() {
-			m_Colors = GenerateColorsPallete(m_Color, Active, m_NumberOfSpoke);
-		}
-
-		/// <summary>
-		/// Generates the colors pallete.
-		/// </summary>
-		/// <param name="_objColor">Color of the lightest spoke.</param>
-		/// <param name="_blnShadeColor">if set to <c>true</c> the color will be shaded on X spoke.</param>
-		/// <returns>An array of color used to draw the circle.</returns>
-		private Color[] GenerateColorsPallete(Color _objColor, bool _blnShadeColor, int _intNbSpoke) {
-			Color[] objColors = new Color[SpokeCount];
+			bool useGradient = Active;
+			spokeColors = new Color[SpokeCount];
 
 			// Value is used to simulate a gradient feel... For each spoke, the 
-			// color will be darken by value in intIncrement.
-			byte bytIncrement = (byte)(byte.MaxValue / SpokeCount);
+			// color will be darkened by darkStep.
+			byte darkStep = (byte)(byte.MaxValue / SpokeCount);
 
 			//Reset variable in case of multiple passes
-			byte PERCENTAGE_OF_DARKEN = 0;
+			byte darkness = 0;
 
 			for (int intCursor = 0; intCursor < SpokeCount; intCursor++) {
-				if (_blnShadeColor) {
-					if (intCursor == 0 || intCursor < SpokeCount - _intNbSpoke)
-						objColors[intCursor] = _objColor;
+				if (!useGradient)
+					spokeColors[intCursor] = baseColor;
+				else {
+					if (intCursor == 0)
+						spokeColors[intCursor] = baseColor;
 					else {
 						// Increment alpha channel color
-						PERCENTAGE_OF_DARKEN += bytIncrement;
+						darkness += darkStep;
 
 						// Ensure that we don't exceed the maximum alpha
 						// channel value (255)
-						if (PERCENTAGE_OF_DARKEN > byte.MaxValue)
-							PERCENTAGE_OF_DARKEN = byte.MaxValue;
+						if (darkness > byte.MaxValue)
+							darkness = byte.MaxValue;
 
 						// Determine the spoke forecolor
-						objColors[intCursor] = Darken(_objColor, PERCENTAGE_OF_DARKEN);
+						spokeColors[intCursor] = Darken(baseColor, darkness);
 					}
-				} else
-					objColors[intCursor] = _objColor;
+				}
 			}
-
-			return objColors;
 		}
 
 		private void UpdateCenterPoint() {
-			m_CenterPoint = GetControlCenterPoint(this);
-		}
-
-		private static PointF GetControlCenterPoint(Control _objControl) {
-			return new PointF(_objControl.Width / 2, _objControl.Height / 2 - 1);
+			center = new Point(Width / 2, Height / 2 - 1);
 		}
 
 		/// <summary>
 		/// Draws the line with GDI+.
 		/// </summary>
-		/// <param name="_objGraphics">The Graphics object.</param>
-		/// <param name="_objPointOne">The point one.</param>
-		/// <param name="_objPointTwo">The point two.</param>
-		/// <param name="_objColor">Color of the spoke.</param>
-		/// <param name="_intLineThickness">The thickness of spoke.</param>
-		private static void DrawLine(Graphics _objGraphics, PointF _objPointOne, PointF _objPointTwo,
-							  Color _objColor, int _intLineThickness) {
-			using (Pen objPen = new Pen(new SolidBrush(_objColor), _intLineThickness)) {
+		/// <param name="g">The Graphics object.</param>
+		/// <param name="from">The point one.</param>
+		/// <param name="to">The point two.</param>
+		/// <param name="color">Color of the spoke.</param>
+		/// <param name="thickness">The thickness of spoke.</param>
+		private static void DrawLine(Graphics g, PointF from, PointF to,
+							  Color color, int thickness) {
+			using (Pen objPen = new Pen(new SolidBrush(color), thickness)) {
 				objPen.StartCap = LineCap.Round;
 				objPen.EndCap = LineCap.Round;
-				_objGraphics.DrawLine(objPen, _objPointOne, _objPointTwo);
+				g.DrawLine(objPen, from, to);
 			}
 		}
 
-		private static PointF GetCoordinate(PointF _objCircleCenter, int _intRadius, double _dblAngle) {
-			double dblAngle = Math.PI * _dblAngle / NumberOfDegreesInHalfCircle;
+		private static PointF GetCoordinate(PointF center, int radius, double angle) {
+			double dblAngle = Math.PI * angle / NumberOfDegreesInHalfCircle;
 
-			return new PointF(_objCircleCenter.X + _intRadius * (float)Math.Cos(dblAngle),
-							  _objCircleCenter.Y + _intRadius * (float)Math.Sin(dblAngle));
+			return new PointF(center.X + radius * (float)Math.Cos(dblAngle),
+							  center.Y + radius * (float)Math.Sin(dblAngle));
 		}
 
 		private void UpdateSpokesAngles() {
-			m_Angles = GetSpokesAngles(SpokeCount);
+			m_Angles = new double[SpokeCount];
+			double dblAngle = (double)NumberOfDegreesInCircle / SpokeCount;
+
+			m_Angles[0] = dblAngle;
+			for (int i = 1; i < SpokeCount; i++)
+				m_Angles[i] = m_Angles[i - 1] + dblAngle;
+		}
+		//TODO: Call this instead
+		double GetAngle(int spokeIndex) {
+			double angleStep = (double)NumberOfDegreesInCircle / SpokeCount;
+			return angleStep * spokeIndex;
 		}
 
-		private static double[] GetSpokesAngles(int spokeCount) {
-			double[] Angles = new double[spokeCount];
-			double dblAngle = (double)NumberOfDegreesInCircle / spokeCount;
-
-			for (int i = 0; i < spokeCount; i++)
-				Angles[i] = (i == 0 ? dblAngle : Angles[i - 1] + dblAngle);
-
-			return Angles;
-		}
-
-		private void ActiveTimer() {
+		private void UpdateTimer() {
 			if (m_IsTimerActive)
 				m_Timer.Start();
 			else {
@@ -466,8 +447,6 @@ namespace ShomreiTorah.WinForms.Controls {
 			SpokeThickness = spokeThickness;
 			InnerCircleRadius = innerCircleRadius;
 			OuterCircleRadius = outerCircleRadius;
-
-			Invalidate();
 		}
 	}
 }
