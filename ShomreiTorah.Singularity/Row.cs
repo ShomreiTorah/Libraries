@@ -34,7 +34,18 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		///<summary>Gets or sets the value of the specified column.</summary>
-		public object this[string name] { get { return this[Schema.Columns[name]]; } set { this[Schema.Columns[name]] = value; } }
+		public object this[string name] {
+			get {
+				var col = Schema.Columns[name];
+				if (col == null) throw new ArgumentException("The " + Schema.Name + " schema has no " + name + "column.", "name");
+				return this[col];
+			}
+			set {
+				var col = Schema.Columns[name];
+				if (col == null) throw new ArgumentException("The " + Schema.Name + " schema has no " + name + "column.", "name");
+				this[col] = value;
+			}
+		}
 		///<summary>Gets or sets the value of the specified column.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1043:UseIntegralOrStringArgumentForIndexers")]
 		public object this[Column column] {
