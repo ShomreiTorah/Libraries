@@ -67,10 +67,18 @@
     </Compile>
     <Compile Include="DisplaySettings\AdvancedColumnsBehavior.cs" />
     <Compile Include="DisplaySettings\RowDetailBehavior.cs" />
+    <Compile Include="Forms\ExceptionReporter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExceptionReporter.Designer.cs">
+      <DependentUpon>ExceptionReporter.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SplashForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Grid\ColumnController.cs" />
+    <Compile Include="Grid\ColumnController.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DisplaySettings\DeletionBehavior.cs" />
     <Compile Include="DisplaySettings\EditorRepository.cs" />
     <Compile Include="DisplaySettings\GridManager.cs" />
@@ -130,6 +138,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\ExceptionReporter.resx">
+      <DependentUpon>ExceptionReporter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -143,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\People16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RedX32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

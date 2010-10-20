@@ -67,6 +67,9 @@ namespace ShomreiTorah.Data.UI {
 			Application.SetCompatibleTextRenderingDefault(false);
 
 			StartSplash();
+			Application.ThreadException += (sender, e) => HandleException(e.Exception);
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) => HandleException((Exception)e.ExceptionObject);
+
 			SetSplashCaption("Loading behavior configuration");
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 			RegisterSettings();
@@ -162,6 +165,15 @@ namespace ShomreiTorah.Data.UI {
 				Dialog.Inform("Not showing row details at design-time for\r\n" + row, "Singularity UI Framework");
 			else
 				rowActivators[row.Schema](row);
+		}
+		#endregion
+
+		#region Error Handling
+		///<summary>Handles an unhandled exception.</summary>
+		public virtual void HandleException(Exception ex) {
+			if (ex == null) throw new ArgumentNullException("ex");
+
+			new Forms.ExceptionReporter(ex).Show(MainForm);
 		}
 		#endregion
 	}
