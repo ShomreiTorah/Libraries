@@ -71,9 +71,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		private const int IE7NumberOfSpoke = 24;
 		private const int IE7SpokeThickness = 4;
 
-		// Enumeration =======================================================
-
-		// Attributes ========================================================
+		// Fields ========================================================
 		private Timer m_Timer;
 		private bool m_IsTimerActive;
 		private int m_NumberOfSpoke;
@@ -87,6 +85,15 @@ namespace ShomreiTorah.WinForms.Controls {
 		private double[] m_Angles;
 		private PresetLoadingStyle m_StylePreset;
 
+
+		///<summary>Gets or sets a value indicating whether the user can give the focus to this control using the TAB key.</summary>
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
+		[DefaultValue(false)]
+		public new bool TabStop {
+			get { return base.TabStop; }
+			set { base.TabStop = value; }
+		}
 		// Properties ========================================================
 		/// <summary>
 		/// Gets or sets the base color of the circle.
@@ -227,6 +234,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		[Category("Appearance")]
 		[Description("Quickly sets the style to one of these presets, or a custom style if desired")]
 		[DefaultValue(typeof(PresetLoadingStyle), "Custom")]
+		[RefreshProperties(RefreshProperties.All)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public PresetLoadingStyle StylePreset {
 			get { return m_StylePreset; }
 			set {
@@ -267,6 +276,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
 			SetStyle(ControlStyles.ResizeRedraw, true);
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+			TabStop = false;
 
 			baseColor = DefaultColor;
 
