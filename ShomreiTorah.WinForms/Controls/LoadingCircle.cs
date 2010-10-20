@@ -34,6 +34,19 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace ShomreiTorah.WinForms.Controls {
+	///<summary>A built-in style for a loading circle.</summary>
+	public enum PresetLoadingStyle {
+		///<summary>The animation used by Mac OSX; a gradient sequence of lines.</summary>
+		MacOSX,
+		///<summary>The animation used by Firefox; a gradient sequence of circles.</summary>
+		Firefox,
+		///<summary>The animation used by IE 7; a solid gradient band.</summary>
+		IE7,
+		///<summary>Custom animation settings</summary>
+		Custom
+	}
+	///<summary>Displays a circular loading animation.</summary>
+	[Description("Displays a circular loading animation.")]
 	public partial class LoadingCircle : Control {
 		// Constants =========================================================
 		private const double NumberOfDegreesInCircle = 360;
@@ -60,12 +73,6 @@ namespace ShomreiTorah.WinForms.Controls {
 		private const int IE7SpokeThickness = 4;
 
 		// Enumeration =======================================================
-		public enum StylePresets {
-			MacOSX,
-			Firefox,
-			IE7,
-			Custom
-		}
 
 		// Attributes ========================================================
 		private Timer m_Timer;
@@ -79,16 +86,16 @@ namespace ShomreiTorah.WinForms.Controls {
 		private Color m_Color;
 		private Color[] m_Colors;
 		private double[] m_Angles;
-		private StylePresets m_StylePreset;
+		private PresetLoadingStyle m_StylePreset;
 
 		// Properties ========================================================
 		/// <summary>
-		/// Gets or sets the lightest color of the circle.
+		/// Gets or sets the base color of the circle.
 		/// </summary>
 		/// <value>The lightest color of the circle.</value>
-		[TypeConverter("System.Drawing.ColorConverter"),
-		 Category("LoadingCircle"),
-		 Description("Sets the color of spoke.")]
+		[TypeConverter("System.Drawing.ColorConverter")]
+		[Category("Appearance")]
+		[Description("Gets or sets the base color of the circle.")]
 		public Color Color {
 			get {
 				return m_Color;
@@ -96,17 +103,17 @@ namespace ShomreiTorah.WinForms.Controls {
 			set {
 				m_Color = value;
 
-				GenerateColorsPallet();
+				GenerateColorsPallete();
 				Invalidate();
 			}
 		}
 
 		/// <summary>
-		/// Gets or sets the outer circle radius.
+		/// Gets or sets the radius of the outer circle.
 		/// </summary>
 		/// <value>The outer circle radius.</value>
-		[System.ComponentModel.Description("Gets or sets the radius of outer circle."),
-		 System.ComponentModel.Category("LoadingCircle")]
+		[Description("Gets or sets the radius of the outer circle.")]
+		[Category("Appearance")]
 		public int OuterCircleRadius {
 			get {
 				if (m_OuterCircleRadius == 0)
@@ -121,11 +128,11 @@ namespace ShomreiTorah.WinForms.Controls {
 		}
 
 		/// <summary>
-		/// Gets or sets the inner circle radius.
+		/// Gets or sets the radius of the inner circle.
 		/// </summary>
 		/// <value>The inner circle radius.</value>
-		[System.ComponentModel.Description("Gets or sets the radius of inner circle."),
-		 System.ComponentModel.Category("LoadingCircle")]
+		[Description("Gets or sets the radius of the inner circle.")]
+		[Category("Appearance")]
 		public int InnerCircleRadius {
 			get {
 				if (m_InnerCircleRadius == 0)
@@ -140,12 +147,12 @@ namespace ShomreiTorah.WinForms.Controls {
 		}
 
 		/// <summary>
-		/// Gets or sets the number of spoke.
+		/// Gets or sets the number of spokes.
 		/// </summary>
-		/// <value>The number of spoke.</value>
-		[System.ComponentModel.Description("Gets or sets the number of spoke."),
-		System.ComponentModel.Category("LoadingCircle")]
-		public int NumberSpoke {
+		/// <value>The number of spokes.</value>
+		[Description("Gets or sets the number of spokes.")]
+		[Category("Appearance")]
+		public int SpokeCount {
 			get {
 				if (m_NumberOfSpoke == 0)
 					m_NumberOfSpoke = DefaultNumberOfSpoke;
@@ -155,8 +162,8 @@ namespace ShomreiTorah.WinForms.Controls {
 			set {
 				if (m_NumberOfSpoke != value && m_NumberOfSpoke > 0) {
 					m_NumberOfSpoke = value;
-					GenerateColorsPallet();
-					GetSpokesAngles();
+					GenerateColorsPallete();
+					UpdateSpokesAngles();
 
 					Invalidate();
 				}
@@ -167,8 +174,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// Gets or sets a value indicating whether this <see cref="T:LoadingCircle"/> is active.
 		/// </summary>
 		/// <value><c>true</c> if active; otherwise, <c>false</c>.</value>
-		[System.ComponentModel.Description("Gets or sets the number of spoke."),
-		System.ComponentModel.Category("LoadingCircle")]
+		[Description("Indicates whether the animation is running.")]
+		[Category("Behavior")]
 		public bool Active {
 			get {
 				return m_IsTimerActive;
@@ -183,8 +190,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// Gets or sets the spoke thickness.
 		/// </summary>
 		/// <value>The spoke thickness.</value>
-		[System.ComponentModel.Description("Gets or sets the thickness of a spoke."),
-		System.ComponentModel.Category("LoadingCircle")]
+		[Description("Gets or sets the thickness of a spoke.")]
+		[Category("Appearance")]
 		public int SpokeThickness {
 			get {
 				if (m_SpokeThickness <= 0)
@@ -202,8 +209,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// Gets or sets the rotation speed.
 		/// </summary>
 		/// <value>The rotation speed.</value>
-		[System.ComponentModel.Description("Gets or sets the rotation speed. Higher the slower."),
-		System.ComponentModel.Category("LoadingCircle")]
+		[Description("Gets or sets the rotation speed. Higher values result in a slower animation.")]
+		[Category("Appearance")]
 		public int RotationSpeed {
 			get {
 				return m_Timer.Interval;
@@ -218,31 +225,31 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// Quickly sets the style to one of these presets, or a custom style if desired
 		/// </summary>
 		/// <value>The style preset.</value>
-		[Category("LoadingCircle"),
-		 Description("Quickly sets the style to one of these presets, or a custom style if desired"),
-		 DefaultValue(typeof(StylePresets), "Custom")]
-		public StylePresets StylePreset {
+		[Category("Appearance")]
+		[Description("Quickly sets the style to one of these presets, or a custom style if desired")]
+		[DefaultValue(typeof(PresetLoadingStyle), "Custom")]
+		public PresetLoadingStyle StylePreset {
 			get { return m_StylePreset; }
 			set {
 				m_StylePreset = value;
 
 				switch (m_StylePreset) {
-					case StylePresets.MacOSX:
+					case PresetLoadingStyle.MacOSX:
 						SetCircleAppearance(MacOSXNumberOfSpoke,
 							MacOSXSpokeThickness, MacOSXInnerCircleRadius,
 							MacOSXOuterCircleRadius);
 						break;
-					case StylePresets.Firefox:
+					case PresetLoadingStyle.Firefox:
 						SetCircleAppearance(FireFoxNumberOfSpoke,
 							FireFoxSpokeThickness, FireFoxInnerCircleRadius,
 							FireFoxOuterCircleRadius);
 						break;
-					case StylePresets.IE7:
+					case PresetLoadingStyle.IE7:
 						SetCircleAppearance(IE7NumberOfSpoke,
 							IE7SpokeThickness, IE7InnerCircleRadius,
 							IE7OuterCircleRadius);
 						break;
-					case StylePresets.Custom:
+					case PresetLoadingStyle.Custom:
 						SetCircleAppearance(DefaultNumberOfSpoke,
 							DefaultSpokeThickness,
 							DefaultInnerCircleRadius,
@@ -264,26 +271,22 @@ namespace ShomreiTorah.WinForms.Controls {
 
 			m_Color = DefaultColor;
 
-			GenerateColorsPallet();
-			GetSpokesAngles();
-			GetControlCenterPoint();
+			GenerateColorsPallete();
+			UpdateSpokesAngles();
+			UpdateCenterPoint();
 
 			m_Timer = new Timer();
-			m_Timer.Tick += new EventHandler(aTimer_Tick);
+			m_Timer.Tick += aTimer_Tick;
 			ActiveTimer();
+		}
 
-			this.Resize += new EventHandler(LoadingCircle_Resize);
+		///<summary>Raises the Resize event.</summary>
+		protected override void OnResize(EventArgs e) {
+			base.OnResize(e);
+			UpdateCenterPoint();
 		}
 
 		// Events ============================================================
-		/// <summary>
-		/// Handles the Resize event of the LoadingCircle control.
-		/// </summary>
-		/// <param name="sender">The source of the event.</param>
-		/// <param name="e">The <see cref="T:System.EventArgs"/> instance containing the event data.</param>
-		void LoadingCircle_Resize(object sender, EventArgs e) {
-			GetControlCenterPoint();
-		}
 
 		/// <summary>
 		/// Handles the Tick event of the aTimer control.
@@ -338,8 +341,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// </summary>
 		/// <param name="_objColor">Color to darken.</param>
 		/// <param name="_intPercent">The percent of darken.</param>
-		/// <returns>The new color generated.</returns>
-		private Color Darken(Color _objColor, int _intPercent) {
+		/// <returns>The new darker color.</returns>
+		private static Color Darken(Color _objColor, int _intPercent) {
 			int intRed = _objColor.R;
 			int intGreen = _objColor.G;
 			int intBlue = _objColor.B;
@@ -349,29 +352,29 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// <summary>
 		/// Generates the colors pallet.
 		/// </summary>
-		private void GenerateColorsPallet() {
-			m_Colors = GenerateColorsPallet(m_Color, Active, m_NumberOfSpoke);
+		private void GenerateColorsPallete() {
+			m_Colors = GenerateColorsPallete(m_Color, Active, m_NumberOfSpoke);
 		}
 
 		/// <summary>
-		/// Generates the colors pallet.
+		/// Generates the colors pallete.
 		/// </summary>
 		/// <param name="_objColor">Color of the lightest spoke.</param>
 		/// <param name="_blnShadeColor">if set to <c>true</c> the color will be shaded on X spoke.</param>
 		/// <returns>An array of color used to draw the circle.</returns>
-		private Color[] GenerateColorsPallet(Color _objColor, bool _blnShadeColor, int _intNbSpoke) {
-			Color[] objColors = new Color[NumberSpoke];
+		private Color[] GenerateColorsPallete(Color _objColor, bool _blnShadeColor, int _intNbSpoke) {
+			Color[] objColors = new Color[SpokeCount];
 
 			// Value is used to simulate a gradient feel... For each spoke, the 
 			// color will be darken by value in intIncrement.
-			byte bytIncrement = (byte)(byte.MaxValue / NumberSpoke);
+			byte bytIncrement = (byte)(byte.MaxValue / SpokeCount);
 
 			//Reset variable in case of multiple passes
 			byte PERCENTAGE_OF_DARKEN = 0;
 
-			for (int intCursor = 0; intCursor < NumberSpoke; intCursor++) {
+			for (int intCursor = 0; intCursor < SpokeCount; intCursor++) {
 				if (_blnShadeColor) {
-					if (intCursor == 0 || intCursor < NumberSpoke - _intNbSpoke)
+					if (intCursor == 0 || intCursor < SpokeCount - _intNbSpoke)
 						objColors[intCursor] = _objColor;
 					else {
 						// Increment alpha channel color
@@ -392,18 +395,11 @@ namespace ShomreiTorah.WinForms.Controls {
 			return objColors;
 		}
 
-		/// <summary>
-		/// Gets the control center point.
-		/// </summary>
-		private void GetControlCenterPoint() {
+		private void UpdateCenterPoint() {
 			m_CenterPoint = GetControlCenterPoint(this);
 		}
 
-		/// <summary>
-		/// Gets the control center point.
-		/// </summary>
-		/// <returns>PointF object</returns>
-		private PointF GetControlCenterPoint(Control _objControl) {
+		private static PointF GetControlCenterPoint(Control _objControl) {
 			return new PointF(_objControl.Width / 2, _objControl.Height / 2 - 1);
 		}
 
@@ -415,7 +411,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// <param name="_objPointTwo">The point two.</param>
 		/// <param name="_objColor">Color of the spoke.</param>
 		/// <param name="_intLineThickness">The thickness of spoke.</param>
-		private void DrawLine(Graphics _objGraphics, PointF _objPointOne, PointF _objPointTwo,
+		private static void DrawLine(Graphics _objGraphics, PointF _objPointOne, PointF _objPointTwo,
 							  Color _objColor, int _intLineThickness) {
 			using (Pen objPen = new Pen(new SolidBrush(_objColor), _intLineThickness)) {
 				objPen.StartCap = LineCap.Round;
@@ -424,45 +420,27 @@ namespace ShomreiTorah.WinForms.Controls {
 			}
 		}
 
-		/// <summary>
-		/// Gets the coordinate.
-		/// </summary>
-		/// <param name="_objCircleCenter">The Circle center.</param>
-		/// <param name="_intRadius">The radius.</param>
-		/// <param name="_dblAngle">The angle.</param>
-		/// <returns></returns>
-		private PointF GetCoordinate(PointF _objCircleCenter, int _intRadius, double _dblAngle) {
+		private static PointF GetCoordinate(PointF _objCircleCenter, int _intRadius, double _dblAngle) {
 			double dblAngle = Math.PI * _dblAngle / NumberOfDegreesInHalfCircle;
 
 			return new PointF(_objCircleCenter.X + _intRadius * (float)Math.Cos(dblAngle),
 							  _objCircleCenter.Y + _intRadius * (float)Math.Sin(dblAngle));
 		}
 
-		/// <summary>
-		/// Gets the spokes angles.
-		/// </summary>
-		private void GetSpokesAngles() {
-			m_Angles = GetSpokesAngles(NumberSpoke);
+		private void UpdateSpokesAngles() {
+			m_Angles = GetSpokesAngles(SpokeCount);
 		}
 
-		/// <summary>
-		/// Gets the spoke angles.
-		/// </summary>
-		/// <param name="_shtNumberSpoke">The number spoke.</param>
-		/// <returns>An array of angle.</returns>
-		private double[] GetSpokesAngles(int _intNumberSpoke) {
-			double[] Angles = new double[_intNumberSpoke];
-			double dblAngle = (double)NumberOfDegreesInCircle / _intNumberSpoke;
+		private static double[] GetSpokesAngles(int spokeCount) {
+			double[] Angles = new double[spokeCount];
+			double dblAngle = (double)NumberOfDegreesInCircle / spokeCount;
 
-			for (int shtCounter = 0; shtCounter < _intNumberSpoke; shtCounter++)
-				Angles[shtCounter] = (shtCounter == 0 ? dblAngle : Angles[shtCounter - 1] + dblAngle);
+			for (int i = 0; i < spokeCount; i++)
+				Angles[i] = (i == 0 ? dblAngle : Angles[i - 1] + dblAngle);
 
 			return Angles;
 		}
 
-		/// <summary>
-		/// Actives the timer.
-		/// </summary>
 		private void ActiveTimer() {
 			if (m_IsTimerActive)
 				m_Timer.Start();
@@ -471,7 +449,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				m_ProgressValue = 0;
 			}
 
-			GenerateColorsPallet();
+			GenerateColorsPallete();
 			Invalidate();
 		}
 
@@ -484,7 +462,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		/// <param name="outerCircleRadius">The outer circle radius.</param>
 		public void SetCircleAppearance(int numberSpoke, int spokeThickness,
 			int innerCircleRadius, int outerCircleRadius) {
-			NumberSpoke = numberSpoke;
+			SpokeCount = numberSpoke;
 			SpokeThickness = spokeThickness;
 			InnerCircleRadius = innerCircleRadius;
 			OuterCircleRadius = outerCircleRadius;
