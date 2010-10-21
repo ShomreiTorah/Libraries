@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Mask;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid.Columns;
 using ShomreiTorah.Common;
@@ -29,7 +30,19 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 			AccountEditor = new ComboBoxSettings(Names.AccountNames);
 			PaymentMethodEditor = new ComboBoxSettings(Names.PaymentMethods);
+
 			StateEditor = new ComboBoxSettings(Names.CommonStates.Concat(Names.StateAbbreviations));
+			ZipEditor = new EditorSettings<RepositoryItemTextEdit>(properties => {
+				properties.Mask.AutoComplete = AutoCompleteType.None;
+				properties.Mask.EditMask = @"\d{5}";
+				properties.Mask.MaskType = MaskType.RegEx;
+				properties.Mask.ShowPlaceHolders = false;
+			});
+			PhoneEditor = new EditorSettings<RepositoryItemTextEdit>(properties => {
+				properties.Mask.EditMask = @"\(\d\d\d\) \d\d\d - \d\d\d\d";
+				properties.Mask.MaskType = MaskType.RegEx;
+				properties.Mask.ShowPlaceHolders = false;
+			});
 			#endregion
 			PersonLookup = new MutableEditorSettings<RepositoryItemItemSelector>();
 		}
@@ -40,8 +53,13 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		public static ComboBoxSettings AccountEditor { get; private set; }
 		///<summary>Gets the EditorSettings for the payment method field.</summary>
 		public static ComboBoxSettings PaymentMethodEditor { get; private set; }
+
 		///<summary>Gets the EditorSettings for a US State field.</summary>
 		public static ComboBoxSettings StateEditor { get; private set; }
+		///<summary>Gets the EditorSettings for a ZIP code field.</summary>
+		public static EditorSettings<RepositoryItemTextEdit> ZipEditor { get; private set; }
+		///<summary>Gets the EditorSettings for a phone number field.</summary>
+		public static EditorSettings<RepositoryItemTextEdit> PhoneEditor { get; private set; }
 
 		///<summary>Gets the EditorSettings for a lookup displaying the master directory.</summary>
 		public static MutableEditorSettings<RepositoryItemItemSelector> PersonLookup { get; private set; }

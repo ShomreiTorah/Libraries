@@ -19,13 +19,19 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Registers grid and column behaviors.</summary>
 	static class SettingsRegistrator {
 		static void InitializeStandardSettings() {
+			//This method will only be called once
 			RegisterEditors();
 			RegisterColumnSuppressions();
 			RegisterBehaviors();
 			RegisterColumnControllers();
 		}
 		static void RegisterEditors() {
-			//This method will only be called once
+			EditorRepository.Register(Person.StateColumn, EditorRepository.StateEditor);
+			EditorRepository.Register(Person.ZipColumn, EditorRepository.ZipEditor);
+			EditorRepository.Register(Person.PhoneColumn, EditorRepository.PhoneEditor);
+
+			EditorRepository.Register(Payment.MethodColumn, EditorRepository.PaymentMethodEditor);
+
 			EditorRepository.Register(new[] { Pledge.AmountColumn, Payment.AmountColumn }, EditorRepository.CurrencyEditor);
 			EditorRepository.Register(new[] { Pledge.AccountColumn, Payment.AccountColumn }, EditorRepository.AccountEditor);
 
@@ -77,6 +83,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			});
 		}
 		#endregion
+
+		//TODO: Group summaries, deletion, comments column, max widths
 		#region Behaviors
 		static void RegisterBehaviors() {
 			GridManager.RegisterBehavior(
