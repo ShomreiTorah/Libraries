@@ -31,7 +31,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			view.ShowGridMenu += View_ShowGridMenu;
 
 			foreach (var col in FieldNames.Select(view.Columns.ColumnByFieldName))
-				col.Visible = false;
+				if (col != null)
+					col.Visible = false;
 		}
 
 		void View_ShowGridMenu(object sender, GridMenuEventArgs e) {
