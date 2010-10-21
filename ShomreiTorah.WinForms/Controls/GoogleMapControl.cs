@@ -107,7 +107,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		public void EndUpdate() { if (--updateCount == 0 && updateQueued) DoUpdate(); }
 
 		bool updateQueued;
-		///<summary>Downloads the map from the server.</summary>
+		///<summary>Downloads the map from the server, unless updates are blocked.</summary>
 		void DoUpdate() {
 			if (updateCount > 0) {
 				updateQueued = true;
@@ -120,7 +120,6 @@ namespace ShomreiTorah.WinForms.Controls {
 		///<summary>Downloads the map image from the server.</summary>
 		public void UpdateMap() {
 			updateQueued = false;
-			pictureBox.Show();
 
 			if (String.IsNullOrEmpty(CleanAddress)) {
 				pictureBox.Cursor = null;
@@ -129,6 +128,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				pictureBox.Cursor = Cursors.Hand;
 				LoadMapImage();
 			}
+			pictureBox.Show();
 		}
 		static Uri AddKey(string url) {
 			var builder = new UriBuilder(url);
