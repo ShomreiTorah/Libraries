@@ -84,7 +84,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 
-		//TODO: Group summaries, deletion, comments column, max widths
+		//TODO: Group summaries, deletion, comments column
 		#region Behaviors
 		static void RegisterBehaviors() {
 			GridManager.RegisterBehavior(
@@ -103,13 +103,21 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 		#region Column Controllers
+		static ColumnController MaxWidth(int width) { return new ColumnController(c => c.MaxWidth = width); }
 		static void RegisterColumnControllers() {
+			GridManager.RegisterColumn(Person.StateColumn, MaxWidth(50));
+			GridManager.RegisterColumn(Person.ZipColumn, MaxWidth(40));
+			GridManager.RegisterColumn(Person.PhoneColumn, MaxWidth(95));
+			GridManager.RegisterColumn(Payment.MethodColumn, MaxWidth(70));
+
+			GridManager.RegisterColumns(new[] { Payment.AccountColumn, Pledge.AccountColumn }, MaxWidth(100));
+
 			GridManager.RegisterColumn(
 				Pledge.AmountColumn,
 				new ColumnController(c => {
-					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);
+					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);	//Copy currency format
 
-					c.MaxWidth = 70;
+					c.MaxWidth = 85;
 					c.SummaryItem.DisplayFormat = "{0:c} Total Pledged";
 					c.SummaryItem.SummaryType = SummaryItemType.Sum;
 				})
@@ -117,17 +125,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.RegisterColumn(
 				Payment.AmountColumn,
 				new ColumnController(c => {
-					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);
+					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);	//Copy currency format
 
-					c.MaxWidth = 70;
+					c.MaxWidth = 85;
 					c.SummaryItem.DisplayFormat = "{0:c} Total Paid";
 					c.SummaryItem.SummaryType = SummaryItemType.Sum;
 				})
-			);
-
-			GridManager.RegisterColumns(
-				new[] { Payment.AccountColumn, Pledge.AccountColumn },
-				new ColumnController(c => { c.MaxWidth = 100; })
 			);
 
 			GridManager.RegisterColumn(
@@ -197,6 +200,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			protected internal override void Apply(SmartGridColumn column) {
 				column.OptionsColumn.AllowSort = DefaultBoolean.True;
 				column.OptionsColumn.AllowGroup = DefaultBoolean.True;
+				column.MaxWidth = 90;
+				column.Caption = "Deposited";
 
 				column.OptionsColumn.AllowEdit = false;
 				column.OptionsColumn.ReadOnly = true;
