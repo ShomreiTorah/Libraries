@@ -1,18 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Text;
-using ShomreiTorah.WinForms.Controls.Lookup;
-using DevExpress.XtraEditors.Controls;
 using DevExpress.Utils;
-using ShomreiTorah.Data.UI.Properties;
-using System.ComponentModel;
+using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Registrator;
-using System.Drawing;
-using System.Diagnostics.CodeAnalysis;
+using ShomreiTorah.Data.UI.Properties;
+using ShomreiTorah.WinForms;
+using ShomreiTorah.WinForms.Controls.Lookup;
+
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>A control that allows the user to select a person from the master directory.</summary>
 	public class PersonSelector : ItemSelector {
+		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
+		static PersonSelector() { RepositoryItemPersonSelector.Register(); }
+
 		///<summary>Gets or sets the person selected in the lookup.</summary>
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -23,7 +29,9 @@ namespace ShomreiTorah.Data.UI.Controls {
 
 		///<summary>Gets the editor's type name.</summary>
 		public override string EditorTypeName { get { return "PersonSelector"; } }
+
 	}
+	[UserRepositoryItem("Register")]
 	public class RepositoryItemPersonSelector : RepositoryItemItemSelector {
 		#region Editor Registration
 		static RepositoryItemPersonSelector() { Register(); }
@@ -41,9 +49,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "NullValuePrompt overrides should be trivial")]
 		public RepositoryItemPersonSelector() {
-			SelectionIcon = Resources.People16;
 			NullValuePrompt = DefaultNullValuePrompt;
-			//TODO: Columns
+			DisplaySettings.EditorRepository.PersonLookup.Apply(this);
 		}
 
 		#region Property overrides
@@ -64,6 +71,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 			set { base.SelectionIcon = value; }
 		}
 
+		//If these properties are designer-serialized, all defaults will be duplicated.
+
 		///<summary>Gets or sets the column to display in the editor when a value is selected.</summary>
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -71,16 +80,27 @@ namespace ShomreiTorah.Data.UI.Controls {
 			get { return base.ResultDisplayColumn; }
 			set { base.ResultDisplayColumn = value; }
 		}
+		///<summary>Gets columns that display additional information about the selected item.</summary>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public new ItemSelectorColumnCollection AdditionalResultColumns { get { return base.AdditionalResultColumns; } }
+		///<summary>Gets the columns displayed in the results grid.</summary>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public new ItemSelectorColumnCollection Columns { get { return base.Columns; } }
 		#endregion
 
 		public override void CreateDefaultButton() {
 			base.CreateDefaultButton();
-			var superTip = new SuperToolTip();
-			superTip.Items.AddTitle("New Person...");
-			superTip.Items.Add("Adds a new person to the master directory");
-			Buttons.Add(new EditorButton(ButtonPredefines.Glyph, Resources.Plus13, superTip));
+			Buttons.Add(new EditorButton(ButtonPredefines.Glyph) {
+				SuperTip = Utilities.CreateSuperTip("New Person...", "Adds a new person to the master directory"),
+				Image = Resources.Plus13,
+				Width = 90,
+				ImageLocation = ImageLocation.MiddleLeft,
+				Caption = "New person...",
+				IsDefaultButton = true
+			});
 		}
-
 		protected override void RaiseButtonClick(ButtonPressedEventArgs e) {
 			base.RaiseButtonClick(e);
 			if (e.Button.Index == 1) {

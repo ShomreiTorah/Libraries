@@ -8,19 +8,50 @@ using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Views.Base;
 using DevExpress.XtraGrid.Views.Grid;
+using ShomreiTorah.Common;
 using ShomreiTorah.Data.UI.Grid;
 using ShomreiTorah.Data.UI.Properties;
 using ShomreiTorah.Singularity;
+using ShomreiTorah.WinForms.Controls.Lookup;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Registers grid and column behaviors.</summary>
 	static class SettingsRegistrator {
 		static void InitializeStandardSettings() {
+			RegisterEditors();
+			RegisterColumnSuppressions();
+			RegisterBehaviors();
+			RegisterColumnControllers();
+		}
+		static void RegisterEditors() {
 			//This method will only be called once
 			EditorRepository.Register(new[] { Pledge.AmountColumn, Payment.AmountColumn }, EditorRepository.CurrencyEditor);
 			EditorRepository.Register(new[] { Pledge.AccountColumn, Payment.AccountColumn }, EditorRepository.AccountEditor);
 
-			#region Column Suppressions
+			EditorRepository.PersonLookup.AddConfigurator(item => {
+				if (!AppFramework.Current.IsDesignTime)
+					item.DataSource = AppFramework.Current.DataContext.Table<Person>();
+				item.SelectionIcon = Resources.People16;
+
+				item.Columns.AddRange(
+					new DataSourceColumn("LastName", 100) { ShouldFilter = true },
+					new DataSourceColumn("HisName", 95) { ShouldFilter = true },
+					new DataSourceColumn("HerName", 75) { ShouldFilter = true },
+					new DataSourceColumn("Phone"),
+					new DataSourceColumn("Address", 260),
+					new DataSourceColumn("Zip", 50)
+				);
+
+				item.ResultDisplayColumn = new DataSourceColumn("FullName");
+
+				item.AdditionalResultColumns.AddRange(
+					new DataSourceColumn("Address"),
+					new DataSourceColumn("Phone")
+				);
+			});
+		}
+		#region Column Suppressions
+		static void RegisterColumnSuppressions() {
 			GridManager.SuppressColumns(Pledge.ExternalSourceColumn, Pledge.ExternalIdColumn);
 			GridManager.SuppressColumns(Payment.ExternalSourceColumn, Payment.ExternalIdColumn);
 
@@ -43,9 +74,10 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				//If this column is a foreign key that references the schema of the parent view, hide it.
 				return fkc != null && fkc.ForeignSchema == parentSchema && fkc.ChildRelation.Name == c.View.LevelName;
 			});
-			#endregion
-
-			#region Behaviors
+		}
+		#endregion
+		#region Behaviors
+		static void RegisterBehaviors() {
 			GridManager.RegisterBehavior(
 				new TableSchema[] { Pledge.Schema, Payment.Schema },
 				new AdvancedColumnsBehavior("modifier columns", new[] { "Modified", "Modifier" })
@@ -59,8 +91,10 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				},
 				new RowDetailBehavior()
 			);
-			#endregion
-
+		}
+		#endregion
+		#region Column Controllers
+		static void RegisterColumnControllers() {
 			GridManager.RegisterColumn(
 				Pledge.AmountColumn,
 				new ColumnController(c => {
@@ -96,6 +130,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			);
 			GridManager.RegisterColumn(Payment.DepositColumn, new DepositColumnController());
 		}
+		#endregion
 
 		class PersonColumnController : ColumnController {
 			protected internal override void Apply(SmartGridColumn column) {

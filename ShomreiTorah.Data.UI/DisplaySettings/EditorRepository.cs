@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Repository;
+using DevExpress.XtraGrid.Columns;
 using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
-using DevExpress.XtraGrid.Columns;
+using ShomreiTorah.WinForms.Controls.Lookup;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Contains RepositoryItem presets.</summary>
@@ -31,6 +31,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			PaymentMethodEditor = new ComboBoxSettings(Names.PaymentMethods);
 			StateEditor = new ComboBoxSettings(Names.CommonStates.Concat(Names.StateAbbreviations));
 			#endregion
+			PersonLookup = new MutableEditorSettings<RepositoryItemItemSelector>();
 		}
 
 		///<summary>Gets the EditorSettings for a currency field.</summary>
@@ -41,6 +42,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		public static ComboBoxSettings PaymentMethodEditor { get; private set; }
 		///<summary>Gets the EditorSettings for a US State field.</summary>
 		public static ComboBoxSettings StateEditor { get; private set; }
+
+		///<summary>Gets the EditorSettings for a lookup displaying the master directory.</summary>
+		public static MutableEditorSettings<RepositoryItemItemSelector> PersonLookup { get; private set; }
 
 		///<summary>Gets the number of behavior registrations,</summary>
 		///<remarks>This property is used by the grid to verify design-time
@@ -121,6 +125,21 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		RepositoryItem IEditorSettings.CreateItem() { return CreateItem(); }
 		void IEditorSettings.Apply(RepositoryItem item) { Apply((TRepositoryItem)item); }
+	}
+	///<summary>Contains a preset RepositoryItem that can be modified by client applications.</summary>
+	public class MutableEditorSettings<TRepositoryItem> : EditorSettings<TRepositoryItem> where TRepositoryItem : RepositoryItem, new() {
+		readonly LinkedList<Action<TRepositoryItem>> configurators = new LinkedList<Action<TRepositoryItem>>();
+
+		///<summary>Configures an existing RepositoryItem with this instance's settings.</summary>
+		public override void Apply(TRepositoryItem item) {
+			foreach (var method in configurators)
+				method(item);
+		}
+
+		///<summary>Adds an additional configuration delegate to apply settings to repository items.</summary>
+		public void AddConfigurator(Action<TRepositoryItem> method) {
+			configurators.AddLast(method);
+		}
 	}
 
 	///<summary>Contains settings for a simple RepositoryItemComboBox.</summary>
