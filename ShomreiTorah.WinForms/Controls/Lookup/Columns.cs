@@ -17,7 +17,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		internal virtual void SetOwner(RepositoryItemItemSelector owner) {
 			if (owner == null) throw new ArgumentNullException("owner");
 			Owner = owner;
-			if (Owner.DataSource != null) OnDataSourceSet();
+			if (Owner.OwnerEdit != null && owner.OwnerEdit.AllItems != null)
+				OnDataSourceSet();
 		}
 		internal virtual void OnDataSourceSet() { }
 

@@ -406,17 +406,34 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (source == DataSource && member == DataMember) return;
 			dataSource = source; dataMember = member;
 
-			if (source == null) {
+			SetEditorData();
+		}
+		///<summary>Sets the owning edit's DataSource.  This method must be called when initialization is complete.</summary>
+		void SetEditorData() {
+			if (IsLoading || OwnerEdit == null || OwnerEdit.BindingContext == null)
+				return;
+			if (DataSource == null) {
 				OwnerEdit.AllItems = new object[0];
 				return;
 			}
 
 			ResultsBindingManager = OwnerEdit.BindingContext[DataSource, DataMember];
 			ItemProperties = ResultsBindingManager.GetItemProperties();
-			Columns.OnDataSourceSet();
 			OwnerEdit.AllItems = (IList)ListBindingHelper.GetList(DataSource, DataMember);
+			Columns.OnDataSourceSet();
+			AdditionalResultColumns.OnDataSourceSet();
+			if (ResultDisplayColumn != null)
+				ResultDisplayColumn.SetOwner(this);
 		}
 		#endregion
+		protected override void OnOwnerEditChanged() {
+			base.OnOwnerEditChanged();
+			SetEditorData();
+		}
+		public override void EndInit() {
+			base.EndInit();
+			SetEditorData();
+		}
 
 		#region Events
 		///<summary>Raises the ItemSelecting event.</summary>
