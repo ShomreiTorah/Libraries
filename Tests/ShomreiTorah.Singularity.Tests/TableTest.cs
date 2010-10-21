@@ -277,5 +277,22 @@ namespace ShomreiTorah.Singularity.Tests {
 				Assert.AreEqual((i % 2 == 0) ? evenRow : oddRow, row["IsEven"]);
 			}
 		}
+
+		[TestMethod]
+		public void XmlWhitespaceTest() {
+			string[] strings = new[] { "abc", "a   b   c", "a\r\nb \t c", "\t\n\r", "<>&nbsp;&#d;" };
+			var table = new Table("StringsTest");
+			table.Schema.Columns.AddValueColumn("Str", typeof(string), null);
+
+			foreach (var str in strings) {
+				table.Rows.AddFromValues(str);
+			}
+
+			Assert.IsTrue(table.Rows.Select(r => r["Str"]).SequenceEqual(strings));
+			var newTable = new Table(table.Schema);
+			newTable.ReadXml(table.ToXml());
+			Assert.AreEqual(table.ToXml().ToString(), newTable.ToXml().ToString());
+			Assert.IsTrue(newTable.Rows.Select(r => r["Str"]).SequenceEqual(strings));
+		}
 	}
 }
