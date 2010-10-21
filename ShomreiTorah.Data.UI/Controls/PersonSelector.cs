@@ -30,6 +30,13 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Gets the editor's type name.</summary>
 		public override string EditorTypeName { get { return "PersonSelector"; } }
 
+		protected override void OnEditValueChanged() {
+			base.OnEditValueChanged();
+			if (SelectedPerson == null)
+				SuperTip = null;
+			else
+				SuperTip = SelectedPerson.GetSuperTip();
+		}
 	}
 	[UserRepositoryItem("Register")]
 	public class RepositoryItemPersonSelector : RepositoryItemItemSelector {
@@ -92,6 +99,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 
 		public override void CreateDefaultButton() {
 			base.CreateDefaultButton();
+			Buttons[0].SuperTip = Utilities.CreateSuperTip(body: "Click to select a person");
 			Buttons.Add(new EditorButton(ButtonPredefines.Glyph) {
 				SuperTip = Utilities.CreateSuperTip("New Person...", "Adds a new person to the master directory"),
 				Image = Resources.Plus13,
