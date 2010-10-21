@@ -6,15 +6,19 @@ using DevExpress.Utils;
 using System.Drawing;
 using DevExpress.Utils.Drawing;
 using DevExpress.LookAndFeel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.WinForms {
 	///<summary>Contains miscellaneous useful methods.</summary>
 	public static class Utilities {
 		///<summary>Creates a DevExpress SuperToolTip object from a title and body text.</summary>
-		public static SuperToolTip CreateSuperTip(string title, string body) {
+		[SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Justification = "Optional for named parameters only")]
+		public static SuperToolTip CreateSuperTip(string title = null, string body = null) {
 			var retVal = new SuperToolTip();
-			retVal.Items.AddTitle(title);
-			retVal.Items.Add(body);
+			if (!String.IsNullOrEmpty(title))
+				retVal.Items.AddTitle(title);
+			if (!String.IsNullOrEmpty(body))
+				retVal.Items.Add(body);
 			return retVal;
 		}
 		///<summary>Gets the color of the border around a column header in a skin.</summary>
