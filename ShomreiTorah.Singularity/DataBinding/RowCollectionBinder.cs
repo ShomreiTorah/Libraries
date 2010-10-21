@@ -162,12 +162,12 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		#region Boolean properties
 		public bool IsSorted { get { return false; } }
 		public bool AllowEdit { get { return true; } }
-		public bool AllowNew { get { return true; } }
-		public bool AllowRemove { get { return true; } }
+		public virtual bool AllowNew { get { return true; } }
+		public virtual bool AllowRemove { get { return true; } }
 		public bool SupportsChangeNotification { get { return true; } }
 		public bool SupportsSearching { get { return false; } }
 		public bool SupportsSorting { get { return false; } }
-		public bool IsFixedSize { get { return false; } }
+		public virtual bool IsFixedSize { get { return false; } }
 
 		public bool IsSynchronized { get { return false; } }
 		public object SyncRoot { get { return Inner; } }
