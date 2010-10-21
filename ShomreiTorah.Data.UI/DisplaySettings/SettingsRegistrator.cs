@@ -112,6 +112,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 			GridManager.RegisterColumns(new[] { Payment.AccountColumn, Pledge.AccountColumn }, MaxWidth(100));
 
+			GridManager.RegisterColumn(Person.LastNameColumn, new ColumnController(c => {
+				c.SortOrder = ColumnSortOrder.Ascending;
+				c.SummaryItem.DisplayFormat = "{0} People";
+				c.SummaryItem.SummaryType = SummaryItemType.Count;
+			}));
+
 			GridManager.RegisterColumn(
 				Pledge.AmountColumn,
 				new ColumnController(c => {
