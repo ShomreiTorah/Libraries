@@ -12,6 +12,7 @@ using DevExpress.XtraGrid.Views.Grid;
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>A grid control that automatically reads column settings from metadata.</summary>
 	[Description("A grid control that automatically reads column settings from metadata.")]
+	[DefaultProperty("DataMember")]
 	public partial class SmartGrid : GridControl {
 		///<summary>Initializes a new SmartGrid instance.</summary>
 		public SmartGrid() {
