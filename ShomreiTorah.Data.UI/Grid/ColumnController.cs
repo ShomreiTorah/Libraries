@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using System.Drawing;
+using DevExpress.Utils;
+using DevExpress.Utils.Drawing;
 using DevExpress.Utils.Serializing;
-using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid.Views.Base;
 using DevExpress.XtraGrid.Views.Grid;
+using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>Controls the behavior of a column in a SmartGridView.</summary>
@@ -29,11 +29,11 @@ namespace ShomreiTorah.Data.UI.Grid {
 		}
 
 		///<summary>Allows the controller to provide a custom display text for its column.</summary>
-		protected internal virtual string GetDisplayText(object row, object value) {
-			return null;
-		}
-		protected internal virtual void OnShowFilterPopupListBox(FilterPopupListBoxEventArgs e) {
-		}
+		protected internal virtual string GetDisplayText(object row, object value) { return null; }
+		///<summary>Allows the controller to customize the items in the column's filter popup.</summary>
+		protected internal virtual void OnShowFilterPopupListBox(FilterPopupListBoxEventArgs e) { }
+		///<summary>Allows the controller to provide a custom tooltip for the cells in the column.</summary>
+		protected internal virtual SuperToolTip GetCellToolTip(object row, object value) { return null; }
 	}
 
 	partial class SmartGridColumn {
@@ -99,7 +99,21 @@ namespace ShomreiTorah.Data.UI.Grid {
 					e.DisplayText = column.Controller.GetDisplayText(null, e.Value) ?? e.DisplayText;
 			}
 		}
-
+		protected override ToolTipControlInfo GetToolTipObjectInfoCore(GraphicsCache cache, Point p) {
+			var baseInfo = base.GetToolTipObjectInfoCore(cache, p);
+			if (baseInfo != null)
+				return baseInfo;
+			var ht = GetHintObjectInfo() as GridHitInfo;
+			if (ht != null && ht.InRowCell) {
+				var column = ht.Column as SmartGridColumn;
+				if (column != null && column.Controller != null) {
+					var superTip = column.Controller.GetCellToolTip(GetRow(ht.RowHandle), GetRowCellValue(ht.RowHandle, column));
+					if (superTip != null)
+						return new ToolTipControlInfo() { SuperTip = superTip };
+				}
+			}
+			return null;
+		}
 
 		void ApplyColumnControllers() {
 			foreach (var column in Columns) {

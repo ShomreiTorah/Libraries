@@ -12,6 +12,7 @@ using ShomreiTorah.Common;
 using ShomreiTorah.Data.UI.Grid;
 using ShomreiTorah.Data.UI.Properties;
 using ShomreiTorah.Singularity;
+using ShomreiTorah.WinForms;
 using ShomreiTorah.WinForms.Controls.Lookup;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
@@ -148,7 +149,11 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				if (person == null) return "";
 				return person.FullName;
 			}
-
+			protected internal override SuperToolTip GetCellToolTip(object row, object value) {
+				var person = (Person)value;
+				if (person == null) return null;
+				return person.GetSuperTip();
+			}
 			class PersonEditSettings : EditorSettings<RepositoryItemButtonEdit> {
 				private PersonEditSettings() { }
 				public static readonly PersonEditSettings Instance = new PersonEditSettings();
@@ -156,7 +161,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				public override void Apply(RepositoryItemButtonEdit item) {
 					item.TextEditStyle = TextEditStyles.DisableTextEditor;
 					item.Buttons.Clear();
-					item.Buttons.Add(new EditorButton(ButtonPredefines.Glyph) { Image = Resources.UserGrid, IsLeft = true, ToolTip = "Show Person" });
+					item.Buttons.Add(new EditorButton(ButtonPredefines.Glyph) { Image = Resources.UserGrid, IsLeft = true, SuperTip = Utilities.CreateSuperTip(body: "Show Person") });
 
 					item.CustomDisplayText += (sender, e) => {
 						var person = e.Value as Person;
@@ -204,6 +209,14 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 							item.Text = "(All deposited)";
 					}
 				}
+			}
+
+			static readonly SuperToolTip Undeposited = Utilities.CreateSuperTip(body: "This payment has not been deposited");
+			protected internal override SuperToolTip GetCellToolTip(object row, object value) {
+				var deposit = value as Deposit;
+				if (deposit == null)
+					return Undeposited;
+				return deposit.GetSuperTip();
 			}
 		}
 
