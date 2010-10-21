@@ -19,10 +19,10 @@ using DevExpress.Utils.Win;
 using System.Collections.ObjectModel;
 
 namespace ShomreiTorah.WinForms.Controls {
-
 	///<summary>A control that allows the user to select an item from a list.</summary>
 	[DefaultEvent("ItemSelected")]
 	[Description("A control that allows the user to select an item from a list.")]
+	[ToolboxBitmap(typeof(LookupControl), "Images.OldLookup.bmp")]
 	public partial class LookupControl : XtraUserControl {
 		DataView results = new DataView();
 		int pMaxPopupHeight = 400;

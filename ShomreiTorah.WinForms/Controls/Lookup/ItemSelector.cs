@@ -26,6 +26,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 	///<summary>A control that allows the user to select an item from a list.</summary>
 	[Description("A control that allows the user to select an item from a list.")]
 	[ComplexBindingProperties("DataSource", "DataMember")]
+	[ToolboxBitmap(typeof(ItemSelector), "Images.NewLookup.bmp")]
 	public class ItemSelector : PopupBaseEdit {
 		static readonly ReadOnlyCollection<string> EmptyStrings = new ReadOnlyCollection<string>(new string[0]);
 
