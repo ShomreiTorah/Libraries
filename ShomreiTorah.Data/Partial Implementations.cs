@@ -8,6 +8,43 @@ using System.Diagnostics.CodeAnalysis;
 namespace ShomreiTorah.Data {
 	[SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes", Justification = "Comparable for grids only")]
 	partial class Person : IComparable<Person>, IComparable {
+		#region String properties
+		///<summary>Gets the family's full name, including both spouses.</summary>
+		public string VeryFullName {
+			get {
+				StringBuilder retVal = new StringBuilder((HisName ?? "").Length + (HerName ?? "").Length + (LastName ?? "").Length + 6);
+
+				if (!String.IsNullOrEmpty(HisName)) {
+					retVal.Append(HisName);
+					if (!String.IsNullOrEmpty(HerName))
+						retVal.Append(" and ");
+				}
+
+				if (!String.IsNullOrEmpty(HerName))
+					retVal.Append(HerName);
+
+				if (retVal.Length != 0 && !String.IsNullOrEmpty(LastName)) retVal.Append(" ");
+
+				if (!String.IsNullOrEmpty(LastName)) retVal.Append(LastName);
+				return retVal.ToString();
+			}
+		}
+		///<summary>Gets the person's full mailing address.</summary>
+		public string MailingAddress {
+			get {
+				var retVal = new StringBuilder();
+				if (!String.IsNullOrEmpty(FullName)) retVal.AppendLine(FullName);
+				if (!String.IsNullOrEmpty(Address)) retVal.AppendLine(Address);
+				if (!String.IsNullOrEmpty(City)
+				 && !String.IsNullOrEmpty(State)) {
+					retVal.Append(City).Append(", ").Append(State);
+					if (!String.IsNullOrEmpty(Zip)) retVal.Append(" ").Append(Zip);
+				}
+				return retVal.ToString();
+			}
+		}
+		#endregion
+
 		int IComparable.CompareTo(object obj) { return CompareTo(obj as Person); }
 		///<summary>Compares this person to another Person instance.</summary>
 		public int CompareTo(Person other) {
