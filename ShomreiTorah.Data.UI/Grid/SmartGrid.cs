@@ -1,18 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Registrator;
 using DevExpress.XtraGrid.Views.Base;
-using ShomreiTorah.Common;
 using DevExpress.XtraGrid.Views.Grid;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>A grid control that automatically reads column settings from metadata.</summary>
 	[Description("A grid control that automatically reads column settings from metadata.")]
 	[DefaultProperty("DataMember")]
+	[ToolboxBitmap(typeof(GridControl), "Bitmaps256.GridControl.bmp")]
 	public partial class SmartGrid : GridControl {
 		///<summary>Initializes a new SmartGrid instance.</summary>
 		public SmartGrid() {
