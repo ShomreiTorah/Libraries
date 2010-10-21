@@ -84,7 +84,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 
-		//TODO: Group summaries, deletion, comments column
+		//TODO: Group summaries, deletion
 		#region Behaviors
 		static void RegisterBehaviors() {
 			GridManager.RegisterBehavior(
@@ -111,6 +111,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.RegisterColumn(Payment.MethodColumn, MaxWidth(70));
 
 			GridManager.RegisterColumns(new[] { Payment.AccountColumn, Pledge.AccountColumn }, MaxWidth(100));
+
+			GridManager.RegisterColumns(new[] { Payment.CommentsColumn, Pledge.CommentsColumn }, new CommentsColumnController());
 
 			GridManager.RegisterColumn(Person.LastNameColumn, new ColumnController(c => {
 				c.SortOrder = ColumnSortOrder.Ascending;
@@ -236,6 +238,17 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				if (deposit == null)
 					return Undeposited;
 				return deposit.GetSuperTip();
+			}
+		}
+		class CommentsColumnController : ColumnController {
+			protected internal override void Apply(SmartGridColumn column) {
+				column.SetDefaultEditor(EditorRepository.CommentsPopupEditor.CreateItem());
+			}
+			protected internal override SuperToolTip GetCellToolTip(object row, object value) {
+				string str = (value ?? "").ToString();
+				if (String.IsNullOrWhiteSpace(str) || !str.Contains('\n'))
+					return null;
+				return Utilities.CreateSuperTip(body: str);
 			}
 		}
 

@@ -27,7 +27,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				properties.EditFormat.Assign(properties.DisplayFormat);
 				properties.Mask.EditMask = "c";
 			});
-
+			CommentsPopupEditor = new EditorSettings<RepositoryItemMemoExEdit>(properties => {
+				properties.ShowIcon = false;
+			});
 			AccountEditor = new ComboBoxSettings(Names.AccountNames);
 			PaymentMethodEditor = new ComboBoxSettings(Names.PaymentMethods);
 
@@ -47,6 +49,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			PersonLookup = new MutableEditorSettings<RepositoryItemItemSelector>();
 		}
 
+		///<summary>Gets the EditorSettings for a comments field in a grid.</summary>
+		public static EditorSettings<RepositoryItemMemoExEdit> CommentsPopupEditor { get; private set; }
 		///<summary>Gets the EditorSettings for a currency field.</summary>
 		public static EditorSettings<RepositoryItemSpinEdit> CurrencyEditor { get; private set; }
 		///<summary>Gets the EditorSettings for the Billing Account field.</summary>
