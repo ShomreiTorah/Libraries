@@ -50,6 +50,7 @@
     <Reference Include="DevExpress.XtraEditors.v10.1, Version=10.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraGrid.v10.1, Version=10.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraGrid.v10.1.Design, Version=10.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraLayout.v10.1, Version=10.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -62,6 +63,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppFramework.cs" />
+    <Compile Include="Controls\EditorSettingsApplier.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PersonEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PersonEditor.Designer.cs">
+      <DependentUpon>PersonEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PersonSelector.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -139,6 +149,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\PersonEditor.resx">
+      <DependentUpon>PersonEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExceptionReporter.resx">
       <DependentUpon>ExceptionReporter.cs</DependentUpon>
     </EmbeddedResource>
