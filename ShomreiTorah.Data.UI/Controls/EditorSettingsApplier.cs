@@ -31,6 +31,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 
 		///<summary>Applies any registered EditorSettings to an editor.</summary>
+		///<returns>True if there were any settings to apply.</returns>
 		bool ApplySettings(BaseEdit edit) {
 			//This will be called in addition to normal designer serialization of previously applied settings
 			if (edit.DataBindings.Count != 1) {
