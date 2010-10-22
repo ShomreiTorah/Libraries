@@ -98,15 +98,16 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			var column = schema.Columns[columnName];
 			if (column == null) return null;	//eg, unbound columns
 
-			IEditorSettings retVal;
-			dictionary.TryGetValue(column, out retVal);
-			return retVal;
+			return GetSettings(column);
 		}
 		///<summary>Gets an IEditorSettings to use for the given grid column, or null if there is no preset for that column.</summary>
 		public static IEditorSettings GetSettings(GridColumn gridColumn) {
 			var column = gridColumn.GetSchemaColumn();
 			if (column == null) return null;	//eg, unbound columns
-
+			return GetSettings(column);
+		}
+		///<summary>Gets an IEditorSettings to use for the given Singularity schema column, or null if there is no preset for that column.</summary>
+		public static IEditorSettings GetSettings(Column column) {
 			IEditorSettings retVal;
 			dictionary.TryGetValue(column, out retVal);
 			return retVal;
