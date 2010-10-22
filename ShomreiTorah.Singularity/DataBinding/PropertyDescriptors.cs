@@ -36,7 +36,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		protected virtual void ResetValue(Row component) { }
 	}
 
-	sealed class ColumnPropertyDescriptor : PropertyDescriptor<Row> {
+	sealed class ColumnPropertyDescriptor : PropertyDescriptor<Row>, ISchemaItem {
 		public Column Column { get; private set; }
 
 		public ColumnPropertyDescriptor(Column column) : base(column.Name) { this.Column = column; }
@@ -56,9 +56,11 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			var other = obj as ColumnPropertyDescriptor;
 			return other != null && Column == other.Column;
 		}
+
+		public TableSchema Schema { get { return Column.Schema; } }
 	}
 
-	sealed class ChildRelationPropertyDescriptor : PropertyDescriptor<Row>, ITypedListPropertyProvider {
+	sealed class ChildRelationPropertyDescriptor : PropertyDescriptor<Row>, ITypedListPropertyProvider, ISchemaItem {
 		//The DataContext is necessary so that we can
 		//only return child relations for tables that
 		//exist in the context.
@@ -88,5 +90,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public PropertyDescriptorCollection GetItemProperties() {
 			return Context.Tables[Relation.ChildSchema].CreatePropertyDescriptors();
 		}
+
+		public TableSchema Schema { get { return Relation.ParentSchema; } }
 	}
 }
