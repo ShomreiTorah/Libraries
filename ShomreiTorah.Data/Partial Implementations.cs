@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Net.Mail;
+using System.Text;
 
 namespace ShomreiTorah.Data {
 	[SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes", Justification = "Comparable for grids only")]
@@ -80,5 +81,23 @@ namespace ShomreiTorah.Data {
 			var result = Date.CompareTo(other.Date);
 			return result == 0 ? Number.CompareTo(other.Number) : result;
 		}
+	}
+
+	partial class EmailAddress {
+		partial void ValidateEmail(string newValue, Action<string> error) {
+			try {
+				new MailAddress(newValue).ToString();
+			} catch (FormatException) {
+				error("Invalid email address");
+				return;
+			}
+		}
+		partial void OnEmailChanged(string oldValue, string newValue) {
+			if (newValue == null & Table == null) return;
+			Email = new MailAddress(newValue).Address;
+		}
+
+		///<summary>Gets a MailAddress object for this email address.</summary>
+		public MailAddress MailAddress { get { return new MailAddress(Email, Name); } }
 	}
 }
