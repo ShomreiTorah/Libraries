@@ -15,6 +15,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 	public class EditorSettingsApplier : Component, IExtenderProvider, ISupportInitialize {
 		readonly Dictionary<BaseEdit, bool> values = new Dictionary<BaseEdit, bool>();
 
+		///<summary>Gets the value of the UseDefaultSettings property for an editor.</summary>
 		[Description("Gets or sets whether the editor should use the default settings for the column it's bound to.")]
 		[Category("Data")]
 		[DefaultValue(false)]
@@ -24,10 +25,12 @@ namespace ShomreiTorah.Data.UI.Controls {
 			values.TryGetValue(editor, out result);	//Defaults to false if not found
 			return result;
 		}
+		///<summary>Sets the value of the UseDefaultSettings property for an editor.</summary>
 		public void SetUseDefaultSettings(BaseEdit editor, bool value) {
 			values[editor] = value && ApplySettings(editor);	//Only apply if value is true
 		}
 
+		///<summary>Applies any registered EditorSettings to an editor.</summary>
 		bool ApplySettings(BaseEdit edit) {
 			//This will be called in addition to normal designer serialization of previously applied settings
 			if (edit.DataBindings.Count != 1) {
@@ -63,7 +66,9 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 
 		bool initializing;
+		///<summary>Called to signal the object that initialization is starting.</summary>
 		public void BeginInit() { initializing = true; }
+		///<summary>Called to signal the object that initialization is complete.</summary>
 		public void EndInit() { initializing = false; }
 	}
 }
