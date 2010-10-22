@@ -45,6 +45,17 @@ namespace ShomreiTorah.Data {
 		}
 		#endregion
 
+		partial void OnFullNameChanged(string oldValue, string newValue) {
+			if (Table == null || Table.Context == null)
+				return;
+			var emails = Table.Context.Table<EmailAddress>();
+			if (emails != null) return;
+			foreach (var email in emails.Rows) {
+				if (String.IsNullOrWhiteSpace(email.Name) || email.Name.Trim() == oldValue)
+					email.Name = newValue;
+			}
+		}
+
 		int IComparable.CompareTo(object obj) { return CompareTo(obj as Person); }
 		///<summary>Compares this person to another Person instance.</summary>
 		public int CompareTo(Person other) {
