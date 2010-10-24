@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
-using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
-using ShomreiTorah.Singularity.Sql;
 using ShomreiTorah.Singularity.DataBinding;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>A composite editor for a Person row.</summary>
@@ -19,7 +14,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Creates a new PersonEditor control.</summary>
 		public PersonEditor() {
 			InitializeComponent();
-			//bindingSource.DataSource = null;
 		}
 
 		///<summary>Gets or sets the person bound to the control.</summary>
@@ -75,52 +69,66 @@ namespace ShomreiTorah.Data.UI.Controls {
 		#endregion
 
 		#region FullName
-		bool hasCustomFullName;
-		private void SingleName_Changing(object sender, DevExpress.XtraEditors.Controls.ChangingEventArgs e) {
-			hasCustomFullName = !String.IsNullOrWhiteSpace(FullNameTextEdit.Text) && FullNameTextEdit.Text != GenerateFullName();
-		}
-		string GenerateFullName() {
+		///<summary>Generates a default full name from the his-, her-, and last-name textboxes.</summary>
+		///<param name="valueGetter">A function to get the value of a textbox.  This can be used to get a previous FullName.</param>
+		string GenerateFullName(Func<TextEdit, String> valueGetter) {
+			Func<TextEdit, bool> isEmpty = t => String.IsNullOrWhiteSpace(valueGetter(t));
+
 			string title;
 			string first;
 
-			if (!String.IsNullOrWhiteSpace(HisNameTextEdit.Text)) {
-				if (!String.IsNullOrWhiteSpace(HerNameTextEdit.Text))
+			if (!isEmpty(HisNameTextEdit)) {
+				if (!isEmpty(HerNameTextEdit))
 					title = "Mr. & Mrs.";
 				else
 					title = "Mr.";
-				first = HisNameTextEdit.Text;
-			} else if (!String.IsNullOrWhiteSpace(HerNameTextEdit.Text)) {
+				first = valueGetter(HisNameTextEdit);
+			} else if (!isEmpty(HerNameTextEdit)) {
 				title = "Mrs.";
-				first = HisNameTextEdit.Text;
-			} else if (!String.IsNullOrWhiteSpace(LastNameTextEdit.Text))
-				return LastNameTextEdit.Text + " Family";
+				first = valueGetter(HerNameTextEdit);
+			} else if (!isEmpty(LastNameTextEdit))
+				return valueGetter(LastNameTextEdit) + " Family";
 			else
 				return null;
 
-			return (title + " " + first + " " + LastNameTextEdit.Text).Trim();
+			return (title + " " + first + " " + valueGetter(LastNameTextEdit)).Trim();
 		}
+		readonly Dictionary<TextEdit, string> oldTexts = new Dictionary<TextEdit, string>();
 		void UpdateFullName(TextEdit changedEdit) {
-			if (!hasCustomFullName) {
-				FullNameTextEdit.Text = GenerateFullName();
+			if (oldTexts.Count == 0) {	//This happens in an EndInit call
+				UpdateOldTexts();
 				return;
 			}
+
+			var newFullName = GenerateFullName(e => e.Text);
+			var oldFullName = GenerateFullName(e => oldTexts[e]);
+			UpdateOldTexts();
+
+			if (String.IsNullOrWhiteSpace(FullNameTextEdit.Text)
+			 || FullNameTextEdit.Text == oldFullName) {
+				FullNameTextEdit.Text = newFullName;
+				return;
+			}
+
 			var oldName = changedEdit.OldEditValue as string;	//Can be DBNull
 			if (!String.IsNullOrWhiteSpace(oldName))
 				FullNameTextEdit.Text = FullNameTextEdit.Text.Replace(oldName, changedEdit.Text);
 		}
 
-		private void HisNameTextEdit_EditValueChanged(object sender, EventArgs e) {
-			UpdateFullName(HisNameTextEdit);
-		}
 
-		private void HerNameTextEdit_EditValueChanged(object sender, EventArgs e) {
-			UpdateFullName(HerNameTextEdit);
+		private void SingleNameEdit_KeyUp(object sender, KeyEventArgs e) {
+			UpdateFullName((TextEdit)sender);
 		}
-		private void LastNameTextEdit_EditValueChanged(object sender, EventArgs e) {
-			UpdateFullName(LastNameTextEdit);
+		private void SingleNameEdit_EditValueChanged(object sender, EventArgs e) {
+			UpdateFullName((TextEdit)sender);
+			UpdateOldTexts();
+		}
+		void UpdateOldTexts() {
+			oldTexts[HisNameTextEdit] = HisNameTextEdit.Text;
+			oldTexts[HerNameTextEdit] = HerNameTextEdit.Text;
+			oldTexts[LastNameTextEdit] = LastNameTextEdit.Text;
 		}
 		#endregion
-
 	}
 	class DataBinderContext : DataContext {
 		public DataBinderContext() {
