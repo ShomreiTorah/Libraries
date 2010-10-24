@@ -31,6 +31,14 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			return new PropertyDescriptorCollection(descriptors.ToArray(), true);
 		}
 
+		public static PropertyDescriptorCollection CreatePropertyDescriptors(this TableSchema schema) {
+			var descriptors = new List<PropertyDescriptor>(schema.Columns.Count + schema.ChildRelations.Count);
+
+			descriptors.AddRange(schema.Columns.Select(c => new ColumnPropertyDescriptor(c)));
+			//Since there's no table, don't add any child properties.
+			return new PropertyDescriptorCollection(descriptors.ToArray(), true);
+		}
+
 
 		///<summary>Exposes the GetList method on a class that implements IListSource explicitly.</summary>
 		public static IList GetList(this IListSource listSource) { return listSource.GetList(); }

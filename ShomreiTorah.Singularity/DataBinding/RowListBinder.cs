@@ -14,11 +14,12 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		///<summary>Creates a new RowListBinder that exposes the given list of rows.</summary>
 		///<param name="table">The table containing the rows.</param>
 		///<param name="rows">The rows to expose.</param>
-		///<remarks>The table parameter is required so that I can obtain schema information for an empty list.</remarks>
+		///<remarks>The table parameter is used to obtain schema information for an empty list.</remarks>
 		public RowListBinder(Table table, IList<Row> rows) {
-			if (table == null) throw new ArgumentNullException("table");
-
 			if (rows == null) throw new ArgumentNullException("rows");
+			if (table == null && rows.Count == 0)
+				throw new ArgumentNullException("table", "If there are no rows, the table parameter is required");
+
 			Table = table;
 			Rows = rows;
 
@@ -42,8 +43,10 @@ namespace ShomreiTorah.Singularity.DataBinding {
 				: base(owner.Table.Schema, owner.Rows) {
 
 				this.owner = owner;
-				owner.Table.LoadCompleted += Table_LoadCompleted;
-				owner.Table.ValueChanged += Table_ValueChanged;
+				if (owner.Table != null) {
+					owner.Table.LoadCompleted += Table_LoadCompleted;
+					owner.Table.ValueChanged += Table_ValueChanged;
+				}
 			}
 
 			void Table_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
@@ -53,11 +56,19 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			}
 
 			public void Dispose() {
-				owner.Table.LoadCompleted -= Table_LoadCompleted;
-				owner.Table.ValueChanged -= Table_ValueChanged;
+				if (owner.Table != null) {
+					owner.Table.LoadCompleted -= Table_LoadCompleted;
+					owner.Table.ValueChanged -= Table_ValueChanged;
+				}
 			}
 
-			protected override string ListName { get { return owner.Table.Schema.Name; } }
+			protected override string ListName {
+				get {
+					if (owner.Table == null)
+						return owner.Rows[0].Schema.Name;
+					return owner.Table.Schema.Name;
+				}
+			}
 			protected override Table SourceTable { get { return owner.Table; } }
 
 			protected override Row CreateNewRow() { throw new NotSupportedException(); }

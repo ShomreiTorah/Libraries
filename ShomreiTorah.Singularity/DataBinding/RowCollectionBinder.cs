@@ -24,8 +24,12 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		PropertyDescriptorCollection propertyDescriptors;
 		PropertyDescriptorCollection PropertyDescriptors {
 			get {
-				if (propertyDescriptors == null)
-					propertyDescriptors = SourceTable.CreatePropertyDescriptors();
+				if (propertyDescriptors == null) {
+					if (SourceTable != null)
+						propertyDescriptors = SourceTable.CreatePropertyDescriptors();
+					else
+						propertyDescriptors = this[0].Schema.CreatePropertyDescriptors();
+				}
 
 				return propertyDescriptors;
 			}
@@ -55,19 +59,19 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		//some actual changes.
 		bool loadChangePending;
 		protected void OnValueChanged(ValueChangedEventArgs args) {
-			if (SourceTable.IsLoadingData)
+			if (SourceTable != null && SourceTable.IsLoadingData)
 				loadChangePending = true;
 			else
 				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, IndexOf(args.Row), new ColumnPropertyDescriptor(args.Column)));
 		}
 		protected void OnRowAdded(RowListEventArgs args) {
-			if (SourceTable.IsLoadingData)
+			if (SourceTable != null && SourceTable.IsLoadingData)
 				loadChangePending = true;
 			else
 				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemAdded, args.Index));
 		}
 		protected void OnRowRemoved(RowListEventArgs args) {
-			if (SourceTable.IsLoadingData)
+			if (SourceTable != null && SourceTable.IsLoadingData)
 				loadChangePending = true;
 			else
 				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemDeleted, args.Index));
