@@ -42,17 +42,17 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.ItemForSource = new DevExpress.XtraLayout.LayoutControlItem();
 			this.layoutControlGroup1 = new DevExpress.XtraLayout.LayoutControlGroup();
 			this.layoutControlGroup2 = new DevExpress.XtraLayout.LayoutControlGroup();
-			this.ItemForLastName = new DevExpress.XtraLayout.LayoutControlItem();
+			this.ItemForPhone = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForHisName = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForHerName = new DevExpress.XtraLayout.LayoutControlItem();
+			this.ItemForLastName = new DevExpress.XtraLayout.LayoutControlItem();
+			this.layoutControlGroup3 = new DevExpress.XtraLayout.LayoutControlGroup();
 			this.ItemForFullName = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForAddress = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForCity = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForState = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForZip = new DevExpress.XtraLayout.LayoutControlItem();
-			this.ItemForPhone = new DevExpress.XtraLayout.LayoutControlItem();
 			this.editorSettingsApplier1 = new ShomreiTorah.Data.UI.Controls.EditorSettingsApplier();
-			this.layoutControlGroup3 = new DevExpress.XtraLayout.LayoutControlGroup();
 			((System.ComponentModel.ISupportInitialize)(this.dataLayoutControl1)).BeginInit();
 			this.dataLayoutControl1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.IdTextEdit.Properties)).BeginInit();
@@ -72,17 +72,17 @@ namespace ShomreiTorah.Data.UI.Controls {
 			((System.ComponentModel.ISupportInitialize)(this.ItemForSource)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup2)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.ItemForLastName)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ItemForPhone)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForHisName)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForHerName)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.ItemForLastName)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup3)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForFullName)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForAddress)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForCity)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForState)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForZip)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.ItemForPhone)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.editorSettingsApplier1)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup3)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// dataLayoutControl1
@@ -141,6 +141,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// LastNameTextEdit
 			// 
 			this.LastNameTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.LastName", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.LastNameTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Inactive);
 			this.LastNameTextEdit.Location = new System.Drawing.Point(66, 36);
 			this.LastNameTextEdit.Name = "LastNameTextEdit";
 			this.LastNameTextEdit.Size = new System.Drawing.Size(334, 20);
@@ -150,6 +151,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// HisNameTextEdit
 			// 
 			this.HisNameTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.HisName", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.HisNameTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Inactive);
 			this.HisNameTextEdit.Location = new System.Drawing.Point(66, 12);
 			this.HisNameTextEdit.Name = "HisNameTextEdit";
 			this.HisNameTextEdit.Size = new System.Drawing.Size(103, 20);
@@ -159,6 +161,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// HerNameTextEdit
 			// 
 			this.HerNameTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.HerName", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.HerNameTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Inactive);
 			this.HerNameTextEdit.Location = new System.Drawing.Point(227, 12);
 			this.HerNameTextEdit.Name = "HerNameTextEdit";
 			this.HerNameTextEdit.Size = new System.Drawing.Size(173, 20);
@@ -168,6 +171,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// FullNameTextEdit
 			// 
 			this.FullNameTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.FullName", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.FullNameTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Inactive);
 			this.FullNameTextEdit.Location = new System.Drawing.Point(78, 92);
 			this.FullNameTextEdit.Name = "FullNameTextEdit";
 			this.FullNameTextEdit.Size = new System.Drawing.Size(310, 20);
@@ -177,6 +181,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// AddressTextEdit
 			// 
 			this.AddressTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.Address", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.AddressTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Inactive);
 			this.AddressTextEdit.Location = new System.Drawing.Point(78, 116);
 			this.AddressTextEdit.Name = "AddressTextEdit";
 			this.AddressTextEdit.Size = new System.Drawing.Size(310, 20);
@@ -186,6 +191,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// CityTextEdit
 			// 
 			this.CityTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.City", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.CityTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Inactive);
 			this.CityTextEdit.Location = new System.Drawing.Point(78, 140);
 			this.CityTextEdit.Name = "CityTextEdit";
 			this.CityTextEdit.Size = new System.Drawing.Size(69, 20);
@@ -195,6 +201,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// StateComboBoxEdit
 			// 
 			this.StateComboBoxEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.State", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.StateComboBoxEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Active);
 			this.StateComboBoxEdit.Location = new System.Drawing.Point(205, 140);
 			this.StateComboBoxEdit.Name = "StateComboBoxEdit";
 			this.StateComboBoxEdit.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -257,11 +264,11 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.StateComboBoxEdit.Size = new System.Drawing.Size(50, 20);
 			this.StateComboBoxEdit.StyleController = this.dataLayoutControl1;
 			this.StateComboBoxEdit.TabIndex = 12;
-			this.editorSettingsApplier1.SetUseDefaultSettings(this.StateComboBoxEdit, true);
 			// 
 			// ZipTextEdit
 			// 
 			this.ZipTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.Zip", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.ZipTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Active);
 			this.ZipTextEdit.Location = new System.Drawing.Point(313, 140);
 			this.ZipTextEdit.Name = "ZipTextEdit";
 			this.ZipTextEdit.Properties.Mask.AutoComplete = DevExpress.XtraEditors.Mask.AutoCompleteType.None;
@@ -271,11 +278,11 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.ZipTextEdit.Size = new System.Drawing.Size(75, 20);
 			this.ZipTextEdit.StyleController = this.dataLayoutControl1;
 			this.ZipTextEdit.TabIndex = 13;
-			this.editorSettingsApplier1.SetUseDefaultSettings(this.ZipTextEdit, true);
 			// 
 			// PhoneTextEdit
 			// 
 			this.PhoneTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.Phone", true));
+			this.editorSettingsApplier1.SetDefaultSettingsMode(this.PhoneTextEdit, ShomreiTorah.Data.UI.Controls.DefaultSettingsMode.Active);
 			this.PhoneTextEdit.Location = new System.Drawing.Point(66, 176);
 			this.PhoneTextEdit.Name = "PhoneTextEdit";
 			this.PhoneTextEdit.Properties.Mask.EditMask = "\\(\\d\\d\\d\\) \\d\\d\\d - \\d\\d\\d\\d";
@@ -284,7 +291,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.PhoneTextEdit.Size = new System.Drawing.Size(334, 20);
 			this.PhoneTextEdit.StyleController = this.dataLayoutControl1;
 			this.PhoneTextEdit.TabIndex = 14;
-			this.editorSettingsApplier1.SetUseDefaultSettings(this.PhoneTextEdit, true);
 			// 
 			// SourceTextEdit
 			// 
@@ -358,15 +364,15 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.layoutControlGroup2.Size = new System.Drawing.Size(392, 203);
 			this.layoutControlGroup2.Text = "autoGeneratedGroup0";
 			// 
-			// ItemForLastName
+			// ItemForPhone
 			// 
-			this.ItemForLastName.Control = this.LastNameTextEdit;
-			this.ItemForLastName.CustomizationFormText = "Last Name";
-			this.ItemForLastName.Location = new System.Drawing.Point(0, 24);
-			this.ItemForLastName.Name = "ItemForLastName";
-			this.ItemForLastName.Size = new System.Drawing.Size(392, 24);
-			this.ItemForLastName.Text = "Last Name";
-			this.ItemForLastName.TextSize = new System.Drawing.Size(50, 13);
+			this.ItemForPhone.Control = this.PhoneTextEdit;
+			this.ItemForPhone.CustomizationFormText = "Phone";
+			this.ItemForPhone.Location = new System.Drawing.Point(0, 164);
+			this.ItemForPhone.Name = "ItemForPhone";
+			this.ItemForPhone.Size = new System.Drawing.Size(392, 39);
+			this.ItemForPhone.Text = "Phone";
+			this.ItemForPhone.TextSize = new System.Drawing.Size(50, 13);
 			// 
 			// ItemForHisName
 			// 
@@ -387,6 +393,30 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.ItemForHerName.Size = new System.Drawing.Size(231, 24);
 			this.ItemForHerName.Text = "Her Name";
 			this.ItemForHerName.TextSize = new System.Drawing.Size(50, 13);
+			// 
+			// ItemForLastName
+			// 
+			this.ItemForLastName.Control = this.LastNameTextEdit;
+			this.ItemForLastName.CustomizationFormText = "Last Name";
+			this.ItemForLastName.Location = new System.Drawing.Point(0, 24);
+			this.ItemForLastName.Name = "ItemForLastName";
+			this.ItemForLastName.Size = new System.Drawing.Size(392, 24);
+			this.ItemForLastName.Text = "Last Name";
+			this.ItemForLastName.TextSize = new System.Drawing.Size(50, 13);
+			// 
+			// layoutControlGroup3
+			// 
+			this.layoutControlGroup3.CustomizationFormText = "Mailing Address";
+			this.layoutControlGroup3.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] {
+            this.ItemForFullName,
+            this.ItemForAddress,
+            this.ItemForCity,
+            this.ItemForState,
+            this.ItemForZip});
+			this.layoutControlGroup3.Location = new System.Drawing.Point(0, 48);
+			this.layoutControlGroup3.Name = "layoutControlGroup3";
+			this.layoutControlGroup3.Size = new System.Drawing.Size(392, 116);
+			this.layoutControlGroup3.Text = "Mailing Address";
 			// 
 			// ItemForFullName
 			// 
@@ -441,30 +471,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.ItemForZip.Text = "Zip";
 			this.ItemForZip.TextSize = new System.Drawing.Size(50, 13);
 			// 
-			// ItemForPhone
-			// 
-			this.ItemForPhone.Control = this.PhoneTextEdit;
-			this.ItemForPhone.CustomizationFormText = "Phone";
-			this.ItemForPhone.Location = new System.Drawing.Point(0, 164);
-			this.ItemForPhone.Name = "ItemForPhone";
-			this.ItemForPhone.Size = new System.Drawing.Size(392, 39);
-			this.ItemForPhone.Text = "Phone";
-			this.ItemForPhone.TextSize = new System.Drawing.Size(50, 13);
-			// 
-			// layoutControlGroup3
-			// 
-			this.layoutControlGroup3.CustomizationFormText = "Mailing Address";
-			this.layoutControlGroup3.Items.AddRange(new DevExpress.XtraLayout.BaseLayoutItem[] {
-            this.ItemForFullName,
-            this.ItemForAddress,
-            this.ItemForCity,
-            this.ItemForState,
-            this.ItemForZip});
-			this.layoutControlGroup3.Location = new System.Drawing.Point(0, 48);
-			this.layoutControlGroup3.Name = "layoutControlGroup3";
-			this.layoutControlGroup3.Size = new System.Drawing.Size(392, 116);
-			this.layoutControlGroup3.Text = "Mailing Address";
-			// 
 			// PersonEditor
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -491,17 +497,17 @@ namespace ShomreiTorah.Data.UI.Controls {
 			((System.ComponentModel.ISupportInitialize)(this.ItemForSource)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup2)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.ItemForLastName)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ItemForPhone)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForHisName)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForHerName)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.ItemForLastName)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup3)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForFullName)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForAddress)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForCity)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForState)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForZip)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.ItemForPhone)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.editorSettingsApplier1)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.layoutControlGroup3)).EndInit();
 			this.ResumeLayout(false);
 
 		}

@@ -11,23 +11,26 @@ using ShomreiTorah.Singularity;
 
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>Applies preset editor settings to editors in a designer.</summary>
-	[ProvideProperty("UseDefaultSettings", typeof(BaseEdit))]
+	[ProvideProperty("DefaultSettingsMode", typeof(BaseEdit))]
 	public class EditorSettingsApplier : Component, IExtenderProvider, ISupportInitialize {
-		readonly Dictionary<BaseEdit, bool> values = new Dictionary<BaseEdit, bool>();
+		readonly Dictionary<BaseEdit, DefaultSettingsMode> values = new Dictionary<BaseEdit, DefaultSettingsMode>();
 
-		///<summary>Gets the value of the UseDefaultSettings property for an editor.</summary>
-		[Description("Gets or sets whether the editor should use the default settings for the column it's bound to.")]
+		///<summary>Gets the value of the DefaultSettingsMode property for an editor.</summary>
+		[Description("Gets or sets whether the editor should try use the default settings for the column it's bound to.")]
 		[Category("Data")]
-		[DefaultValue(false)]
+		[DefaultValue(DefaultSettingsMode.None)]
 		[RefreshProperties(RefreshProperties.All)]
-		public bool GetUseDefaultSettings(BaseEdit editor) {
-			bool result;
+		public DefaultSettingsMode GetDefaultSettingsMode(BaseEdit editor) {
+			DefaultSettingsMode result;
 			values.TryGetValue(editor, out result);	//Defaults to false if not found
 			return result;
 		}
-		///<summary>Sets the value of the UseDefaultSettings property for an editor.</summary>
-		public void SetUseDefaultSettings(BaseEdit editor, bool value) {
-			values[editor] = value && ApplySettings(editor);	//Only apply if value is true
+		///<summary>Sets the value of the DefaultSettingsMode property for an editor.</summary>
+		public void SetDefaultSettingsMode(BaseEdit editor, DefaultSettingsMode value) {
+			if (value != DefaultSettingsMode.None)
+				value = ApplySettings(editor) ? DefaultSettingsMode.Active : DefaultSettingsMode.Inactive;
+
+			values[editor] = value;
 		}
 
 		///<summary>Applies any registered EditorSettings to an editor.</summary>
@@ -71,5 +74,14 @@ namespace ShomreiTorah.Data.UI.Controls {
 		public void BeginInit() { initializing = true; }
 		///<summary>Called to signal the object that initialization is complete.</summary>
 		public void EndInit() { initializing = false; }
+	}
+	///<summary>Specifies whether default editor settings should be applied.</summary>
+	public enum DefaultSettingsMode {
+		///<summary>Default settings should not be applied.</summary>
+		None,
+		///<summary>Default settings should be applied, but there are no settings to apply for this column.</summary>
+		Inactive,
+		///<summary>Default settings are applied.</summary>
+		Active
 	}
 }
