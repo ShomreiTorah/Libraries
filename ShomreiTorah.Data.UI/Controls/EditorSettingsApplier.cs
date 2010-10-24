@@ -8,10 +8,12 @@ using DevExpress.XtraEditors;
 using ShomreiTorah.WinForms;
 using ShomreiTorah.Data.UI.DisplaySettings;
 using ShomreiTorah.Singularity;
+using System.ComponentModel.Design;
 
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>Applies preset editor settings to editors in a designer.</summary>
 	[ProvideProperty("DefaultSettingsMode", typeof(BaseEdit))]
+	[Designer(typeof(EsaDesigner))]
 	public class EditorSettingsApplier : Component, IExtenderProvider, ISupportInitialize {
 		readonly Dictionary<BaseEdit, DefaultSettingsMode> values = new Dictionary<BaseEdit, DefaultSettingsMode>();
 
@@ -75,6 +77,35 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Called to signal the object that initialization is complete.</summary>
 		public void EndInit() { initializing = false; }
 	}
+
+	sealed class EsaDesigner : IDesigner {
+		public void Initialize(IComponent component) {
+			if (component == null) throw new ArgumentNullException("component");
+			Component = (EditorSettingsApplier)component;
+
+			Verbs = new DesignerVerbCollection { 
+				new DesignerVerb("Apply to all editors", delegate { DoDefaultAction(); }) 
+			};
+		}
+		IComponent IDesigner.Component { get { return Component; } }
+		public EditorSettingsApplier Component { get; private set; }
+
+		public void DoDefaultAction() {
+			if (Dialog.Confirm("Would you like to apply default settings to all editors?", "EditorSettingsApplier Designer"))
+				ApplyToAll();
+		}
+
+		void ApplyToAll() {
+			foreach (var edit in Component.Container.Components.OfType<BaseEdit>()) {
+				Component.SetDefaultSettingsMode(edit, DefaultSettingsMode.Active);
+			}
+		}
+
+		public DesignerVerbCollection Verbs { get; private set; }
+
+		public void Dispose() { }
+	}
+
 	///<summary>Specifies whether default editor settings should be applied.</summary>
 	public enum DefaultSettingsMode {
 		///<summary>Default settings should not be applied.</summary>
