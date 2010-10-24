@@ -13,13 +13,34 @@ using ShomreiTorah.Singularity.DataBinding;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Data.UI.Controls {
+	///<summary>A composite editor for a Person row.</summary>
+	[Description("A composite editor for a Person row.")]
+	[DefaultBindingProperty("Person")]
 	public partial class PersonEditor : XtraUserControl {
+		///<summary>Creates a new PersonEditor control.</summary>
 		public PersonEditor() {
 			InitializeComponent();
+			bindingSource.DataSource = null;
+			bindingSource.DataMember = null;
+		}
+
+		///<summary>Gets or sets the person bound to the control.</summary>
+		[Description("Gets or sets the person bound to the control.")]
+		[Category("Data")]
+		[DefaultValue(null)]
+		[Bindable(true)]
+		public Person Person {
+			get { return (Person)bindingSource.Current; }
+			set {
+				if (value == null)
+					bindingSource.DataSource = null;
+				else
+					bindingSource.DataSource = new RowListBinder(value.Table, new Row[] { value });
+			}
 		}
 
 		#region ZIP Codes
-		[SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.StartsWith(System.String)", Justification="Numeric")]
+		[SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.StartsWith(System.String)", Justification = "Numeric")]
 		private void CityTextEdit_EditValueChanged(object sender, EventArgs e) {
 			if (StateComboBoxEdit.Text == "NJ") {
 				switch (CityTextEdit.Text) {
