@@ -10,6 +10,7 @@ using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
 using ShomreiTorah.Singularity.Sql;
 using ShomreiTorah.Singularity.DataBinding;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Data.UI.Controls {
 	public partial class PersonEditor : XtraUserControl {
@@ -18,6 +19,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 
 		#region ZIP Codes
+		[SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.StartsWith(System.String)", Justification="Numeric")]
 		private void CityTextEdit_EditValueChanged(object sender, EventArgs e) {
 			if (StateComboBoxEdit.Text == "NJ") {
 				switch (CityTextEdit.Text) {
@@ -34,6 +36,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 				}
 			}
 		}
+		[SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.StartsWith(System.String)", Justification = "Numeric")]
 		private void ZipTextEdit_EditValueChanged(object sender, EventArgs e) {
 			if (ZipTextEdit.Text == "07055") {
 				CityTextEdit.Text = "Passaic";
