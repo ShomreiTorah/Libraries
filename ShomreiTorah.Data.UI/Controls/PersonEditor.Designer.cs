@@ -24,9 +24,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		/// </summary>
 		private void InitializeComponent() {
 			this.dataLayoutControl1 = new DevExpress.XtraDataLayout.DataLayoutControl();
-			this.IdTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.contextBinder1 = new ShomreiTorah.Data.UI.Controls.ContextBinder();
-			this.YKIDSpinEdit = new DevExpress.XtraEditors.SpinEdit();
 			this.LastNameTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.HisNameTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.HerNameTextEdit = new DevExpress.XtraEditors.TextEdit();
@@ -36,7 +34,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.StateComboBoxEdit = new DevExpress.XtraEditors.ComboBoxEdit();
 			this.ZipTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.PhoneTextEdit = new DevExpress.XtraEditors.TextEdit();
-			this.SourceTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.ItemForId = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForYKID = new DevExpress.XtraLayout.LayoutControlItem();
 			this.ItemForSource = new DevExpress.XtraLayout.LayoutControlItem();
@@ -55,8 +52,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.editorSettingsApplier1 = new ShomreiTorah.Data.UI.Controls.EditorSettingsApplier();
 			((System.ComponentModel.ISupportInitialize)(this.dataLayoutControl1)).BeginInit();
 			this.dataLayoutControl1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.IdTextEdit.Properties)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.YKIDSpinEdit.Properties)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.LastNameTextEdit.Properties)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.HisNameTextEdit.Properties)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.HerNameTextEdit.Properties)).BeginInit();
@@ -66,7 +61,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			((System.ComponentModel.ISupportInitialize)(this.StateComboBoxEdit.Properties)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ZipTextEdit.Properties)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.PhoneTextEdit.Properties)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.SourceTextEdit.Properties)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForId)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForYKID)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForSource)).BeginInit();
@@ -87,8 +81,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// 
 			// dataLayoutControl1
 			// 
-			this.dataLayoutControl1.Controls.Add(this.IdTextEdit);
-			this.dataLayoutControl1.Controls.Add(this.YKIDSpinEdit);
 			this.dataLayoutControl1.Controls.Add(this.LastNameTextEdit);
 			this.dataLayoutControl1.Controls.Add(this.HisNameTextEdit);
 			this.dataLayoutControl1.Controls.Add(this.HerNameTextEdit);
@@ -98,7 +90,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.dataLayoutControl1.Controls.Add(this.StateComboBoxEdit);
 			this.dataLayoutControl1.Controls.Add(this.ZipTextEdit);
 			this.dataLayoutControl1.Controls.Add(this.PhoneTextEdit);
-			this.dataLayoutControl1.Controls.Add(this.SourceTextEdit);
 			this.dataLayoutControl1.DataMember = "MasterDirectory";
 			this.dataLayoutControl1.DataSource = this.contextBinder1;
 			this.dataLayoutControl1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -112,31 +103,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.dataLayoutControl1.Size = new System.Drawing.Size(412, 223);
 			this.dataLayoutControl1.TabIndex = 0;
 			this.dataLayoutControl1.Text = "dataLayoutControl1";
-			// 
-			// IdTextEdit
-			// 
-			this.IdTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.Id", true));
-			this.IdTextEdit.Location = new System.Drawing.Point(0, 0);
-			this.IdTextEdit.Name = "IdTextEdit";
-			this.IdTextEdit.Size = new System.Drawing.Size(0, 20);
-			this.IdTextEdit.StyleController = this.dataLayoutControl1;
-			this.IdTextEdit.TabIndex = 4;
-			// 
-			// YKIDSpinEdit
-			// 
-			this.YKIDSpinEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.YKID", true));
-			this.YKIDSpinEdit.EditValue = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
-			this.YKIDSpinEdit.Location = new System.Drawing.Point(0, 0);
-			this.YKIDSpinEdit.Name = "YKIDSpinEdit";
-			this.YKIDSpinEdit.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton()});
-			this.YKIDSpinEdit.Size = new System.Drawing.Size(0, 20);
-			this.YKIDSpinEdit.StyleController = this.dataLayoutControl1;
-			this.YKIDSpinEdit.TabIndex = 5;
 			// 
 			// LastNameTextEdit
 			// 
@@ -292,18 +258,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.PhoneTextEdit.StyleController = this.dataLayoutControl1;
 			this.PhoneTextEdit.TabIndex = 14;
 			// 
-			// SourceTextEdit
-			// 
-			this.SourceTextEdit.DataBindings.Add(new System.Windows.Forms.Binding("EditValue", this.contextBinder1, "MasterDirectory.Source", true));
-			this.SourceTextEdit.Location = new System.Drawing.Point(0, 0);
-			this.SourceTextEdit.Name = "SourceTextEdit";
-			this.SourceTextEdit.Size = new System.Drawing.Size(0, 20);
-			this.SourceTextEdit.StyleController = this.dataLayoutControl1;
-			this.SourceTextEdit.TabIndex = 15;
-			// 
 			// ItemForId
 			// 
-			this.ItemForId.Control = this.IdTextEdit;
 			this.ItemForId.CustomizationFormText = "Id";
 			this.ItemForId.Location = new System.Drawing.Point(0, 0);
 			this.ItemForId.Name = "ItemForId";
@@ -314,7 +270,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// 
 			// ItemForYKID
 			// 
-			this.ItemForYKID.Control = this.YKIDSpinEdit;
 			this.ItemForYKID.CustomizationFormText = "YKID";
 			this.ItemForYKID.Location = new System.Drawing.Point(0, 0);
 			this.ItemForYKID.Name = "ItemForYKID";
@@ -325,7 +280,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			// 
 			// ItemForSource
 			// 
-			this.ItemForSource.Control = this.SourceTextEdit;
 			this.ItemForSource.CustomizationFormText = "Source";
 			this.ItemForSource.Location = new System.Drawing.Point(0, 0);
 			this.ItemForSource.Name = "ItemForSource";
@@ -480,8 +434,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.Size = new System.Drawing.Size(412, 223);
 			((System.ComponentModel.ISupportInitialize)(this.dataLayoutControl1)).EndInit();
 			this.dataLayoutControl1.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.IdTextEdit.Properties)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.YKIDSpinEdit.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.LastNameTextEdit.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.HisNameTextEdit.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.HerNameTextEdit.Properties)).EndInit();
@@ -491,7 +443,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			((System.ComponentModel.ISupportInitialize)(this.StateComboBoxEdit.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ZipTextEdit.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.PhoneTextEdit.Properties)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.SourceTextEdit.Properties)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForId)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForYKID)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ItemForSource)).EndInit();
@@ -517,8 +468,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 		private EditorSettingsApplier editorSettingsApplier1;
 		private ContextBinder contextBinder1;
 		private DevExpress.XtraDataLayout.DataLayoutControl dataLayoutControl1;
-		private DevExpress.XtraEditors.TextEdit IdTextEdit;
-		private DevExpress.XtraEditors.SpinEdit YKIDSpinEdit;
 		private DevExpress.XtraEditors.TextEdit LastNameTextEdit;
 		private DevExpress.XtraEditors.TextEdit HisNameTextEdit;
 		private DevExpress.XtraEditors.TextEdit HerNameTextEdit;
@@ -528,7 +477,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 		private DevExpress.XtraEditors.ComboBoxEdit StateComboBoxEdit;
 		private DevExpress.XtraEditors.TextEdit ZipTextEdit;
 		private DevExpress.XtraEditors.TextEdit PhoneTextEdit;
-		private DevExpress.XtraEditors.TextEdit SourceTextEdit;
 		private DevExpress.XtraLayout.LayoutControlItem ItemForId;
 		private DevExpress.XtraLayout.LayoutControlItem ItemForYKID;
 		private DevExpress.XtraLayout.LayoutControlItem ItemForSource;
