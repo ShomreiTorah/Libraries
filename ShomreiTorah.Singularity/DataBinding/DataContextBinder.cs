@@ -58,7 +58,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public bool Contains(object value) { return value == context; }
 
 		public bool IsSynchronized { get { return false; } }
-		public object SyncRoot { get { throw new NotSupportedException(); } }
+		public object SyncRoot { get { return context; } }
 
 		public int Count { get { return 1; } }
 		public bool IsFixedSize { get { return true; } }
