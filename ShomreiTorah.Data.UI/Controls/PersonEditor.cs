@@ -17,6 +17,39 @@ namespace ShomreiTorah.Data.UI.Controls {
 			InitializeComponent();
 		}
 
+		#region ZIP Codes
+		private void CityTextEdit_EditValueChanged(object sender, EventArgs e) {
+			if (StateComboBoxEdit.Text == "NJ") {
+				switch (CityTextEdit.Text) {
+					case "Passaic":
+						ZipTextEdit.Text = "07055";
+						break;
+					case "Clifton":
+						if (!ZipTextEdit.Text.StartsWith("0701"))
+							ZipTextEdit.Text = "0701";
+						break;
+					case "Rutherford":
+						ZipTextEdit.Text = "07070";
+						break;
+				}
+			}
+		}
+		private void ZipTextEdit_EditValueChanged(object sender, EventArgs e) {
+			if (ZipTextEdit.Text == "07055") {
+				CityTextEdit.Text = "Passaic";
+				StateComboBoxEdit.Text = "NJ";
+			} else if (ZipTextEdit.Text == "07070") {
+				CityTextEdit.Text = "Rutherford";
+				StateComboBoxEdit.Text = "NJ";
+			} else if (ZipTextEdit.Text.StartsWith("0701")	//Clifton's ZIP codes are between 07011 & 07015 (Google them)
+					&& ZipTextEdit.Text.Length == 4 || (ZipTextEdit.Text[4] >= '1' && ZipTextEdit.Text[4] <= '6')) {
+				CityTextEdit.Text = "Clifton";
+				StateComboBoxEdit.Text = "NJ";
+			}
+		}
+		#endregion
+
+		#region FullName
 		bool hasCustomFullName;
 		private void SingleName_Changing(object sender, DevExpress.XtraEditors.Controls.ChangingEventArgs e) {
 			hasCustomFullName = !String.IsNullOrWhiteSpace(FullNameTextEdit.Text) && FullNameTextEdit.Text != GenerateFullName();
@@ -61,6 +94,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 		private void LastNameTextEdit_EditValueChanged(object sender, EventArgs e) {
 			UpdateFullName(LastNameTextEdit);
 		}
+		#endregion
+
 	}
 	class DataBinderContext : DataContext {
 		public DataBinderContext() {
