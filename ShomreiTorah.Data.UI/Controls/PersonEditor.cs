@@ -15,23 +15,24 @@ using System.Diagnostics.CodeAnalysis;
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>A composite editor for a Person row.</summary>
 	[Description("A composite editor for a Person row.")]
-	[DefaultBindingProperty("Person")]
 	public partial class PersonEditor : XtraUserControl {
 		///<summary>Creates a new PersonEditor control.</summary>
 		public PersonEditor() {
 			InitializeComponent();
-			bindingSource.DataSource = null;
-			bindingSource.DataMember = null;
+			//bindingSource.DataSource = null;
 		}
 
 		///<summary>Gets or sets the person bound to the control.</summary>
-		[Description("Gets or sets the person bound to the control.")]
-		[Category("Data")]
-		[DefaultValue(null)]
-		[Bindable(true)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		//[Description("Gets or sets the person bound to the control.")]
+		//[Category("Data")]
+		//[DefaultValue(null)]
+		//[Bindable(true)]
 		public Person Person {
 			get { return (Person)bindingSource.Current; }
 			set {
+				bindingSource.DataMember = null;
 				if (value == null)
 					bindingSource.DataSource = null;
 				else
@@ -66,7 +67,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 				CityTextEdit.Text = "Rutherford";
 				StateComboBoxEdit.Text = "NJ";
 			} else if (ZipTextEdit.Text.StartsWith("0701")	//Clifton's ZIP codes are between 07011 & 07015 (Google them)
-					&& ZipTextEdit.Text.Length == 4 || (ZipTextEdit.Text[4] >= '1' && ZipTextEdit.Text[4] <= '6')) {
+					&& (ZipTextEdit.Text.Length == 4 || (ZipTextEdit.Text[4] >= '1' && ZipTextEdit.Text[4] <= '6'))) {
 				CityTextEdit.Text = "Clifton";
 				StateComboBoxEdit.Text = "NJ";
 			}
@@ -103,7 +104,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 				FullNameTextEdit.Text = GenerateFullName();
 				return;
 			}
-			var oldName = (string)changedEdit.OldEditValue;
+			var oldName = changedEdit.OldEditValue as string;	//Can be DBNull
 			if (!String.IsNullOrWhiteSpace(oldName))
 				FullNameTextEdit.Text = FullNameTextEdit.Text.Replace(oldName, changedEdit.Text);
 		}
