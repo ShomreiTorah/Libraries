@@ -10,7 +10,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 	///<summary>Exposes a static list of rows for data-binding.</summary>
 	///<remarks>This binder does not allow rows to be added or 
 	///deleted, but does allow columns to be changed.</remarks>
-	public sealed class RowListBinder : IListSource, IDisposable {
+	public sealed class RowListBinder : IListSource, ISchemaItem, IDisposable {
 		///<summary>Creates a new RowListBinder that exposes the given list of rows.</summary>
 		///<param name="table">The table containing the rows.</param>
 		///<param name="rows">The rows to expose.</param>
@@ -29,6 +29,8 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public Table Table { get; private set; }
 		///<summary>Gets the list of rows exposed by the binder.</summary>
 		public IList<Row> Rows { get; private set; }
+		///<summary>Gets the schema for the rows exposed by the binder.</summary>
+		public TableSchema Schema { get { return Table == null ? Rows[0].Schema : Table.Schema; } }
 
 		///<summary>Raises the Reset event, causing any data-binding clients to refresh.  Call this method after adding or removing rows in the list.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
@@ -40,7 +42,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		sealed class Binder : RowCollectionBinder, IDisposable {
 			readonly RowListBinder owner;
 			public Binder(RowListBinder owner)
-				: base(owner.Table.Schema, owner.Rows) {
+				: base(owner.Schema, owner.Rows) {
 
 				this.owner = owner;
 				if (owner.Table != null) {
@@ -62,13 +64,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 				}
 			}
 
-			protected override string ListName {
-				get {
-					if (owner.Table == null)
-						return owner.Rows[0].Schema.Name;
-					return owner.Table.Schema.Name;
-				}
-			}
+			protected override string ListName { get { return Schema.Name; } }
 			protected override Table SourceTable { get { return owner.Table; } }
 
 			protected override Row CreateNewRow() { throw new NotSupportedException(); }
