@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
-using DevExpress.XtraEditors.Repository;
+using System.ComponentModel.Design;
+using System.Linq;
+using System.Windows.Forms;
 using DevExpress.XtraEditors;
-using ShomreiTorah.WinForms;
 using ShomreiTorah.Data.UI.DisplaySettings;
 using ShomreiTorah.Singularity;
-using System.ComponentModel.Design;
+using ShomreiTorah.WinForms;
 
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>Applies preset editor settings to editors in a designer.</summary>
@@ -46,18 +45,17 @@ namespace ShomreiTorah.Data.UI.Controls {
 			}
 			var binding = edit.DataBindings[0];
 
-			var schema = TableSchema.GetSchema(binding.BindingManagerBase.GetItemProperties()[0]);
-			if (schema == null) {
+			var column = GetColumn(binding);
+			if (column == null) {
 				if (ShouldShowErrors)
 					Dialog.ShowError(edit.Name + " is not bound to a Singularity schema");
 				return false;
 			}
-			var column = schema.Columns[binding.BindingMemberInfo.BindingField];
 
 			var settings = EditorRepository.GetSettings(column);
 			if (settings == null) {
 				if (ShouldShowErrors)
-					Dialog.ShowError("There are no settings associated with the " + schema.Name + "." + column.Name + " column");
+					Dialog.ShowError("There are no settings associated with the " + column.Schema.Name + "." + column.Name + " column");
 				return false;
 			}
 
@@ -65,6 +63,12 @@ namespace ShomreiTorah.Data.UI.Controls {
 			return true;
 		}
 		bool ShouldShowErrors { get { return !initializing && DesignMode; } }
+
+		static Column GetColumn(Binding binding) {
+			var schema = TableSchema.GetSchema(binding.BindingManagerBase.GetItemProperties()[0]);
+			if (schema == null) return null;
+			return schema.Columns[binding.BindingMemberInfo.BindingField];
+		}
 
 		///<summary>Checks whether this extender can extend the given object.</summary>
 		public bool CanExtend(object extendee) {
@@ -76,6 +80,72 @@ namespace ShomreiTorah.Data.UI.Controls {
 		public void BeginInit() { initializing = true; }
 		///<summary>Called to signal the object that initialization is complete.</summary>
 		public void EndInit() { initializing = false; }
+
+		///<summary>Gets a CustomTypeDescriptor that shows information about the editors on the form at design time.</summary>
+		[Category("Information")]
+		[Description("Shows information about the editors on the form.")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[ParenthesizePropertyName]
+		[TypeConverter(typeof(ExpandableObjectConverter))]
+		//[TypeConverter(typeof(DevExpress.Utils.Design.UniversalTypeConverter))]
+		public object Editors { get { return new EditorsInfo(this); } }
+
+		class EditorsInfo : CustomTypeDescriptor {
+			readonly EditorSettingsApplier owner;
+			public EditorsInfo(EditorSettingsApplier owner) { this.owner = owner; }
+
+			public override PropertyDescriptorCollection GetProperties(Attribute[] attributes) {
+				return GetProperties();
+			}
+			public override PropertyDescriptorCollection GetProperties() {
+				return new PropertyDescriptorCollection(
+					owner.Container.Components
+						.OfType<BaseEdit>()
+						.OrderByDescending(e => (int)owner.GetDefaultSettingsMode(e))	//Active, then Inactive, then None.
+								   .ThenBy(e => e.Name)
+						.Select((e, i) => new EditorProperty(owner, i, e)).ToArray()
+				);
+			}
+			static string GetDescription(BaseEdit edit) {
+				if (edit.DataBindings.Count == 0)
+					return edit.Name + " is not databound";
+				if (edit.DataBindings.Count > 1)
+					return edit.Name + " has multiple bound properties";
+
+				var binding = edit.DataBindings[0];
+
+				var column = GetColumn(binding);
+				if (column == null)
+					return edit.Name + " is not bound to a Singularity schema";
+
+				return edit.Name + " is bound to " + column.Schema.Name + "." + column.Name;
+			}
+			class EditorProperty : PropertyDescriptor {
+				readonly EditorSettingsApplier owner;
+				readonly BaseEdit edit;
+				public EditorProperty(EditorSettingsApplier owner, int index, BaseEdit edit)
+					: base(index + ": " + edit.Name, new[] { new DescriptionAttribute(GetDescription(edit)) }) {
+					this.owner = owner;
+					this.edit = edit;
+				}
+
+				public override Type ComponentType { get { return typeof(EditorsInfo); } }
+				public override Type PropertyType { get { return typeof(string); } }
+
+				public override object GetValue(object component) {
+					return owner.GetDefaultSettingsMode(edit).ToString();
+				}
+				//Non-None values should be bold.
+				public override bool ShouldSerializeValue(object component) {
+					return owner.GetDefaultSettingsMode(edit) != DefaultSettingsMode.None;
+				}
+
+				public override bool IsReadOnly { get { return true; } }
+				public override bool CanResetValue(object component) { return false; }
+				public override void ResetValue(object component) { }
+				public override void SetValue(object component, object value) { }
+			}
+		}
 	}
 
 	sealed class EsaDesigner : IDesigner {
