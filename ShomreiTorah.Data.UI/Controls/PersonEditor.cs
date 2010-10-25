@@ -6,11 +6,16 @@ using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using ShomreiTorah.Singularity;
 using ShomreiTorah.Singularity.DataBinding;
+using ShomreiTorah.WinForms;
 
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>A composite editor for a Person row.</summary>
 	[Description("A composite editor for a Person row.")]
 	public partial class PersonEditor : XtraUserControl {
+		//When setting properties, you must call UpdateValue
+		//Otherwise, the underlying row will not be updated.
+
+
 		///<summary>Creates a new PersonEditor control.</summary>
 		public PersonEditor() {
 			InitializeComponent();
@@ -40,14 +45,14 @@ namespace ShomreiTorah.Data.UI.Controls {
 			if (StateComboBoxEdit.Text == "NJ") {
 				switch (CityTextEdit.Text) {
 					case "Passaic":
-						ZipTextEdit.Text = "07055";
+						ZipTextEdit.UpdateValue("07055");
 						break;
 					case "Clifton":
 						if (!ZipTextEdit.Text.StartsWith("0701"))
-							ZipTextEdit.Text = "0701";
+							ZipTextEdit.UpdateValue("0701");
 						break;
 					case "Rutherford":
-						ZipTextEdit.Text = "07070";
+						ZipTextEdit.UpdateValue("07070");
 						break;
 				}
 			}
@@ -55,15 +60,15 @@ namespace ShomreiTorah.Data.UI.Controls {
 		[SuppressMessage("Microsoft.Globalization", "CA1307:SpecifyStringComparison", MessageId = "System.String.StartsWith(System.String)", Justification = "Numeric")]
 		private void ZipTextEdit_EditValueChanged(object sender, EventArgs e) {
 			if (ZipTextEdit.Text == "07055") {
-				CityTextEdit.Text = "Passaic";
-				StateComboBoxEdit.Text = "NJ";
+				CityTextEdit.UpdateValue("Passaic");
+				StateComboBoxEdit.UpdateValue("NJ");
 			} else if (ZipTextEdit.Text == "07070") {
-				CityTextEdit.Text = "Rutherford";
-				StateComboBoxEdit.Text = "NJ";
+				CityTextEdit.UpdateValue("Rutherford");
+				StateComboBoxEdit.UpdateValue("NJ");
 			} else if (ZipTextEdit.Text.StartsWith("0701")	//Clifton's ZIP codes are between 07011 & 07015 (Google them)
 					&& (ZipTextEdit.Text.Length == 4 || (ZipTextEdit.Text[4] >= '1' && ZipTextEdit.Text[4] <= '6'))) {
-				CityTextEdit.Text = "Clifton";
-				StateComboBoxEdit.Text = "NJ";
+				CityTextEdit.UpdateValue("Clifton");
+				StateComboBoxEdit.UpdateValue("NJ");
 			}
 		}
 		#endregion
@@ -106,13 +111,13 @@ namespace ShomreiTorah.Data.UI.Controls {
 
 			if (String.IsNullOrWhiteSpace(FullNameTextEdit.Text)
 			 || FullNameTextEdit.Text == oldFullName) {
-				FullNameTextEdit.Text = newFullName;
+				FullNameTextEdit.UpdateValue(newFullName);
 				return;
 			}
 
 			var oldName = changedEdit.OldEditValue as string;	//Can be DBNull
 			if (!String.IsNullOrWhiteSpace(oldName))
-				FullNameTextEdit.Text = FullNameTextEdit.Text.Replace(oldName, changedEdit.Text);
+				FullNameTextEdit.UpdateValue(FullNameTextEdit.Text.Replace(oldName, changedEdit.Text));
 		}
 
 
