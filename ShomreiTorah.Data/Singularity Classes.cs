@@ -320,8 +320,8 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets or sets the person that uses the email address.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Person {
-            get { return base.Field<Row>(PersonColumn); }
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
             set { base[PersonColumn] = value; }
         }
         #endregion
@@ -356,8 +356,8 @@ namespace ShomreiTorah.Data {
         partial void ValidateUseHtml(Boolean newValue, Action<string> error);
         partial void OnUseHtmlChanged(Boolean oldValue, Boolean newValue);
         
-        partial void ValidatePerson(Row newValue, Action<string> error);
-        partial void OnPersonChanged(Row oldValue, Row newValue);
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
         #endregion
         
         #region Column Callbacks
@@ -401,7 +401,7 @@ namespace ShomreiTorah.Data {
                 ValidateUseHtml((Boolean)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == PersonColumn) {
-                ValidatePerson((Row)newValue, reporter);
+                ValidatePerson((Person)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
@@ -430,7 +430,7 @@ namespace ShomreiTorah.Data {
             else if (column == UseHtmlColumn)
             	OnUseHtmlChanged((Boolean)oldValue, (Boolean)newValue);
             else if (column == PersonColumn)
-            	OnPersonChanged((Row)oldValue, (Row)newValue);
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
             
             base.OnValueChanged(column, oldValue, newValue);
         }
@@ -887,8 +887,8 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets or sets the person who made the payment.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Person {
-            get { return base.Field<Row>(PersonColumn); }
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
             set { base[PersonColumn] = value; }
         }
         ///<summary>Gets or sets the date of the payment.</summary>
@@ -929,8 +929,8 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets or sets the deposit of the payment.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Deposit {
-            get { return base.Field<Row>(DepositColumn); }
+        public Deposit Deposit {
+            get { return base.Field<Deposit>(DepositColumn); }
             set { base[DepositColumn] = value; }
         }
         ///<summary>Gets or sets the comments of the payment.</summary>
@@ -976,8 +976,8 @@ namespace ShomreiTorah.Data {
         partial void ValidatePaymentId(Guid newValue, Action<string> error);
         partial void OnPaymentIdChanged(Guid oldValue, Guid newValue);
         
-        partial void ValidatePerson(Row newValue, Action<string> error);
-        partial void OnPersonChanged(Row oldValue, Row newValue);
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateDate(DateTime newValue, Action<string> error);
         partial void OnDateChanged(DateTime oldValue, DateTime newValue);
@@ -994,8 +994,8 @@ namespace ShomreiTorah.Data {
         partial void ValidateAmount(Decimal newValue, Action<string> error);
         partial void OnAmountChanged(Decimal oldValue, Decimal newValue);
         
-        partial void ValidateDeposit(Row newValue, Action<string> error);
-        partial void OnDepositChanged(Row oldValue, Row newValue);
+        partial void ValidateDeposit(Deposit newValue, Action<string> error);
+        partial void OnDepositChanged(Deposit oldValue, Deposit newValue);
         
         partial void ValidateComments(String newValue, Action<string> error);
         partial void OnCommentsChanged(String oldValue, String newValue);
@@ -1030,7 +1030,7 @@ namespace ShomreiTorah.Data {
                 ValidatePaymentId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == PersonColumn) {
-                ValidatePerson((Row)newValue, reporter);
+                ValidatePerson((Person)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == DateColumn) {
                 ValidateDate((DateTime)newValue, reporter);
@@ -1048,7 +1048,7 @@ namespace ShomreiTorah.Data {
                 ValidateAmount((Decimal)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == DepositColumn) {
-                ValidateDeposit((Row)newValue, reporter);
+                ValidateDeposit((Deposit)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == CommentsColumn) {
                 ValidateComments((String)newValue, reporter);
@@ -1076,7 +1076,7 @@ namespace ShomreiTorah.Data {
             if (column == PaymentIdColumn)
             	OnPaymentIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PersonColumn)
-            	OnPersonChanged((Row)oldValue, (Row)newValue);
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == DateColumn)
             	OnDateChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == MethodColumn)
@@ -1088,7 +1088,7 @@ namespace ShomreiTorah.Data {
             else if (column == AmountColumn)
             	OnAmountChanged((Decimal)oldValue, (Decimal)newValue);
             else if (column == DepositColumn)
-            	OnDepositChanged((Row)oldValue, (Row)newValue);
+            	OnDepositChanged((Deposit)oldValue, (Deposit)newValue);
             else if (column == CommentsColumn)
             	OnCommentsChanged((String)oldValue, (String)newValue);
             else if (column == ModifiedColumn)
@@ -1226,8 +1226,8 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets or sets the person who made the pledge.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Person {
-            get { return base.Field<Row>(PersonColumn); }
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
             set { base[PersonColumn] = value; }
         }
         ///<summary>Gets or sets the date of the pledge.</summary>
@@ -1320,8 +1320,8 @@ namespace ShomreiTorah.Data {
         partial void ValidatePledgeId(Guid newValue, Action<string> error);
         partial void OnPledgeIdChanged(Guid oldValue, Guid newValue);
         
-        partial void ValidatePerson(Row newValue, Action<string> error);
-        partial void OnPersonChanged(Row oldValue, Row newValue);
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateDate(DateTime newValue, Action<string> error);
         partial void OnDateChanged(DateTime oldValue, DateTime newValue);
@@ -1374,7 +1374,7 @@ namespace ShomreiTorah.Data {
                 ValidatePledgeId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == PersonColumn) {
-                ValidatePerson((Row)newValue, reporter);
+                ValidatePerson((Person)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == DateColumn) {
                 ValidateDate((DateTime)newValue, reporter);
@@ -1420,7 +1420,7 @@ namespace ShomreiTorah.Data {
             if (column == PledgeIdColumn)
             	OnPledgeIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PersonColumn)
-            	OnPersonChanged((Row)oldValue, (Row)newValue);
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == DateColumn)
             	OnDateChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == TypeColumn)
@@ -1541,8 +1541,8 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets or sets the pledge associated with this reservation.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Pledge {
-            get { return base.Field<Row>(PledgeColumn); }
+        public Pledge Pledge {
+            get { return base.Field<Pledge>(PledgeColumn); }
             set { base[PledgeColumn] = value; }
         }
         ///<summary>Gets or sets the mens seats of the seating reservation.</summary>
@@ -1595,8 +1595,8 @@ namespace ShomreiTorah.Data {
         partial void ValidateId(Guid newValue, Action<string> error);
         partial void OnIdChanged(Guid oldValue, Guid newValue);
         
-        partial void ValidatePledge(Row newValue, Action<string> error);
-        partial void OnPledgeChanged(Row oldValue, Row newValue);
+        partial void ValidatePledge(Pledge newValue, Action<string> error);
+        partial void OnPledgeChanged(Pledge oldValue, Pledge newValue);
         
         partial void ValidateMensSeats(Int32 newValue, Action<string> error);
         partial void OnMensSeatsChanged(Int32 oldValue, Int32 newValue);
@@ -1634,7 +1634,7 @@ namespace ShomreiTorah.Data {
                 ValidateId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == PledgeColumn) {
-                ValidatePledge((Row)newValue, reporter);
+                ValidatePledge((Pledge)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == MensSeatsColumn) {
                 ValidateMensSeats((Int32)newValue, reporter);
@@ -1665,7 +1665,7 @@ namespace ShomreiTorah.Data {
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PledgeColumn)
-            	OnPledgeChanged((Row)oldValue, (Row)newValue);
+            	OnPledgeChanged((Pledge)oldValue, (Pledge)newValue);
             else if (column == MensSeatsColumn)
             	OnMensSeatsChanged((Int32)oldValue, (Int32)newValue);
             else if (column == WomensSeatsColumn)
@@ -1775,8 +1775,8 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets or sets the person who received the statement.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Row Person {
-            get { return base.Field<Row>(PersonColumn); }
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
             set { base[PersonColumn] = value; }
         }
         ///<summary>Gets or sets the date generated of the statement log.</summary>
@@ -1829,8 +1829,8 @@ namespace ShomreiTorah.Data {
         partial void ValidateId(Guid newValue, Action<string> error);
         partial void OnIdChanged(Guid oldValue, Guid newValue);
         
-        partial void ValidatePerson(Row newValue, Action<string> error);
-        partial void OnPersonChanged(Row oldValue, Row newValue);
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateDateGenerated(DateTime newValue, Action<string> error);
         partial void OnDateGeneratedChanged(DateTime oldValue, DateTime newValue);
@@ -1868,7 +1868,7 @@ namespace ShomreiTorah.Data {
                 ValidateId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == PersonColumn) {
-                ValidatePerson((Row)newValue, reporter);
+                ValidatePerson((Person)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == DateGeneratedColumn) {
                 ValidateDateGenerated((DateTime)newValue, reporter);
@@ -1899,7 +1899,7 @@ namespace ShomreiTorah.Data {
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PersonColumn)
-            	OnPersonChanged((Row)oldValue, (Row)newValue);
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == DateGeneratedColumn)
             	OnDateGeneratedChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == MediaColumn)
