@@ -119,11 +119,61 @@ namespace ShomreiTorah.Data.UI.Controls {
 				IsDefaultButton = true
 			});
 		}
+		///<summary>Raises the ButtonClick event.</summary>
 		protected override void RaiseButtonClick(ButtonPressedEventArgs e) {
 			base.RaiseButtonClick(e);
 			if (e.Button.Index == 1) {
-				OwnerEdit.EditValue = AppFramework.Current.PromptPerson();
+				var person = AppFramework.Current.PromptPerson();
+				if (!RaisePersonSelecting(person, PersonSelectionReason.Created))
+					return;
+				OwnerEdit.EditValue = person;
 			}
 		}
+		///<summary>Raises the PersonSelecting event.</summary>
+		///<returns>False if the event was cancelled.</returns>
+		bool RaisePersonSelecting(Person person, PersonSelectionReason method) {
+			var args = new PersonSelectingEventArgs(person, method);
+			OnPersonSelecting(args);
+			return !args.Cancel;
+		}
+
+		///<summary>Raises the ItemSelecting event.</summary>
+		protected override void OnItemSelecting(ItemSelectingEventArgs e) {
+			base.OnItemSelecting(e);
+			var args = new PersonSelectingEventArgs((Person)e.NewItem, PersonSelectionReason.ResultClick) { Cancel = e.Cancel };
+			OnPersonSelecting(args);
+			e.Cancel = args.Cancel;
+		}
+
+
+		///<summary>Occurs before a person is selecting using the UI.</summary>
+		public event EventHandler<PersonSelectingEventArgs> PersonSelecting;
+		///<summary>Raises the PersonSelecting event.</summary>
+		///<param name="e">A PersonSelectingEventArgs object that provides the event data.</param>
+		internal protected virtual void OnPersonSelecting(PersonSelectingEventArgs e) {
+			if (PersonSelecting != null)
+				PersonSelecting(this, e);
+		}
+	}
+	///<summary>Provides information for the PersonSelecting event.</summary>
+	public class PersonSelectingEventArgs : CancelEventArgs {
+		///<summary>Creates a PersonSelectingEventArgs instance.</summary>
+		public PersonSelectingEventArgs(Person person, PersonSelectionReason method) {
+			if (person == null) throw new ArgumentNullException("person");
+			Person = person;
+			Method = method;
+		}
+
+		///<summary>Gets the person that was selected.</summary>
+		public Person Person { get; private set; }
+		///<summary>Gets the way in which the person was selected.</summary>
+		public PersonSelectionReason Method { get; private set; }
+	}
+	///<summary>Represents the reason that a person was selected.</summary>
+	public enum PersonSelectionReason {
+		///<summary>The person was clicked in the results grid.</summary>
+		ResultClick,
+		///<summary>The person was created using the New person dialog.</summary>
+		Created
 	}
 }
