@@ -74,6 +74,13 @@ namespace ShomreiTorah.Data.UI.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap Plus16 {
+            get {
+                object obj = ResourceManager.GetObject("Plus16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap RedX32 {
             get {
                 object obj = ResourceManager.GetObject("RedX32", resourceCulture);

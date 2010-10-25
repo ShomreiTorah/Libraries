@@ -112,6 +112,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		protected override void RaiseButtonClick(ButtonPressedEventArgs e) {
 			base.RaiseButtonClick(e);
 			if (e.Button.Index == 1) {
+				OwnerEdit.EditValue = AppFramework.Current.PromptPerson();
 			}
 		}
 	}

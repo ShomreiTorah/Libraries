@@ -121,13 +121,16 @@
   <data name="Plus13" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Plus13.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="RedX32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RedX32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="UserGrid" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UserGrid.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="People16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\People16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="RedX32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RedX32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Plus16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\plus16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

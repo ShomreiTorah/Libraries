@@ -89,6 +89,12 @@ namespace ShomreiTorah.Data.UI {
 			Application.Run(MainForm);
 		}
 
+		///<summary>Prompts the user to create a new person.</summary>
+		///<remarks>The new Person row, or null if the user clicked cancel.</remarks>
+		public virtual Person PromptPerson() {
+			return Forms.PersonCreator.Prompt();
+		}
+
 		#region Splash
 		ISplashScreen splashScreen;
 
