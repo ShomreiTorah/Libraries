@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using ShomreiTorah.Singularity;
 
 namespace ShomreiTorah.Data {
 	partial class Person {
@@ -105,6 +106,25 @@ namespace ShomreiTorah.Data {
 		partial void OnDepositChanged(Deposit oldValue, Deposit newValue) {
 			if (oldValue.Payments.Count == 0)
 				oldValue.RemoveRow();
+		}
+	}
+	#endregion
+
+	#region Modification tracking
+	partial class Pledge {
+		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
+			if (column != ModifiedColumn && column != ModifierColumn) {
+				Modifier = Environment.UserName;
+				Modified = DateTime.UtcNow;
+			}
+		}
+	}
+	partial class Payment {
+		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
+			if (column != ModifiedColumn && column != ModifierColumn && column != DepositColumn) {
+				Modifier = Environment.UserName;
+				Modified = DateTime.UtcNow;
+			}
 		}
 	}
 	#endregion
