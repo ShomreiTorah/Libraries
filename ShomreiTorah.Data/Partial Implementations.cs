@@ -104,7 +104,8 @@ namespace ShomreiTorah.Data {
 				Deposit.RemoveRow();
 		}
 		partial void OnDepositChanged(Deposit oldValue, Deposit newValue) {
-			if (oldValue.Payments.Count == 0)
+			if (Table != null && !Table.IsLoadingData
+			 && oldValue != null && oldValue.Payments.Count == 0)
 				oldValue.RemoveRow();
 		}
 	}
@@ -112,16 +113,28 @@ namespace ShomreiTorah.Data {
 
 	#region Modification tracking
 	partial class Pledge {
+		///<summary>Called when the row is added to a table.</summary>
+		protected override void OnAdded() {
+			Modifier = Environment.UserName;
+			Modified = DateTime.UtcNow;
+		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
-			if (column != ModifiedColumn && column != ModifierColumn) {
+			if (Table != null && !Table.IsLoadingData
+			 && column != ModifiedColumn && column != ModifierColumn) {
 				Modifier = Environment.UserName;
 				Modified = DateTime.UtcNow;
 			}
 		}
 	}
 	partial class Payment {
+		///<summary>Called when the row is added to a table.</summary>
+		protected override void OnAdded() {
+			Modifier = Environment.UserName;
+			Modified = DateTime.UtcNow;
+		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
-			if (column != ModifiedColumn && column != ModifierColumn && column != DepositColumn) {
+			if (Table != null && !Table.IsLoadingData
+			 && column != ModifiedColumn && column != ModifierColumn && column != DepositColumn) {
 				Modifier = Environment.UserName;
 				Modified = DateTime.UtcNow;
 			}
