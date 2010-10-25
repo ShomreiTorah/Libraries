@@ -61,6 +61,11 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Notifies the editor that the initialization has been completed.</summary>
 		public override void EndInit() {
 			base.EndInit();
+			//By applying settings here, any previous settings in 
+			//the designer will be overwritten.  This allows me to
+			//change the settings in Data.UI and have the changes 
+			//applied to existing designers.
+			CreateDefaultButton();
 			DisplaySettings.EditorRepository.PersonLookup.Apply(this);
 		}
 
@@ -102,6 +107,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		#endregion
 
 		public override void CreateDefaultButton() {
+			Buttons.Clear();
 			base.CreateDefaultButton();
 			Buttons[0].SuperTip = Utilities.CreateSuperTip(body: "Click to select a person");
 			Buttons.Add(new EditorButton(ButtonPredefines.Glyph) {

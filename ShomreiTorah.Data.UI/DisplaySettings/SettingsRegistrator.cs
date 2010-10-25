@@ -40,6 +40,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					item.DataSource = AppFramework.Current.DataContext.Table<Person>();
 				item.SelectionIcon = Resources.People16;
 
+				item.Columns.Clear();
+				item.AdditionalResultColumns.Clear();
 				item.Columns.AddRange(
 					new DataSourceColumn("LastName", 100) { ShouldFilter = true },
 					new DataSourceColumn("HisName", 95) { ShouldFilter = true },
