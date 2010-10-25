@@ -427,10 +427,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				ResultDisplayColumn.SetOwner(this);
 		}
 		#endregion
+		///<summary>Called when the repository item is connected to an editor control.</summary>
 		protected override void OnOwnerEditChanged() {
 			base.OnOwnerEditChanged();
 			SetEditorData();
 		}
+		///<summary>Notifies the editor that the initialization has been completed.</summary>
 		public override void EndInit() {
 			base.EndInit();
 			SetEditorData();
