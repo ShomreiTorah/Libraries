@@ -89,12 +89,14 @@ namespace ShomreiTorah.Singularity {
 			}
 			protected override void RemoveItem(int index) {
 				var row = this[index];
+				row.OnRemoving();
 				base.RemoveItem(index);
 				Table.ProcessRowRemoved(row, index);
 			}
 			protected override void SetItem(int index, Row item) {
 				Table.ValidateAddRow(item);
 				var oldRow = this[index];
+				oldRow.OnRemoving();
 				base.SetItem(index, item);
 				Table.ProcessRowRemoved(oldRow, index);
 				Table.ProcessRowAdded(item, index);
@@ -136,6 +138,7 @@ namespace ShomreiTorah.Singularity {
 			row.Table = this;
 			foreach (var column in Schema.Columns)
 				column.OnRowAdded(row);		//Adds the row to parent relations, and handles calculated columns
+			row.OnAdded();
 			OnRowAdded(new RowListEventArgs(row, index));
 		}
 		void ProcessRowRemoved(Row row, int index) {

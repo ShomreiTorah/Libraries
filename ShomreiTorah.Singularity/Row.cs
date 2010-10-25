@@ -127,6 +127,13 @@ namespace ShomreiTorah.Singularity {
 			}
 		}
 
+		///<summary>Called when the row is added to a table.</summary>
+		///<remarks>This method allows typed rows to add logic.</remarks>
+		protected internal virtual void OnAdded() { }
+		///<summary>Called before the row is removed from its table.</summary>
+		///<remarks>This method  allows inherited rows to add logic.</remarks>
+		protected internal virtual void OnRemoving() { }
+
 		///<summary>Clears the current value from a calculated column, causing it to be recalculated next time the value is retrieved.</summary>
 		internal void InvalidateCalculatedValue(CalculatedColumn column) {
 			values[column] = CalculatedColumn.UncalculatedValue;
