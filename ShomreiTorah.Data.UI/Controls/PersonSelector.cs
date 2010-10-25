@@ -57,6 +57,10 @@ namespace ShomreiTorah.Data.UI.Controls {
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "NullValuePrompt overrides should be trivial")]
 		public RepositoryItemPersonSelector() {
 			NullValuePrompt = DefaultNullValuePrompt;
+		}
+		///<summary>Notifies the editor that the initialization has been completed.</summary>
+		public override void EndInit() {
+			base.EndInit();
 			DisplaySettings.EditorRepository.PersonLookup.Apply(this);
 		}
 
