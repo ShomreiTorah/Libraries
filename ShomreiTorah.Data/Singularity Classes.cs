@@ -99,6 +99,8 @@ namespace ShomreiTorah.Data {
         #endregion
         
         #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
         partial void ValidateDepositId(Guid newValue, Action<string> error);
         partial void OnDepositIdChanged(Guid oldValue, Guid newValue);
         
@@ -144,6 +146,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            OnColumnChanged(column, oldValue, newValue);
             if (column == DepositIdColumn)
             	OnDepositIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == DateColumn)
@@ -324,6 +327,8 @@ namespace ShomreiTorah.Data {
         #endregion
         
         #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
         partial void ValidateId(Int32 newValue, Action<string> error);
         partial void OnIdChanged(Int32 oldValue, Int32 newValue);
         
@@ -405,6 +410,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Int32)oldValue, (Int32)newValue);
             else if (column == NameColumn)
@@ -634,6 +640,8 @@ namespace ShomreiTorah.Data {
         #endregion
         
         #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
         partial void ValidateId(Guid newValue, Action<string> error);
         partial void OnIdChanged(Guid oldValue, Guid newValue);
         
@@ -727,6 +735,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == YKIDColumn)
@@ -962,6 +971,8 @@ namespace ShomreiTorah.Data {
         #endregion
         
         #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
         partial void ValidatePaymentId(Guid newValue, Action<string> error);
         partial void OnPaymentIdChanged(Guid oldValue, Guid newValue);
         
@@ -1061,6 +1072,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            OnColumnChanged(column, oldValue, newValue);
             if (column == PaymentIdColumn)
             	OnPaymentIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PersonColumn)
@@ -1303,6 +1315,8 @@ namespace ShomreiTorah.Data {
         #endregion
         
         #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
         partial void ValidatePledgeId(Guid newValue, Action<string> error);
         partial void OnPledgeIdChanged(Guid oldValue, Guid newValue);
         
@@ -1402,6 +1416,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            OnColumnChanged(column, oldValue, newValue);
             if (column == PledgeIdColumn)
             	OnPledgeIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PersonColumn)
@@ -1575,6 +1590,8 @@ namespace ShomreiTorah.Data {
         #endregion
         
         #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
         partial void ValidateId(Guid newValue, Action<string> error);
         partial void OnIdChanged(Guid oldValue, Guid newValue);
         
@@ -1644,6 +1661,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PledgeColumn)
@@ -1806,6 +1824,8 @@ namespace ShomreiTorah.Data {
         #endregion
         
         #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
         partial void ValidateId(Guid newValue, Action<string> error);
         partial void OnIdChanged(Guid oldValue, Guid newValue);
         
@@ -1875,6 +1895,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
             else if (column == PersonColumn)
