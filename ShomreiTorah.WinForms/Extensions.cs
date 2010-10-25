@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using DevExpress.XtraEditors;
 
 namespace ShomreiTorah.WinForms {
 	///<summary>Contains miscellaneous extension methods.</summary>
@@ -51,6 +52,12 @@ namespace ShomreiTorah.WinForms {
 			return rect;
 		}
 		#endregion
+
+		///<summary>Updates the value of a data-bound editor and commits the changes to the underlying object.</summary>	
+		public static void UpdateValue(this BaseEdit edit, object value) {
+			edit.EditValue = value;
+			edit.BindingManager.EndCurrentEdit();
+		}
 
 		///<summary>Gets the data of a given type.</summary>
 		///<typeparam name="TData">The type of data to get.</typeparam>
