@@ -82,28 +82,11 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Gets or sets the icon displayed in the editor when an item is selected.</summary>
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		//Set by EditorRepository.PersonLookup
 		public new Image SelectionIcon {
 			get { return base.SelectionIcon; }
 			set { base.SelectionIcon = value; }
 		}
-
-		//If these properties are designer-serialized, all defaults will be duplicated.
-
-		///<summary>Gets or sets the column to display in the editor when a value is selected.</summary>
-		[Browsable(false)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public new ResultColumn ResultDisplayColumn {
-			get { return base.ResultDisplayColumn; }
-			set { base.ResultDisplayColumn = value; }
-		}
-		///<summary>Gets columns that display additional information about the selected item.</summary>
-		[Browsable(false)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public new ItemSelectorColumnCollection AdditionalResultColumns { get { return base.AdditionalResultColumns; } }
-		///<summary>Gets the columns displayed in the results grid.</summary>
-		[Browsable(false)]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public new ItemSelectorColumnCollection Columns { get { return base.Columns; } }
 		#endregion
 
 		public override void CreateDefaultButton() {

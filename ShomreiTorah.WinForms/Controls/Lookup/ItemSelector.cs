@@ -288,10 +288,25 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		#region Basic Properties
 		///<summary>Gets the columns displayed in the results grid.</summary>
-		[Description("Gets the columns displayed in the results grid.")]
-		[Category("Data")]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public ItemSelectorColumnCollection Columns { get; private set; }
+		///<summary>Gets columns that display additional information about the selected item.</summary>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public ItemSelectorColumnCollection AdditionalResultColumns { get; private set; }
+		///<summary>Gets or sets the column to display in the editor when a value is selected.</summary>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public ResultColumn ResultDisplayColumn {
+			get { return resultDisplayColumn; }
+			set {
+				resultDisplayColumn = value;
+				if (value != null)
+					value.SetOwner(this);
+				OnPropertiesChanged();
+			}
+		}
 
 		///<summary>Gets or sets whether the results grid will display column headers.</summary>
 		[Description("Gets or sets whether the results grid will display column headers.")]
@@ -340,18 +355,6 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			set { selectionIcon = value; OnPropertiesChanged(); }
 		}
 
-		///<summary>Gets or sets the column to display in the editor when a value is selected.</summary>
-		[Description("Gets or sets the column to display in the editor when a value is selected.")]
-		[Category("Data")]
-		public ResultColumn ResultDisplayColumn {
-			get { return resultDisplayColumn; }
-			set { resultDisplayColumn = value; value.SetOwner(this); OnPropertiesChanged(); }
-		}
-		///<summary>Gets columns that display additional information about the selected item.</summary>
-		[Description("Gets columns that display additional information about the selected item.")]
-		[Category("Data")]
-		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-		public ItemSelectorColumnCollection AdditionalResultColumns { get; private set; }
 		#endregion
 		#region Suppressed Properties
 		///<summary>This property is irrelevant for this control.</summary>
