@@ -73,7 +73,7 @@ namespace ShomreiTorah.Data.UI {
 			SetSplashCaption("Loading behavior configuration");
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 			RegisterSettings();
-			Debug.Assert(!String.IsNullOrWhiteSpace(Dialog.DefaultTitle), "Please set a dialog title");
+			Debug.Assert(!String.IsNullOrWhiteSpace(Dialog.DefaultTitle), "Please set a dialog title (in RegisterSettings)");
 
 			//TODO: Updates, Error handling
 			SetSplashCaption("Reading database");
