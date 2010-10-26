@@ -89,7 +89,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 
-		//TODO: Group summaries, SubType sorting
+		//TODO: Group summaries, CheckNumber validation
 		#region Behaviors
 		static void RegisterBehaviors() {
 			//TODO: Delete LoggedStatements?
@@ -179,6 +179,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				new PersonColumnController()
 			);
 			GridManager.RegisterColumn(Payment.DepositColumn, new DepositColumnController());
+			GridManager.RegisterColumn(Pledge.SubtypeColumn, new SubTypeColumnController());
 		}
 		#endregion
 
@@ -279,6 +280,19 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				if (String.IsNullOrWhiteSpace(str) || !str.Contains('\n'))
 					return null;
 				return Utilities.CreateSuperTip(body: str);
+			}
+		}
+		class SubTypeColumnController : ColumnController {
+			//No settings to apply
+			protected internal override void Apply(SmartGridColumn column) { }
+
+			static readonly string[] SortedOrder = new[] { "כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר", "פתיחה", "הגבהה" };
+			protected internal override void CompareValues(CustomColumnSortEventArgs e) {
+				var index1 = Array.IndexOf(SortedOrder, e.Value1 as string);
+				var index2 = Array.IndexOf(SortedOrder, e.Value2 as string);
+
+				e.Result = index1.CompareTo(index2);
+				e.Handled = index1 != index2;
 			}
 		}
 
