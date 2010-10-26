@@ -183,7 +183,14 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		int IList.IndexOf(object value) { return base.IndexOf(value as Row); }
 		void IList.Insert(int index, object value) { throw new NotSupportedException(); }
 		void IList.Remove(object value) { base.Remove((Row)value); }
-		void ICollection.CopyTo(Array array, int index) { base.CopyTo(array as Row[], index); }
+		void ICollection.CopyTo(Array array, int index) {
+			if (array == null) throw new ArgumentNullException("array");
+
+			var arr = (object[])array;
+			for (int i = 0; i < Count; i++) {
+				arr[index + i] = this[i];
+			}
+		}
 
 		object IList.this[int index] {
 			get { return this[index]; }
