@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using DevExpress.Data;
 using DevExpress.Utils;
@@ -88,9 +89,34 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 
-		//TODO: Group summaries, deletion
+		//TODO: Group summaries, SubType sorting
 		#region Behaviors
 		static void RegisterBehaviors() {
+			//TODO: Delete LoggedStatements?
+
+			GridManager.RegisterBehavior(Person.Schema,
+				DeletionBehavior.Disallow("You cannot delete rows from the master directory.\r\nIf you really want to delete someone, call Schabse.")
+			);
+			GridManager.RegisterBehavior(EmailAddress.Schema,
+				DeletionBehavior.WithMessages(
+					"email address from the email list?",
+					"email addresses from the email list?"
+				)
+			);
+			GridManager.RegisterBehavior(Pledge.Schema,
+				DeletionBehavior.WithMessages<Pledge>(
+					singular: p => p.Amount.ToString("c", CultureInfo.CurrentCulture) + " pledge",
+					plural: pledges => (pledges.Count().ToString(CultureInfo.InvariantCulture) + " pledges totaling "
+									 + pledges.Sum(p => p.Amount).ToString("c", CultureInfo.CurrentCulture))
+				)
+			);
+			GridManager.RegisterBehavior(Payment.Schema,
+				DeletionBehavior.WithMessages<Payment>(
+					singular: p => p.Amount.ToString("c", CultureInfo.CurrentCulture) + " payment",
+					plural: payments => (payments.Count().ToString(CultureInfo.InvariantCulture) + " payments totaling "
+									   + payments.Sum(p => p.Amount).ToString("c", CultureInfo.CurrentCulture))
+				)
+			);
 			GridManager.RegisterBehavior(
 				new TableSchema[] { Pledge.Schema, Payment.Schema },
 				new AdvancedColumnsBehavior("modifier columns", new[] { "Modified", "Modifier" })
