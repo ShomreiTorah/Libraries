@@ -34,6 +34,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 		protected internal virtual void OnShowFilterPopupListBox(FilterPopupListBoxEventArgs e) { }
 		///<summary>Allows the controller to provide a custom tooltip for the cells in the column.</summary>
 		protected internal virtual SuperToolTip GetCellToolTip(object row, object value) { return null; }
+		///<summary>Allows the controller to customize the column's sorting comparisons.</summary>
+		protected internal virtual void CompareValues(CustomColumnSortEventArgs e) { }
 	}
 
 	partial class SmartGridColumn {
@@ -85,7 +87,12 @@ namespace ShomreiTorah.Data.UI.Grid {
 		void AddControllerHandlers() {
 			this.ShowFilterPopupListBox += SmartGridView_ShowFilterPopupListBox;
 		}
-
+		protected override void RaiseCustomColumnSort(CustomColumnSortEventArgs e) {
+			base.RaiseCustomColumnSort(e);
+			var column = e.Column as SmartGridColumn;
+			if (column != null && column.Controller != null)
+				column.Controller.CompareValues(e);
+		}
 		void SmartGridView_ShowFilterPopupListBox(object sender, FilterPopupListBoxEventArgs e) {
 			var column = e.Column as SmartGridColumn;
 			if (column != null && column.Controller != null)
