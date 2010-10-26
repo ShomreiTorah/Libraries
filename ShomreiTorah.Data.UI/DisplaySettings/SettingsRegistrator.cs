@@ -53,6 +53,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				);
 
 				item.ResultDisplayColumn = new DataSourceColumn("FullName");
+				item.SortColumn = new DataSourceColumn("LastName");
 
 				item.AdditionalResultColumns.AddRange(
 					new DataSourceColumn("Address"),

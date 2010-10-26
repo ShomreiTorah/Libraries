@@ -85,12 +85,27 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		string lastFilterText;
 		void RunFilter(bool force = false) {
 			if (!force && Text.Equals(lastFilterText, StringComparison.CurrentCultureIgnoreCase)) return;
+
+			ArrayList unsortedItems = null;
 			if (String.IsNullOrEmpty(Text)) {
 				FilterWords = EmptyStrings;
-				CurrentItems = AllItems;
+				if (Properties.SortComparer == null)
+					CurrentItems = AllItems;	//If there is no sort and no filter, I can just use the original list.
+				else
+					unsortedItems = new ArrayList(AllItems);
 			} else {
 				FilterWords = new ReadOnlyCollection<string>(Text.Split(filterSplitChars, StringSplitOptions.RemoveEmptyEntries).OrderByDescending(w => w.Length).ToArray());
-				CurrentItems = AllItems.Cast<object>().Where(MeetsFilter).ToArray();
+
+				unsortedItems = new ArrayList(AllItems.Count);
+				foreach (object item in AllItems)
+					if (MeetsFilter(item)) unsortedItems.Add(item);
+
+				if (Properties.SortComparer == null)
+					CurrentItems = unsortedItems;
+			}
+			if (Properties.SortColumn != null) {
+				unsortedItems.Sort(Properties.SortComparer);
+				CurrentItems = unsortedItems;
 			}
 
 			lastFilterText = Text;
@@ -225,6 +240,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		Image selectionIcon;
 
 		ResultColumn resultDisplayColumn;
+		ResultColumn sortColumn;
 
 		///<summary>Creates a new RepositoryItemItemSelector.</summary>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "Simple property setter")]
@@ -246,7 +262,14 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Columns.Clear();
 			Columns.AddRange(source.Columns.Select(c => c.Copy()));	//The InsertItem overload will set the source.
 
-			ResultDisplayColumn = source.ResultDisplayColumn.Copy();
+			if (source.SortColumn == null)
+				SortColumn = null;
+			else
+				SortColumn = source.SortColumn.Copy();
+			if (source.ResultDisplayColumn == null)
+				ResultDisplayColumn = null;
+			else
+				ResultDisplayColumn = source.ResultDisplayColumn.Copy();
 			AdditionalResultColumns.AddRange(source.AdditionalResultColumns.Select(c => c.Copy()));
 
 			SelectionIcon = source.SelectionIcon;
@@ -306,6 +329,31 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				if (value != null)
 					value.SetOwner(this);
 				OnPropertiesChanged();
+			}
+		}
+		///<summary>Gets or sets the column to to sort the results by.</summary>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public ResultColumn SortColumn {
+			get { return sortColumn; }
+			set {
+				sortColumn = value;
+				if (value != null)
+					value.SetOwner(this);
+				SortComparer = value == null ? null : new ColumnComparer(value);
+				OnPropertiesChanged();
+			}
+		}
+		///<summary>Gets the comparer to sort the results, if any.</summary>
+		internal IComparer SortComparer { get; private set; }
+		class ColumnComparer : IComparer {
+			readonly ResultColumn column;
+			public ColumnComparer(ResultColumn column) { this.column = column; }
+			public int Compare(object x, object y) {
+				if (Equals(x, y)) return 0;
+				if (x == null) return -1;
+				if (y == null) return -1;
+				return Comparer.Default.Compare(column.GetValue(x), column.GetValue(y));
 			}
 		}
 
@@ -429,6 +477,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			AdditionalResultColumns.OnDataSourceSet();
 			if (ResultDisplayColumn != null)
 				ResultDisplayColumn.SetOwner(this);
+			if (SortColumn != null)
+				SortColumn.SetOwner(this);
 		}
 		#endregion
 		///<summary>Called when the repository item is connected to an editor control.</summary>
