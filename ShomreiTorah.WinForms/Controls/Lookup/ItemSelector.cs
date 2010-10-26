@@ -70,7 +70,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override void OnEditorKeyDown(KeyEventArgs e) {
 			base.OnEditorKeyDown(e);
 			if (e.Handled) return;
-			ShowPopup();
+			if (e.KeyCode != Keys.Escape)
+				ShowPopup();
 		}
 		protected override void OnEditorKeyUp(KeyEventArgs e) {
 			base.OnEditorKeyUp(e);
