@@ -45,7 +45,7 @@ namespace ShomreiTorah.Data.UI {
 		public DataSyncContext SyncContext { get; private set; }
 
 
-		///<summary>Overridden by derived classes to create the application's splash screen.</summary>
+		///<summary>Overridden by derived classes to create the application's splash screen.  Called on the main thread.</summary>
 		protected abstract ISplashScreen CreateSplash();
 		///<summary>Overridden by derived classes to register grid and editor settings.</summary>
 		protected abstract void RegisterSettings();
@@ -100,17 +100,16 @@ namespace ShomreiTorah.Data.UI {
 
 		///<summary>Shows the splash screen on a background thread.</summary>
 		void StartSplash() {
-			var splashThread = new Thread(delegate() {
-				splashScreen = CreateSplash();
-				if (splashScreen != null)
-					splashScreen.RunSplash();
-			}) { IsBackground = true };
+			splashScreen = CreateSplash();
+			if (splashScreen == null) return;
+
+			var splashThread = new Thread(splashScreen.RunSplash) { IsBackground = true };
 			splashThread.SetApartmentState(ApartmentState.STA);
 			splashThread.Start();
 		}
 		///<summary>Sets the splash screen's loading message, if supported.</summary>
 		///<param name="message">A message to display on the splash screen.</param>
-		protected void SetSplashCaption(string message) {
+		protected virtual void SetSplashCaption(string message) {
 			if (splashScreen != null)
 				splashScreen.SetCaption(message);
 		}
