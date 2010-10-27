@@ -116,6 +116,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 	///<summary>Contains a preset RepositoryItem.</summary>
 	public interface IEditorSettings {
+		///<summary>Gets the type of RepositoryItem that these settings apply to.</summary>
+		Type ItemType { get; }
+
 		///<summary>Creates a new RepositoryItem pre-configured for this instance's settings.</summary>
 		RepositoryItem CreateItem();
 		///<summary>Configures an existing RepositoryItem with this instance's settings.</summary>
@@ -148,6 +151,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		RepositoryItem IEditorSettings.CreateItem() { return CreateItem(); }
 		void IEditorSettings.Apply(RepositoryItem item) { Apply((TRepositoryItem)item); }
+		///<summary>Gets the type of RepositoryItem that these settings apply to.</summary>
+		public Type ItemType { get { return typeof(TRepositoryItem); } }
 	}
 	///<summary>Contains a preset RepositoryItem that can be modified by client applications.</summary>
 	public class MutableEditorSettings<TRepositoryItem> : EditorSettings<TRepositoryItem> where TRepositoryItem : RepositoryItem, new() {

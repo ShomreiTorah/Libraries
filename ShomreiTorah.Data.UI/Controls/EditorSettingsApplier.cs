@@ -87,6 +87,13 @@ namespace ShomreiTorah.Data.UI.Controls {
 					Dialog.ShowError("There are no settings associated with the " + column.Schema.Name + "." + column.Name + " column");
 				return false;
 			}
+			if (!settings.ItemType.IsInstanceOfType(edit.Properties)) {
+				if (ShouldShowErrors)
+					Dialog.ShowError("The " + edit.Name + " edit must be converted to a " 
+								   + settings.ItemType.Name.Replace("RepositoryItem", "")
+								   + " in order to receive settings from " + column.Schema.Name + "." + column.Name);
+				return false;
+			}
 
 			settings.Apply(edit.Properties);
 			return true;
