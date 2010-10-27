@@ -175,4 +175,38 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets a MailAddress object for this email address.</summary>
 		public MailAddress MailAddress { get { return new MailAddress(Email, Name); } }
 	}
+
+	#region Interfaces
+	partial class Pledge : ITransaction {
+		///<summary>Gets the amount with the sign as reflected in the balance due.</summary>
+		public decimal SignedAmount { get { return Amount; } }
+	}
+	partial class Payment : ITransaction {
+		///<summary>Gets the amount with the sign as reflected in the balance due.</summary>
+		public decimal SignedAmount { get { return -Amount; } }
+	}
+	partial class EmailAddress : IOwnedObject { }
+	partial class LoggedStatement : IOwnedObject { }
+	partial class SeatingReservation : IOwnedObject {
+		///<summary>Gets the person that placed the reservation.</summary>
+		public Person Person { get { return Pledge == null ? null : Pledge.Person; } }
+	}
+	
+
+	///<summary>Represents a billing transaction (a pledge or payment).</summary>
+	public interface ITransaction : IOwnedObject {
+		///<summary>Gets the date that the transaction was made.</summary>
+		[SuppressMessage("Microsoft.Naming", "CA1716:IdentifiersShouldNotMatchKeywords", MessageId = "Date", Justification = "For internal consumption")]
+		DateTime Date { get; }
+		///<summary>Gets the account that the transaction is applied to.</summary>
+		string Account { get; }
+		///<summary>Gets the amount with the sign as reflected in the balance due.</summary>
+		decimal SignedAmount { get; }
+	}
+	///<summary>Represents an object associated with a person.</summary>
+	public interface IOwnedObject {
+		///<summary>Gets the person that owns the object.</summary>
+		Person Person { get; }
+	}
+	#endregion
 }
