@@ -18,9 +18,9 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			if (targetDate.Year < FirstYear)
 				return null;
 
-			var index = targetDate.Year - FirstYear;					//Find the index in years for the requested year.
+			var index = targetDate.Year - FirstYear;			//Find the index in years for the requested year.
 			if (index >= years.Count || years[index] == null)	//If we haven't loaded that year yet, 
-				if (!LoadYear(targetDate.Year))						//If we can't load it,
+				if (!LoadYear(targetDate.Year))					//If we can't load it,
 					return null;								//Give up.  We'll call LoadYear again next time, in case something changed.
 
 			return years[index][targetDate];
@@ -32,7 +32,7 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			if (year < FirstYear)
 				throw new ArgumentOutOfRangeException("year", "Year must be on or after the year " + FirstYear);
 
-			//Add the year to the array even if we don't load the file.
+			//Add the year to the array even if we don't load the data.
 			var yearIndex = year - FirstYear;
 			if (yearIndex >= years.Count)
 				years.AddRange(new YearlyZmanimDictionary[1 + yearIndex - years.Count]);
