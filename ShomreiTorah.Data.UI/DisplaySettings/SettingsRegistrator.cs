@@ -32,6 +32,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			EditorRepository.Register(Person.PhoneColumn, EditorRepository.PhoneEditor);
 
 			EditorRepository.Register(Payment.MethodColumn, EditorRepository.PaymentMethodEditor);
+			EditorRepository.Register(Payment.CheckNumberColumn, new EditorSettings<Controls.RepositoryItemCheckNumberEdit>(p => { }));
 
 			EditorRepository.Register(new[] { Pledge.AmountColumn, Payment.AmountColumn }, EditorRepository.CurrencyEditor);
 			EditorRepository.Register(new[] { Pledge.AccountColumn, Payment.AccountColumn }, EditorRepository.AccountEditor);
