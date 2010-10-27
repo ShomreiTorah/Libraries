@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
@@ -28,16 +29,44 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 		///<summary>Sets the value of the DefaultSettingsMode property for an editor.</summary>
 		public void SetDefaultSettingsMode(BaseEdit editor, DefaultSettingsMode value) {
-			if (value != DefaultSettingsMode.None)
-				value = ApplySettings(editor) ? DefaultSettingsMode.Active : DefaultSettingsMode.Inactive;
-
+			//If we're still initializing, apply the settings 
+			//(and update the property value) after we finish.
+			//If we're not initializing, apply immediately.
+			if (initializing)
+				queuedApplications.Add(delegate { SetDefaultSettingsMode(editor, value); });
+			else {
+				if (value != DefaultSettingsMode.None)
+					value = ApplySettings(editor) ? DefaultSettingsMode.Active : DefaultSettingsMode.Inactive;
+			}
+			//If we're initializing, set the value twice - once immediately and once after applying.
 			values[editor] = value;
 		}
+
+		readonly List<Action> queuedApplications = new List<Action>();
+		bool initializing, isPostInit;
+		///<summary>Called to signal the object that initialization is starting.</summary>
+		public void BeginInit() { initializing = true; }
+		///<summary>Called to signal the object that initialization is complete.</summary>
+		public void EndInit() {
+			//The queuedApplications must be applied
+			//when initializing is false, but should
+			//not show error messages.
+
+			initializing = false;
+			isPostInit = true;
+			try {
+				queuedApplications.ForEach(a => a());
+			} finally { isPostInit = false; }
+			queuedApplications.Clear();
+		}
+		bool ShouldShowErrors { get { return !initializing && !isPostInit && DesignMode; } }
 
 		///<summary>Applies any registered EditorSettings to an editor.</summary>
 		///<returns>True if there were any settings to apply.</returns>
 		bool ApplySettings(BaseEdit edit) {
-			//This will be called in addition to normal designer serialization of previously applied settings
+			Debug.Assert(edit.BindingManager != null, "How does " + edit.Name + " have a null BindingManager?");
+
+			//This will be called after normal designer serialization of previously applied settings
 			if (edit.DataBindings.Count != 1) {
 				if (ShouldShowErrors)
 					Dialog.ShowError(edit.Name + " is not databound");
@@ -62,7 +91,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			settings.Apply(edit.Properties);
 			return true;
 		}
-		bool ShouldShowErrors { get { return !initializing && DesignMode; } }
 
 		static Column GetColumn(Binding binding) {
 			var schema = TableSchema.GetSchema(binding.BindingManagerBase.GetItemProperties()[0]);
@@ -75,11 +103,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 			return true;
 		}
 
-		bool initializing;
-		///<summary>Called to signal the object that initialization is starting.</summary>
-		public void BeginInit() { initializing = true; }
-		///<summary>Called to signal the object that initialization is complete.</summary>
-		public void EndInit() { initializing = false; }
 
 		///<summary>Gets a CustomTypeDescriptor that shows information about the editors on the form at design time.</summary>
 		[Category("Information")]
@@ -87,7 +110,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		[ParenthesizePropertyName]
 		[TypeConverter(typeof(ExpandableObjectConverter))]
-		//[TypeConverter(typeof(DevExpress.Utils.Design.UniversalTypeConverter))]
 		public object Editors { get { return new EditorsInfo(this); } }
 
 		class EditorsInfo : CustomTypeDescriptor {
