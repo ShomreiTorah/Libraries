@@ -35,6 +35,8 @@ namespace ShomreiTorah.WinForms {
 		///<returns>True if the user clicked Yes.</returns>
 		public static bool Warn(string text, string title) { return DialogResult.Yes == Show(text, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning); }
 
+		///<summary>Displays a message box with an OK button.</summary>
+		public static DialogResult Show(string text, MessageBoxIcon icon) { return Show(text, MessageBoxButtons.OK, icon); }
 		///<summary>Displays a message box.</summary>
 		public static DialogResult Show(string text, MessageBoxButtons buttons, MessageBoxIcon icon) { return Show(text, DefaultTitle, buttons, icon); }
 		///<summary>Displays a message box.</summary>
