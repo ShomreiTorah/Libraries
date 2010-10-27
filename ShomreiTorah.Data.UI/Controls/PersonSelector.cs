@@ -107,7 +107,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			base.RaiseButtonClick(e);
 			if (e.Button.Index == 1) {
 				var person = AppFramework.Current.PromptPerson();
-				if (!RaisePersonSelecting(person, PersonSelectionReason.Created))
+				if (person != null && !RaisePersonSelecting(person, PersonSelectionReason.Created))
 					return;
 				OwnerEdit.EditValue = person;
 			}
