@@ -30,5 +30,19 @@ namespace ShomreiTorah.Data.UI {
 			);
 		}
 		#endregion
+
+		///<summary>Confirms that a payment does not have a duplicate check number.</summary>
+		///<returns>The duplicated Payment instance, if any.</returns>
+		public static Payment FindDuplicate(this Payment payment) { return payment.FindDuplicate(payment.CheckNumber); }
+		///<summary>Confirms that a payment does not have a duplicate check number.</summary>
+		///<returns>The duplicated Payment instance, if any.</returns>
+		public static Payment FindDuplicate(this Payment payment, string newCheckNumber) {
+			if (payment == null) throw new ArgumentNullException("payment");
+			if (payment.Person == null) return null;
+			if (String.IsNullOrWhiteSpace(newCheckNumber)) return null;
+
+			return payment.Person.Payments
+					.FirstOrDefault(p => p != payment && String.Equals(p.CheckNumber, newCheckNumber, StringComparison.CurrentCultureIgnoreCase));
+		}
 	}
 }

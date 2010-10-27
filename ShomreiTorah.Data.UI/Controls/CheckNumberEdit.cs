@@ -3,10 +3,12 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
+using System.Windows.Forms;
 using DevExpress.Accessibility;
+using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Drawing;
+using DevExpress.XtraEditors.DXErrorProvider;
 using DevExpress.XtraEditors.Registrator;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraEditors.ViewInfo;
@@ -45,17 +47,40 @@ namespace ShomreiTorah.Data.UI.Controls {
 		protected override void OnValidating(CancelEventArgs e) {
 			base.OnValidating(e);
 			if (e.Cancel) return;
-			if (String.IsNullOrWhiteSpace(Text)) return;
 			var payment = BoundRow;
-			if (payment == null || payment.Person == null) return;
+			if (payment == null) return;
 
-			var duplicate = payment.Person.Payments
-				.FirstOrDefault(p => p != payment && String.Equals(p.CheckNumber, Text, StringComparison.CurrentCultureIgnoreCase));
-			if (duplicate == null) return;
+			var duplicate = payment.FindDuplicate(Text);
+			if (duplicate == null) {
+				SetWarning(null);
+				return;
+			}
+			var message = String.Format(CultureInfo.CurrentCulture, "{0} #{1} for {2} has already been entered ({3:d}, {4:c}).",
+																	duplicate.Method, duplicate.CheckNumber, duplicate.Person.FullName, duplicate.Date, duplicate.Amount);
+			Dialog.Show(message, MessageBoxIcon.Warning);
 
-			e.Cancel = !Dialog.Warn(String.Format(CultureInfo.CurrentCulture, "{0} #{1} for {2} has already been entered ({3:d}, {4:c}).\r\nAre you sure you aren't making a mistake?",
-																			  duplicate.Method, duplicate.CheckNumber, duplicate.Person.FullName, duplicate.Date, duplicate.Amount));
+			SetWarning(String.Format(CultureInfo.CurrentCulture, "Potential duplicate of {0} #{1} ({2:d}, {3:c}).",
+																 duplicate.Method.ToLowerInvariant(), duplicate.CheckNumber, duplicate.Date, duplicate.Amount));
 		}
+		void SetWarning(string message) {
+			ErrorText = message;
+			ErrorIcon = String.IsNullOrEmpty(message) ? null : WarningIcon;
+			var grid = Parent as GridControl;
+			if (grid != null) {
+				var view = (ColumnView)grid.FocusedView;
+				view.SetColumnError(view.FocusedColumn, ErrorText, ErrorType.Warning);
+			}
+		}
+		[ThreadStatic]
+		static Image warningIcon;
+		static Image WarningIcon {
+			get {
+				if (warningIcon == null)
+					warningIcon = ResourceImageHelper.CreateImageFromResources("DevExpress.XtraEditors.Images.Warning.png", typeof(DXErrorProvider).Assembly);
+				return warningIcon;
+			}
+		}
+
 	}
 
 	///<summary>Holds settings for a CheckNumberEdit.</summary>
