@@ -106,16 +106,18 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			);
 			GridManager.RegisterBehavior(Pledge.Schema,
 				DeletionBehavior.WithMessages<Pledge>(
-					singular: p => p.Amount.ToString("c", CultureInfo.CurrentCulture) + " pledge",
-					plural: pledges => (pledges.Count().ToString(CultureInfo.InvariantCulture) + " pledges totaling "
-									 + pledges.Sum(p => p.Amount).ToString("c", CultureInfo.CurrentCulture))
+					singular: p => "Are you sure you want to delete this " + p.Amount.ToString("c", CultureInfo.CurrentCulture) + " pledge?",
+					plural: pledges => "Are you sure you want to delete "
+									  + (pledges.Count().ToString(CultureInfo.InvariantCulture) + " pledges totaling "
+									   + pledges.Sum(p => p.Amount).ToString("c", CultureInfo.CurrentCulture) + "?")
 				)
 			);
 			GridManager.RegisterBehavior(Payment.Schema,
 				DeletionBehavior.WithMessages<Payment>(
-					singular: p => p.Amount.ToString("c", CultureInfo.CurrentCulture) + " payment",
-					plural: payments => (payments.Count().ToString(CultureInfo.InvariantCulture) + " payments totaling "
-									   + payments.Sum(p => p.Amount).ToString("c", CultureInfo.CurrentCulture))
+					singular: p => "Are you sure you want to delete this " + p.Amount.ToString("c", CultureInfo.CurrentCulture) + " payment?",
+					plural: payments => "Are you sure you want to delete "
+									  + (payments.Count().ToString(CultureInfo.InvariantCulture) + " payments totaling "
+									   + payments.Sum(p => p.Amount).ToString("c", CultureInfo.CurrentCulture) + "?")
 				)
 			);
 			GridManager.RegisterBehavior(
