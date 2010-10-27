@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
-using System.Web.Script.Serialization;
-using ShomreiTorah.Common.Calendar.Zmanim.Temp;
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
+using System.Text;
 
 namespace ShomreiTorah.Common.Calendar.Zmanim {
 	///<summary>Reads Zmanim from the OU's AJAX web service.</summary>
@@ -27,25 +28,131 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 
 		const string UrlFormat = @"http://www.ou.org/ou_services/getCalendarData.php?mode=grid&startDate={2:MM/dd/yyyy}&numberOfResults={3}&lat={0}&long={1}&timezone=America/New_York";
 		readonly WebClient web = new WebClient();
-		static readonly JavaScriptSerializer jsonDecoder = new JavaScriptSerializer();
 
-		static readonly Dictionary<string, string> keyMappings = new Dictionary<string, string> {
-			{ "sunrise",			Zman.Sunrise.ToZmanName()				},
-			{ "sunset",				Zman.Sunset.ToZmanName()				},
-			{ "sof_zman_shema_ma",	Zman.סוף٠זמן٠קריאת٠שמע٠מ٠א.ToZmanName()	},
-			{ "sof_zman_shema_gra",	Zman.סוף٠זמן٠קריאת٠שמע٠גרא.ToZmanName()	},
-			{ "sof_zman_tefila_ma",	Zman.סוף٠זמן٠תפילה.ToZmanName()			},
-			{ "alos_ma",			Zman.עלות.ToZmanName()					},    
-			{ "talis_ma",			Zman.טלית.ToZmanName()					},
-			{ "chatzos",			Zman.חצות.ToZmanName()					},
-			{ "mincha_gedola_ma",	Zman.מנחה٠גדולה.ToZmanName()				},
-			{ "mincha_ketana_ma",	Zman.מנחה٠קטנה.ToZmanName()				},
-			{ "plag_mincha_ma",		Zman.פלג٠המנחה.ToZmanName()				},
-			{ "tzeis_595_degrees",	Zman.צאת72.ToZmanName()					},  
-			{ "tzeis_850_degrees",	Zman.צאת42.ToZmanName()					},
-			{ "tzeis_72_minutes",	Zman.צאת595.ToZmanName()				},
-			{ "tzeis_42_minutes",	Zman.צאת850.ToZmanName()				},
-		};
+		[DataContract]
+		class OUDataObject {
+			[DataMember(Name = "days")]
+			public IList<OUDate> Days { get; set; }
+		}
+		[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "For deserialization")]
+		[DataContract]
+		class OUDate {
+			public ZmanimInfo CreateZmanimInfo() { return new ZmanimInfo(Date, Zmanim.Values); }
+
+			public DateTime Date { get; set; }
+
+			[DataMember(Name = "engDateString")]
+			public string DateString {
+				get { return Date.ToString(); }
+				set { Date = DateTime.ParseExact(value, "M/d/yyyy", CultureInfo.InvariantCulture); }
+			}
+
+			[DataMember(Name = "zmanim")]
+			public OUZmanimSet Zmanim { get; set; }
+		}
+		[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "For deserialization")]
+		[DataContract]
+		class OUZmanimSet {
+			Dictionary<Zman, TimeSpan> values;	//Deserialization will not run the ctor
+			public Dictionary<Zman, TimeSpan> Values {
+				get { return values = values ?? new Dictionary<Zman, TimeSpan>(); }
+			}
+
+			#region Zmanim properties
+			[DataMember]
+			public string sunrise {
+				get { return Values[Zman.Sunrise].ToString(); }
+				set { Values[Zman.Sunrise] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string sunset {
+				get { return Values[Zman.Sunset].ToString(); }
+				set { Values[Zman.Sunset] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string sof_zman_shema_ma {
+				get { return Values[Zman.סוף٠זמן٠קריאת٠שמע٠מ٠א].ToString(); }
+				set { Values[Zman.סוף٠זמן٠קריאת٠שמע٠מ٠א] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string sof_zman_shema_gra {
+				get { return Values[Zman.סוף٠זמן٠קריאת٠שמע٠גרא].ToString(); }
+				set { Values[Zman.סוף٠זמן٠קריאת٠שמע٠גרא] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string sof_zman_tefila_ma {
+				get { return Values[Zman.סוף٠זמן٠תפילה].ToString(); }
+				set { Values[Zman.סוף٠זמן٠תפילה] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string alos_ma {
+				get { return Values[Zman.עלות].ToString(); }
+				set { Values[Zman.עלות] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string talis_ma {
+				get { return Values[Zman.טלית].ToString(); }
+				set { Values[Zman.טלית] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string chatzos {
+				get { return Values[Zman.חצות].ToString(); }
+				set { Values[Zman.חצות] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string mincha_gedola_ma {
+				get { return Values[Zman.מנחה٠גדולה].ToString(); }
+				set { Values[Zman.מנחה٠גדולה] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string mincha_ketana_ma {
+				get { return Values[Zman.מנחה٠קטנה].ToString(); }
+				set { Values[Zman.מנחה٠קטנה] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string plag_mincha_ma {
+				get { return Values[Zman.פלג٠המנחה].ToString(); }
+				set { Values[Zman.פלג٠המנחה] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string tzeis_595_degrees {
+				get { return Values[Zman.צאת72].ToString(); }
+				set { Values[Zman.צאת72] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string tzeis_850_degrees {
+				get { return Values[Zman.צאת42].ToString(); }
+				set { Values[Zman.צאת42] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string tzeis_72_minutes {
+				get { return Values[Zman.צאת595].ToString(); }
+				set { Values[Zman.צאת595] = TimeSpan.Parse(value); }
+			}
+			[DataMember]
+			public string tzeis_42_minutes {
+				get { return Values[Zman.צאת850].ToString(); }
+				set { Values[Zman.צאת850] = TimeSpan.Parse(value); }
+			}
+			#endregion
+
+			//sunset: Zman.Sunset
+			//sof_zman_shema_ma: Zman.סוף٠זמן٠קריאת٠שמע٠מ٠א
+			//sof_zman_shema_gra: Zman.סוף٠זמן٠קריאת٠שמע٠גרא
+			//sof_zman_tefila_ma: Zman.סוף٠זמן٠תפילה
+			//alos_ma: Zman.עלות
+			//talis_ma: Zman.טלית
+			//chatzos: Zman.חצות
+			//mincha_gedola_ma: Zman.מנחה٠גדולה
+			//mincha_ketana_ma: Zman.מנחה٠קטנה
+			//plag_mincha_ma: Zman.פלג٠המנחה
+			//tzeis_595_degrees: Zman.צאת72	
+			//tzeis_850_degrees: Zman.צאת42	
+			//tzeis_72_minutes: Zman.צאת595	
+			//tzeis_42_minutes: Zman.צאת850	
+		}
+
+		static readonly DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(OUDataObject));
 
 		///<summary>Creates a YearlyZmanimDictionary for the given year.</summary>
 		///<returns>The Zmanim for that year, or null if they could not be loaded.</returns>
@@ -58,12 +165,11 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			//jsonString = "Giant JSON object"
 			var jsonString = jsCall.Substring(start, jsCall.Length - start - 1);
 
-			var days = jsonDecoder.DeserializeObject(jsonString).GetKey<object[]>("days");
-			return new YearlyZmanimDictionary(year, days.Select(d =>
-				new ZmanimInfo(DateTime.ParseExact(d.GetKey<string>("engDateString"), "M/d/yyyy", CultureInfo.InvariantCulture),
-						d.GetKey<Dictionary<string, object>>("zmanim").ToDictionary(kvp => keyMappings[kvp.Key], kvp => TimeSpan.Parse(kvp.Value.ToString()))
-					)
-				).ToArray());
+			OUDataObject data;
+			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString), writable: false))
+				data = (OUDataObject)serializer.ReadObject(stream);
+
+			return new YearlyZmanimDictionary(year, data.Days.Select(day => day.CreateZmanimInfo()).ToArray());
 		}
 
 		///<summary>Gets the first date that this instance can provide Zmanim for.</summary>
@@ -71,12 +177,5 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 
 		///<summary>Gets the last date that this instance can provide Zmanim for.</summary>
 		public override DateTime MaxDate { get { return DateTime.MaxValue; } }
-	}
-	namespace Temp {
-		static class Extensions {
-			public static T GetKey<T>(this object obj, string key) {
-				return (T)((Dictionary<string, object>)obj)[key];
-			}
-		}
 	}
 }
