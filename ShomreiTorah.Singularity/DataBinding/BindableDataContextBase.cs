@@ -14,6 +14,8 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		TDataContext dataContext;
 		///<summary>Gets the typed DataContext wrapped by this instance.</summary>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public TDataContext DataContext {
 			get {
 				if (dataContext == null)
