@@ -56,6 +56,34 @@ namespace ShomreiTorah.Data {
 			}
 		}
 		#endregion
+
+		#region Transaction properties
+		///<summary>Gets all of the person's transactions.</summary>
+		public IEnumerable<ITransaction> Transactions { get { return Pledges.Cast<ITransaction>().Concat(Payments); } }
+
+		///<summary>Gets the accounts in which this person has outstanding balance.</summary>
+		public IEnumerable<string> OpenAccounts {
+			get {
+				return from t in Transactions
+					   group t by t.Account into a
+					   where a.Sum(t => t.SignedAmount) != 0
+					   select a.Key;
+			}
+		}
+
+		///<summary>Gets the person's total outstanding balance as of the given date.</summary>
+		public decimal GetBalance(DateTime until) {
+			return Transactions.Where(p => p.Date < until).Sum(p => p.SignedAmount);
+		}
+		///<summary>Gets the person's current outstanding balance in the given account.</summary>
+		public decimal GetBalance(string account) {
+			return Transactions.Where(p => p.Account == account).Sum(p => p.SignedAmount);
+		}
+		///<summary>Gets the person's outstanding balance in the given account as of the given date.</summary>
+		public decimal GetBalance(DateTime until, string account) {
+			return Transactions.Where(p => p.Date < until && p.Account == account).Sum(p => p.SignedAmount);
+		}
+		#endregion
 	}
 
 	#region Comparable
@@ -191,7 +219,7 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the person that placed the reservation.</summary>
 		public Person Person { get { return Pledge == null ? null : Pledge.Person; } }
 	}
-	
+
 
 	///<summary>Represents a billing transaction (a pledge or payment).</summary>
 	public interface ITransaction : IOwnedObject {
