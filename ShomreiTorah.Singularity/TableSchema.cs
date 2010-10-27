@@ -5,6 +5,7 @@ using System.Text;
 using ShomreiTorah.Common;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Windows.Forms;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>Contains the schema of a Singularity table.</summary>
@@ -14,6 +15,9 @@ namespace ShomreiTorah.Singularity {
 		///<returns>The schema instance used by the object, or null if the object doesn't have a schema.</returns>
 		[SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "obj")]
 		public static TableSchema GetSchema(object obj) {
+			var bs = obj as BindingSource;
+			if (bs != null) return GetSchema(bs.List);
+
 			var schema = obj as TableSchema;
 			if (schema != null) return schema;
 
