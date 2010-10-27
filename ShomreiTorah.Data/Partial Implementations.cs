@@ -142,7 +142,23 @@ namespace ShomreiTorah.Data {
 	}
 	#endregion
 
+	partial class Pledge {
+		partial void ValidateAmount(decimal newValue, Action<string> error) {
+			if (newValue < 0) error("Amount cannot be negative");
+		}
+	}
+	partial class Payment {
+		partial void ValidateAmount(decimal newValue, Action<string> error) {
+			if (newValue < 0) error("Amount cannot be negative");
+		}
+	}
+
 	partial class EmailAddress {
+		partial void Initialize() {
+			RandomCode = Guid.NewGuid().ToString("N").Remove(20).ToUpperInvariant();
+			DateAdded = DateTime.Now;
+		}
+
 		partial void ValidateEmail(string newValue, Action<string> error) {
 			try {
 				new MailAddress(newValue).ToString();
