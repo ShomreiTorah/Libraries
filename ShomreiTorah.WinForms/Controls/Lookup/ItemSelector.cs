@@ -189,6 +189,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Gets the owning editor's type name.</summary>
 		public override string EditorTypeName { get { return "ItemSelector"; } }
 		///<summary>Gets the owning ItemSelector.</summary>
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[Browsable(false)]
 		public new ItemSelector OwnerEdit { get { return (ItemSelector)base.OwnerEdit; } }
 
 		///<summary>Registers an inherited RepositoryItemItemSelector editor.</summary>
