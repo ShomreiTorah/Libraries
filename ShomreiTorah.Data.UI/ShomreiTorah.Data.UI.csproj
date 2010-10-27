@@ -63,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppFramework.cs" />
+    <Compile Include="Controls\CheckNumberEdit.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\EditorSettingsApplier.cs">
       <SubType>Component</SubType>
     </Compile>
