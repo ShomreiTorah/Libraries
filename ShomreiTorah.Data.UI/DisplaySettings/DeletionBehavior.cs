@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using ShomreiTorah.Data.UI.Grid;
 using System.Windows.Forms;
-using ShomreiTorah.WinForms;
 using ShomreiTorah.Common;
+using ShomreiTorah.Data.UI.Grid;
+using ShomreiTorah.WinForms;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Allows rows in a grid to be deleted.</summary>
@@ -33,7 +32,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<typeparam name="T">The type of rows that the behavior applies to.</typeparam>
 		///<param name="messageGetter">A delegate that generates a warning message for a set of selected rows.</param>
 		public static DeletionBehavior WithMessage<T>(Func<IEnumerable<T>, string> messageGetter) {
-			return new DeletionBehavior(s => Dialog.Warn(messageGetter((IEnumerable<T>)s)));
+			return new DeletionBehavior(s => Dialog.Warn(messageGetter(s.Cast<T>())));
 		}
 
 		///<summary>Creates a DeletionBehavior that disallows deletion.</summary>
@@ -55,12 +54,14 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 
 		void View_KeyDown(object sender, KeyEventArgs e) {
-			var view = (SmartGridView)sender;
-			var rows = view.GetSelectedRows().Where(r => r >= 0).Select(view.GetRow);
+			if (e.KeyCode == Keys.Delete) {
+				var view = (SmartGridView)sender;
+				var rows = view.GetSelectedRows().Where(r => r >= 0).Select(view.GetRow);
 
-			if (!rows.Any()) return;
-			if (confirmer(rows))
-				view.DeleteSelectedRows();
+				if (!rows.Any()) return;
+				if (confirmer(rows))
+					view.DeleteSelectedRows();
+			}
 		}
 	}
 }
