@@ -22,6 +22,34 @@ namespace ShomreiTorah.Data {
 		public static readonly ReadOnlyCollection<string> PaymentMethods = Strings("Cash", "Check");
 		#endregion
 
+		#region Pledge Types
+		///<summary>Gets the standard pledge types.</summary>
+		public static readonly ReadOnlyCollection<PledgeType> PledgeTypes = new ReadOnlyCollection<PledgeType>(new[]{
+			new PledgeType("Donation"),
+			new PledgeType("Membership"),
+			new PledgeType("סעודה שלישית"),
+			new PledgeType("Kiddush",		subTypes: new[]{ "ראש השנה", "שמחת תורה", "חתנים", "שבועות" }),
+			new PledgeType("Seforim"),
+			new PledgeType("Building Fund"),
+			new PledgeType("ימים נוראים Seats"),
+
+			new PledgeType("Auction",	
+							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
+												"פתיחה", "הגבהה",
+												"מפטיר יונה", "פתיחה דנעילה", 
+												"אתה הראית", "חתן תורה", "חתן בראשית" }),
+			new PledgeType("מי שברך",	
+							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
+												"מפטיר יונה", "אתה הראית", "חתן תורה", "חתן בראשית" }),
+			new PledgeType("Melave Malka Journal", 
+							subTypes: new[]{	"Diamond ad",	"Platinum ad",		"Gold ad",
+												"Silver ad",	"Bronze ad",		"Full page ad", 
+												"Half page ad", "Quarter page ad",	"Greeting ad" }),
+			new PledgeType("Melave Malka Raffle"),
+			new PledgeType("Shalach Manos"),
+		});
+		#endregion
+
 		#region General
 		///<summary>Gets a dictionary mapping state abbreviations to their full names.</summary>
 		public static readonly ReadOnlyDictionary<string, string> States = new ReadOnlyDictionary<string, string>(new SortedDictionary<string, string>{
@@ -85,5 +113,22 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the abbreviations of the states commonly found in the data.</summary>
 		public static readonly ReadOnlyCollection<string> CommonStates = Strings("NJ", "NY");
 		#endregion
+	}
+	///<summary>Contains information about a standard pledge type.</summary>
+	public sealed class PledgeType {
+		///<summary>Creates a PledgeType instance.</summary>
+		internal PledgeType(string name, IList<string> subTypes = null) {
+			if (name == null) throw new ArgumentNullException("name");
+			Name = name;
+			Subtypes = new ReadOnlyCollection<string>(subTypes ?? new string[0]);
+		}
+
+		///<summary>Gets the name of the pledge type.</summary>
+		public string Name { get; private set; }
+		///<summary>Gets the standard subtypes of this pledge type, if any.</summary>
+		public ReadOnlyCollection<String> Subtypes { get; private set; }
+
+		///<summary>Returns the name of the pledge type.</summary>
+		public override string ToString() { return Name; }
 	}
 }

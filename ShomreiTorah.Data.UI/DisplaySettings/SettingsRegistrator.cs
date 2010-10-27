@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using DevExpress.Data;
@@ -290,10 +291,10 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			//No settings to apply
 			protected internal override void Apply(SmartGridColumn column) { }
 
-			static readonly string[] SortedOrder = new[] { "כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר", "פתיחה", "הגבהה" };
+			static readonly ReadOnlyCollection<string> SortedOrder = Names.PledgeTypes.SelectMany(p => p.Subtypes).Distinct().ReadOnlyCopy();
 			protected internal override void CompareValues(CustomColumnSortEventArgs e) {
-				var index1 = Array.IndexOf(SortedOrder, e.Value1 as string);
-				var index2 = Array.IndexOf(SortedOrder, e.Value2 as string);
+				var index1 = SortedOrder.IndexOf(e.Value1 as string);
+				var index2 = SortedOrder.IndexOf(e.Value2 as string);
 
 				e.Result = index1.CompareTo(index2);
 				e.Handled = index1 != index2;
