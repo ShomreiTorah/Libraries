@@ -230,7 +230,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					item.DoubleClick += (sender, e) => {
 						var edit = sender as BaseEdit;
 						var grid = (GridControl)edit.Parent;
-						var view = (SmartGridView)grid.MainView;
+						var view = (SmartGridView)grid.FocusedView;
 						var row = view.GetFocusedRow() as Row;	//In the designer, there might not be actual rows.
 
 						if (row != null && AppFramework.Current.CanShowDetails(row.Schema))
