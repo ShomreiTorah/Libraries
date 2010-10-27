@@ -43,6 +43,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 				return BindingManager.Current as Payment;
 			}
 		}
+		Payment lastValidatedRow;
+		string lastValidatedValue;
 		///<summary>Raises the Validating event.</summary>
 		protected override void OnValidating(CancelEventArgs e) {
 			base.OnValidating(e);
@@ -50,15 +52,20 @@ namespace ShomreiTorah.Data.UI.Controls {
 			var payment = BoundRow;
 			if (payment == null) return;
 
+			//Don't show the same warning dialog twice in a row.  (But do show the icon)
+			bool showDialog = lastValidatedRow != payment || lastValidatedValue != Text;
+			lastValidatedRow = payment; lastValidatedValue = Text;
+
 			var duplicate = payment.FindDuplicate(Text);
 			if (duplicate == null) {
 				SetWarning(null);
 				return;
 			}
-			var message = String.Format(CultureInfo.CurrentCulture, "{0} #{1} for {2} has already been entered ({3:d}, {4:c}).",
-																	duplicate.Method, duplicate.CheckNumber, duplicate.Person.FullName, duplicate.Date, duplicate.Amount);
-			Dialog.Show(message, MessageBoxIcon.Warning);
-
+			if (showDialog) {
+				var message = String.Format(CultureInfo.CurrentCulture, "{0} #{1} for {2} has already been entered ({3:d}, {4:c}).",
+																		duplicate.Method, duplicate.CheckNumber, duplicate.Person.FullName, duplicate.Date, duplicate.Amount);
+				Dialog.Show(message, MessageBoxIcon.Warning);
+			}
 			SetWarning(String.Format(CultureInfo.CurrentCulture, "Potential duplicate of {0} #{1} ({2:d}, {3:c}).",
 																 duplicate.Method.ToLowerInvariant(), duplicate.CheckNumber, duplicate.Date, duplicate.Amount));
 		}
