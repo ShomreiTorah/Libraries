@@ -150,6 +150,11 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			//tzeis_850_degrees: Zman.צאת42	
 			//tzeis_72_minutes: Zman.צאת595	
 			//tzeis_42_minutes: Zman.צאת850	
+
+			//Replace 
+			//{[a-z0-9_]+}"\::b+{.+}
+			//with
+			//[DataMember]\n public string \1 {\n get { return values[\2].ToString(); }\n set { values[\2] = TimeSpan.Parse(value); }\n }
 		}
 
 		static readonly DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(OUDataObject));
