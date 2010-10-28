@@ -14,6 +14,8 @@ using System.Diagnostics;
 namespace ShomreiTorah.Data.UI {
 	///<summary>The base class for a standard ShomreiTorah application.</summary>
 	public abstract class AppFramework {
+		public static TypedTable<TRow> Table<TRow>() where TRow : Row { return Current.DataContext.Table<TRow>(); }
+
 		///<summary>Gets the AppFramework instance for the current application.</summary>
 		///<remarks>This property is also available at design time.</remarks>
 		public static AppFramework Current { get; private set; }
@@ -67,10 +69,12 @@ namespace ShomreiTorah.Data.UI {
 			Application.SetCompatibleTextRenderingDefault(false);
 
 			StartSplash();
-			Application.ThreadException += (sender, e) => HandleException(e.Exception);
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) => HandleException((Exception)e.ExceptionObject);
+			if (!Debugger.IsAttached) {
+				Application.ThreadException += (sender, e) => HandleException(e.Exception);
+				AppDomain.CurrentDomain.UnhandledException += (sender, e) => HandleException((Exception)e.ExceptionObject);
+			}
 
-			SetSplashCaption("Loading behavior configuration");
+			SetSplashCaption("Loading behaviors");
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 			RegisterSettings();
 			Debug.Assert(!String.IsNullOrWhiteSpace(Dialog.DefaultTitle), "Please set a dialog title (in RegisterSettings)");
@@ -80,6 +84,7 @@ namespace ShomreiTorah.Data.UI {
 			SyncContext = CreateDataContext();
 			SyncContext.ReadData();
 
+			SetSplashCaption("Loading UI");
 			MainForm = CreateMainForm();
 			MainForm.Shown += delegate {
 				if (splashScreen != null)
