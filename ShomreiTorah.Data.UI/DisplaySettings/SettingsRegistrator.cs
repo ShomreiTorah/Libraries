@@ -184,7 +184,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				new PersonColumnController()
 			);
 			GridManager.RegisterColumn(Payment.DepositColumn, new DepositColumnController());
-			GridManager.RegisterColumn(Pledge.SubtypeColumn, new SubTypeColumnController());
+			GridManager.RegisterColumn(Pledge.SubTypeColumn, new SubTypeColumnController());
 		}
 		#endregion
 

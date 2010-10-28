@@ -1122,8 +1122,8 @@ namespace ShomreiTorah.Data {
         public static ValueColumn DateColumn { get; private set; }
         ///<summary>Gets the schema's Type column.</summary>
         public static ValueColumn TypeColumn { get; private set; }
-        ///<summary>Gets the schema's Subtype column.</summary>
-        public static ValueColumn SubtypeColumn { get; private set; }
+        ///<summary>Gets the schema's SubType column.</summary>
+        public static ValueColumn SubTypeColumn { get; private set; }
         ///<summary>Gets the schema's Account column.</summary>
         public static ValueColumn AccountColumn { get; private set; }
         ///<summary>Gets the schema's Amount column.</summary>
@@ -1165,8 +1165,8 @@ namespace ShomreiTorah.Data {
             TypeColumn = Schema.Columns.AddValueColumn("Type", typeof(String), null);
             TypeColumn.AllowNulls = false;
             
-            SubtypeColumn = Schema.Columns.AddValueColumn("Subtype", typeof(String), null);
-            SubtypeColumn.AllowNulls = false;
+            SubTypeColumn = Schema.Columns.AddValueColumn("SubType", typeof(String), null);
+            SubTypeColumn.AllowNulls = false;
             
             AccountColumn = Schema.Columns.AddValueColumn("Account", typeof(String), null);
             AccountColumn.AllowNulls = false;
@@ -1202,7 +1202,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
             SchemaMapping.Columns.AddMapping(DateColumn, "Date");
             SchemaMapping.Columns.AddMapping(TypeColumn, "Type");
-            SchemaMapping.Columns.AddMapping(SubtypeColumn, "SubType");
+            SchemaMapping.Columns.AddMapping(SubTypeColumn, "SubType");
             SchemaMapping.Columns.AddMapping(AccountColumn, "Account");
             SchemaMapping.Columns.AddMapping(AmountColumn, "Amount");
             SchemaMapping.Columns.AddMapping(NoteColumn, "Note");
@@ -1244,12 +1244,12 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(TypeColumn); }
             set { base[TypeColumn] = value; }
         }
-        ///<summary>Gets or sets the subtype of the pledge.</summary>
+        ///<summary>Gets or sets the sub type of the pledge.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public String Subtype {
-            get { return base.Field<String>(SubtypeColumn); }
-            set { base[SubtypeColumn] = value; }
+        public String SubType {
+            get { return base.Field<String>(SubTypeColumn); }
+            set { base[SubTypeColumn] = value; }
         }
         ///<summary>Gets or sets the account of the pledge.</summary>
         [DebuggerNonUserCode]
@@ -1329,8 +1329,8 @@ namespace ShomreiTorah.Data {
         partial void ValidateType(String newValue, Action<string> error);
         partial void OnTypeChanged(String oldValue, String newValue);
         
-        partial void ValidateSubtype(String newValue, Action<string> error);
-        partial void OnSubtypeChanged(String oldValue, String newValue);
+        partial void ValidateSubType(String newValue, Action<string> error);
+        partial void OnSubTypeChanged(String oldValue, String newValue);
         
         partial void ValidateAccount(String newValue, Action<string> error);
         partial void OnAccountChanged(String oldValue, String newValue);
@@ -1382,8 +1382,8 @@ namespace ShomreiTorah.Data {
             } else if (column == TypeColumn) {
                 ValidateType((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == SubtypeColumn) {
-                ValidateSubtype((String)newValue, reporter);
+            } else if (column == SubTypeColumn) {
+                ValidateSubType((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == AccountColumn) {
                 ValidateAccount((String)newValue, reporter);
@@ -1425,8 +1425,8 @@ namespace ShomreiTorah.Data {
             	OnDateChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == TypeColumn)
             	OnTypeChanged((String)oldValue, (String)newValue);
-            else if (column == SubtypeColumn)
-            	OnSubtypeChanged((String)oldValue, (String)newValue);
+            else if (column == SubTypeColumn)
+            	OnSubTypeChanged((String)oldValue, (String)newValue);
             else if (column == AccountColumn)
             	OnAccountChanged((String)oldValue, (String)newValue);
             else if (column == AmountColumn)
