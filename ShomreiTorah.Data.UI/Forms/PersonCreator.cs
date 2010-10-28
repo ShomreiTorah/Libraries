@@ -16,7 +16,6 @@ namespace ShomreiTorah.Data.UI.Forms {
 		PersonCreator() {
 			InitializeComponent();
 			personEditor.Person = new Person {
-				Id = Guid.NewGuid(),
 				Source = "Manually Added",
 				City = "Passaic",
 				State = "NJ",
