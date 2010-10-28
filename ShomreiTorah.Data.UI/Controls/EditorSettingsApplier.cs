@@ -89,7 +89,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			}
 			if (!settings.ItemType.IsInstanceOfType(edit.Properties)) {
 				if (ShouldShowErrors)
-					Dialog.ShowError("The " + edit.Name + " edit must be converted to a " 
+					Dialog.ShowError("The " + edit.Name + " edit must be converted to a "
 								   + settings.ItemType.Name.Replace("RepositoryItem", "")
 								   + " in order to receive settings from " + column.Schema.Name + "." + column.Name);
 				return false;
@@ -135,6 +135,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 						.Select((e, i) => new EditorProperty(owner, i, e)).ToArray()
 				);
 			}
+			public override object GetPropertyOwner(PropertyDescriptor pd) { return owner; }
+
 			static string GetDescription(BaseEdit edit) {
 				if (edit.DataBindings.Count == 0)
 					return edit.Name + " is not databound";
@@ -159,20 +161,29 @@ namespace ShomreiTorah.Data.UI.Controls {
 				}
 
 				public override Type ComponentType { get { return typeof(EditorsInfo); } }
-				public override Type PropertyType { get { return typeof(string); } }
+				public override Type PropertyType { get { return typeof(DefaultSettingsMode); } }
 
 				public override object GetValue(object component) {
-					return owner.GetDefaultSettingsMode(edit).ToString();
+					return owner.GetDefaultSettingsMode(edit);
 				}
+				public override void SetValue(object component, object value) {
+					owner.SetDefaultSettingsMode(edit, (DefaultSettingsMode)value);
+				}
+
 				//Non-None values should be bold.
 				public override bool ShouldSerializeValue(object component) {
 					return owner.GetDefaultSettingsMode(edit) != DefaultSettingsMode.None;
 				}
 
-				public override bool IsReadOnly { get { return true; } }
+				public override bool IsReadOnly { get { return false; } }
 				public override bool CanResetValue(object component) { return false; }
 				public override void ResetValue(object component) { }
-				public override void SetValue(object component, object value) { }
+			}
+			public override string ToString() {
+				var count = owner.values.Count(kvp => kvp.Value == DefaultSettingsMode.Active);
+				if (count == 1)
+					return "One editor applied";
+				return count + " editors applied";
 			}
 		}
 	}
