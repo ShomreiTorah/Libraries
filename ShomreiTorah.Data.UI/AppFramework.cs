@@ -26,10 +26,15 @@ namespace ShomreiTorah.Data.UI {
 			if (dh == null) return;
 
 			var rootType = Type.GetType(GetTargetNamespace(dh) + "." + dh.RootComponentClassName);
+			//TODO: TypeScan fall-back if GetTargetNamespace fails; error handling
+
+			if (rootType.Assembly.EntryPoint == null) return;	//Type is in a DLL
+
 			var appFrameworkType = rootType.Assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(AppFramework)));
 
 			if (appFrameworkType == null) {
-				MessageBox.Show("Cannot find an AppFramework type in " + rootType.Assembly);
+				MessageBox.Show("Cannot find an AppFramework type in " + rootType.Assembly + ".\r\nTry rebuilding the project.",
+								"Shomrei Torah Design System", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
 
@@ -219,6 +224,32 @@ namespace ShomreiTorah.Data.UI {
 		}
 		#endregion
 	}
+
+	///<summary>A component that automatically binds to the DataContext in the current AppFramework.</summary>
+	[Description("A component that automatically binds to the DataContext in the current AppFramework.")]
+	[SuppressMessage("Microsoft.Design", "CA1039:ListsAreStronglyTyped", Justification = "BindingSource")]
+	[SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "BindingSource")]
+	[SuppressMessage("Microsoft.Design", "CA1035:ICollectionImplementationsHaveStronglyTypedMembers", Justification = "BindingSource")]
+	public class FrameworkBindingSource : BindingSource {
+		public FrameworkBindingSource() : base() { Init(); }
+		public FrameworkBindingSource(IContainer container) : base(container) { container.Add(this); Init(); }
+		void Init() {
+			DisplaySettings.SettingsRegistrator.EnsureRegistered();
+DataSource = DisplaySettings.GridManager.DefaultDataSource;
+		}
+
+		///<summary>Gets or sets the data source that the connector binds to.</summary>
+		[Description("Gets or sets the data source that the connector binds to.")]
+		[Category("Data")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		[ReadOnly(true)]
+		[AttributeProvider(typeof(IListSource))]
+		public new object DataSource {
+			get { return base.DataSource; }
+			set { base.DataSource = value; }
+		}
+	}
+
 
 	///<summary>A class that displays a splash screen.</summary>
 	public interface ISplashScreen {

@@ -19,8 +19,28 @@ namespace ShomreiTorah.Data.UI.Grid {
 		///<summary>Initializes a new SmartGrid instance.</summary>
 		public SmartGrid() {
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
+			Source = DisplaySettings.GridManager.DefaultDataSource;
 		}
 
+		private bool ShouldSerializeSource() { return Source != DisplaySettings.GridManager.DefaultDataSource; }
+		private void ResetSource() { Source = DisplaySettings.GridManager.DefaultDataSource; }
+		///<summary>Gets or sets the grid control's data source.</summary>
+		[Category("Data")]
+		[Description("Gets or sets the grid control's data source.")]
+		[AttributeProvider(typeof(IListSource))]
+		public object Source {
+			get { return DataSource; }
+			set { DataSource = value; }
+		}
+
+		///<summary>Gets or sets the grid control's data source.</summary>
+		///<remarks>This property is replaced by Source to suppress its DefaultValueAttribute.</remarks>
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public override object DataSource {
+			get { return base.DataSource; }
+			set { base.DataSource = value; }
+		}
 		protected override BaseView CreateDefaultView() {
 			return CreateView("SmartGridView");
 		}

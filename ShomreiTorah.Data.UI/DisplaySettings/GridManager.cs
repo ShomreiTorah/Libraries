@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
@@ -87,6 +89,42 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			public int GetHashCode(T obj) {
 				if (obj == null) return int.MinValue;
 				return obj.GetType().GetHashCode();
+			}
+		}
+		#endregion
+
+		#region Automatic DataSource
+		///<summary>Gets the default datasource, which wraps the AppFramework's DataContext.</summary>
+		public static object DefaultDataSource { get { return AutoDataSource.Instance; } }
+
+		sealed class AutoDataSource : IListSource, IComponent {
+			public static readonly AutoDataSource Instance = new AutoDataSource();
+			readonly IListSource inner;
+			private AutoDataSource() {
+				inner = AppFramework.Current.DataContext;
+				Site = new NamerSite(this, AppFramework.Current.GetType() + ".DataContext");
+			}
+
+			public bool ContainsListCollection { get { return inner.ContainsListCollection; } }
+			public IList GetList() { return inner.GetList(); }
+
+			public override string ToString() { return Site.Name; }
+
+			//I implement IComonent and ISite to get the name in the Properties window.
+			public void Dispose() { }
+			public event EventHandler Disposed { add { } remove { } }
+			public ISite Site { get; set; }
+			class NamerSite : ISite {
+				public NamerSite(IComponent component, string name) {
+					Component = component;
+					Name = name;
+				}
+				public string Name { get; set; }
+				public IComponent Component { get; private set; }
+				public IContainer Container { get { return null; } }
+
+				public bool DesignMode { get { return LicenseManager.UsageMode == LicenseUsageMode.Designtime; } }
+				public object GetService(Type serviceType) { return LicenseManager.CurrentContext.GetService(serviceType); }
 			}
 		}
 		#endregion
