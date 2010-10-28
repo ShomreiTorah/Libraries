@@ -1,19 +1,51 @@
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using ShomreiTorah.Singularity;
 using ShomreiTorah.Singularity.Sql;
 using ShomreiTorah.WinForms;
 using ShomreiTorah.WinForms.Forms;
-using System.Diagnostics;
 
 namespace ShomreiTorah.Data.UI {
 	///<summary>The base class for a standard ShomreiTorah application.</summary>
 	public abstract class AppFramework {
+		///<summary>Automatically registers the AppFramework for the current project at design time.</summary>
+		public static void AutoRegisterDesigner() {
+			if (Current != null) return;
+			if (LicenseManager.UsageMode != LicenseUsageMode.Designtime) return;
+
+			var dh = (IDesignerHost)LicenseManager.CurrentContext.GetService(typeof(IDesignerHost));
+			if (dh == null) return;
+
+			var rootType = Type.GetType(GetTargetNamespace(dh) + "." + dh.RootComponentClassName);
+			var appFrameworkType = rootType.Assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(AppFramework)));
+
+			if (appFrameworkType == null) {
+				MessageBox.Show("Cannot find an AppFramework type in " + rootType.Assembly);
+				return;
+			}
+
+			CheckDesignTime((AppFramework)Activator.CreateInstance(appFrameworkType));
+		}
+
+		static string GetTargetNamespace(IDesignerHost dh) {
+			var _loader = dh.GetType().GetField("_loader", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(dh);
+			var CodeDom = _loader.GetType().GetProperty("CodeDom", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(_loader, null);
+
+			var TypeNamespace = (CodeNamespace)CodeDom.GetType().GetProperty("TypeNamespace", BindingFlags.Public | BindingFlags.Instance).GetValue(CodeDom, null);
+
+			return TypeNamespace.Name;
+		}
+
+
 		///<summary>Gets the typed table for the given row type from the current application's DataContext.</summary>
 		public static TypedTable<TRow> Table<TRow>() where TRow : Row { return Current.DataContext.Table<TRow>(); }
 
@@ -46,7 +78,6 @@ namespace ShomreiTorah.Data.UI {
 		public DataContext DataContext { get { return SyncContext.DataContext; } }
 		///<summary>Gets the DataSyncContext used to synchronize with a database server.</summary>
 		public DataSyncContext SyncContext { get; private set; }
-
 
 		///<summary>Overridden by derived classes to create the application's splash screen.  Called on the main thread.</summary>
 		protected abstract ISplashScreen CreateSplash();

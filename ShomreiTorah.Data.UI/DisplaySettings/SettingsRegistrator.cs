@@ -301,9 +301,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			}
 		}
 
-		static SettingsRegistrator() { InitializeStandardSettings(); }
+		static SettingsRegistrator() { InitializeStandardSettings(); AppFramework.AutoRegisterDesigner(); }
 
 		///<summary>Ensures that all grid settings have been registered.</summary>
-		public static void EnsureRegistered() { }
+		public static void EnsureRegistered() { AppFramework.AutoRegisterDesigner(); }
 	}
 }
