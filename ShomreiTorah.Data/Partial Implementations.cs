@@ -218,6 +218,9 @@ namespace ShomreiTorah.Data {
 	partial class SeatingReservation : IOwnedObject {
 		///<summary>Gets the person that placed the reservation.</summary>
 		public Person Person { get { return Pledge == null ? null : Pledge.Person; } }
+
+		///<summary>Gets the total number of seats in the reservation.</summary>
+		public int TotalSeats { get { return MensSeats + WomensSeats + BoysSeats + GirlsSeats; } }
 	}
 
 
