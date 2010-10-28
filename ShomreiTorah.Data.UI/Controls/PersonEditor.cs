@@ -135,16 +135,11 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 		#endregion
 	}
-	class DataBinderContext : DataContext {
-		public DataBinderContext() {
-			DisplaySettings.SettingsRegistrator.EnsureRegistered();
-
-			Tables.AddTable(Person.CreateTable());
-		}
-	}
-	class ContextBinder : BindableDataContextBase<DataBinderContext> {
-		protected override DataBinderContext FindDataContext() {
-			return new DataBinderContext();
+	class ContextBinder : BindableDataContextBase {
+		protected override DataContext FindDataContext() {
+			var context = new DataContext();
+			context.Tables.AddTable(Person.CreateTable());
+			return context;
 		}
 	}
 }
