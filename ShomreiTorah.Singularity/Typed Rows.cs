@@ -148,6 +148,8 @@ namespace ShomreiTorah.Singularity {
 	public class ValueChangedEventArgs<TRow> : ValueChangedEventArgs where TRow : Row {
 		///<summary>Creates a new ValueChangedEventArgs instance.</summary>
 		public ValueChangedEventArgs(TRow row, Column column) : base(row, column) { }
+		///<summary>Gets the row that changed.</summary>
+		public new TRow Row { get { return (TRow)base.Row; } }
 	}
 
 	partial class Row {
