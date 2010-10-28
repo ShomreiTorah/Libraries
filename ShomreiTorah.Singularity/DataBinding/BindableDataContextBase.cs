@@ -7,16 +7,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Collections;
 
 namespace ShomreiTorah.Singularity.DataBinding {
-	///<summary>A base class for a wrapper around a typed DataContext for use in a designer.</summary>
-	public abstract class BindableDataContextBase<TDataContext> : Component, IListSource where TDataContext : DataContext {
+	///<summary>A base class for a wrapper around a DataContext for use in a designer.</summary>
+	public abstract class BindableDataContextBase : Component, IListSource  {
 		///<summary>Gets the DataContext instance to bind to at runtime.</summary>
-		protected abstract TDataContext FindDataContext();
+		protected abstract DataContext FindDataContext();
 
-		TDataContext dataContext;
+		DataContext dataContext;
 		///<summary>Gets the typed DataContext wrapped by this instance.</summary>
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-		public TDataContext DataContext {
+		public DataContext DataContext {
 			get {
 				if (dataContext == null)
 					dataContext = FindDataContext();
