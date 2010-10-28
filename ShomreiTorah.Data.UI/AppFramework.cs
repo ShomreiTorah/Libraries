@@ -14,6 +14,7 @@ using System.Diagnostics;
 namespace ShomreiTorah.Data.UI {
 	///<summary>The base class for a standard ShomreiTorah application.</summary>
 	public abstract class AppFramework {
+		///<summary>Gets the typed table for the given row type from the current application's DataContext.</summary>
 		public static TypedTable<TRow> Table<TRow>() where TRow : Row { return Current.DataContext.Table<TRow>(); }
 
 		///<summary>Gets the AppFramework instance for the current application.</summary>
