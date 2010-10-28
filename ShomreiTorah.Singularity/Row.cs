@@ -16,6 +16,8 @@ namespace ShomreiTorah.Singularity {
 			Schema = schema;
 			values = schema.Columns.ToDictionary(c => c, c => c.DefaultValue);
 			Schema.AddRow(this);
+			if (Schema.PrimaryKey != null && schema.PrimaryKey.DataType == typeof(Guid) && schema.PrimaryKey.DefaultValue == null)
+				this[Schema.PrimaryKey] = Guid.NewGuid();
 		}
 
 		readonly Dictionary<Column, object> values;
