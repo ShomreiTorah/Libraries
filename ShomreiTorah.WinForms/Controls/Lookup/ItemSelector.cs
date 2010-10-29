@@ -593,7 +593,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//of the MaskBox.  Instead of hiding the maskbox, I shrink
 			//to not occupy any space, while leaving it focused.  This
 			//allows the user to start typing to re-show the popup.
-			if (OwnerEdit.EditValue != null && !OwnerEdit.IsPopupOpen) {
+			if (OwnerEdit.EditValue != null && OwnerEdit.EditValue != DBNull.Value && !OwnerEdit.IsPopupOpen) {
 				DrawSelectedItem = true;
 				SelectionBounds = Rectangle.Inflate(base.MaskBoxRect, 0, 1);
 				fMaskBoxRect = Rectangle.Empty;
