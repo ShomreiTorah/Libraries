@@ -17,13 +17,16 @@ using System.Threading;
 
 namespace ShomreiTorah.Data.UI.Forms {
 	///<summary>Displays an unhandled exception to the user.  This form is called by AppFramework.HandleException.</summary>
-	sealed partial class ExceptionReporter : XtraForm {
+	public sealed partial class ExceptionReporter : XtraForm {
 		readonly Exception exception;
 		readonly Stream imageStream;
 
+		///<summary>Creates an ExceptionReporter form that reports the given exception.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Ignore all GDI+ errors")]
-		internal ExceptionReporter(Exception exception) {
+		public ExceptionReporter(Exception exception) {
+			if (exception == null) throw new ArgumentNullException("exception");
 			InitializeComponent();
+
 
 			while (exception is TargetInvocationException)
 				exception = exception.InnerException;
