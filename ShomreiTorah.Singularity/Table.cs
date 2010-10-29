@@ -138,8 +138,8 @@ namespace ShomreiTorah.Singularity {
 			row.Table = this;
 			foreach (var column in Schema.Columns)
 				column.OnRowAdded(row);		//Adds the row to parent relations, and handles calculated columns
-			row.OnAdded();
 			OnRowAdded(new RowListEventArgs(row, index));
+			row.OnAdded();		//Workaround: TableSynchronizer cannot handle ValueChanges before RowAdded; overrides wil change values
 		}
 		void ProcessRowRemoved(Row row, int index) {
 			row.Table = null;
