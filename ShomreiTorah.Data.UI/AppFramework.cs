@@ -94,6 +94,9 @@ namespace ShomreiTorah.Data.UI {
 		///<returns>A DataSyncContext used to synchronize with a database server.</returns>
 		protected abstract DataSyncContext CreateDataContext();
 
+		///<summary>Indicates whether EnableVisualStyles and SetCompatibleTextRenderingDefault have already been called.</summary>
+		///<remarks>Set this to true to prevent them from being called again.</remarks>
+		protected bool IsWinFormsSetup { get; set; }
 
 		///<summary>Runs the application.</summary>
 		protected void Run() {
@@ -102,8 +105,11 @@ namespace ShomreiTorah.Data.UI {
 			isDesignTime = false;
 			Current = this;
 
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
+			if (!IsWinFormsSetup) {
+				Application.EnableVisualStyles();
+				Application.SetCompatibleTextRenderingDefault(false);
+				IsWinFormsSetup = true;
+			}
 
 			StartSplash();
 			if (!Debugger.IsAttached) {
@@ -235,7 +241,7 @@ namespace ShomreiTorah.Data.UI {
 		public FrameworkBindingSource(IContainer container) : base(container) { container.Add(this); Init(); }
 		void Init() {
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
-DataSource = DisplaySettings.GridManager.DefaultDataSource;
+			DataSource = DisplaySettings.GridManager.DefaultDataSource;
 		}
 
 		///<summary>Gets or sets the data source that the connector binds to.</summary>
