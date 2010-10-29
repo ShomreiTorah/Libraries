@@ -50,7 +50,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					new DataSourceColumn("HisName", 95) { ShouldFilter = true },
 					new DataSourceColumn("HerName", 75) { ShouldFilter = true },
 					new DataSourceColumn("Phone"),
-					new DataSourceColumn("Address", 260),
+					new DataSourceColumn("Address", 150),
 					new DataSourceColumn("Zip", 50)
 				);
 
