@@ -41,7 +41,6 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		}
 
 		public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors) {
-			Debug.Assert(listAccessors == null || listAccessors.Length == 0, (listAccessors ?? new PropertyDescriptor[0]).Select(pd => pd.Name).Join("."));
 			return listAccessors.GetProperties(() => PropertyDescriptors);
 		}
 
