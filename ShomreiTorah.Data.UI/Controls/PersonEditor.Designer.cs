@@ -27,7 +27,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			this.dataLayoutControl1 = new DevExpress.XtraDataLayout.DataLayoutControl();
 			this.LastNameTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
-			this.contextBinder1 = new ShomreiTorah.Data.UI.Controls.ContextBinder();
+			this.contextBinder1 = new ShomreiTorah.Data.UI.Controls.DesignerBinder();
 			this.HisNameTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.HerNameTextEdit = new DevExpress.XtraEditors.TextEdit();
 			this.FullNameTextEdit = new DevExpress.XtraEditors.TextEdit();
@@ -482,7 +482,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		#endregion
 
 		private EditorSettingsApplier editorSettingsApplier1;
-		private ContextBinder contextBinder1;
+		private DesignerBinder contextBinder1;
 		private DevExpress.XtraDataLayout.DataLayoutControl dataLayoutControl1;
 		private DevExpress.XtraEditors.TextEdit LastNameTextEdit;
 		private DevExpress.XtraEditors.TextEdit HisNameTextEdit;

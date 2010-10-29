@@ -135,8 +135,19 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 		#endregion
 	}
-	class ContextBinder : BindableDataContextBase {
+	///<summary>A component that binds to a dummy DataContext for use in designers in libraries.</summary>
+	class DesignerBinder : BindableDataContextBase {
 		protected override DataContext FindDataContext() {
+			//DesignerBinders should not be used in real programs.
+			//However, they will still be used by library controls
+			//InitializeComponents, so they must work in programs.
+			//If the program has calculated columns that reference
+			//other tables, we won't be able to easily create this
+			//DataContext.  Therefore, I use the AppFramework when
+			//available.
+			if (AppFramework.Current != null)	
+				return AppFramework.Current.DataContext;
+
 			var context = new DataContext();
 			context.Tables.AddTable(Person.CreateTable());
 			return context;
