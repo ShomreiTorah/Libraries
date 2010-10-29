@@ -219,7 +219,7 @@
     </Column>
   </Schema>
   <Schema Name="SeatingReservations" RowClassDescription="Describes a ימים נוראים seating reservation." RowClassName="SeatingReservation" RowClassVisibility="Public" SqlName="SeatingReservations" SqlSchemaName="Seating" PrimaryKeyName="Id">
-    <Column Name="Id" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the id of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Id" PropertyVisibility="Public" SqlName="Id">
+    <Column Name="Id" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Id" PropertyVisibility="Public" SqlName="Id">
       <DefaultValue>
         <Null />
       </DefaultValue>
