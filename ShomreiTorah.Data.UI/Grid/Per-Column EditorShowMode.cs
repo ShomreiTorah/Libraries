@@ -35,7 +35,13 @@ namespace ShomreiTorah.Data.UI.Grid {
 				if (e.Button == MouseButtons.Left && View.IsDefaultState) {
 					var col = DownPointHitInfo.Column as SmartGridColumn;
 					if (col != null && DownPointHitInfo.InRowCell) {
-						if (col.ShowEditorOnMouseDown && View.GetShowEditorMode() != EditorShowMode.MouseDown) {
+						//If the column should be mouse activated,
+						//but the rest of the grid should not, and
+						//the user isn't holding down shift, focus
+						//the editor.
+						if (col.ShowEditorOnMouseDown
+						 && View.GetShowEditorMode() != EditorShowMode.MouseDown
+						 && Control.ModifierKeys == 0) {		//Don't interfere with multi-selection
 							View.ShowEditorByMouse();
 
 							if (SmartOwner != null) {	//The designer's feature browser uses a different control.
