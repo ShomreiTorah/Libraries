@@ -122,6 +122,8 @@ namespace ShomreiTorah.Singularity.Sql {
 
 		void Table_ValueChanged(object sender, ValueChangedEventArgs e) {
 			if (isReadingDB) return;
+			if (Mapping.Columns[e.Column] == null) return;	//Ignore changes to unmapped columns.
+
 			var changeIndex = GetChangeIndex(e.Row);
 
 			if (changeIndex >= 0)
