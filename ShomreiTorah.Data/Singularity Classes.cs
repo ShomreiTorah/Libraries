@@ -229,7 +229,7 @@ namespace ShomreiTorah.Data {
             UseHtmlColumn = Schema.Columns.AddValueColumn("UseHtml", typeof(Boolean), null);
             UseHtmlColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresss");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresses");
             PersonColumn.AllowNulls = true;
             #endregion
             
@@ -632,7 +632,7 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets the person's payments.</summary>
         public IChildRowCollection<Payment> Payments { get { return TypedChildRows<Payment>(Payment.PersonColumn); } }
         ///<summary>Gets the person's email addresses.</summary>
-        public IChildRowCollection<EmailAddress> EmailAddresss { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
+        public IChildRowCollection<EmailAddress> EmailAddresses { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
         ///<summary>Gets the statements sent to the person.</summary>
         public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         #endregion
