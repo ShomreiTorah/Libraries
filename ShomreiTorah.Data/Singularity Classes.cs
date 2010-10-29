@@ -63,7 +63,7 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the deposit id of the deposit.</summary>
+        ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Guid DepositId {
@@ -230,7 +230,7 @@ namespace ShomreiTorah.Data {
             UseHtmlColumn = Schema.Columns.AddValueColumn("UseHtml", typeof(Boolean), null);
             UseHtmlColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresss");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresses");
             PersonColumn.AllowNulls = true;
             #endregion
             
@@ -254,7 +254,7 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the mail ID of the tbl ML member.</summary>
+        ///<summary>Gets or sets the numeric ID of the subscriber.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Int32 Id {
@@ -542,7 +542,7 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the id of the master directory.</summary>
+        ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Guid Id {
@@ -877,7 +877,7 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the payment id of the payment.</summary>
+        ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Guid PaymentId {
@@ -1216,7 +1216,7 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the pledge id of the pledge.</summary>
+        ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Guid PledgeId {
@@ -1765,7 +1765,7 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the id of the statement log.</summary>
+        ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Guid Id {
