@@ -18,7 +18,7 @@ namespace ShomreiTorah.Singularity {
 			Schema.AddRow(this);
 			if (Schema.PrimaryKey != null && schema.PrimaryKey.DataType == typeof(Guid) && schema.PrimaryKey.DefaultValue == null)
 				values[Schema.PrimaryKey] = Guid.NewGuid();	//Bypass the indexer to ignore child validation (Virtual method calls from ctor)
- 		}
+		}
 
 		readonly Dictionary<Column, object> values;
 
