@@ -93,11 +93,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var desiredHeight = heightOverride ?? rect.Height;
 
 			if (desiredHeight > naturalHeight) {
-				if (ViewInfo.IsTopSizeBar)	//If the popup is above the editor, adjust the Y coordinate to preserve the bottom
-					rect.Y += desiredHeight - naturalHeight;
 				rect.Height = naturalHeight;
 			} else
 				rect.Height = desiredHeight;
+
+			if (ViewInfo.IsTopSizeBar)	//If the popup is above the editor, adjust the Y coordinate to preserve the bottom
+				rect.Y = Bounds.Bottom - rect.Height;
 
 			return rect;
 		}
