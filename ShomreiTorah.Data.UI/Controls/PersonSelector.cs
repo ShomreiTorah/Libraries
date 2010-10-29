@@ -23,7 +23,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public Person SelectedPerson {
-			get { return (Person)base.EditValue; }
+			get { return base.EditValue as Person; }
 			set { base.EditValue = value; }
 		}
 
@@ -37,6 +37,22 @@ namespace ShomreiTorah.Data.UI.Controls {
 			else
 				SuperTip = SelectedPerson.GetSuperTip();
 		}
+		///<summary>Prompts the user to create a new person.</summary>
+		protected internal virtual Person PromptNew() { return AppFramework.Current.PromptPerson(); }
+
+		///<summary>Gets settings specific to the PersonSelector.</summary>
+		[Category("Properties")]
+		[Description("Gets an object containing properties, methods and events specific to the control.")]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+		public new RepositoryItemPersonSelector Properties { get { return (RepositoryItemPersonSelector)base.Properties; } }
+
+		///<summary>Occurs before a person is selecting using the UI.</summary>
+		[Description("Occurs before a person is selecting using the UI.")]
+		[Category("Data")]
+		public event EventHandler<PersonSelectingEventArgs> PersonSelecting {
+			add { Properties.PersonSelecting += value; }
+			remove { Properties.PersonSelecting -= value; }
+		}
 	}
 	[UserRepositoryItem("Register")]
 	public class RepositoryItemPersonSelector : RepositoryItemItemSelector {
@@ -49,7 +65,9 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Gets the owning editor's type name.</summary>
 		public override string EditorTypeName { get { return "PersonSelector"; } }
 		///<summary>Gets the owning ItemSelector.</summary>
-		public new ItemSelector OwnerEdit { get { return (PersonSelector)base.OwnerEdit; } }
+		[Browsable(false)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public new PersonSelector OwnerEdit { get { return (PersonSelector)base.OwnerEdit; } }
 		#endregion
 
 		const string DefaultNullValuePrompt = "Click here to select a person, or type to search";
@@ -106,7 +124,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		protected override void RaiseButtonClick(ButtonPressedEventArgs e) {
 			base.RaiseButtonClick(e);
 			if (e.Button.Index == 1) {
-				var person = AppFramework.Current.PromptPerson();
+				var person = OwnerEdit.PromptNew();
 				if (person != null && !RaisePersonSelecting(person, PersonSelectionReason.Created))
 					return;
 				OwnerEdit.EditValue = person;
