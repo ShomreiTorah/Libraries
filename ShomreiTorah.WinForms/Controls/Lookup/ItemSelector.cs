@@ -144,15 +144,15 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 
 		protected override void OnMaskBox_ValueChanged(object sender, EventArgs e) {
-			//Suppress EditValue changes
+			//Suppress EditValue changes when editing the filter
 			//base.OnMaskBox_ValueChanged(sender, e);
 		}
 		protected override void OnMaskBox_ValueChanging(object sender, ChangingEventArgs e) {
-			//Suppress EditValue changes
+			//Suppress EditValue changes when editing the filter
 			//base.OnMaskBox_ValueChanging(sender, e);
 		}
 		protected override void OnMouseDownClosePopup() {
-			//Don't close the popup
+			//Don't close the popup on a MouseDown in the editor
 			//base.OnMouseDownClosePopup();
 		}
 		protected override void OnMaskBox_Click(object sender, EventArgs e) {
@@ -166,12 +166,17 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			RunFilter(force: true);
 			base.DoShowPopup();
 		}
-
 		protected override void AcceptPopupValue(object val) {
 			//DevExpress will occasionally close the popup
 			//and accept a null value.  I don't want that.
 			if (val != null)
 				base.AcceptPopupValue(val);
+		}
+		protected override void DoClosePopup(PopupCloseMode closeMode) {
+			//Clear the filter textbox without
+			//affecting the editor's EditValue
+			MaskBox.SetEditValue("", "", true);
+			base.DoClosePopup(closeMode);
 		}
 	}
 
