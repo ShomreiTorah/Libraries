@@ -146,6 +146,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == DepositIdColumn)
             	OnDepositIdChanged((Guid)oldValue, (Guid)newValue);
@@ -155,8 +156,6 @@ namespace ShomreiTorah.Data {
             	OnNumberChanged((Int32)oldValue, (Int32)newValue);
             else if (column == AccountColumn)
             	OnAccountChanged((String)oldValue, (String)newValue);
-            
-            base.OnValueChanged(column, oldValue, newValue);
         }
         #endregion
     }
@@ -230,7 +229,7 @@ namespace ShomreiTorah.Data {
             UseHtmlColumn = Schema.Columns.AddValueColumn("UseHtml", typeof(Boolean), null);
             UseHtmlColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresses");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresss");
             PersonColumn.AllowNulls = true;
             #endregion
             
@@ -410,6 +409,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Int32)oldValue, (Int32)newValue);
@@ -431,8 +431,6 @@ namespace ShomreiTorah.Data {
             	OnUseHtmlChanged((Boolean)oldValue, (Boolean)newValue);
             else if (column == PersonColumn)
             	OnPersonChanged((Person)oldValue, (Person)newValue);
-            
-            base.OnValueChanged(column, oldValue, newValue);
         }
         #endregion
     }
@@ -634,7 +632,7 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets the person's payments.</summary>
         public IChildRowCollection<Payment> Payments { get { return TypedChildRows<Payment>(Payment.PersonColumn); } }
         ///<summary>Gets the person's email addresses.</summary>
-        public IChildRowCollection<EmailAddress> EmailAddresses { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
+        public IChildRowCollection<EmailAddress> EmailAddresss { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
         ///<summary>Gets the statements sent to the person.</summary>
         public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         #endregion
@@ -735,6 +733,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
@@ -760,8 +759,6 @@ namespace ShomreiTorah.Data {
             	OnPhoneChanged((String)oldValue, (String)newValue);
             else if (column == SourceColumn)
             	OnSourceChanged((String)oldValue, (String)newValue);
-            
-            base.OnValueChanged(column, oldValue, newValue);
         }
         #endregion
     }
@@ -1072,6 +1069,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == PaymentIdColumn)
             	OnPaymentIdChanged((Guid)oldValue, (Guid)newValue);
@@ -1099,8 +1097,6 @@ namespace ShomreiTorah.Data {
             	OnExternalSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
             	OnExternalIdChanged((Int32?)oldValue, (Int32?)newValue);
-            
-            base.OnValueChanged(column, oldValue, newValue);
         }
         #endregion
     }
@@ -1416,6 +1412,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == PledgeIdColumn)
             	OnPledgeIdChanged((Guid)oldValue, (Guid)newValue);
@@ -1443,8 +1440,6 @@ namespace ShomreiTorah.Data {
             	OnExternalSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
             	OnExternalIdChanged((Int32?)oldValue, (Int32?)newValue);
-            
-            base.OnValueChanged(column, oldValue, newValue);
         }
         #endregion
     }
@@ -1531,7 +1526,7 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the id of the seating reservation.</summary>
+        ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Guid Id {
@@ -1661,6 +1656,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
@@ -1678,8 +1674,6 @@ namespace ShomreiTorah.Data {
             	OnNotesChanged((String)oldValue, (String)newValue);
             else if (column == StatusColumn)
             	OnStatusChanged((String)oldValue, (String)newValue);
-            
-            base.OnValueChanged(column, oldValue, newValue);
         }
         #endregion
     }
@@ -1895,6 +1889,7 @@ namespace ShomreiTorah.Data {
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
             	OnIdChanged((Guid)oldValue, (Guid)newValue);
@@ -1912,8 +1907,6 @@ namespace ShomreiTorah.Data {
             	OnEndDateChanged((DateTime)oldValue, (DateTime)newValue);
             else if (column == UserNameColumn)
             	OnUserNameChanged((String)oldValue, (String)newValue);
-            
-            base.OnValueChanged(column, oldValue, newValue);
         }
         #endregion
     }
