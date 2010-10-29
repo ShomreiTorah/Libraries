@@ -119,7 +119,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				throw new InvalidOperationException("No item is hovered");
 
 			var item = Items[ViewInfo.HoveredIndex.Value];
-			if (!Properties.RaiseItemSelecting(ResultValue))
+			if (!Properties.RaiseItemSelecting(item))
 				return;
 			popupResultValue = item;
 			ClosePopup(PopupCloseMode.Normal);
