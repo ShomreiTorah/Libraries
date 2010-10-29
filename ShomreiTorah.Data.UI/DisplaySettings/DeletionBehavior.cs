@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using DevExpress.Utils;
 using ShomreiTorah.Common;
 using ShomreiTorah.Data.UI.Grid;
 using ShomreiTorah.WinForms;
@@ -50,12 +51,15 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		///<summary>Applies the behavior to a SmartGridView.</summary>
 		public void Apply(SmartGridView view) {
-			view.KeyDown += View_KeyDown;
+			if (view.OptionsBehavior.AllowDeleteRows != DefaultBoolean.False)
+				view.KeyDown += View_KeyDown;
 		}
 
 		void View_KeyDown(object sender, KeyEventArgs e) {
 			if (e.KeyCode == Keys.Delete) {
 				var view = (SmartGridView)sender;
+				if (view.OptionsBehavior.AllowDeleteRows == DefaultBoolean.False)
+					return;
 				var rows = view.GetSelectedRows().Where(r => r >= 0).Select(view.GetRow);
 
 				if (!rows.Any()) return;
