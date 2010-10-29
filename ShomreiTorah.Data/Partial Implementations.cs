@@ -10,7 +10,7 @@ using ShomreiTorah.Singularity;
 namespace ShomreiTorah.Data {
 	partial class Person {
 		partial void OnFullNameChanged(string oldValue, string newValue) {
-			if (Table == null || Table.Context == null)
+			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
 			var emails = Table.Context.Table<EmailAddress>();
 			if (emails != null) return;
@@ -128,7 +128,7 @@ namespace ShomreiTorah.Data {
 	partial class Payment {
 		///<summary>Called before the row is removed from its table.</summary>
 		protected override void OnRemoving() {
-			if (Deposit != null && Deposit.Payments.Count == 1)
+			if (!Table.IsLoadingData && Deposit != null && Deposit.Payments.Count == 1)
 				Deposit.RemoveRow();
 		}
 		partial void OnDepositChanged(Deposit oldValue, Deposit newValue) {
@@ -143,8 +143,10 @@ namespace ShomreiTorah.Data {
 	partial class Pledge {
 		///<summary>Called when the row is added to a table.</summary>
 		protected override void OnAdded() {
-			Modifier = Environment.UserName;
-			Modified = DateTime.UtcNow;
+			if (!Table.IsLoadingData) {
+				Modifier = Environment.UserName;
+				Modified = DateTime.UtcNow;
+			}
 		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
 			if (Table != null && !Table.IsLoadingData
@@ -157,8 +159,10 @@ namespace ShomreiTorah.Data {
 	partial class Payment {
 		///<summary>Called when the row is added to a table.</summary>
 		protected override void OnAdded() {
-			Modifier = Environment.UserName;
-			Modified = DateTime.UtcNow;
+			if (!Table.IsLoadingData) {
+				Modifier = Environment.UserName;
+				Modified = DateTime.UtcNow;
+			}
 		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
 			if (Table != null && !Table.IsLoadingData
