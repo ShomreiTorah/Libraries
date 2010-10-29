@@ -575,7 +575,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			SelectionBackgroundElement = CommonSkins.GetSkin(LookAndFeel)[CommonSkins.SkinLayoutItemBackground];
 
-			if (OwnerEdit.EditValue == null || Item.SelectionIcon == null) {
+			if (OwnerEdit.EditValue == null || OwnerEdit.EditValue == DBNull.Value || Item.SelectionIcon == null) {
 				Image = null;
 				ImageBounds = new Rectangle(ContentRect.Location, Size.Empty);
 				DrawSelectedItem = false;
