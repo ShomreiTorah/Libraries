@@ -139,7 +139,7 @@ namespace ShomreiTorah.Singularity {
 			foreach (var column in Schema.Columns)
 				column.OnRowAdded(row);		//Adds the row to parent relations, and handles calculated columns
 			OnRowAdded(new RowListEventArgs(row, index));
-			row.OnAdded();		//Workaround: TableSynchronizer cannot handle ValueChanges before RowAdded; overrides wil change values
+			row.OnAdded();		//Workaround: TableSynchronizer cannot handle ValueChanges before RowAdded; overrides will change values
 		}
 		void ProcessRowRemoved(Row row, int index) {
 			row.Table = null;
