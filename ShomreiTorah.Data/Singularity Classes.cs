@@ -189,18 +189,12 @@ namespace ShomreiTorah.Data {
         ///<summary>Creates a strongly-typed EmailAddresses table.</summary>
         public static TypedTable<EmailAddress> CreateTable() { return new TypedTable<EmailAddress>(Schema, () => new EmailAddress()); }
         
-        ///<summary>Gets the schema's Id column.</summary>
-        public static ValueColumn IdColumn { get; private set; }
         ///<summary>Gets the schema's Name column.</summary>
         public static ValueColumn NameColumn { get; private set; }
         ///<summary>Gets the schema's Email column.</summary>
         public static ValueColumn EmailColumn { get; private set; }
         ///<summary>Gets the schema's RandomCode column.</summary>
         public static ValueColumn RandomCodeColumn { get; private set; }
-        ///<summary>Gets the schema's Password column.</summary>
-        public static ValueColumn PasswordColumn { get; private set; }
-        ///<summary>Gets the schema's Salt column.</summary>
-        public static ValueColumn SaltColumn { get; private set; }
         ///<summary>Gets the schema's Active column.</summary>
         public static ValueColumn ActiveColumn { get; private set; }
         ///<summary>Gets the schema's DateAdded column.</summary>
@@ -223,10 +217,6 @@ namespace ShomreiTorah.Data {
             #region Create Schema
             Schema = new TypedSchema<EmailAddress>("EmailAddresses");
             
-            Schema.PrimaryKey = IdColumn = Schema.Columns.AddValueColumn("Id", typeof(Int32), null);
-            IdColumn.Unique = true;
-            IdColumn.AllowNulls = false;
-            
             NameColumn = Schema.Columns.AddValueColumn("Name", typeof(String), null);
             NameColumn.AllowNulls = true;
             
@@ -235,12 +225,6 @@ namespace ShomreiTorah.Data {
             
             RandomCodeColumn = Schema.Columns.AddValueColumn("RandomCode", typeof(String), null);
             RandomCodeColumn.AllowNulls = true;
-            
-            PasswordColumn = Schema.Columns.AddValueColumn("Password", typeof(String), null);
-            PasswordColumn.AllowNulls = true;
-            
-            SaltColumn = Schema.Columns.AddValueColumn("Salt", typeof(String), null);
-            SaltColumn.AllowNulls = true;
             
             ActiveColumn = Schema.Columns.AddValueColumn("Active", typeof(Boolean), null);
             ActiveColumn.AllowNulls = false;
@@ -254,7 +238,8 @@ namespace ShomreiTorah.Data {
             PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresses");
             PersonColumn.AllowNulls = true;
             
-            RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             #endregion
             
@@ -263,12 +248,9 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SqlName = "tblMLMembers";
             SchemaMapping.SqlSchemaName = "dbo";
             
-            SchemaMapping.Columns.AddMapping(IdColumn, "Mail_ID");
             SchemaMapping.Columns.AddMapping(NameColumn, "Name");
             SchemaMapping.Columns.AddMapping(EmailColumn, "Email");
             SchemaMapping.Columns.AddMapping(RandomCodeColumn, "ID_Code");
-            SchemaMapping.Columns.AddMapping(PasswordColumn, "Password");
-            SchemaMapping.Columns.AddMapping(SaltColumn, "Salt");
             SchemaMapping.Columns.AddMapping(ActiveColumn, "Active");
             SchemaMapping.Columns.AddMapping(DateAddedColumn, "Join_Date");
             SchemaMapping.Columns.AddMapping(UseHtmlColumn, "HTMLformat");
@@ -279,13 +261,6 @@ namespace ShomreiTorah.Data {
         }
         
         #region Value Properties
-        ///<summary>Gets or sets the numeric ID of the subscriber.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Int32 Id {
-            get { return base.Field<Int32>(IdColumn); }
-            set { base[IdColumn] = value; }
-        }
         ///<summary>Gets or sets the name of the tbl ML member.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
@@ -306,20 +281,6 @@ namespace ShomreiTorah.Data {
         public String RandomCode {
             get { return base.Field<String>(RandomCodeColumn); }
             set { base[RandomCodeColumn] = value; }
-        }
-        ///<summary>Gets or sets the password of the tbl ML member.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public String Password {
-            get { return base.Field<String>(PasswordColumn); }
-            set { base[PasswordColumn] = value; }
-        }
-        ///<summary>Gets or sets the salt of the tbl ML member.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public String Salt {
-            get { return base.Field<String>(SaltColumn); }
-            set { base[SaltColumn] = value; }
         }
         ///<summary>Gets or sets the active of the tbl ML member.</summary>
         [DebuggerNonUserCode]
@@ -361,9 +322,6 @@ namespace ShomreiTorah.Data {
         #region Partial Methods
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
-        partial void ValidateId(Int32 newValue, Action<string> error);
-        partial void OnIdChanged(Int32 oldValue, Int32 newValue);
-        
         partial void ValidateName(String newValue, Action<string> error);
         partial void OnNameChanged(String oldValue, String newValue);
         
@@ -372,12 +330,6 @@ namespace ShomreiTorah.Data {
         
         partial void ValidateRandomCode(String newValue, Action<string> error);
         partial void OnRandomCodeChanged(String oldValue, String newValue);
-        
-        partial void ValidatePassword(String newValue, Action<string> error);
-        partial void OnPasswordChanged(String oldValue, String newValue);
-        
-        partial void ValidateSalt(String newValue, Action<string> error);
-        partial void OnSaltChanged(String oldValue, String newValue);
         
         partial void ValidateActive(Boolean newValue, Action<string> error);
         partial void OnActiveChanged(Boolean oldValue, Boolean newValue);
@@ -408,10 +360,7 @@ namespace ShomreiTorah.Data {
             if (!String.IsNullOrEmpty(error)) return error;
             Action<string> reporter = s => error = s;
             
-            if (column == IdColumn) {
-                ValidateId((Int32)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == NameColumn) {
+            if (column == NameColumn) {
                 ValidateName((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == EmailColumn) {
@@ -419,12 +368,6 @@ namespace ShomreiTorah.Data {
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == RandomCodeColumn) {
                 ValidateRandomCode((String)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == PasswordColumn) {
-                ValidatePassword((String)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == SaltColumn) {
-                ValidateSalt((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == ActiveColumn) {
                 ValidateActive((Boolean)newValue, reporter);
@@ -450,18 +393,12 @@ namespace ShomreiTorah.Data {
         protected override void OnValueChanged(Column column, object oldValue, object newValue) {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
-            if (column == IdColumn)
-            	OnIdChanged((Int32)oldValue, (Int32)newValue);
-            else if (column == NameColumn)
+            if (column == NameColumn)
             	OnNameChanged((String)oldValue, (String)newValue);
             else if (column == EmailColumn)
             	OnEmailChanged((String)oldValue, (String)newValue);
             else if (column == RandomCodeColumn)
             	OnRandomCodeChanged((String)oldValue, (String)newValue);
-            else if (column == PasswordColumn)
-            	OnPasswordChanged((String)oldValue, (String)newValue);
-            else if (column == SaltColumn)
-            	OnSaltChanged((String)oldValue, (String)newValue);
             else if (column == ActiveColumn)
             	OnActiveChanged((Boolean)oldValue, (Boolean)newValue);
             else if (column == DateAddedColumn)

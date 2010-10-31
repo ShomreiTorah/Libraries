@@ -270,12 +270,7 @@
       </DefaultValue>
     </Column>
   </Schema>
-  <Schema Name="EmailAddresses" RowClassDescription="Describes a subscriber to the email list." RowClassName="EmailAddress" RowClassVisibility="Public" SqlName="tblMLMembers" SqlSchemaName="dbo" PrimaryKeyName="Id">
-    <Column Name="Id" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the numeric ID of the subscriber." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Id" PropertyVisibility="Public" SqlName="Mail_ID">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
+  <Schema Name="EmailAddresses" RowClassDescription="Describes a subscriber to the email list." RowClassName="EmailAddress" RowClassVisibility="Public" SqlName="tblMLMembers" SqlSchemaName="dbo" PrimaryKeyName="RowId">
     <Column Name="Name" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the name of the tbl ML member." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Name" PropertyVisibility="Public" SqlName="Name">
       <DefaultValue>
         <Null />
@@ -287,16 +282,6 @@
       </DefaultValue>
     </Column>
     <Column Name="RandomCode" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets a random string unique to this address." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="RandomCode" PropertyVisibility="Public" SqlName="ID_Code">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Password" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the password of the tbl ML member." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Password" PropertyVisibility="Public" SqlName="Password">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Salt" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the salt of the tbl ML member." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Salt" PropertyVisibility="Public" SqlName="Salt">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -321,7 +306,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
       <DefaultValue>
         <Null />
       </DefaultValue>

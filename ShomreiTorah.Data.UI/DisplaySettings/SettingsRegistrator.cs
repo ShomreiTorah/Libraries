@@ -91,7 +91,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.SuppressColumns(Pledge.ExternalSourceColumn, Pledge.ExternalIdColumn);
 			GridManager.SuppressColumns(Payment.ExternalSourceColumn, Payment.ExternalIdColumn);
 
-			GridManager.SuppressColumns(EmailAddress.ActiveColumn, EmailAddress.PasswordColumn, EmailAddress.RandomCodeColumn, EmailAddress.SaltColumn, EmailAddress.UseHtmlColumn);
+			GridManager.SuppressColumns(EmailAddress.ActiveColumn, EmailAddress.RandomCodeColumn, EmailAddress.UseHtmlColumn);
 
 			GridManager.SuppressColumn(c => {
 				//Detail views in the designer won't have column types.
