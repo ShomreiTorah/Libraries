@@ -178,6 +178,22 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			MaskBox.SetEditValue("", "", true);
 			base.DoClosePopup(closeMode);
 		}
+
+		internal bool PreventCloseOnFocusLost { get; set; }
+		bool isLosingFocus;
+		//base.OnLostFocus calls ClosePopup(PopupCloseMode.Immediate),
+		//which I want to suppress during the ItemSelecting event.
+		protected override void OnLostFocus(EventArgs e) {
+			try {
+				isLosingFocus = true;
+				base.OnLostFocus(e);
+			} finally { isLosingFocus = false; }
+		}
+		protected override void ClosePopup(PopupCloseMode closeMode) {
+			if (closeMode == PopupCloseMode.Immediate && isLosingFocus)
+				return;
+			base.ClosePopup(closeMode);
+		}
 	}
 
 
@@ -499,7 +515,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			SetEditorData();
 		}
 
-		#region Events
+		#region ItemSelecting Event
 		///<summary>Raises the ItemSelecting event.</summary>
 		///<param name="newVal">The item that is being selected.</param>
 		///<returns>False if the selection was cancelled.</returns>
@@ -514,8 +530,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<summary>Raises the ItemSelecting event.</summary>
 		///<param name="e">A ItemSelectingEventArgs object that provides the event data.</param>
 		internal protected virtual void OnItemSelecting(ItemSelectingEventArgs e) {
-			if (ItemSelecting != null)
-				ItemSelecting(GetEventSender(), e);
+			var handler = ItemSelecting;
+			if (handler == null) return;
+			try {
+				OwnerEdit.PreventCloseOnFocusLost = true;
+				handler(GetEventSender(), e);
+			} finally { OwnerEdit.PreventCloseOnFocusLost = false; }
 		}
 		#endregion
 	}
