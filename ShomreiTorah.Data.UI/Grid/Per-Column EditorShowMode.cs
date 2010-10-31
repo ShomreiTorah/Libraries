@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
-using DevExpress.Utils.Serializing;
 using System.Windows.Forms;
 using DevExpress.Utils;
+using DevExpress.Utils.Serializing;
+using DevExpress.XtraGrid.Views.Grid;
 
 namespace ShomreiTorah.Data.UI.Grid {
 	partial class SmartGridColumn {
@@ -32,7 +29,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 				//If the user mouse-downed in a cell and the column
 				//overrode EditorShowMode, show the editor.    This
 				//code was copied from the GridHandler source.
-				if (e.Button == MouseButtons.Left && View.IsDefaultState) {
+				if (e.Button == MouseButtons.Left
+				 && (View.IsDefaultState || View.State == GridState.Editing)) {
 					var col = DownPointHitInfo.Column as SmartGridColumn;
 					if (col != null && DownPointHitInfo.InRowCell) {
 						//If the column should be mouse activated,
