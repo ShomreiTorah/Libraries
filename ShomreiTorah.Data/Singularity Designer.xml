@@ -21,6 +21,16 @@
         <Null />
       </DefaultValue>
     </Column>
+    <Column Name="Amount" AllowNulls="false" DataType="System.Decimal, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets the total value of the payments in the deposit." Expression="row.Payments.Sum(p =&gt; p.Amount)" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="false" IsUnique="false" PropertyName="Amount" PropertyVisibility="Public" SqlName="">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Count" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets the number of payments in the deposit." Expression="row.Payments.Count" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="false" IsUnique="false" PropertyName="Count" PropertyVisibility="Public" SqlName="">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
   </Schema>
   <Schema Name="MasterDirectory" RowClassDescription="Describes a person." RowClassName="Person" RowClassVisibility="Public" SqlName="MasterDirectory" SqlSchemaName="Data" PrimaryKeyName="Id">
     <Column Name="Id" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Id" PropertyVisibility="Public" SqlName="Id">

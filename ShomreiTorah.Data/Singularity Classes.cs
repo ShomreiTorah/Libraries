@@ -23,6 +23,10 @@ namespace ShomreiTorah.Data {
         public static ValueColumn NumberColumn { get; private set; }
         ///<summary>Gets the schema's Account column.</summary>
         public static ValueColumn AccountColumn { get; private set; }
+        ///<summary>Gets the schema's Amount column.</summary>
+        public static CalculatedColumn AmountColumn { get; private set; }
+        ///<summary>Gets the schema's Count column.</summary>
+        public static CalculatedColumn CountColumn { get; private set; }
         
         ///<summary>Gets the Deposits schema instance.</summary>
         public static new TypedSchema<Deposit> Schema { get; private set; }
@@ -47,6 +51,10 @@ namespace ShomreiTorah.Data {
             
             AccountColumn = Schema.Columns.AddValueColumn("Account", typeof(String), null);
             AccountColumn.AllowNulls = false;
+            
+            AmountColumn = Schema.Columns.AddCalculatedColumn<Deposit, Decimal>("Amount", row => row.Payments.Sum(p => p.Amount));
+            
+            CountColumn = Schema.Columns.AddCalculatedColumn<Deposit, Int32>("Count", row => row.Payments.Count);
             #endregion
             
             #region Create SchemaMapping
@@ -90,6 +98,18 @@ namespace ShomreiTorah.Data {
         public String Account {
             get { return base.Field<String>(AccountColumn); }
             set { base[AccountColumn] = value; }
+        }
+        ///<summary>Gets the total value of the payments in the deposit.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Decimal Amount {
+            get { return base.Field<Decimal>(AmountColumn); }
+        }
+        ///<summary>Gets the number of payments in the deposit.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 Count {
+            get { return base.Field<Int32>(CountColumn); }
         }
         #endregion
         
