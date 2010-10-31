@@ -17,7 +17,10 @@ namespace ShomreiTorah.Data.UI.Grid {
 	[ToolboxBitmap(typeof(GridControl), "Bitmaps256.GridControl.bmp")]
 	public partial class SmartGrid : GridControl {
 		///<summary>Initializes a new SmartGrid instance.</summary>
-		public SmartGrid() {
+		public SmartGrid() { Init(); }
+		///<summary>Initializes a new SmartGrid instance.</summary>
+		public SmartGrid(IContainer container) { container.Add(this); Init(); }
+		void Init() {
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 			Source = DisplaySettings.GridManager.DefaultDataSource;
 		}
