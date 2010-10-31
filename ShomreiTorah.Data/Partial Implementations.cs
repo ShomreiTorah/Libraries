@@ -149,7 +149,7 @@ namespace ShomreiTorah.Data {
 			}
 		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
-			if (Table != null && !Table.IsLoadingData
+			if ((Modifier == null || (Table != null && !Table.IsLoadingData))	//Don't overwrite the values when loading the table
 			 && column != ModifiedColumn && column != ModifierColumn) {
 				Modifier = Environment.UserName;
 				Modified = DateTime.UtcNow;
@@ -165,7 +165,7 @@ namespace ShomreiTorah.Data {
 			}
 		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
-			if (Table != null && !Table.IsLoadingData
+			if ((Modifier == null || (Table != null && !Table.IsLoadingData))	//Don't overwrite the values when loading the table
 			 && column != ModifiedColumn && column != ModifierColumn && column != DepositColumn) {
 				Modifier = Environment.UserName;
 				Modified = DateTime.UtcNow;
