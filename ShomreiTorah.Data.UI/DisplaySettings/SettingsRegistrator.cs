@@ -62,6 +62,29 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					new DataSourceColumn("Phone")
 				);
 			});
+			EditorRepository.PersonOwnedLookup.AddConfigurator(item => {
+				if (item.SelectionIcon == null)
+					item.SelectionIcon = Resources.People16;
+
+				item.Columns.Clear();
+				item.AdditionalResultColumns.Clear();
+				item.Columns.AddRange(
+					new CustomColumn<IOwnedObject>(o => o.Person.LastName, 100) { ShouldFilter = true },
+					new CustomColumn<IOwnedObject>(o => o.Person.HisName, 95) { ShouldFilter = true },
+					new CustomColumn<IOwnedObject>(o => o.Person.HerName, 75) { ShouldFilter = true },
+					new CustomColumn<IOwnedObject>(o => o.Person.Phone),
+					new CustomColumn<IOwnedObject>(o => o.Person.Address, 150),
+					new CustomColumn<IOwnedObject>(o => o.Person.Zip, 50)
+				);
+
+				item.ResultDisplayColumn = new CustomColumn<IOwnedObject>(o => o.Person.FullName);
+				item.SortColumn = new CustomColumn<IOwnedObject>(o => o.Person.LastName);
+
+				item.AdditionalResultColumns.AddRange(
+					new CustomColumn<IOwnedObject>(o => o.Person.Address),
+					new CustomColumn<IOwnedObject>(o => o.Person.Phone)
+				);
+			});
 		}
 		#region Column Suppressions
 		static void RegisterColumnSuppressions() {

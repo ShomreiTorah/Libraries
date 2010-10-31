@@ -47,6 +47,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			});
 			#endregion
 			PersonLookup = new MutableEditorSettings<RepositoryItemItemSelector>();
+			PersonOwnedLookup = new MutableEditorSettings<RepositoryItemItemSelector>();
 		}
 
 		///<summary>Gets the EditorSettings for a comments field in a grid.</summary>
@@ -67,6 +68,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		///<summary>Gets the EditorSettings for a lookup displaying the master directory.</summary>
 		public static MutableEditorSettings<RepositoryItemItemSelector> PersonLookup { get; private set; }
+		///<summary>Gets the EditorSettings for a lookup displaying a child table of the master directory.</summary>
+		public static MutableEditorSettings<RepositoryItemItemSelector> PersonOwnedLookup { get; private set; }
 
 		///<summary>Gets the number of behavior registrations,</summary>
 		///<remarks>This property is used by the grid to verify design-time
