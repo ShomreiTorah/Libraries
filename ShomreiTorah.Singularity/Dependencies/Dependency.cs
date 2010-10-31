@@ -40,6 +40,10 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		public AggregateDependency(IEnumerable<Dependency> dependencies) {
 			Dependencies = new ReadOnlyCollection<Dependency>(dependencies.ToArray());
 			RequiresDataContext = Dependencies.Any(d => d.RequiresDataContext);
+
+			foreach (var child in dependencies) {
+				child.RowInvalidated += (sender, e) => OnRowInvalidated(e);
+			}
 		}
 
 		///<summary>Gets the dependencies aggregated by this dependency.</summary>
