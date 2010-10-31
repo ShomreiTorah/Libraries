@@ -64,6 +64,7 @@ namespace ShomreiTorah.Singularity {
 				if (column.Schema != Schema) throw new ArgumentException("Column must belong to same schema", "column");
 				if (column.ReadOnly) throw new InvalidOperationException("A read-only column cannot be modified");
 
+				if (value == DBNull.Value) value = null;
 				var oldValue = this[column];
 
 				if (Equals(oldValue, value)) return;
