@@ -112,12 +112,8 @@ namespace ShomreiTorah.Singularity {
 		IList<Row> IRowEventProvider.Rows { get { return Rows; } }
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		bool IListSource.ContainsListCollection { get { return false; } }
-		DataBinding.TableBinder binder;
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
-		System.Collections.IList IListSource.GetList() {
-			if (binder == null) binder = new DataBinding.TableBinder(this);
-			return binder;
-		}
+		System.Collections.IList IListSource.GetList() { return new DataBinding.TableBinder(this); }
 
 		void ValidateAddRow(Row row) {
 			if (row.Table != null)

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A table containing a specific row type.</summary>
@@ -110,12 +109,7 @@ namespace ShomreiTorah.Singularity {
 		public new bool Contains(Row row) { return row != null && row.Table == ChildTable && row[Relation.ChildColumn] == ParentRow; }
 
 		public bool ContainsListCollection { get { return false; } }
-
-		DataBinding.ChildRowsBinder binder;
-		public System.Collections.IList GetList() {
-			if (binder == null) binder = new DataBinding.ChildRowsBinder(this);
-			return binder;
-		}
+		public System.Collections.IList GetList() { return new DataBinding.ChildRowsBinder(this); }
 
 		IList<Row> IRowEventProvider.Rows { get { return this; } }
 

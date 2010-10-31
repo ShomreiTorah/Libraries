@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
-using ShomreiTorah.Singularity.Dependencies;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Linq.Expressions;
+using ShomreiTorah.Singularity.Dependencies;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A filtered view of an existing table.</summary>
@@ -151,12 +150,8 @@ namespace ShomreiTorah.Singularity {
 
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		bool IListSource.ContainsListCollection { get { return false; } }
-		DataBinding.FilteredTableBinder<TRow> binder;
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
-		System.Collections.IList IListSource.GetList() {
-			if (binder == null) binder = new DataBinding.FilteredTableBinder<TRow>(this);
-			return binder;
-		}
+		System.Collections.IList IListSource.GetList() { return new DataBinding.FilteredTableBinder<TRow>(this); }
 
 
 		///<summary>Releases all resources used by the FilteredTable.</summary>
