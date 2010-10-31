@@ -148,6 +148,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 	public class CustomColumn<TItem> : CustomColumn {
 		///<summary>Creates a CustomColumn that uses the given delegate.</summary>
 		public CustomColumn(Func<TItem, string> getter) : base(o => getter((TItem)o)) { }
+		///<summary>Creates a CustomColumn that uses the given delegate.</summary>
+		public CustomColumn(Func<TItem, string> getter, int width) : base(o => getter((TItem)o)) { Width = width; }
 	}
-
 }
