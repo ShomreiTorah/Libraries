@@ -46,12 +46,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				item.Columns.Clear();
 				item.AdditionalResultColumns.Clear();
 				item.Columns.AddRange(
-					new DataSourceColumn("LastName", 100) { ShouldFilter = true },
-					new DataSourceColumn("HisName", 95) { ShouldFilter = true },
-					new DataSourceColumn("HerName", 75) { ShouldFilter = true },
+					new DataSourceColumn("LastName", 100) { Caption = "Last name", ShouldFilter = true },
+					new DataSourceColumn("HisName", 95) { Caption = "His name", ShouldFilter = true },
+					new DataSourceColumn("HerName", 75) { Caption = "Her name", ShouldFilter = true },
 					new DataSourceColumn("Phone"),
 					new DataSourceColumn("Address", 150),
-					new DataSourceColumn("Zip", 50)
+					new DataSourceColumn("Zip", 50) { Caption = "Zip code" }
 				);
 
 				item.ResultDisplayColumn = new DataSourceColumn("FullName");
@@ -69,12 +69,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				item.Columns.Clear();
 				item.AdditionalResultColumns.Clear();
 				item.Columns.AddRange(
-					new CustomColumn<IOwnedObject>(o => o.Person.LastName, 100) { ShouldFilter = true },
-					new CustomColumn<IOwnedObject>(o => o.Person.HisName, 95) { ShouldFilter = true },
-					new CustomColumn<IOwnedObject>(o => o.Person.HerName, 75) { ShouldFilter = true },
-					new CustomColumn<IOwnedObject>(o => o.Person.Phone),
-					new CustomColumn<IOwnedObject>(o => o.Person.Address, 150),
-					new CustomColumn<IOwnedObject>(o => o.Person.Zip, 50)
+					new CustomColumn<IOwnedObject>(o => o.Person.LastName, 100) { Caption = "Last name", ShouldFilter = true },
+					new CustomColumn<IOwnedObject>(o => o.Person.HisName, 95) { Caption = "His name", ShouldFilter = true },
+					new CustomColumn<IOwnedObject>(o => o.Person.HerName, 75) { Caption = "Her name", ShouldFilter = true },
+					new CustomColumn<IOwnedObject>(o => o.Person.Phone) { Caption = "Phone" },
+					new CustomColumn<IOwnedObject>(o => o.Person.Address, 150) { Caption = "Address" },
+					new CustomColumn<IOwnedObject>(o => o.Person.Zip, 50) { Caption = "Zip code" }
 				);
 
 				item.ResultDisplayColumn = new CustomColumn<IOwnedObject>(o => o.Person.FullName);
