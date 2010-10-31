@@ -194,6 +194,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				column.OptionsColumn.AllowSort = DefaultBoolean.True;
 				column.OptionsColumn.AllowGroup = DefaultBoolean.True;
 				column.ShowButtonMode = ShowButtonModeEnum.ShowAlways;
+				column.ShowEditorOnMouseDown = true;
 
 				if (AppFramework.Current.CanShowDetails<Person>())
 					column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
@@ -201,7 +202,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			}
 			protected internal override string GetDisplayText(object row, object value) {
 				var person = (Person)value;
-				if (person == null) return "";
+				if (person == null) return null;
 				return person.FullName;
 			}
 			protected internal override SuperToolTip GetCellToolTip(object row, object value) {
@@ -218,6 +219,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					item.Buttons.Clear();
 					item.Buttons.Add(new EditorButton(ButtonPredefines.Glyph) { Image = Resources.UserGrid, IsLeft = true, SuperTip = Utilities.CreateSuperTip(body: "Show Person") });
 
+					//TODO: Forward KeyUp
 					item.CustomDisplayText += (sender, e) => {
 						var person = e.Value as Person;
 						if (person != null) e.DisplayText = person.FullName;
