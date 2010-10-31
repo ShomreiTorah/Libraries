@@ -209,6 +209,8 @@ namespace ShomreiTorah.Data {
         public static ValueColumn UseHtmlColumn { get; private set; }
         ///<summary>Gets the schema's Person column.</summary>
         public static ForeignKeyColumn PersonColumn { get; private set; }
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
         
         ///<summary>Gets the EmailAddresses schema instance.</summary>
         public static new TypedSchema<EmailAddress> Schema { get; private set; }
@@ -251,6 +253,9 @@ namespace ShomreiTorah.Data {
             
             PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresses");
             PersonColumn.AllowNulls = true;
+            
+            RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.AllowNulls = false;
             #endregion
             
             #region Create SchemaMapping
@@ -268,6 +273,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(DateAddedColumn, "Join_Date");
             SchemaMapping.Columns.AddMapping(UseHtmlColumn, "HTMLformat");
             SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -343,6 +349,13 @@ namespace ShomreiTorah.Data {
             get { return base.Field<Person>(PersonColumn); }
             set { base[PersonColumn] = value; }
         }
+        ///<summary>Gets or sets the row's unique ID.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
         #endregion
         
         #region Partial Methods
@@ -377,6 +390,9 @@ namespace ShomreiTorah.Data {
         
         partial void ValidatePerson(Person newValue, Action<string> error);
         partial void OnPersonChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid oldValue, Guid newValue);
         #endregion
         
         #region Column Callbacks
@@ -422,6 +438,9 @@ namespace ShomreiTorah.Data {
             } else if (column == PersonColumn) {
                 ValidatePerson((Person)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
         }
@@ -451,6 +470,8 @@ namespace ShomreiTorah.Data {
             	OnUseHtmlChanged((Boolean)oldValue, (Boolean)newValue);
             else if (column == PersonColumn)
             	OnPersonChanged((Person)oldValue, (Person)newValue);
+            else if (column == RowIdColumn)
+            	OnRowIdChanged((Guid)oldValue, (Guid)newValue);
         }
         #endregion
     }

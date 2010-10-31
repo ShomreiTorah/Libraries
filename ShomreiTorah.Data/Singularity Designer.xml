@@ -321,6 +321,11 @@
         <Null />
       </DefaultValue>
     </Column>
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
   </Schema>
   <Schema Name="StatementLog" RowClassDescription="Describes a statement sent to a person." RowClassName="LoggedStatement" RowClassVisibility="Public" SqlName="StatementLog" SqlSchemaName="Billing" PrimaryKeyName="Id">
     <Column Name="Id" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Id" PropertyVisibility="Public" SqlName="Id">
