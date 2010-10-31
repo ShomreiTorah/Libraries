@@ -107,6 +107,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public override void ShowPopupForm() {
 			base.ShowPopupForm();
 			//Reset the popup's state
+			popupResultValue = null;
 			ViewInfo.HoveredIndex = null;
 			dragScrollTimer.Stop();
 			isTrackingMouseDown = false;
