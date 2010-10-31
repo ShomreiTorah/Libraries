@@ -169,8 +169,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override void AcceptPopupValue(object val) {
 			//DevExpress will occasionally close the popup
 			//and accept a null value.  I don't want that.
-			if (val != null)
+			if (val != null) {
 				base.AcceptPopupValue(val);
+				IsModified = true;	//Force validation to commit the new value for databinding
+				DoValidate();
+			}
 		}
 		protected override void DoClosePopup(PopupCloseMode closeMode) {
 			//Clear the filter textbox without
