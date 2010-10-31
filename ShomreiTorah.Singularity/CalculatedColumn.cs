@@ -21,15 +21,19 @@ namespace ShomreiTorah.Singularity {
 
 		readonly Func<Row, object> func;
 
-		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Dependency dependency)
+		//The dependency is only created when first needed to 
+		//allow for cyclic dependencies during schema creation
+		//This is required for typed rows that have calculated
+		//columns which use child rows, since the columns are 
+		//added by the static ctor.
+		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Func<Dependency> dependencyGenerator)
 			: base(schema, name) {
 			CanValidate = false;
 			this.func = func;
 			DataType = dataType;
 			ReadOnly = true;
 
-			Dependency = dependency;
-			Dependency.RowInvalidated += Dependency_RowInvalidated;
+			this.dependencyGenerator = dependencyGenerator;
 
 			//TODO: Loop over empty tables
 			foreach (var table in Schema.Rows.Select(r => r.Table).Distinct()) {
@@ -40,6 +44,20 @@ namespace ShomreiTorah.Singularity {
 			if (dataType.IsValueType)
 				DefaultValue = Activator.CreateInstance(dataType);
 			//Otherwise, keep it null.
+		}
+
+		Func<Dependency> dependencyGenerator;
+		Dependency dependency;
+		///<summary>Gets a dependency object that can track changes to the data that this column depends on.</summary>
+		internal Dependency Dependency {
+			get {
+				if (dependency == null) {
+					dependency = dependencyGenerator();
+					dependency.RowInvalidated += Dependency_RowInvalidated;
+					dependencyGenerator = null;
+				}
+				return dependency;
+			}
 		}
 
 		void Dependency_RowInvalidated(object sender, RowEventArgs e) {
@@ -67,8 +85,6 @@ namespace ShomreiTorah.Singularity {
 		///<summary>This method is not supported.</summary>
 		public override string ValidateValueType(object value) { throw new NotSupportedException(); }
 
-		///<summary>Gets a dependency object that can track changes to the data that this column depends on.</summary>
-		internal Dependency Dependency { get; private set; }
 	}
 	//The public AddCalculatedColumn take strongly-typed 
 	//expression trees with actual types of the value and
@@ -83,9 +99,7 @@ namespace ShomreiTorah.Singularity {
 		///<param name="expression">An expression used to calculate the column's value.</param>
 		public CalculatedColumn AddCalculatedColumn<TValue>(string name, Expression<Func<Row, TValue>> expression) {
 			if (expression == null) throw new ArgumentNullException("expression");
-			var compiled = expression.Compile();
-
-			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled(row), DependencyParser.GetDependencyTree(Schema, expression)));
+			return AddCalculatedColumn<Row, TValue>(name, expression);
 		}
 		///<summary>Adds a calculated column to the schema.</summary>
 		///<typeparam name="TValue">The type of the column's value.</typeparam>
@@ -96,7 +110,7 @@ namespace ShomreiTorah.Singularity {
 			if (expression == null) throw new ArgumentNullException("expression");
 			var compiled = expression.Compile();
 
-			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled((TRow)row), DependencyParser.GetDependencyTree(Schema, expression)));
+			return AddColumn(new CalculatedColumn(Schema, name, typeof(TValue), row => compiled((TRow)row), () => DependencyParser.GetDependencyTree(Schema, expression)));
 		}
 	}
 }
