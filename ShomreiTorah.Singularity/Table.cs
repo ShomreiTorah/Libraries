@@ -90,6 +90,7 @@ namespace ShomreiTorah.Singularity {
 			protected override void RemoveItem(int index) {
 				var row = this[index];
 				row.OnRemoving();
+				if (!Contains(row)) return;	//The row was deleted by its OnRemoving handler (this happens when a deposit clears its payments)
 				base.RemoveItem(index);
 				Table.ProcessRowRemoved(row, index);
 			}
