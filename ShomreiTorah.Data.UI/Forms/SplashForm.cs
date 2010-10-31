@@ -30,9 +30,10 @@ namespace ShomreiTorah.Data.UI.Forms {
 			SetStyle(ControlStyles.AllPaintingInWmPaint
 				   | ControlStyles.UserPaint, true);
 
-			if (SupportsCaption)
+			if (SupportsCaption) {
 				captionedImage = new Bitmap(image.Width, image.Height);
-			else
+				captionedImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+			} else
 				captionedImage = image;
 		}
 
