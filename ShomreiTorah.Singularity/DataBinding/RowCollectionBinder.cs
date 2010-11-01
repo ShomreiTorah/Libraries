@@ -287,7 +287,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		void Table_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
 
 		void Rows_RowAdded(object sender, RowListEventArgs<TRow> e) { OnRowAdded(new RowListEventArgs(e.Row, e.Index)); }
-		void Rows_ValueChanged(object sender, ValueChangedEventArgs<TRow> e) { OnValueChanged(e); }
+		void Rows_ValueChanged(object sender, ValueChangedEventArgs<TRow> e) { OnValueChanged(e.Inner); }
 		void Rows_RowRemoved(object sender, RowListEventArgs<TRow> e) { OnRowRemoved(new RowListEventArgs(e.Row, e.Index)); }
 
 		protected override string ListName { get { return FilteredTable.Table.Schema.Name; } }

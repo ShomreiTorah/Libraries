@@ -146,8 +146,12 @@ namespace ShomreiTorah.Singularity {
 
 			OnRowRemoved(new RowListEventArgs(row, index));
 		}
-		internal void ProcessValueChanged(Row row, Column column) {
-			OnValueChanged(new ValueChangedEventArgs(row, column));
+		internal void ProcessValueChanged(Row row, Column column, object oldValue) {
+			if (column is CalculatedColumn)
+				OnValueChanged(new ValueChangedEventArgs(row, column));	//Calculated columns don't have an old value
+			else
+				OnValueChanged(new ValueChangedEventArgs(row, column, oldValue));
+
 		}
 
 		#region Events
@@ -190,13 +194,37 @@ namespace ShomreiTorah.Singularity {
 	}
 	///<summary>Provides data for the ValueChanged event.</summary>
 	public class ValueChangedEventArgs : EventArgs {
-		///<summary>Creates a new ValueChangedEventArgs instance.</summary>
-		public ValueChangedEventArgs(Row row, Column column) { Row = row; Column = column; }
+		readonly string oldValueError;
+		readonly object oldValue;
 
-		///<summary>Gets the row.</summary>
+		///<summary>Creates a new ValueChangedEventArgs instance for a change in a calculated column.</summary>
+		public ValueChangedEventArgs(Row row, Column column) {
+			Row = row;
+			Column = column;
+			oldValueError = "Previous values are not available for change events in calculated columns";
+		}
+		///<summary>Creates a new ValueChangedEventArgs instance for a change in a normal column.</summary>
+		public ValueChangedEventArgs(Row row, Column column, object oldValue) {
+			Row = row;
+			Column = column;
+			this.oldValue = oldValue;
+		}
+
+		///<summary>Gets the row containing the change.</summary>
 		public Row Row { get; private set; }
-		///<summary>Gets the column.</summary>
+		///<summary>Gets the column that changed.</summary>
 		public Column Column { get; private set; }
+
+		///<summary>Gets the column's previous value.  This property is not available for calculated columns.</summary>
+		///<remarks>Making this property available for calculated columns would require re-calculating the column
+		///after every dependency change, even if no-one needs the value yet.</remarks>
+		public object OldValue {
+			get {
+				if (!String.IsNullOrEmpty(oldValueError))
+					throw new InvalidOperationException(oldValueError);
+				return oldValue;
+			}
+		}
 	}
 	///<summary>A collection of tables contained in a DataContext.</summary>
 	public sealed class TableCollection : ReadOnlyCollection<Table>, ICollection<Table> {

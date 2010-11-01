@@ -105,12 +105,12 @@ namespace ShomreiTorah.Singularity {
 			if (column == null) throw new ArgumentNullException("column");
 
 			column.OnValueChanged(this, oldValue, newValue);
-			RaiseValueChanged(column);
+			RaiseValueChanged(column, oldValue);
 		}
 
-		void RaiseValueChanged(Column column) {
+		void RaiseValueChanged(Column column, object oldValue) {
 			if (Table != null) {
-				Table.ProcessValueChanged(this, column);
+				Table.ProcessValueChanged(this, column, oldValue);
 
 				//Raise ValueChanged events on every foreign
 				//row that contains this row as a child.  If
@@ -140,7 +140,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Clears the current value from a calculated column, causing it to be recalculated next time the value is retrieved.</summary>
 		internal void InvalidateCalculatedValue(CalculatedColumn column) {
 			values[column] = CalculatedColumn.UncalculatedValue;
-			RaiseValueChanged(column);
+			RaiseValueChanged(column, oldValue: DBNull.Value);	//Passing the old value would force unnecessary recalcs
 		}
 		///<summary>Toggles the value of a calculated column between the default value (if the row is detached) and the uncalculated value (if the row is attached).</summary>
 		///<remarks>This is called by each CalculatedColumn when the row is added to or removed from the table.</remarks>

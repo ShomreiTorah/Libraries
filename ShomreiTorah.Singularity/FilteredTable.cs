@@ -67,7 +67,7 @@ namespace ShomreiTorah.Singularity {
 				RemoveRow(row);
 		}
 		void Table_ValueChanged(object sender, ValueChangedEventArgs e) {
-			if (Rows.Contains((TRow)e.Row)) OnValueChanged(new ValueChangedEventArgs<TRow>((TRow)e.Row, e.Column));
+			if (Rows.Contains((TRow)e.Row)) OnValueChanged(new ValueChangedEventArgs<TRow>(e));
 		}
 
 		void Table_RowRemoved(object sender, RowListEventArgs e) {

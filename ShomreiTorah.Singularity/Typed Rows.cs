@@ -62,7 +62,7 @@ namespace ShomreiTorah.Singularity {
 		public new ITableRowCollection<TRow> Rows { get; private set; }
 
 		///<summary>A typed wrapper around an untyped row collection.</summary>
-		sealed class TypedRowCollection : ITableRowCollection<TRow>, IListSource,ISchemaItem {
+		sealed class TypedRowCollection : ITableRowCollection<TRow>, IListSource, ISchemaItem {
 			readonly ITableRowCollection<Row> inner;
 			internal TypedRowCollection(ITableRowCollection<Row> inner) { this.inner = inner; }
 
@@ -123,7 +123,7 @@ namespace ShomreiTorah.Singularity {
 		protected override void OnValueChanged(ValueChangedEventArgs e) {
 			base.OnValueChanged(e);
 			if (ValueChanged != null)
-				ValueChanged(this, new ValueChangedEventArgs<TRow>((TRow)e.Row, e.Column));
+				ValueChanged(this, new ValueChangedEventArgs<TRow>(e));
 		}
 		#endregion
 	}
@@ -145,11 +145,18 @@ namespace ShomreiTorah.Singularity {
 		public int Index { get; private set; }
 	}
 	///<summary>Provides data for the strongly-typed ValueChanged event.</summary>
-	public class ValueChangedEventArgs<TRow> : ValueChangedEventArgs where TRow : Row {
+	public class ValueChangedEventArgs<TRow> : RowEventArgs<TRow> where TRow : Row {
+		internal ValueChangedEventArgs Inner { get; private set; }
+
 		///<summary>Creates a new ValueChangedEventArgs instance.</summary>
-		public ValueChangedEventArgs(TRow row, Column column) : base(row, column) { }
-		///<summary>Gets the row that changed.</summary>
-		public new TRow Row { get { return (TRow)base.Row; } }
+		internal ValueChangedEventArgs(ValueChangedEventArgs inner) : base((TRow)inner.Row) { this.Inner = inner; }
+
+		///<summary>Gets the column that changed.</summary>
+		public Column Column { get { return Inner.Column; } }
+		///<summary>Gets the column's previous value.  This property is not available for calculated columns.</summary>
+		///<remarks>Making this property available for calculated columns would require re-calculating the column
+		///after every dependency change, even if no-one needs the value yet.</remarks>
+		public object OldValue { get { return Inner.OldValue; } }
 	}
 
 	partial class Row {
