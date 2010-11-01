@@ -142,6 +142,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 		}
 
 		void InvokeIfNeeded(Action method) {
+			if (IsDisposed) return;
 			if (!IsHandleCreated) shownWaiter.Wait();
 			if (InvokeRequired)
 				BeginInvoke(method);
