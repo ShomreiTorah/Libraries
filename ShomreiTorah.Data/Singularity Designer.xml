@@ -116,9 +116,7 @@
       </DefaultValue>
     </Column>
     <Column Name="SubType" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the sub type of the pledge." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="SubType" PropertyVisibility="Public" SqlName="SubType">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>""</DefaultValue>
     </Column>
     <Column Name="Account" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the account of the pledge." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Account" PropertyVisibility="Public" SqlName="Account">
       <DefaultValue>
@@ -240,24 +238,16 @@
       </DefaultValue>
     </Column>
     <Column Name="MensSeats" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the mens seats of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="MensSeats" PropertyVisibility="Public" SqlName="MensSeats">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>0</DefaultValue>
     </Column>
     <Column Name="WomensSeats" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the womens seats of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="WomensSeats" PropertyVisibility="Public" SqlName="WomensSeats">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>0</DefaultValue>
     </Column>
     <Column Name="BoysSeats" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the boys seats of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="BoysSeats" PropertyVisibility="Public" SqlName="BoysSeats">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>0</DefaultValue>
     </Column>
     <Column Name="GirlsSeats" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the girls seats of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="GirlsSeats" PropertyVisibility="Public" SqlName="GirlsSeats">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>0</DefaultValue>
     </Column>
     <Column Name="Notes" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the notes of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Notes" PropertyVisibility="Public" SqlName="Notes">
       <DefaultValue>

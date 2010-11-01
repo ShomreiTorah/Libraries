@@ -1139,7 +1139,7 @@ namespace ShomreiTorah.Data {
             TypeColumn = Schema.Columns.AddValueColumn("Type", typeof(String), null);
             TypeColumn.AllowNulls = false;
             
-            SubTypeColumn = Schema.Columns.AddValueColumn("SubType", typeof(String), null);
+            SubTypeColumn = Schema.Columns.AddValueColumn("SubType", typeof(String), "");
             SubTypeColumn.AllowNulls = false;
             
             AccountColumn = Schema.Columns.AddValueColumn("Account", typeof(String), null);
@@ -1467,16 +1467,16 @@ namespace ShomreiTorah.Data {
             PledgeColumn.Unique = true;
             PledgeColumn.AllowNulls = false;
             
-            MensSeatsColumn = Schema.Columns.AddValueColumn("MensSeats", typeof(Int32), null);
+            MensSeatsColumn = Schema.Columns.AddValueColumn("MensSeats", typeof(Int32), 0);
             MensSeatsColumn.AllowNulls = false;
             
-            WomensSeatsColumn = Schema.Columns.AddValueColumn("WomensSeats", typeof(Int32), null);
+            WomensSeatsColumn = Schema.Columns.AddValueColumn("WomensSeats", typeof(Int32), 0);
             WomensSeatsColumn.AllowNulls = false;
             
-            BoysSeatsColumn = Schema.Columns.AddValueColumn("BoysSeats", typeof(Int32), null);
+            BoysSeatsColumn = Schema.Columns.AddValueColumn("BoysSeats", typeof(Int32), 0);
             BoysSeatsColumn.AllowNulls = false;
             
-            GirlsSeatsColumn = Schema.Columns.AddValueColumn("GirlsSeats", typeof(Int32), null);
+            GirlsSeatsColumn = Schema.Columns.AddValueColumn("GirlsSeats", typeof(Int32), 0);
             GirlsSeatsColumn.AllowNulls = false;
             
             NotesColumn = Schema.Columns.AddValueColumn("Notes", typeof(String), null);
