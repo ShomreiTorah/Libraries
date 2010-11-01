@@ -36,6 +36,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 		protected internal virtual SuperToolTip GetCellToolTip(object row, object value) { return null; }
 		///<summary>Allows the controller to customize the column's sorting comparisons.</summary>
 		protected internal virtual void CompareValues(CustomColumnSortEventArgs e) { }
+		///<summary>Allows the controller to provide data for an unbound column.</summary>
+		protected internal virtual void OnCustomUnboundColumnData(CustomColumnDataEventArgs e) { }
 	}
 
 	partial class SmartGridColumn {
@@ -92,6 +94,12 @@ namespace ShomreiTorah.Data.UI.Grid {
 			var column = e.Column as SmartGridColumn;
 			if (column != null && column.Controller != null)
 				column.Controller.CompareValues(e);
+		}
+		protected override void RaiseCustomUnboundColumnData(CustomColumnDataEventArgs e) {
+			var column = e.Column as SmartGridColumn;
+			if (column != null && column.Controller != null)
+				column.Controller.OnCustomUnboundColumnData(e);
+			base.RaiseCustomUnboundColumnData(e);
 		}
 		void SmartGridView_ShowFilterPopupListBox(object sender, FilterPopupListBoxEventArgs e) {
 			var column = e.Column as SmartGridColumn;
