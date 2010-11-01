@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using ShomreiTorah.Data.UI.Properties;
 
 namespace ShomreiTorah.Data.UI.Forms {
 	///<summary>Displays a splash screen while an application loads, optionally with a status message.</summary>
@@ -22,6 +23,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 		public SplashForm(Bitmap image, Rectangle captionBounds, Color captionColor) {
 			if (image == null) throw new ArgumentNullException("image");
 
+			this.Icon = Resources.LoadingIcon;
 			this.BackgroundImage = image;
 			this.Size = image.Size;
 			this.captionBounds = captionBounds;

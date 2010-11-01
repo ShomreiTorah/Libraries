@@ -60,6 +60,13 @@ namespace ShomreiTorah.Data.UI.Properties {
             }
         }
         
+        internal static System.Drawing.Icon LoadingIcon {
+            get {
+                object obj = ResourceManager.GetObject("LoadingIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap People16 {
             get {
                 object obj = ResourceManager.GetObject("People16", resourceCulture);
