@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using DevExpress.Data;
@@ -23,6 +24,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		static void InitializeStandardSettings() {
 			//This method will only be called once
 			RegisterEditors();
+			ConfigureLookups();
 			RegisterColumnSuppressions();
 			RegisterBehaviors();
 			RegisterColumnControllers();
@@ -37,7 +39,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 			EditorRepository.Register(new[] { Pledge.AmountColumn, Payment.AmountColumn }, EditorRepository.CurrencyEditor);
 			EditorRepository.Register(new[] { Pledge.AccountColumn, Payment.AccountColumn }, EditorRepository.AccountEditor);
-
+		}
+		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Configuration")]
+		static void ConfigureLookups() {
 			EditorRepository.PersonLookup.AddConfigurator(item => {
 				if (!AppFramework.Current.IsDesignTime)
 					item.DataSource = AppFramework.Current.DataContext.Table<Person>();
