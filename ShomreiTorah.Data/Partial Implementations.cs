@@ -190,7 +190,10 @@ namespace ShomreiTorah.Data {
 			RandomCode = Guid.NewGuid().ToString("N").Remove(20).ToUpperInvariant();
 			DateAdded = DateTime.Now;
 		}
-
+		partial void OnPersonChanged(Person oldValue, Person newValue) {
+			if (String.IsNullOrWhiteSpace(Name) && newValue != null)
+				Name = newValue.FullName;
+		}
 		partial void ValidateEmail(string newValue, Action<string> error) {
 			try {
 				new MailAddress(newValue).ToString();

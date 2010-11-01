@@ -226,13 +226,13 @@ namespace ShomreiTorah.Data {
             RandomCodeColumn = Schema.Columns.AddValueColumn("RandomCode", typeof(String), null);
             RandomCodeColumn.AllowNulls = true;
             
-            ActiveColumn = Schema.Columns.AddValueColumn("Active", typeof(Boolean), null);
+            ActiveColumn = Schema.Columns.AddValueColumn("Active", typeof(Boolean), true);
             ActiveColumn.AllowNulls = false;
             
             DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
             DateAddedColumn.AllowNulls = false;
             
-            UseHtmlColumn = Schema.Columns.AddValueColumn("UseHtml", typeof(Boolean), null);
+            UseHtmlColumn = Schema.Columns.AddValueColumn("UseHtml", typeof(Boolean), true);
             UseHtmlColumn.AllowNulls = false;
             
             PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresses");

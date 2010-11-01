@@ -287,9 +287,7 @@
       </DefaultValue>
     </Column>
     <Column Name="Active" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the active of the tbl ML member." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Active" PropertyVisibility="Public" SqlName="Active">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>true</DefaultValue>
     </Column>
     <Column Name="DateAdded" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date that the subscriber joined the list." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DateAdded" PropertyVisibility="Public" SqlName="Join_Date">
       <DefaultValue>
@@ -297,9 +295,7 @@
       </DefaultValue>
     </Column>
     <Column Name="UseHtml" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the whether the subscriber should receive HTML emails.  Not currently used." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="UseHtml" PropertyVisibility="Public" SqlName="HTMLformat">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>true</DefaultValue>
     </Column>
     <Column Name="Person" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that uses the email address." Expression="" ForeignRelationName="EmailAddresses" ForeignRelationPropertyDescription="Gets the person's email addresses." ForeignRelationPropertyName="EmailAddresses" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
