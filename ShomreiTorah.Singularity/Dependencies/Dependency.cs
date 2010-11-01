@@ -38,6 +38,8 @@ namespace ShomreiTorah.Singularity.Dependencies {
 	public sealed class AggregateDependency : Dependency {
 		///<summary>Creates a new AggregateDependency.</summary>
 		public AggregateDependency(IEnumerable<Dependency> dependencies) {
+			if (dependencies == null) throw new ArgumentNullException("dependencies");
+
 			Dependencies = new ReadOnlyCollection<Dependency>(dependencies.ToArray());
 			RequiresDataContext = Dependencies.Any(d => d.RequiresDataContext);
 
