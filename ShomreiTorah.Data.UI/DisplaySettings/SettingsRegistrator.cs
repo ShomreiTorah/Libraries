@@ -223,60 +223,6 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 
-		class PersonColumnController : ColumnController {
-			protected internal override void Apply(SmartGridColumn column) {
-				column.OptionsColumn.ReadOnly = true;
-				column.OptionsColumn.AllowSort = DefaultBoolean.True;
-				column.OptionsColumn.AllowGroup = DefaultBoolean.True;
-				column.ShowButtonMode = ShowButtonModeEnum.ShowAlways;
-				column.ShowEditorOnMouseDown = true;
-
-				if (AppFramework.Current.CanShowDetails<Person>())
-					column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
-				column.Caption = "Full Name";
-			}
-			protected internal override string GetDisplayText(object row, object value) {
-				var person = (Person)value;
-				if (person == null) return null;
-				return person.FullName;
-			}
-			protected internal override SuperToolTip GetCellToolTip(object row, object value) {
-				var person = (Person)value;
-				if (person == null) return null;
-				return person.GetSuperTip();
-			}
-			class PersonEditSettings : EditorSettings<RepositoryItemButtonEdit> {
-				private PersonEditSettings() { }
-				public static readonly PersonEditSettings Instance = new PersonEditSettings();
-
-				public override void Apply(RepositoryItemButtonEdit item) {
-					item.TextEditStyle = TextEditStyles.DisableTextEditor;
-					item.Buttons.Clear();
-					item.Buttons.Add(new EditorButton(ButtonPredefines.Glyph) { Image = Resources.UserGrid, IsLeft = true, SuperTip = Utilities.CreateSuperTip(body: "Show Person") });
-
-					//TODO: Forward KeyUp
-					item.CustomDisplayText += (sender, e) => {
-						var person = e.Value as Person;
-						if (person != null) e.DisplayText = person.FullName;
-					};
-					item.ButtonClick += (sender, e) => {
-						var edit = sender as BaseEdit;
-						var row = edit.EditValue as Row;
-						if (row != null)
-							AppFramework.Current.ShowDetails(row);
-					};
-					item.DoubleClick += (sender, e) => {
-						var edit = sender as BaseEdit;
-						var grid = (GridControl)edit.Parent;
-						var view = (SmartGridView)grid.FocusedView;
-						var row = view.GetFocusedRow() as Row;	//In the designer, there might not be actual rows.
-
-						if (row != null && AppFramework.Current.CanShowDetails(row.Schema))
-							AppFramework.Current.ShowDetails(row);
-					};
-				}
-			}
-		}
 		class DepositColumnController : ColumnController {
 			protected internal override void Apply(SmartGridColumn column) {
 				column.OptionsColumn.AllowSort = DefaultBoolean.True;
@@ -342,5 +288,60 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		///<summary>Ensures that all grid settings have been registered.</summary>
 		public static void EnsureRegistered() { AppFramework.AutoRegisterDesigner(); }
+	}
+	///<summary>A ColumnController that controls a column displaying Person objects.</summary>
+	public class PersonColumnController : ColumnController {
+		protected internal override void Apply(SmartGridColumn column) {
+			column.OptionsColumn.ReadOnly = true;
+			column.OptionsColumn.AllowSort = DefaultBoolean.True;
+			column.OptionsColumn.AllowGroup = DefaultBoolean.True;
+			column.ShowButtonMode = ShowButtonModeEnum.ShowAlways;
+			column.ShowEditorOnMouseDown = true;
+
+			if (AppFramework.Current.CanShowDetails<Person>())
+				column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
+			column.Caption = "Full Name";
+		}
+		protected internal override string GetDisplayText(object row, object value) {
+			var person = (Person)value;
+			if (person == null) return null;
+			return person.FullName;
+		}
+		protected internal override SuperToolTip GetCellToolTip(object row, object value) {
+			var person = (Person)value;
+			if (person == null) return null;
+			return person.GetSuperTip();
+		}
+		class PersonEditSettings : EditorSettings<RepositoryItemButtonEdit> {
+			private PersonEditSettings() { }
+			public static readonly PersonEditSettings Instance = new PersonEditSettings();
+
+			public override void Apply(RepositoryItemButtonEdit item) {
+				item.TextEditStyle = TextEditStyles.DisableTextEditor;
+				item.Buttons.Clear();
+				item.Buttons.Add(new EditorButton(ButtonPredefines.Glyph) { Image = Resources.UserGrid, IsLeft = true, SuperTip = Utilities.CreateSuperTip(body: "Show Person") });
+
+				//TODO: Forward KeyUp
+				item.CustomDisplayText += (sender, e) => {
+					var person = e.Value as Person;
+					if (person != null) e.DisplayText = person.FullName;
+				};
+				item.ButtonClick += (sender, e) => {
+					var edit = sender as BaseEdit;
+					var row = edit.EditValue as Row;
+					if (row != null)
+						AppFramework.Current.ShowDetails(row);
+				};
+				item.DoubleClick += (sender, e) => {
+					var edit = sender as BaseEdit;
+					var grid = (GridControl)edit.Parent;
+					var view = (SmartGridView)grid.FocusedView;
+					var row = view.GetFocusedRow() as Row;	//In the designer, there might not be actual rows.
+
+					if (row != null && AppFramework.Current.CanShowDetails(row.Schema))
+						AppFramework.Current.ShowDetails(row);
+				};
+			}
+		}
 	}
 }
