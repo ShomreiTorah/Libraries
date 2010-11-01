@@ -1445,8 +1445,6 @@ namespace ShomreiTorah.Data {
         public static ValueColumn GirlsSeatsColumn { get; private set; }
         ///<summary>Gets the schema's Notes column.</summary>
         public static ValueColumn NotesColumn { get; private set; }
-        ///<summary>Gets the schema's Status column.</summary>
-        public static ValueColumn StatusColumn { get; private set; }
         
         ///<summary>Gets the SeatingReservations schema instance.</summary>
         public static new TypedSchema<SeatingReservation> Schema { get; private set; }
@@ -1479,11 +1477,8 @@ namespace ShomreiTorah.Data {
             GirlsSeatsColumn = Schema.Columns.AddValueColumn("GirlsSeats", typeof(Int32), 0);
             GirlsSeatsColumn.AllowNulls = false;
             
-            NotesColumn = Schema.Columns.AddValueColumn("Notes", typeof(String), null);
+            NotesColumn = Schema.Columns.AddValueColumn("Notes", typeof(String), "");
             NotesColumn.AllowNulls = false;
-            
-            StatusColumn = Schema.Columns.AddValueColumn("Status", typeof(String), null);
-            StatusColumn.AllowNulls = false;
             #endregion
             
             #region Create SchemaMapping
@@ -1498,7 +1493,6 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(BoysSeatsColumn, "BoysSeats");
             SchemaMapping.Columns.AddMapping(GirlsSeatsColumn, "GirlsSeats");
             SchemaMapping.Columns.AddMapping(NotesColumn, "Notes");
-            SchemaMapping.Columns.AddMapping(StatusColumn, "Status");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -1553,13 +1547,6 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(NotesColumn); }
             set { base[NotesColumn] = value; }
         }
-        ///<summary>Gets or sets the status of the seating reservation.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public String Status {
-            get { return base.Field<String>(StatusColumn); }
-            set { base[StatusColumn] = value; }
-        }
         #endregion
         
         #region Partial Methods
@@ -1585,9 +1572,6 @@ namespace ShomreiTorah.Data {
         
         partial void ValidateNotes(String newValue, Action<string> error);
         partial void OnNotesChanged(String oldValue, String newValue);
-        
-        partial void ValidateStatus(String newValue, Action<string> error);
-        partial void OnStatusChanged(String oldValue, String newValue);
         #endregion
         
         #region Column Callbacks
@@ -1624,9 +1608,6 @@ namespace ShomreiTorah.Data {
             } else if (column == NotesColumn) {
                 ValidateNotes((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == StatusColumn) {
-                ValidateStatus((String)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
         }
@@ -1650,8 +1631,6 @@ namespace ShomreiTorah.Data {
             	OnGirlsSeatsChanged((Int32)oldValue, (Int32)newValue);
             else if (column == NotesColumn)
             	OnNotesChanged((String)oldValue, (String)newValue);
-            else if (column == StatusColumn)
-            	OnStatusChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }

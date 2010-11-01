@@ -250,14 +250,7 @@
       <DefaultValue>0</DefaultValue>
     </Column>
     <Column Name="Notes" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the notes of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Notes" PropertyVisibility="Public" SqlName="Notes">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Status" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the status of the seating reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Status" PropertyVisibility="Public" SqlName="Status">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
+      <DefaultValue>""</DefaultValue>
     </Column>
   </Schema>
   <Schema Name="EmailAddresses" RowClassDescription="Describes a subscriber to the email list." RowClassName="EmailAddress" RowClassVisibility="Public" SqlName="tblMLMembers" SqlSchemaName="dbo" PrimaryKeyName="RowId">
