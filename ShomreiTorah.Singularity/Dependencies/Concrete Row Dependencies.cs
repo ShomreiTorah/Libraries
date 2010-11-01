@@ -30,6 +30,8 @@ namespace ShomreiTorah.Singularity.Dependencies {
 			ParentColumn = parentColumn;
 			RequiresDataContext = true;
 		}
+		//This dependency is created by an expression of the form ParentRow.SomeColumn
+		//The parser will have already added a dependency on the ParentRow column.
 
 		///<summary>Gets the row collection represented by this dependency for the specified table.</summary>
 		///<returns>The table containing the parent rows.</returns>
@@ -63,6 +65,29 @@ namespace ShomreiTorah.Singularity.Dependencies {
 			RequiresDataContext = true;
 		}
 
+		///<summary>Registers event handlers for this dependency to track changes for a table.</summary>
+		public override void Register(Table table) {
+			base.Register(table);
+			GetRowCollection(table).ValueChanged += ChildTable_ValueChanged;
+		}
+		///<summary>Unregisters event handlers registered in Register.</summary>
+		public override void Unregister(Table table) {
+			base.Unregister(table);
+			GetRowCollection(table).ValueChanged -= ChildTable_ValueChanged;
+		}
+		//If a child row switches to a new parent, both the old and
+		//the new parents are affected.  (eg, depositing a payment)
+		void ChildTable_ValueChanged(object sender, ValueChangedEventArgs e) {
+			if (e.Column == ChildRelation.ChildColumn) {
+				var oldRow = (Row)e.OldValue;
+				if (oldRow != null)
+					OnRowInvalidated(oldRow);
+
+				var newRow = e.Row.Field<Row>(e.Column);
+				if (newRow != null)
+					OnRowInvalidated(newRow);
+			}
+		}
 
 		///<summary>Gets the row collection represented by this dependency for the specified table.</summary>
 		///<returns>The table containing the child rows.</returns>
@@ -76,7 +101,6 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		///<returns>The parent row of the child row that was changed.</returns>
 		protected override IEnumerable<Row> GetAffectedRows(Row modifiedRow) {
 			if (modifiedRow == null) throw new ArgumentNullException("modifiedRow");
-
 
 			//When a child row changes, its parent is affected,
 			//unless the child row doesn't have a parent.
