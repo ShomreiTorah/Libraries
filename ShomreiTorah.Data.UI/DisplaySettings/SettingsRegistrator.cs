@@ -119,7 +119,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 
-		//TODO: Group summaries, CheckNumber validation
+		//TODO: Group summaries
 		#region Behaviors
 		static void RegisterBehaviors() {
 			//TODO: Delete LoggedStatements?
@@ -173,6 +173,14 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.RegisterColumn(Payment.MethodColumn, MaxWidth(70));
 
 			GridManager.RegisterColumns(new[] { Payment.AccountColumn, Pledge.AccountColumn }, MaxWidth(100));
+
+			GridManager.RegisterColumns(
+				new[] { Pledge.ModifiedColumn, Payment.ModifiedColumn },
+				new ColumnController(c => {
+					c.DisplayFormat.FormatType = FormatType.DateTime;
+					c.DisplayFormat.FormatString = "g";
+				})
+			);
 
 			GridManager.RegisterColumns(new[] { Payment.CommentsColumn, Pledge.CommentsColumn }, new CommentsColumnController());
 
