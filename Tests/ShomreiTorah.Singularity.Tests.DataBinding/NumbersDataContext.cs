@@ -24,8 +24,8 @@ namespace ShomreiTorah.Singularity.Tests.DataBinding {
 		public TypedTable<PowersRow> Powers { get; private set; }
 	}
 
-	public class NumbersDataSource : BindableDataContextBase<NumbersDataContext> {
-		protected override NumbersDataContext FindDataContext() { return new NumbersDataContext(); }
+	public class NumbersDataSource : BindableDataContextBase {
+		protected override DataContext FindDataContext() { return new NumbersDataContext(); }
 	}
 
 	public class Number : Row {
