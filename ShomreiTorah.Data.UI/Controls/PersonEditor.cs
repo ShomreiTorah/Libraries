@@ -15,7 +15,6 @@ namespace ShomreiTorah.Data.UI.Controls {
 		//When setting properties, you must call UpdateValue
 		//Otherwise, the underlying row will not be updated.
 
-
 		///<summary>Creates a new PersonEditor control.</summary>
 		public PersonEditor() {
 			InitializeComponent();
