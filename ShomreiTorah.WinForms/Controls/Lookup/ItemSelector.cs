@@ -182,20 +182,10 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.DoClosePopup(closeMode);
 		}
 
-		internal bool PreventCloseOnFocusLost { get; set; }
-		bool isLosingFocus;
-		//base.OnLostFocus calls ClosePopup(PopupCloseMode.Immediate),
-		//which I want to suppress during the ItemSelecting event.
-		protected override void OnLostFocus(EventArgs e) {
-			try {
-				isLosingFocus = true;
-				base.OnLostFocus(e);
-			} finally { isLosingFocus = false; }
-		}
+		internal bool PreventClose { get; set; }
 		protected override void ClosePopup(PopupCloseMode closeMode) {
-			if (closeMode == PopupCloseMode.Immediate && isLosingFocus)
-				return;
-			base.ClosePopup(closeMode);
+			if (!PreventClose)
+				base.ClosePopup(closeMode);
 		}
 	}
 
@@ -524,7 +514,11 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		///<returns>False if the selection was cancelled.</returns>
 		internal bool RaiseItemSelecting(object newVal) {
 			var args = new ItemSelectingEventArgs(newVal);
-			OnItemSelecting(args);
+
+			try {	//Wrap OnItemSelecting overrides 
+				OwnerEdit.PreventClose = true;
+				OnItemSelecting(args);
+			} finally { OwnerEdit.PreventClose = false; }
 			return !args.Cancel;
 		}
 
@@ -532,13 +526,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		public event EventHandler<ItemSelectingEventArgs> ItemSelecting;
 		///<summary>Raises the ItemSelecting event.</summary>
 		///<param name="e">A ItemSelectingEventArgs object that provides the event data.</param>
-		internal protected virtual void OnItemSelecting(ItemSelectingEventArgs e) {
-			var handler = ItemSelecting;
-			if (handler == null) return;
-			try {
-				OwnerEdit.PreventCloseOnFocusLost = true;
-				handler(GetEventSender(), e);
-			} finally { OwnerEdit.PreventCloseOnFocusLost = false; }
+		protected virtual void OnItemSelecting(ItemSelectingEventArgs e) {
+			if (ItemSelecting != null) ItemSelecting(GetEventSender(), e);
 		}
 		#endregion
 	}
