@@ -75,7 +75,8 @@ namespace ShomreiTorah.Data.UI.Forms {
 				message.Subject = Dialog.DefaultTitle + " Error from " + Environment.MachineName + "\\" + Environment.UserName;
 				message.Body = exception.ToString();
 
-				message.Attachments.Add(new Attachment(SaveDB(), "Data.xml.gz", "application/x-gzip"));
+				if (AppFramework.Current != null && AppFramework.Current.DataContext != null)
+					message.Attachments.Add(new Attachment(SaveDB(), "Data.xml.gz", "application/x-gzip"));
 
 				if (imageStream != null)
 					message.Attachments.Add(new Attachment(imageStream, "Screen.jpeg", MediaTypeNames.Image.Jpeg));
