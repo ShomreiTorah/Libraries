@@ -39,7 +39,8 @@ namespace ShomreiTorah.Data.UI.Forms {
 				Dialog.ShowError("Please enter a full name");
 				return;
 			}
-
+			if (String.IsNullOrWhiteSpace(personEditor.Person.Phone) || personEditor.Person.Phone.Trim() == "973")
+				personEditor.Person.Phone = "";
 			try {
 				AppFramework.Current.DataContext.Table<Person>().Rows.Add(personEditor.Person);
 			} catch (InvalidOperationException ex) {
