@@ -21,6 +21,15 @@ namespace ShomreiTorah.Data.UI.Controls {
 			InitializeComponent();
 		}
 
+		///<summary>Gets or sets whether the Mailing Address header is visible.</summary>
+		[Description("Gets or sets whether the Mailing Address header is visible.")]
+		[Category("Appearance")]
+		[DefaultValue(true)]
+		public bool HeaderVisible {
+			get { return mailingAddressGroup.GroupBordersVisible; }
+			set { mailingAddressGroup.GroupBordersVisible = value; }
+		}
+
 		///<summary>Gets or sets the person bound to the control.</summary>
 		[Browsable(false)]
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]

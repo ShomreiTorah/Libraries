@@ -37,16 +37,16 @@ namespace ShomreiTorah.Data.UI.Forms {
 			this.panelControl1.Controls.Add(this.ok);
 			this.panelControl1.Controls.Add(this.cancel);
 			this.panelControl1.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.panelControl1.Location = new System.Drawing.Point(0, 202);
+			this.panelControl1.Location = new System.Drawing.Point(0, 208);
 			this.panelControl1.Name = "panelControl1";
-			this.panelControl1.Size = new System.Drawing.Size(369, 40);
+			this.panelControl1.Size = new System.Drawing.Size(306, 40);
 			this.panelControl1.TabIndex = 1;
 			// 
 			// ok
 			// 
 			this.ok.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.ok.Image = ((System.Drawing.Image)(resources.GetObject("ok.Image")));
-			this.ok.Location = new System.Drawing.Point(201, 5);
+			this.ok.Location = new System.Drawing.Point(138, 5);
 			this.ok.Name = "ok";
 			this.ok.Size = new System.Drawing.Size(75, 23);
 			this.ok.TabIndex = 1;
@@ -57,7 +57,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 			// 
 			this.cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.cancel.Location = new System.Drawing.Point(282, 5);
+			this.cancel.Location = new System.Drawing.Point(219, 5);
 			this.cancel.Name = "cancel";
 			this.cancel.Size = new System.Drawing.Size(75, 23);
 			this.cancel.TabIndex = 0;
@@ -68,7 +68,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 			this.personEditor.Dock = System.Windows.Forms.DockStyle.Top;
 			this.personEditor.Location = new System.Drawing.Point(0, 0);
 			this.personEditor.Name = "personEditor";
-			this.personEditor.Size = new System.Drawing.Size(369, 211);
+			this.personEditor.Size = new System.Drawing.Size(306, 211);
 			this.personEditor.TabIndex = 0;
 			// 
 			// PersonCreator
@@ -77,13 +77,13 @@ namespace ShomreiTorah.Data.UI.Forms {
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.cancel;
-			this.ClientSize = new System.Drawing.Size(369, 242);
+			this.ClientSize = new System.Drawing.Size(306, 248);
 			this.ControlBox = false;
 			this.Controls.Add(this.panelControl1);
 			this.Controls.Add(this.personEditor);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximumSize = new System.Drawing.Size(900, 310);
-			this.MinimumSize = new System.Drawing.Size(377, 270);
+			this.MaximumSize = new System.Drawing.Size(900, 65535);
+			this.MinimumSize = new System.Drawing.Size(270, 0);
 			this.Name = "PersonCreator";
 			this.Text = "New Person";
 			((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();

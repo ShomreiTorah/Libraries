@@ -23,6 +23,12 @@ namespace ShomreiTorah.Data.UI.Forms {
 				Phone = "973"
 			};
 		}
+		protected override void OnShown(EventArgs e) {
+			base.OnShown(e);
+			//Set min/max regardless of skin sizing differences.
+			MinimumSize = new Size(MinimumSize.Width, Height);
+			MaximumSize = new Size(Screen.FromControl(this).WorkingArea.Width, Height);
+		}
 
 		private void ok_Click(object sender, EventArgs e) {
 			//var columnErrors = Person.Schema.Columns.Select(c => personEditor.Person.ValidateValue(c, personEditor.Person[c]))
