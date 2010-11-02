@@ -48,21 +48,21 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		}
 		void DependentValueChanged(object sender, ValueChangedEventArgs e) {
 			if (!DependentColumns.Contains(e.Column)) return;
-			foreach (var row in GetAffectedRows(e.Row))
+			foreach (var row in GetAffectedRows(e.Row, (Table)sender))
 				OnRowInvalidated(row);
 		}
 
 		void DependentRowAdded(object sender, RowListEventArgs e) {
-			foreach (var row in GetAffectedRows(e.Row))
+			foreach (var row in GetAffectedRows(e.Row, (Table)sender))
 				OnRowInvalidated(row);
 		}
 		void DependentRowRemoved(object sender, RowListEventArgs e) {
-			foreach (var row in GetAffectedRows(e.Row))
+			foreach (var row in GetAffectedRows(e.Row, (Table)sender))
 				OnRowInvalidated(row);
 		}
 
 		void NestedDependency_RowInvalidated(object sender, RowEventArgs e) {
-			foreach (var affectedRow in GetAffectedRows(e.Row))
+			foreach (var affectedRow in GetAffectedRows(e.Row, (Table)sender))
 				OnRowInvalidated(affectedRow);
 		}
 
@@ -77,8 +77,9 @@ namespace ShomreiTorah.Singularity.Dependencies {
 
 		///<summary>Gets the row(s) affected by a change in a row.</summary>
 		///<param name="modifiedRow">The dependent row that was changed.</param>
+		///<param name="owner">The table containing the change.  This parameter is necessary for the RowRemoved event, which fires when the row has no table.</param>
 		///<returns>The rows for which the calculated column was affected.</returns>
-		protected abstract IEnumerable<Row> GetAffectedRows(Row modifiedRow);
+		protected abstract IEnumerable<Row> GetAffectedRows(Row modifiedRow, Table owner);
 	}
 
 	///<summary>Contains parameters for a RowDependency instance.</summary>

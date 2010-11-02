@@ -14,7 +14,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		protected override IRowEventProvider GetRowCollection(Table table) { return table; }
 		///<summary>Gets the row(s) affected by a change in a row.</summary>
 		///<returns>The same row that was modified.</returns>
-		protected override IEnumerable<Row> GetAffectedRows(Row modifiedRow) { yield return modifiedRow; }
+		protected override IEnumerable<Row> GetAffectedRows(Row modifiedRow, Table owner) { yield return modifiedRow; }
 	}
 	///<summary>A dependency on a column in a row's parent row.</summary>
 	///<remarks>
@@ -43,10 +43,17 @@ namespace ShomreiTorah.Singularity.Dependencies {
 
 		///<summary>Gets the row(s) affected by a change in a row.</summary>
 		///<returns>All of the row's child rows by this relation. </returns>
-		protected override IEnumerable<Row> GetAffectedRows(Row modifiedRow) {
+		protected override IEnumerable<Row> GetAffectedRows(Row modifiedRow, Table owner) {
 			if (modifiedRow == null) throw new ArgumentNullException("modifiedRow");
-			
-			return modifiedRow.ChildRows(ParentColumn.ChildRelation);
+			if (owner == null) throw new ArgumentNullException("owner");
+
+			if (modifiedRow.Table != null)
+				return modifiedRow.ChildRows(ParentColumn.ChildRelation);
+			else {
+				//If the row was deleted, we cannot use its ChildRowCollection,
+				//so we need to find the children manually.
+				return owner.Context.Tables[ParentColumn.Schema].Rows.Where(row => row[ParentColumn] == modifiedRow);
+			}
 		}
 	}
 
@@ -93,13 +100,13 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		///<returns>The table containing the child rows.</returns>
 		protected override IRowEventProvider GetRowCollection(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
-			
+
 			return table.Context.Tables[ChildRelation.ChildSchema];	//A change in a child row affects its parent row in the parent table
 		}
 
 		///<summary>Gets the row(s) affected by a change in a row.</summary>
 		///<returns>The parent row of the child row that was changed.</returns>
-		protected override IEnumerable<Row> GetAffectedRows(Row modifiedRow) {
+		protected override IEnumerable<Row> GetAffectedRows(Row modifiedRow, Table owner) {
 			if (modifiedRow == null) throw new ArgumentNullException("modifiedRow");
 
 			//When a child row changes, its parent is affected,
