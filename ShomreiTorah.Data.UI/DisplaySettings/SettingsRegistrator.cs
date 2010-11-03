@@ -132,8 +132,14 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			);
 			GridManager.RegisterBehavior(EmailAddress.Schema,
 				DeletionBehavior.WithMessages(
-					"email address from the email list?",
-					"email addresses from the email list?"
+					"email address from the email list",
+					"email addresses from the email list"
+				)
+			);
+			GridManager.RegisterBehavior(MelaveMalkaInvitation.Schema,
+				DeletionBehavior.WithMessages(
+					"Melave Malka invitation",
+					"Melave Malka invitations"
 				)
 			);
 			GridManager.RegisterBehavior(Pledge.Schema,
