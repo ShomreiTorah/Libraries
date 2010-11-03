@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows.Forms;
+using DevExpress.Data;
 using DevExpress.Utils.Serializing;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Columns;
@@ -50,7 +51,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 				if (GridControl == null) return;
 				if (lastAppliedDataSource != null && lastAppliedDataSource == DataSource)
 					return;
-				if (DataController.Columns.Count == 0) return;	//Ignore fake datasources such as DataContexts.
+				if (DataController.Columns.Cast<DataColumnInfo>().All(dci => dci.Unbound))
+					return;	//Ignore fake datasources such as DataContexts that have no real columns.
 
 				ApplyBehaviors();
 				ApplyColumnControllers();
