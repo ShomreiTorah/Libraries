@@ -50,6 +50,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 				if (GridControl == null) return;
 				if (lastAppliedDataSource != null && lastAppliedDataSource == DataSource)
 					return;
+				if (DataController.Columns.Count == 0) return;	//Ignore fake datasources such as DataContexts.
+
 				ApplyBehaviors();
 				ApplyColumnControllers();
 				BestFitColumns();
@@ -84,7 +86,14 @@ namespace ShomreiTorah.Data.UI.Grid {
 				Columns.Remove(column);
 		}
 
+		internal void SendKeyDown(KeyEventArgs e) { Handler.SendKeyDown(e); }
+		internal void SendKeyPress(KeyPressEventArgs e) { Handler.SendKeyPress(e); }
+		internal void SendKeyUp(KeyEventArgs e) { Handler.SendKeyUp(e); }
 		sealed partial class MyHandler : GridHandler {
+			internal void SendKeyDown(KeyEventArgs e) { OnKeyDown(e); }
+			internal void SendKeyPress(KeyPressEventArgs e) { OnKeyPress(e); }
+			internal void SendKeyUp(KeyEventArgs e) { OnKeyUp(e); }
+
 			public MyHandler(SmartGridView view) : base(view) { }
 
 			public new SmartGridView View { get { return (SmartGridView)base.View; } }
