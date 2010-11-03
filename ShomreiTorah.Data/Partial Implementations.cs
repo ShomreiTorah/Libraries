@@ -220,6 +220,7 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the amount with the sign as reflected in the balance due.</summary>
 		public decimal SignedAmount { get { return -Amount; } }
 	}
+	partial class MelaveMalkaInvitation : IOwnedObject { }
 	partial class EmailAddress : IOwnedObject { }
 	partial class LoggedStatement : IOwnedObject { }
 	partial class SeatingReservation : IOwnedObject {
