@@ -112,6 +112,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			dragScrollTimer.Stop();
 			isTrackingMouseDown = false;
 			isKeyDown = false;
+			Bounds = ConstrainHeight(Bounds, Properties.UserPopupHeight);
 		}
 
 		///<summary>Sets the result of the popup to the currently hovered item.</summary>
