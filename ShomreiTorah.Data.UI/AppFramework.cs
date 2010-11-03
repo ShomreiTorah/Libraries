@@ -25,7 +25,18 @@ namespace ShomreiTorah.Data.UI {
 			var dh = (IDesignerHost)LicenseManager.CurrentContext.GetService(typeof(IDesignerHost));
 			if (dh == null) return;
 
-			var rootType = Type.GetType(GetTargetNamespace(dh) + "." + dh.RootComponentClassName);
+			string typeName;
+			if (dh.RootComponentClassName.Contains('.'))
+				typeName = dh.RootComponentClassName;
+			else
+				typeName = GetTargetNamespace(dh) + "." + dh.RootComponentClassName;
+			var rootType = Type.GetType(typeName);
+			if (rootType == null) {
+				MessageBox.Show("Cannot find  type " + typeName + ".\r\nTry rebuilding the project.",
+								"Shomrei Torah Design System", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+
+			}
 			//TODO: TypeScan fall-back if GetTargetNamespace fails; error handling
 
 			if (rootType.Assembly.EntryPoint == null) return;	//Type is in a DLL
