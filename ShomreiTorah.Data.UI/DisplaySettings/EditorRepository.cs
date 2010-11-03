@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Mask;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid.Columns;
@@ -32,7 +33,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			});
 			AccountEditor = new ComboBoxSettings(Names.AccountNames);
 			PaymentMethodEditor = new ComboBoxSettings(Names.PaymentMethods);
-			MelaveMalkaSourceEditor = new ComboBoxSettings(Names.MelaveMalkaSources);
+			MelaveMalkaSourceEditor = new ComboBoxSettings(Names.MelaveMalkaSources, p => p.TextEditStyle = TextEditStyles.DisableTextEditor);
 
 			StateEditor = new ComboBoxSettings(Names.CommonStates.Concat(Names.StateAbbreviations));
 			ZipEditor = new EditorSettings<RepositoryItemTextEdit>(properties => {
