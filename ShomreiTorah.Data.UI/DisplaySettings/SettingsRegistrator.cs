@@ -137,9 +137,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				)
 			);
 			GridManager.RegisterBehavior(MelaveMalkaInvitation.Schema,
-				DeletionBehavior.WithMessages(
-					"Melave Malka invitation",
-					"Melave Malka invitations"
+				DeletionBehavior.WithMessages<MelaveMalkaInvitation>(
+					singular: mmi => "Are you sure you want to uninvite " + mmi.Person.FullName + "?",
+					plural: mmis => "Are you sure you want to uninvite " + mmis.Count() + " people?"
 				)
 			);
 			GridManager.RegisterBehavior(Pledge.Schema,
