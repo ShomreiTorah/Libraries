@@ -101,7 +101,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		internal override void OnDataSourceSet() {
 			base.OnDataSourceSet();
-			descriptor = Owner.ItemProperties.Cast<PropertyDescriptor>().FirstOrDefault(pd => pd.Name == FieldName);
+			if (Owner.ItemProperties != null)
+				descriptor = Owner.ItemProperties.Find(FieldName, ignoreCase: false);
 		}
 		PropertyDescriptor descriptor;
 
