@@ -122,7 +122,7 @@ namespace ShomreiTorah.Data.UI {
 			RegisterSettings();
 			Debug.Assert(!String.IsNullOrWhiteSpace(Dialog.DefaultTitle), "Please set a dialog title (in RegisterSettings)");
 
-			//TODO: Updates, Error handling
+			//TODO: Updates
 			SetSplashCaption("Reading database");
 			SyncContext = CreateDataContext();
 			SyncContext.ReadData();
