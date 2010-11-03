@@ -339,7 +339,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="PersonId" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person invited" Expression="" ForeignRelationName="Invitees" ForeignRelationPropertyDescription="Gets the person's Melave Malka invitations." ForeignRelationPropertyName="Invitees" GenerateSqlMapping="true" IsUnique="false" PropertyName="PersonId" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person invited." Expression="" ForeignRelationName="Invitees" ForeignRelationPropertyDescription="Gets the person's Melave Malka invitations." ForeignRelationPropertyName="Invitees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -350,6 +350,11 @@
       </DefaultValue>
     </Column>
     <Column Name="Source" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the source of the invitation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Source" PropertyVisibility="Public" SqlName="Source">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="DateAdded" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date that the invitation was entered." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DateAdded" PropertyVisibility="Public" SqlName="DateAdded">
       <DefaultValue>
         <Null />
       </DefaultValue>

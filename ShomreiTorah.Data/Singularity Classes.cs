@@ -424,12 +424,14 @@ namespace ShomreiTorah.Data {
         
         ///<summary>Gets the schema's RowId column.</summary>
         public static ValueColumn RowIdColumn { get; private set; }
-        ///<summary>Gets the schema's PersonId column.</summary>
-        public static ForeignKeyColumn PersonIdColumn { get; private set; }
+        ///<summary>Gets the schema's Person column.</summary>
+        public static ForeignKeyColumn PersonColumn { get; private set; }
         ///<summary>Gets the schema's Year column.</summary>
         public static ValueColumn YearColumn { get; private set; }
         ///<summary>Gets the schema's Source column.</summary>
         public static ValueColumn SourceColumn { get; private set; }
+        ///<summary>Gets the schema's DateAdded column.</summary>
+        public static ValueColumn DateAddedColumn { get; private set; }
         
         ///<summary>Gets the Invitees schema instance.</summary>
         public static new TypedSchema<MelaveMalkaInvitation> Schema { get; private set; }
@@ -446,14 +448,17 @@ namespace ShomreiTorah.Data {
             RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             
-            PersonIdColumn = Schema.Columns.AddForeignKey("PersonId", ShomreiTorah.Data.Person.Schema, "Invitees");
-            PersonIdColumn.AllowNulls = false;
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Invitees");
+            PersonColumn.AllowNulls = false;
             
             YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
             YearColumn.AllowNulls = false;
             
             SourceColumn = Schema.Columns.AddValueColumn("Source", typeof(String), null);
             SourceColumn.AllowNulls = false;
+            
+            DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
+            DateAddedColumn.AllowNulls = false;
             #endregion
             
             #region Create SchemaMapping
@@ -462,9 +467,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SqlSchemaName = "MelaveMalka";
             
             SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
-            SchemaMapping.Columns.AddMapping(PersonIdColumn, "PersonId");
+            SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
             SchemaMapping.Columns.AddMapping(YearColumn, "Year");
             SchemaMapping.Columns.AddMapping(SourceColumn, "Source");
+            SchemaMapping.Columns.AddMapping(DateAddedColumn, "DateAdded");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -477,12 +483,12 @@ namespace ShomreiTorah.Data {
             get { return base.Field<Guid>(RowIdColumn); }
             set { base[RowIdColumn] = value; }
         }
-        ///<summary>Gets or sets the person invited</summary>
+        ///<summary>Gets or sets the person invited.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Person PersonId {
-            get { return base.Field<Person>(PersonIdColumn); }
-            set { base[PersonIdColumn] = value; }
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
+            set { base[PersonColumn] = value; }
         }
         ///<summary>Gets or sets the year that the invitation applies to.</summary>
         [DebuggerNonUserCode]
@@ -498,6 +504,13 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(SourceColumn); }
             set { base[SourceColumn] = value; }
         }
+        ///<summary>Gets or sets the date that the invitation was entered.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime DateAdded {
+            get { return base.Field<DateTime>(DateAddedColumn); }
+            set { base[DateAddedColumn] = value; }
+        }
         #endregion
         
         #region Partial Methods
@@ -506,14 +519,17 @@ namespace ShomreiTorah.Data {
         partial void ValidateRowId(Guid newValue, Action<string> error);
         partial void OnRowIdChanged(Guid oldValue, Guid newValue);
         
-        partial void ValidatePersonId(Person newValue, Action<string> error);
-        partial void OnPersonIdChanged(Person oldValue, Person newValue);
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateYear(Int32 newValue, Action<string> error);
         partial void OnYearChanged(Int32 oldValue, Int32 newValue);
         
         partial void ValidateSource(String newValue, Action<string> error);
         partial void OnSourceChanged(String oldValue, String newValue);
+        
+        partial void ValidateDateAdded(DateTime newValue, Action<string> error);
+        partial void OnDateAddedChanged(DateTime oldValue, DateTime newValue);
         #endregion
         
         #region Column Callbacks
@@ -532,14 +548,17 @@ namespace ShomreiTorah.Data {
             if (column == RowIdColumn) {
                 ValidateRowId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == PersonIdColumn) {
-                ValidatePersonId((Person)newValue, reporter);
+            } else if (column == PersonColumn) {
+                ValidatePerson((Person)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == YearColumn) {
                 ValidateYear((Int32)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == SourceColumn) {
                 ValidateSource((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == DateAddedColumn) {
+                ValidateDateAdded((DateTime)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
@@ -552,12 +571,14 @@ namespace ShomreiTorah.Data {
             OnColumnChanged(column, oldValue, newValue);
             if (column == RowIdColumn)
             	OnRowIdChanged((Guid)oldValue, (Guid)newValue);
-            else if (column == PersonIdColumn)
-            	OnPersonIdChanged((Person)oldValue, (Person)newValue);
+            else if (column == PersonColumn)
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == YearColumn)
             	OnYearChanged((Int32)oldValue, (Int32)newValue);
             else if (column == SourceColumn)
             	OnSourceChanged((String)oldValue, (String)newValue);
+            else if (column == DateAddedColumn)
+            	OnDateAddedChanged((DateTime)oldValue, (DateTime)newValue);
         }
         #endregion
     }
@@ -763,7 +784,7 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets the statements sent to the person.</summary>
         public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         ///<summary>Gets the person's Melave Malka invitations.</summary>
-        public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonIdColumn); } }
+        public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonColumn); } }
         #endregion
         
         #region Partial Methods
