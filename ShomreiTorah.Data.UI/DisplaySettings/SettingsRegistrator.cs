@@ -35,6 +35,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			EditorRepository.Register(Person.ZipColumn, EditorRepository.ZipEditor);
 			EditorRepository.Register(Person.PhoneColumn, EditorRepository.PhoneEditor);
 
+			EditorRepository.Register(MelaveMalkaInvitation.SourceColumn, EditorRepository.MelaveMalkaSourceEditor);
+
 			EditorRepository.Register(Payment.MethodColumn, EditorRepository.PaymentMethodEditor);
 			EditorRepository.Register(Payment.CheckNumberColumn, new EditorSettings<Controls.RepositoryItemCheckNumberEdit>(p => { }));
 

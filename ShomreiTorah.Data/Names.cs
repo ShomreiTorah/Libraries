@@ -11,6 +11,13 @@ namespace ShomreiTorah.Data {
 	public static class Names {
 		static ReadOnlyCollection<string> Strings(params string[] values) { return new ReadOnlyCollection<string>(values); }
 
+		#region Melave Malka
+		///<summary>Gets the values for the Melave Malka's Source field.</summary>
+		public static readonly ReadOnlyCollection<string> MelaveMalkaSources = Strings("Shul", "Rav", "Honoree");
+		//TODO: AdType struct / class
+
+		#endregion
+
 		#region Billing-related
 		///<summary>Gets the names of the standard billing accounts.</summary>
 		public static readonly ReadOnlyCollection<string> AccountNames = Strings("Operating Fund", "Building Fund");
