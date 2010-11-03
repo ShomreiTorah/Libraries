@@ -413,6 +413,155 @@ namespace ShomreiTorah.Data {
         #endregion
     }
     
+    ///<summary>Describes a Melave Malka invitation.</summary>
+    public partial class MelaveMalkaInvitation : Row {
+        ///<summary>Creates a new MelaveMalkaInvitation instance.</summary>
+        public MelaveMalkaInvitation () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed Invitees table.</summary>
+        public static TypedTable<MelaveMalkaInvitation> CreateTable() { return new TypedTable<MelaveMalkaInvitation>(Schema, () => new MelaveMalkaInvitation()); }
+        
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
+        ///<summary>Gets the schema's PersonId column.</summary>
+        public static ForeignKeyColumn PersonIdColumn { get; private set; }
+        ///<summary>Gets the schema's Year column.</summary>
+        public static ValueColumn YearColumn { get; private set; }
+        ///<summary>Gets the schema's Source column.</summary>
+        public static ValueColumn SourceColumn { get; private set; }
+        
+        ///<summary>Gets the Invitees schema instance.</summary>
+        public static new TypedSchema<MelaveMalkaInvitation> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server Invitees table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static MelaveMalkaInvitation() {
+            #region Create Schema
+            Schema = new TypedSchema<MelaveMalkaInvitation>("Invitees");
+            
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
+            RowIdColumn.AllowNulls = false;
+            
+            PersonIdColumn = Schema.Columns.AddForeignKey("PersonId", ShomreiTorah.Data.Person.Schema, "Invitees");
+            PersonIdColumn.AllowNulls = false;
+            
+            YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
+            YearColumn.AllowNulls = false;
+            
+            SourceColumn = Schema.Columns.AddValueColumn("Source", typeof(String), null);
+            SourceColumn.AllowNulls = false;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "Invitees";
+            SchemaMapping.SqlSchemaName = "MelaveMalka";
+            
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
+            SchemaMapping.Columns.AddMapping(PersonIdColumn, "PersonId");
+            SchemaMapping.Columns.AddMapping(YearColumn, "Year");
+            SchemaMapping.Columns.AddMapping(SourceColumn, "Source");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        #region Value Properties
+        ///<summary>Gets or sets the row id of the invitee.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the person invited</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person PersonId {
+            get { return base.Field<Person>(PersonIdColumn); }
+            set { base[PersonIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the year that the invitation applies to.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 Year {
+            get { return base.Field<Int32>(YearColumn); }
+            set { base[YearColumn] = value; }
+        }
+        ///<summary>Gets or sets the source of the invitation.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String Source {
+            get { return base.Field<String>(SourceColumn); }
+            set { base[SourceColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid oldValue, Guid newValue);
+        
+        partial void ValidatePersonId(Person newValue, Action<string> error);
+        partial void OnPersonIdChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateYear(Int32 newValue, Action<string> error);
+        partial void OnYearChanged(Int32 oldValue, Int32 newValue);
+        
+        partial void ValidateSource(String newValue, Action<string> error);
+        partial void OnSourceChanged(String oldValue, String newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == PersonIdColumn) {
+                ValidatePersonId((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == YearColumn) {
+                ValidateYear((Int32)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == SourceColumn) {
+                ValidateSource((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == RowIdColumn)
+            	OnRowIdChanged((Guid)oldValue, (Guid)newValue);
+            else if (column == PersonIdColumn)
+            	OnPersonIdChanged((Person)oldValue, (Person)newValue);
+            else if (column == YearColumn)
+            	OnYearChanged((Int32)oldValue, (Int32)newValue);
+            else if (column == SourceColumn)
+            	OnSourceChanged((String)oldValue, (String)newValue);
+        }
+        #endregion
+    }
+    
     ///<summary>Describes a person.</summary>
     public partial class Person : Row {
         ///<summary>Creates a new Person instance.</summary>
@@ -613,6 +762,8 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<EmailAddress> EmailAddresses { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
         ///<summary>Gets the statements sent to the person.</summary>
         public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
+        ///<summary>Gets the person's Melave Malka invitations.</summary>
+        public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonIdColumn); } }
         #endregion
         
         #region Partial Methods
