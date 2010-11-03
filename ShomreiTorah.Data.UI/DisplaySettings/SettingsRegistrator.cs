@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
+using System.Windows.Forms;
 using DevExpress.Data;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
@@ -316,12 +317,30 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			private PersonEditSettings() { }
 			public static readonly PersonEditSettings Instance = new PersonEditSettings();
 
+			//I need to set e.Handled to true to prevent the editor
+			//from sending the event to the grid's EditorContainer 
+			//handlers, which would double the effect.
+			static void HandleKeyEvent(object sender, KeyEventArgs e, Action<SmartGridView> handler) {
+				var view = (SmartGridView)((GridControl)((BaseEdit)sender).Parent).FocusedView;
+				handler(view);
+				e.Handled = true;
+			}
+			static void HandleKeyPressEvent(object sender, KeyPressEventArgs e) {
+				var view = (SmartGridView)((GridControl)((BaseEdit)sender).Parent).FocusedView;
+				view.SendKeyPress(e);
+				e.Handled = true;
+			}
+
 			public override void Apply(RepositoryItemButtonEdit item) {
 				item.TextEditStyle = TextEditStyles.DisableTextEditor;
 				item.Buttons.Clear();
 				item.Buttons.Add(new EditorButton(ButtonPredefines.Glyph) { Image = Resources.UserGrid, IsLeft = true, SuperTip = Utilities.CreateSuperTip(body: "Show Person") });
 
-				//TODO: Forward KeyUp
+				//Forward all keyboard events to the grid; this editor should behave as part of the grid
+				item.KeyDown += (sender, e) => HandleKeyEvent(sender, e, view => view.SendKeyDown(e));
+				item.KeyPress += (sender, e) => HandleKeyPressEvent(sender, e);
+				item.KeyUp += (sender, e) => HandleKeyEvent(sender, e, view => view.SendKeyUp(e));
+
 				item.CustomDisplayText += (sender, e) => {
 					var person = e.Value as Person;
 					if (person != null) e.DisplayText = person.FullName;
