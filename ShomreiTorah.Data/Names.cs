@@ -5,6 +5,7 @@ using System.Text;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
 using ShomreiTorah.Common;
+using System.Globalization;
 
 namespace ShomreiTorah.Data {
 	///<summary>Contains strings used by the data classes.</summary>
@@ -14,8 +15,8 @@ namespace ShomreiTorah.Data {
 		#region Melave Malka
 		///<summary>Gets the values for the Melave Malka's Source field.</summary>
 		public static readonly ReadOnlyCollection<string> MelaveMalkaSources = Strings("Shul", "Rav", "Honoree");
-		//TODO: AdType struct / class
-
+		///<summary>Gets the pre-defined ad types in the journal.</summary>
+		public static ReadOnlyCollection<AdType> AdTypes { get { return AdType.All; } }
 		#endregion
 
 		#region Billing-related
@@ -48,10 +49,7 @@ namespace ShomreiTorah.Data {
 			new PledgeType("מי שברך",	
 							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
 												"מפטיר יונה", "אתה הראית", "חתן תורה", "חתן בראשית" }),
-			new PledgeType("Melave Malka Journal", 
-							subTypes: new[]{	"Diamond ad",	"Platinum ad",		"Gold ad",
-												"Silver ad",	"Bronze ad",		"Full page ad", 
-												"Half page ad", "Quarter page ad",	"Greeting ad" }),
+			new PledgeType("Melave Malka Journal", AdTypes.Select(a => a.PledgeSubType).ToArray()),
 			new PledgeType("Melave Malka Raffle"),
 			new PledgeType("Shalach Manos"),
 		});
@@ -137,5 +135,50 @@ namespace ShomreiTorah.Data {
 
 		///<summary>Returns the name of the pledge type.</summary>
 		public override string ToString() { return Name; }
+	}
+
+	///<summary>Represents a type of ad in the journal.</summary>
+	public class AdType {
+		///<summary>Gets the ID of the ad type.</summary>
+		public int Id { get; private set; }
+		///<summary>Gets the name of the ad type.</summary>
+		public string Name { get; private set; }
+		///<summary>Gets the price of the ad type.</summary>
+		public int DefaultPrice { get; private set; }
+		///<summary>Gets the price of the ad type.</summary>
+		public int AdsPerPage { get; private set; }
+
+		///<summary>Gets the name with price of the ad type.</summary>
+		///<remarks>This is used in drop-down lists.</remarks>
+		public string DisplayAs { get { return Name + " (" + DefaultPrice.ToString("c0", CultureInfo.CurrentCulture) + ")"; } }
+
+		///<summary>Gets the subtype used for a pledge of this ad type.</summary>
+		public string PledgeSubType {
+			get {
+				if (Name == "Greeting")
+					return "Greeting ad";
+				if (DefaultPrice > 180)
+					return Name + " ad";
+				else
+					return Name + " page ad";
+			}
+		}
+
+		private AdType(int id, string name, int defaultPrice, int adsPerPage) { Id = id; Name = name; DefaultPrice = defaultPrice; AdsPerPage = adsPerPage; }
+
+		///<summary>Returns a string representation of this ad type.</summary>
+		public override string ToString() { return DisplayAs; }
+		//Exposed by Names for consistency
+		internal readonly static ReadOnlyCollection<AdType> All = new ReadOnlyCollection<AdType>(new AdType[] { 
+			new AdType(1,	"Diamond",	1000,	1),
+			new AdType(2,	"Platinum",	750,	1),
+			new AdType(3,	"Gold",		500,	1),
+			new AdType(4,	"Silver",	360,	1),
+			new AdType(5,	"Bronze",	250,	1),
+			new AdType(6,	"Full",		180,	1),
+			new AdType(7,	"Half",		100,	2),
+			new AdType(8,	"Quarter",	72,		4),
+			new AdType(9,	"Greeting",	36,		10)
+		});
 	}
 }
