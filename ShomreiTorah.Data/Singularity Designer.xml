@@ -381,7 +381,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="ExternalId" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets an external identifier for the ad.  This field is not used internally." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ExternalId" PropertyVisibility="Public" SqlName="ExternalId">
+    <Column Name="ExternalId" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets an external identifier for the ad.  This field links ads to pledges and payments" Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ExternalId" PropertyVisibility="Public" SqlName="ExternalId">
       <DefaultValue>
         <Null />
       </DefaultValue>

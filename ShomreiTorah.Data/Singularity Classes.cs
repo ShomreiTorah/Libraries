@@ -53,7 +53,7 @@ namespace ShomreiTorah.Data {
             AdTypeColumn.AllowNulls = false;
             
             ExternalIdColumn = Schema.Columns.AddValueColumn("ExternalId", typeof(Int32), null);
-            ExternalIdColumn.AllowNulls = true;
+            ExternalIdColumn.AllowNulls = false;
             
             CommentsColumn = Schema.Columns.AddValueColumn("Comments", typeof(String), null);
             CommentsColumn.AllowNulls = true;
@@ -103,11 +103,11 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(AdTypeColumn); }
             set { base[AdTypeColumn] = value; }
         }
-        ///<summary>Gets or sets an external identifier for the ad.  This field is not used internally.</summary>
+        ///<summary>Gets or sets an external identifier for the ad.  This field links ads to pledges and payments</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Int32? ExternalId {
-            get { return base.Field<Int32?>(ExternalIdColumn); }
+        public Int32 ExternalId {
+            get { return base.Field<Int32>(ExternalIdColumn); }
             set { base[ExternalIdColumn] = value; }
         }
         ///<summary>Gets or sets comments regarding the ad.</summary>
@@ -123,18 +123,18 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidateAdId(Guid newValue, Action<string> error);
-        partial void OnAdIdChanged(Guid oldValue, Guid newValue);
+        partial void OnAdIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidateYear(Int32 newValue, Action<string> error);
-        partial void OnYearChanged(Int32 oldValue, Int32 newValue);
+        partial void OnYearChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateDateAdded(DateTime newValue, Action<string> error);
-        partial void OnDateAddedChanged(DateTime oldValue, DateTime newValue);
+        partial void OnDateAddedChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateAdType(String newValue, Action<string> error);
         partial void OnAdTypeChanged(String oldValue, String newValue);
         
-        partial void ValidateExternalId(Int32? newValue, Action<string> error);
+        partial void ValidateExternalId(Int32 newValue, Action<string> error);
         partial void OnExternalIdChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateComments(String newValue, Action<string> error);
@@ -167,7 +167,7 @@ namespace ShomreiTorah.Data {
                 ValidateAdType((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == ExternalIdColumn) {
-                ValidateExternalId((Int32?)newValue, reporter);
+                ValidateExternalId((Int32)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == CommentsColumn) {
                 ValidateComments((String)newValue, reporter);
@@ -182,11 +182,11 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == AdIdColumn)
-            	OnAdIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnAdIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == YearColumn)
-            	OnYearChanged((Int32)oldValue, (Int32)newValue);
+            	OnYearChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == DateAddedColumn)
-            	OnDateAddedChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnDateAddedChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == AdTypeColumn)
             	OnAdTypeChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
@@ -313,13 +313,13 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidateDepositId(Guid newValue, Action<string> error);
-        partial void OnDepositIdChanged(Guid oldValue, Guid newValue);
+        partial void OnDepositIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidateDate(DateTime newValue, Action<string> error);
-        partial void OnDateChanged(DateTime oldValue, DateTime newValue);
+        partial void OnDateChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateNumber(Int32 newValue, Action<string> error);
-        partial void OnNumberChanged(Int32 oldValue, Int32 newValue);
+        partial void OnNumberChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateAccount(String newValue, Action<string> error);
         partial void OnAccountChanged(String oldValue, String newValue);
@@ -360,11 +360,11 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == DepositIdColumn)
-            	OnDepositIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnDepositIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == DateColumn)
-            	OnDateChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnDateChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == NumberColumn)
-            	OnNumberChanged((Int32)oldValue, (Int32)newValue);
+            	OnNumberChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == AccountColumn)
             	OnAccountChanged((String)oldValue, (String)newValue);
         }
@@ -523,19 +523,19 @@ namespace ShomreiTorah.Data {
         partial void OnRandomCodeChanged(String oldValue, String newValue);
         
         partial void ValidateActive(Boolean newValue, Action<string> error);
-        partial void OnActiveChanged(Boolean oldValue, Boolean newValue);
+        partial void OnActiveChanged(Boolean? oldValue, Boolean? newValue);
         
         partial void ValidateDateAdded(DateTime newValue, Action<string> error);
-        partial void OnDateAddedChanged(DateTime oldValue, DateTime newValue);
+        partial void OnDateAddedChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateUseHtml(Boolean newValue, Action<string> error);
-        partial void OnUseHtmlChanged(Boolean oldValue, Boolean newValue);
+        partial void OnUseHtmlChanged(Boolean? oldValue, Boolean? newValue);
         
         partial void ValidatePerson(Person newValue, Action<string> error);
         partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateRowId(Guid newValue, Action<string> error);
-        partial void OnRowIdChanged(Guid oldValue, Guid newValue);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
         #endregion
         
         #region Column Callbacks
@@ -591,15 +591,15 @@ namespace ShomreiTorah.Data {
             else if (column == RandomCodeColumn)
             	OnRandomCodeChanged((String)oldValue, (String)newValue);
             else if (column == ActiveColumn)
-            	OnActiveChanged((Boolean)oldValue, (Boolean)newValue);
+            	OnActiveChanged((Boolean?)oldValue, (Boolean?)newValue);
             else if (column == DateAddedColumn)
-            	OnDateAddedChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnDateAddedChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == UseHtmlColumn)
-            	OnUseHtmlChanged((Boolean)oldValue, (Boolean)newValue);
+            	OnUseHtmlChanged((Boolean?)oldValue, (Boolean?)newValue);
             else if (column == PersonColumn)
             	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == RowIdColumn)
-            	OnRowIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
         }
         #endregion
     }
@@ -708,19 +708,19 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidateRowId(Guid newValue, Action<string> error);
-        partial void OnRowIdChanged(Guid oldValue, Guid newValue);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidatePerson(Person newValue, Action<string> error);
         partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateYear(Int32 newValue, Action<string> error);
-        partial void OnYearChanged(Int32 oldValue, Int32 newValue);
+        partial void OnYearChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateSource(String newValue, Action<string> error);
         partial void OnSourceChanged(String oldValue, String newValue);
         
         partial void ValidateDateAdded(DateTime newValue, Action<string> error);
-        partial void OnDateAddedChanged(DateTime oldValue, DateTime newValue);
+        partial void OnDateAddedChanged(DateTime? oldValue, DateTime? newValue);
         #endregion
         
         #region Column Callbacks
@@ -761,15 +761,15 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == RowIdColumn)
-            	OnRowIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == PersonColumn)
             	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == YearColumn)
-            	OnYearChanged((Int32)oldValue, (Int32)newValue);
+            	OnYearChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == SourceColumn)
             	OnSourceChanged((String)oldValue, (String)newValue);
             else if (column == DateAddedColumn)
-            	OnDateAddedChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnDateAddedChanged((DateTime?)oldValue, (DateTime?)newValue);
         }
         #endregion
     }
@@ -982,7 +982,7 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidateId(Guid newValue, Action<string> error);
-        partial void OnIdChanged(Guid oldValue, Guid newValue);
+        partial void OnIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidateYKID(Int32? newValue, Action<string> error);
         partial void OnYKIDChanged(Int32? oldValue, Int32? newValue);
@@ -1077,7 +1077,7 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
-            	OnIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == YKIDColumn)
             	OnYKIDChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == LastNameColumn)
@@ -1312,13 +1312,13 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidatePaymentId(Guid newValue, Action<string> error);
-        partial void OnPaymentIdChanged(Guid oldValue, Guid newValue);
+        partial void OnPaymentIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidatePerson(Person newValue, Action<string> error);
         partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateDate(DateTime newValue, Action<string> error);
-        partial void OnDateChanged(DateTime oldValue, DateTime newValue);
+        partial void OnDateChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateMethod(String newValue, Action<string> error);
         partial void OnMethodChanged(String oldValue, String newValue);
@@ -1330,7 +1330,7 @@ namespace ShomreiTorah.Data {
         partial void OnAccountChanged(String oldValue, String newValue);
         
         partial void ValidateAmount(Decimal newValue, Action<string> error);
-        partial void OnAmountChanged(Decimal oldValue, Decimal newValue);
+        partial void OnAmountChanged(Decimal? oldValue, Decimal? newValue);
         
         partial void ValidateDeposit(Deposit newValue, Action<string> error);
         partial void OnDepositChanged(Deposit oldValue, Deposit newValue);
@@ -1339,7 +1339,7 @@ namespace ShomreiTorah.Data {
         partial void OnCommentsChanged(String oldValue, String newValue);
         
         partial void ValidateModified(DateTime newValue, Action<string> error);
-        partial void OnModifiedChanged(DateTime oldValue, DateTime newValue);
+        partial void OnModifiedChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateModifier(String newValue, Action<string> error);
         partial void OnModifierChanged(String oldValue, String newValue);
@@ -1413,11 +1413,11 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == PaymentIdColumn)
-            	OnPaymentIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnPaymentIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == PersonColumn)
             	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == DateColumn)
-            	OnDateChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnDateChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == MethodColumn)
             	OnMethodChanged((String)oldValue, (String)newValue);
             else if (column == CheckNumberColumn)
@@ -1425,13 +1425,13 @@ namespace ShomreiTorah.Data {
             else if (column == AccountColumn)
             	OnAccountChanged((String)oldValue, (String)newValue);
             else if (column == AmountColumn)
-            	OnAmountChanged((Decimal)oldValue, (Decimal)newValue);
+            	OnAmountChanged((Decimal?)oldValue, (Decimal?)newValue);
             else if (column == DepositColumn)
             	OnDepositChanged((Deposit)oldValue, (Deposit)newValue);
             else if (column == CommentsColumn)
             	OnCommentsChanged((String)oldValue, (String)newValue);
             else if (column == ModifiedColumn)
-            	OnModifiedChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnModifiedChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == ModifierColumn)
             	OnModifierChanged((String)oldValue, (String)newValue);
             else if (column == ExternalSourceColumn)
@@ -1655,13 +1655,13 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidatePledgeId(Guid newValue, Action<string> error);
-        partial void OnPledgeIdChanged(Guid oldValue, Guid newValue);
+        partial void OnPledgeIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidatePerson(Person newValue, Action<string> error);
         partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateDate(DateTime newValue, Action<string> error);
-        partial void OnDateChanged(DateTime oldValue, DateTime newValue);
+        partial void OnDateChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateType(String newValue, Action<string> error);
         partial void OnTypeChanged(String oldValue, String newValue);
@@ -1673,7 +1673,7 @@ namespace ShomreiTorah.Data {
         partial void OnAccountChanged(String oldValue, String newValue);
         
         partial void ValidateAmount(Decimal newValue, Action<string> error);
-        partial void OnAmountChanged(Decimal oldValue, Decimal newValue);
+        partial void OnAmountChanged(Decimal? oldValue, Decimal? newValue);
         
         partial void ValidateNote(String newValue, Action<string> error);
         partial void OnNoteChanged(String oldValue, String newValue);
@@ -1682,7 +1682,7 @@ namespace ShomreiTorah.Data {
         partial void OnCommentsChanged(String oldValue, String newValue);
         
         partial void ValidateModified(DateTime newValue, Action<string> error);
-        partial void OnModifiedChanged(DateTime oldValue, DateTime newValue);
+        partial void OnModifiedChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateModifier(String newValue, Action<string> error);
         partial void OnModifierChanged(String oldValue, String newValue);
@@ -1756,11 +1756,11 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == PledgeIdColumn)
-            	OnPledgeIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnPledgeIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == PersonColumn)
             	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == DateColumn)
-            	OnDateChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnDateChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == TypeColumn)
             	OnTypeChanged((String)oldValue, (String)newValue);
             else if (column == SubTypeColumn)
@@ -1768,13 +1768,13 @@ namespace ShomreiTorah.Data {
             else if (column == AccountColumn)
             	OnAccountChanged((String)oldValue, (String)newValue);
             else if (column == AmountColumn)
-            	OnAmountChanged((Decimal)oldValue, (Decimal)newValue);
+            	OnAmountChanged((Decimal?)oldValue, (Decimal?)newValue);
             else if (column == NoteColumn)
             	OnNoteChanged((String)oldValue, (String)newValue);
             else if (column == CommentsColumn)
             	OnCommentsChanged((String)oldValue, (String)newValue);
             else if (column == ModifiedColumn)
-            	OnModifiedChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnModifiedChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == ModifierColumn)
             	OnModifierChanged((String)oldValue, (String)newValue);
             else if (column == ExternalSourceColumn)
@@ -1916,22 +1916,22 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidateId(Guid newValue, Action<string> error);
-        partial void OnIdChanged(Guid oldValue, Guid newValue);
+        partial void OnIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidatePledge(Pledge newValue, Action<string> error);
         partial void OnPledgeChanged(Pledge oldValue, Pledge newValue);
         
         partial void ValidateMensSeats(Int32 newValue, Action<string> error);
-        partial void OnMensSeatsChanged(Int32 oldValue, Int32 newValue);
+        partial void OnMensSeatsChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateWomensSeats(Int32 newValue, Action<string> error);
-        partial void OnWomensSeatsChanged(Int32 oldValue, Int32 newValue);
+        partial void OnWomensSeatsChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateBoysSeats(Int32 newValue, Action<string> error);
-        partial void OnBoysSeatsChanged(Int32 oldValue, Int32 newValue);
+        partial void OnBoysSeatsChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateGirlsSeats(Int32 newValue, Action<string> error);
-        partial void OnGirlsSeatsChanged(Int32 oldValue, Int32 newValue);
+        partial void OnGirlsSeatsChanged(Int32? oldValue, Int32? newValue);
         
         partial void ValidateNotes(String newValue, Action<string> error);
         partial void OnNotesChanged(String oldValue, String newValue);
@@ -1981,17 +1981,17 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
-            	OnIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == PledgeColumn)
             	OnPledgeChanged((Pledge)oldValue, (Pledge)newValue);
             else if (column == MensSeatsColumn)
-            	OnMensSeatsChanged((Int32)oldValue, (Int32)newValue);
+            	OnMensSeatsChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == WomensSeatsColumn)
-            	OnWomensSeatsChanged((Int32)oldValue, (Int32)newValue);
+            	OnWomensSeatsChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == BoysSeatsColumn)
-            	OnBoysSeatsChanged((Int32)oldValue, (Int32)newValue);
+            	OnBoysSeatsChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == GirlsSeatsColumn)
-            	OnGirlsSeatsChanged((Int32)oldValue, (Int32)newValue);
+            	OnGirlsSeatsChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == NotesColumn)
             	OnNotesChanged((String)oldValue, (String)newValue);
         }
@@ -2141,13 +2141,13 @@ namespace ShomreiTorah.Data {
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
         partial void ValidateId(Guid newValue, Action<string> error);
-        partial void OnIdChanged(Guid oldValue, Guid newValue);
+        partial void OnIdChanged(Guid? oldValue, Guid? newValue);
         
         partial void ValidatePerson(Person newValue, Action<string> error);
         partial void OnPersonChanged(Person oldValue, Person newValue);
         
         partial void ValidateDateGenerated(DateTime newValue, Action<string> error);
-        partial void OnDateGeneratedChanged(DateTime oldValue, DateTime newValue);
+        partial void OnDateGeneratedChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateMedia(String newValue, Action<string> error);
         partial void OnMediaChanged(String oldValue, String newValue);
@@ -2156,10 +2156,10 @@ namespace ShomreiTorah.Data {
         partial void OnStatementKindChanged(String oldValue, String newValue);
         
         partial void ValidateStartDate(DateTime newValue, Action<string> error);
-        partial void OnStartDateChanged(DateTime oldValue, DateTime newValue);
+        partial void OnStartDateChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateEndDate(DateTime newValue, Action<string> error);
-        partial void OnEndDateChanged(DateTime oldValue, DateTime newValue);
+        partial void OnEndDateChanged(DateTime? oldValue, DateTime? newValue);
         
         partial void ValidateUserName(String newValue, Action<string> error);
         partial void OnUserNameChanged(String oldValue, String newValue);
@@ -2212,19 +2212,19 @@ namespace ShomreiTorah.Data {
             base.OnValueChanged(column, oldValue, newValue);
             OnColumnChanged(column, oldValue, newValue);
             if (column == IdColumn)
-            	OnIdChanged((Guid)oldValue, (Guid)newValue);
+            	OnIdChanged((Guid?)oldValue, (Guid?)newValue);
             else if (column == PersonColumn)
             	OnPersonChanged((Person)oldValue, (Person)newValue);
             else if (column == DateGeneratedColumn)
-            	OnDateGeneratedChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnDateGeneratedChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == MediaColumn)
             	OnMediaChanged((String)oldValue, (String)newValue);
             else if (column == StatementKindColumn)
             	OnStatementKindChanged((String)oldValue, (String)newValue);
             else if (column == StartDateColumn)
-            	OnStartDateChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnStartDateChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == EndDateColumn)
-            	OnEndDateChanged((DateTime)oldValue, (DateTime)newValue);
+            	OnEndDateChanged((DateTime?)oldValue, (DateTime?)newValue);
             else if (column == UserNameColumn)
             	OnUserNameChanged((String)oldValue, (String)newValue);
         }
