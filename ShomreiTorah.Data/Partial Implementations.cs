@@ -248,4 +248,25 @@ namespace ShomreiTorah.Data {
 		Person Person { get; }
 	}
 	#endregion
+
+	partial class JournalAd {
+		partial void OnExternalIdChanged(int? oldValue, int? newValue) {
+			if (oldValue == null || newValue == null) return;
+			if (Table == null) return;
+			if (Table.Context == null) return;
+
+			var pledges = Table.Context.Table<Pledge>().Rows
+							.Where(p => p.ExternalSource == "Journal " + Year && p.ExternalId == oldValue).ToArray();
+			foreach (var row in pledges)
+				row.ExternalId = newValue.Value;
+			var payments = Table.Context.Table<Payment>().Rows
+							.Where(p => p.ExternalSource == "Journal " + Year && p.ExternalId == oldValue).ToArray();
+			foreach (var row in payments)
+				row.ExternalId = newValue.Value;
+		}
+		partial void ValidateExternalId(int newValue, Action<string> error) {
+			if (Table.Rows.Any(r => r != this && r.Year == Year && r.ExternalId == newValue))
+				error("There is already an ad with external ID " + newValue);
+		}
+	}
 }
