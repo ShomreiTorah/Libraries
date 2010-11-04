@@ -74,6 +74,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<JournalAd> Table { get { return (TypedTable<JournalAd>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the ad id of the ad.</summary>
         [DebuggerNonUserCode]
@@ -261,6 +265,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<Deposit> Table { get { return (TypedTable<Deposit>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
@@ -451,6 +459,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<EmailAddress> Table { get { return (TypedTable<EmailAddress>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the name of the tbl ML member.</summary>
         [DebuggerNonUserCode]
@@ -666,6 +678,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<MelaveMalkaInvitation> Table { get { return (TypedTable<MelaveMalkaInvitation>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the row id of the invitee.</summary>
         [DebuggerNonUserCode]
@@ -878,6 +894,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<Person> Table { get { return (TypedTable<Person>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
@@ -1214,6 +1234,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<Payment> Table { get { return (TypedTable<Payment>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
@@ -1552,6 +1576,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<Pledge> Table { get { return (TypedTable<Pledge>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
@@ -1860,6 +1888,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<SeatingReservation> Table { get { return (TypedTable<SeatingReservation>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
@@ -2078,6 +2110,10 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
         
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<LoggedStatement> Table { get { return (TypedTable<LoggedStatement>)base.Table; } }
         #region Value Properties
         ///<summary>Gets or sets the row's unique ID.</summary>
         [DebuggerNonUserCode]
