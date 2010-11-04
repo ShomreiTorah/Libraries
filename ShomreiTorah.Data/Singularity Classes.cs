@@ -6,6 +6,197 @@ using ShomreiTorah.Singularity;
 using ShomreiTorah.Singularity.Sql;
 
 namespace ShomreiTorah.Data {
+    ///<summary>Describes an ad in the journal.</summary>
+    public partial class JournalAd : Row {
+        ///<summary>Creates a new JournalAd instance.</summary>
+        public JournalAd () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed Ads table.</summary>
+        public static TypedTable<JournalAd> CreateTable() { return new TypedTable<JournalAd>(Schema, () => new JournalAd()); }
+        
+        ///<summary>Gets the schema's AdId column.</summary>
+        public static ValueColumn AdIdColumn { get; private set; }
+        ///<summary>Gets the schema's Year column.</summary>
+        public static ValueColumn YearColumn { get; private set; }
+        ///<summary>Gets the schema's DateAdded column.</summary>
+        public static ValueColumn DateAddedColumn { get; private set; }
+        ///<summary>Gets the schema's AdType column.</summary>
+        public static ValueColumn AdTypeColumn { get; private set; }
+        ///<summary>Gets the schema's ExternalId column.</summary>
+        public static ValueColumn ExternalIdColumn { get; private set; }
+        ///<summary>Gets the schema's Comments column.</summary>
+        public static ValueColumn CommentsColumn { get; private set; }
+        
+        ///<summary>Gets the Ads schema instance.</summary>
+        public static new TypedSchema<JournalAd> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server Ads table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static JournalAd() {
+            #region Create Schema
+            Schema = new TypedSchema<JournalAd>("Ads");
+            
+            Schema.PrimaryKey = AdIdColumn = Schema.Columns.AddValueColumn("AdId", typeof(Guid), null);
+            AdIdColumn.Unique = true;
+            AdIdColumn.AllowNulls = false;
+            
+            YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
+            YearColumn.AllowNulls = false;
+            
+            DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
+            DateAddedColumn.AllowNulls = false;
+            
+            AdTypeColumn = Schema.Columns.AddValueColumn("AdType", typeof(String), null);
+            AdTypeColumn.AllowNulls = false;
+            
+            ExternalIdColumn = Schema.Columns.AddValueColumn("ExternalId", typeof(Int32), null);
+            ExternalIdColumn.AllowNulls = true;
+            
+            CommentsColumn = Schema.Columns.AddValueColumn("Comments", typeof(String), null);
+            CommentsColumn.AllowNulls = true;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "Ads";
+            SchemaMapping.SqlSchemaName = "MelaveMalka";
+            
+            SchemaMapping.Columns.AddMapping(AdIdColumn, "AdId");
+            SchemaMapping.Columns.AddMapping(YearColumn, "Year");
+            SchemaMapping.Columns.AddMapping(DateAddedColumn, "DateAdded");
+            SchemaMapping.Columns.AddMapping(AdTypeColumn, "AdType");
+            SchemaMapping.Columns.AddMapping(ExternalIdColumn, "ExternalId");
+            SchemaMapping.Columns.AddMapping(CommentsColumn, "Comments");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        #region Value Properties
+        ///<summary>Gets or sets the ad id of the ad.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid AdId {
+            get { return base.Field<Guid>(AdIdColumn); }
+            set { base[AdIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the year of the journal containing the ad.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 Year {
+            get { return base.Field<Int32>(YearColumn); }
+            set { base[YearColumn] = value; }
+        }
+        ///<summary>Gets or sets the date that the ad was entered.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime DateAdded {
+            get { return base.Field<DateTime>(DateAddedColumn); }
+            set { base[DateAddedColumn] = value; }
+        }
+        ///<summary>Gets or sets the ad type.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String AdType {
+            get { return base.Field<String>(AdTypeColumn); }
+            set { base[AdTypeColumn] = value; }
+        }
+        ///<summary>Gets or sets an external identifier for the ad.  This field is not used internally.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32? ExternalId {
+            get { return base.Field<Int32?>(ExternalIdColumn); }
+            set { base[ExternalIdColumn] = value; }
+        }
+        ///<summary>Gets or sets comments regarding the ad.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String Comments {
+            get { return base.Field<String>(CommentsColumn); }
+            set { base[CommentsColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateAdId(Guid newValue, Action<string> error);
+        partial void OnAdIdChanged(Guid oldValue, Guid newValue);
+        
+        partial void ValidateYear(Int32 newValue, Action<string> error);
+        partial void OnYearChanged(Int32 oldValue, Int32 newValue);
+        
+        partial void ValidateDateAdded(DateTime newValue, Action<string> error);
+        partial void OnDateAddedChanged(DateTime oldValue, DateTime newValue);
+        
+        partial void ValidateAdType(String newValue, Action<string> error);
+        partial void OnAdTypeChanged(String oldValue, String newValue);
+        
+        partial void ValidateExternalId(Int32? newValue, Action<string> error);
+        partial void OnExternalIdChanged(Int32? oldValue, Int32? newValue);
+        
+        partial void ValidateComments(String newValue, Action<string> error);
+        partial void OnCommentsChanged(String oldValue, String newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == AdIdColumn) {
+                ValidateAdId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == YearColumn) {
+                ValidateYear((Int32)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == DateAddedColumn) {
+                ValidateDateAdded((DateTime)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == AdTypeColumn) {
+                ValidateAdType((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == ExternalIdColumn) {
+                ValidateExternalId((Int32?)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == CommentsColumn) {
+                ValidateComments((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == AdIdColumn)
+            	OnAdIdChanged((Guid)oldValue, (Guid)newValue);
+            else if (column == YearColumn)
+            	OnYearChanged((Int32)oldValue, (Int32)newValue);
+            else if (column == DateAddedColumn)
+            	OnDateAddedChanged((DateTime)oldValue, (DateTime)newValue);
+            else if (column == AdTypeColumn)
+            	OnAdTypeChanged((String)oldValue, (String)newValue);
+            else if (column == ExternalIdColumn)
+            	OnExternalIdChanged((Int32?)oldValue, (Int32?)newValue);
+            else if (column == CommentsColumn)
+            	OnCommentsChanged((String)oldValue, (String)newValue);
+        }
+        #endregion
+    }
+    
     ///<summary>Describes a deposit.</summary>
     public partial class Deposit : Row {
         ///<summary>Creates a new Deposit instance.</summary>
