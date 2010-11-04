@@ -250,15 +250,60 @@ namespace ShomreiTorah.Data {
 	#endregion
 
 	partial class JournalAd {
+		partial void OnAdTypeChanged(string oldValue, string newValue) {
+			if (String.IsNullOrEmpty(oldValue) || String.IsNullOrEmpty(newValue)) return;
+			if (Table == null) return;
+			if (Table.IsLoadingData) return;
+			if (Table.Context == null) return;
+
+			var oldSubType = Names.AdTypes.First(t => t.Name == oldValue).PledgeSubType;
+			var newSubType = Names.AdTypes.First(t => t.Name == newValue).PledgeSubType;
+			foreach (var pledge in Pledges) {
+				if (pledge.SubType == oldSubType)
+					pledge.SubType = newSubType;
+			}
+		}
+
+		///<summary>Creates a pledge for this ad.</summary>
+		public Pledge CreatePledge() {
+			return new Pledge {
+				ExternalSource = "Journal " + Year,
+				ExternalId = ExternalId,
+				Date = DateAdded,
+				Type = "Melave Malka Journal",
+				SubType = Names.AdTypes.First(t => t.Name == AdType).PledgeSubType
+			};
+		}
+		///<summary>Creates a payment for this ad.</summary>
+		public Payment CreatePayment() {
+			return new Payment {
+				ExternalSource = "Journal " + Year,
+				ExternalId = ExternalId,
+				Date = DateAdded
+			};
+		}
+		///<summary>Gets the pledges linked to this ad.</summary>
+		public IEnumerable<Pledge> Pledges {
+			get { return Table.Context.Table<Pledge>().Rows.Where(p => p.ExternalSource == "Journal " + Year && p.ExternalId == ExternalId); }
+		}
+		///<summary>Gets the payments linked to this ad.</summary>
+		public IEnumerable<Payment> Payments {
+			get { return Table.Context.Table<Payment>().Rows.Where(p => p.ExternalSource == "Journal " + Year && p.ExternalId == ExternalId); }
+		}
+
 		partial void OnExternalIdChanged(int? oldValue, int? newValue) {
 			if (oldValue == null || newValue == null) return;
 			if (Table == null) return;
+			if (Table.IsLoadingData) return;
 			if (Table.Context == null) return;
 
+			//I can't use the properties since ExternalId has already changed.
+			//I need to force eager evaluation.
 			var pledges = Table.Context.Table<Pledge>().Rows
 							.Where(p => p.ExternalSource == "Journal " + Year && p.ExternalId == oldValue).ToArray();
 			foreach (var row in pledges)
 				row.ExternalId = newValue.Value;
+
 			var payments = Table.Context.Table<Payment>().Rows
 							.Where(p => p.ExternalSource == "Journal " + Year && p.ExternalId == oldValue).ToArray();
 			foreach (var row in payments)
