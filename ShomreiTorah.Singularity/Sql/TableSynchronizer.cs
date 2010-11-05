@@ -182,15 +182,17 @@ namespace ShomreiTorah.Singularity.Sql {
 
 		internal void WriteChanges(TransactionContext context, RowChangeType? changeType, IProgressReporter progress) {
 			IEnumerable<RowChange> relevantChanges;
-			progress = progress ?? new EmptyProgressReporter();
-			progress.Caption = "Saving " + Table.Schema.Name;
-
 			if (changeType == null)
 				relevantChanges = changes;
 			else
 				relevantChanges = changes.Where(rc => rc.ChangeType == changeType);
 
-			progress.Maximum = relevantChanges.Count();
+			var changeCount = changes.Count();
+			if (changeCount == 0) return;
+
+			progress = progress ?? new EmptyProgressReporter();	
+			progress.Caption = "Saving " + Table.Schema.Name;	//Only set caption if there are actually changes to save
+			progress.Maximum = changeCount;
 			int i = 0;
 			foreach (var change in relevantChanges) {
 				progress.Progress = i++;
