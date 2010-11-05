@@ -52,7 +52,7 @@ namespace ShomreiTorah.Singularity.Sql {
 		///<summary>Saves changes in the tables to the database.</summary>
 		public void WriteData(DbConnection connection, IProgressReporter progress) {
 			progress = progress ?? new EmptyProgressReporter();
-			progress.Caption = "Saving changes";
+			progress.Caption = "Saving database";
 			progress.Maximum = Tables.Sum(t => t.Changes.Count);
 
 			using (var transactionContext = new TransactionContext(connection)) {
