@@ -267,16 +267,18 @@ namespace ShomreiTorah.Data {
 		///<summary>Creates a pledge for this ad.</summary>
 		public Pledge CreatePledge() {
 			return new Pledge {
+				Type = "Melave Malka Journal",
+				SubType = Names.AdTypes.First(t => t.Name == AdType).PledgeSubType,
+				Account = Names.DefaultAccount,
 				ExternalSource = "Journal " + Year,
 				ExternalId = ExternalId,
-				Date = DateAdded,
-				Type = "Melave Malka Journal",
-				SubType = Names.AdTypes.First(t => t.Name == AdType).PledgeSubType
+				Date = DateAdded
 			};
 		}
 		///<summary>Creates a payment for this ad.</summary>
 		public Payment CreatePayment() {
 			return new Payment {
+				Account = Names.DefaultAccount,
 				ExternalSource = "Journal " + Year,
 				ExternalId = ExternalId,
 				Date = DateAdded
