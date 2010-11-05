@@ -74,7 +74,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 				//If there are enough items that the user's preferred
 				//height isn't being overridden, update it.  If there
 				//are too few items, resizes are not persisted, since
-				//they are subject to the limiy.
+				//they are subject to the limit.
 				if (value.Height < NaturalHeight && NaturalHeight > Properties.UserPopupHeight)
 					Properties.UserPopupHeight = value.Height;
 
