@@ -58,6 +58,8 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			Bounds = ConstrainHeight(Bounds, Properties.UserPopupHeight);
 
 			LayoutChanged();		//This call recalculates the ViewInfo.
+			if (Items.Count == 1)	//If there is only one item, allow the user to press enter immediately.
+				ViewInfo.HoveredIndex = 0;
 		}
 
 		#region Sizing control
