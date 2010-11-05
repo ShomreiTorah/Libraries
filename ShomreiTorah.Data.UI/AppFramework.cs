@@ -17,6 +17,7 @@ using ShomreiTorah.WinForms.Forms;
 namespace ShomreiTorah.Data.UI {
 	///<summary>The base class for a standard ShomreiTorah application.</summary>
 	public abstract class AppFramework {
+		#region Automatic Designer Registration
 		///<summary>Automatically registers the AppFramework for the current project at design time.</summary>
 		public static void AutoRegisterDesigner() {
 			if (Current != null) return;
@@ -35,11 +36,10 @@ namespace ShomreiTorah.Data.UI {
 				MessageBox.Show("Cannot find  type " + typeName + ".\r\nTry rebuilding the project.",
 								"Shomrei Torah Design System", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
-
 			}
 			//TODO: TypeScan fall-back if GetTargetNamespace fails; error handling
 
-			if (rootType.Assembly.EntryPoint == null) return;	//Type is in a DLL
+			//if (rootType.Assembly.EntryPoint == null) return;	//Type is in a DLL
 
 			var appFrameworkType = rootType.Assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(AppFramework)));
 
@@ -60,18 +60,21 @@ namespace ShomreiTorah.Data.UI {
 
 			return TypeNamespace.Name;
 		}
-
+		#endregion
 
 		///<summary>Gets the typed table for the given row type from the current application's DataContext.</summary>
 		public static TypedTable<TRow> Table<TRow>() where TRow : Row { return Current.DataContext.Table<TRow>(); }
 
 		///<summary>Gets the AppFramework instance for the current application.</summary>
 		///<remarks>This property is also available at design time.</remarks>
-		public static AppFramework Current { get; private set; }
+		public static AppFramework Current { get; protected set; }
 
 		bool isDesignTime = true;
 		///<summary>Indicates whether the code is running in the Visual Studio designer.</summary>
-		public bool IsDesignTime { get { return isDesignTime; } }
+		public bool IsDesignTime {
+			get { return isDesignTime; }
+			protected set { isDesignTime = value; }
+		}
 
 		///<summary>Registers an AppFramework instance for design time, if none is registered.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Ignore design-time SQL errors")]
@@ -79,7 +82,7 @@ namespace ShomreiTorah.Data.UI {
 			if (Current != null)
 				return;
 			Current = instance;
-			DisplaySettings.SettingsRegistrator.EnsureRegistered();
+			RegisterStandardSettings();
 			instance.RegisterSettings();
 			instance.SyncContext = instance.CreateDataContext();
 
@@ -93,7 +96,7 @@ namespace ShomreiTorah.Data.UI {
 		///<summary>Gets the Singularity DataContext used by the application.</summary>
 		public DataContext DataContext { get { return SyncContext.DataContext; } }
 		///<summary>Gets the DataSyncContext used to synchronize with a database server.</summary>
-		public DataSyncContext SyncContext { get; private set; }
+		public DataSyncContext SyncContext { get; protected set; }
 
 		///<summary>Overridden by derived classes to create the application's splash screen.  Called on the main thread.</summary>
 		protected abstract ISplashScreen CreateSplash();
@@ -129,13 +132,14 @@ namespace ShomreiTorah.Data.UI {
 			}
 
 			SetSplashCaption("Loading behaviors");
-			DisplaySettings.SettingsRegistrator.EnsureRegistered();
+			RegisterStandardSettings();
 			RegisterSettings();
 			Debug.Assert(!String.IsNullOrWhiteSpace(Dialog.DefaultTitle), "Please set a dialog title (in RegisterSettings)");
 
 			//TODO: Updates
 			SetSplashCaption("Reading database");
 			SyncContext = CreateDataContext();
+			Debug.Assert(SyncContext.Tables.Any(), "There aren't any TableSynchronizers!");
 			SyncContext.ReadData();
 
 			SetSplashCaption("Loading UI");
@@ -152,6 +156,11 @@ namespace ShomreiTorah.Data.UI {
 		///<remarks>The new Person row, or null if the user clicked cancel.</remarks>
 		public virtual Person PromptPerson() {
 			return Forms.PersonCreator.Prompt();
+		}
+
+		///<summary>Registers the standard settings in Data.UI.dll.</summary>
+		protected static void RegisterStandardSettings() {
+			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 		}
 
 		#region Splash
@@ -182,11 +191,14 @@ namespace ShomreiTorah.Data.UI {
 
 		///<summary>Saves any changes made to the Singularity DataContext.</summary>
 		public void SaveDatabase() {
+			Debug.Assert(SyncContext.Tables.Any(), "There aren't any TableSynchronizers!");
+			if (!HasDataChanged) return;
 			ProgressWorker.Execute(SyncContext.WriteData, cancellable: false);
 		}
 
 		///<summary>Reads any changes from the database server.</summary>
 		public void RefreshDatabase() {
+			Debug.Assert(SyncContext.Tables.Any(), "There aren't any TableSynchronizers!");
 			var threadContext = SynchronizationContext.Current;
 			ProgressWorker.Execute(progress => {
 				if (HasDataChanged)
@@ -248,7 +260,9 @@ namespace ShomreiTorah.Data.UI {
 	[SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "BindingSource")]
 	[SuppressMessage("Microsoft.Design", "CA1035:ICollectionImplementationsHaveStronglyTypedMembers", Justification = "BindingSource")]
 	public class FrameworkBindingSource : BindingSource {
+		///<summary>Creates a FrameworkBindingSource.</summary>
 		public FrameworkBindingSource() : base() { Init(); }
+		///<summary>Creates a FrameworkBindingSource and adds it to a container.</summary>
 		public FrameworkBindingSource(IContainer container) : base(container) { container.Add(this); Init(); }
 		void Init() {
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
