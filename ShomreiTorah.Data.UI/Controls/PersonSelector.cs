@@ -15,6 +15,7 @@ using ShomreiTorah.WinForms.Controls.Lookup;
 
 namespace ShomreiTorah.Data.UI.Controls {
 	///<summary>A control that allows the user to select a person from the master directory.</summary>
+	[Description("A control that allows the user to select a person from the master directory.")]
 	public class PersonSelector : ItemSelector {
 		[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
 		static PersonSelector() { RepositoryItemPersonSelector.Register(); }
