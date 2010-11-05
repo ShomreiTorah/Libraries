@@ -300,6 +300,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 	}
 	///<summary>A ColumnController that controls a column displaying Person objects.</summary>
 	public class PersonColumnController : ColumnController {
+		///<summary>Applies this controller to a column.</summary>
 		protected internal override void Apply(SmartGridColumn column) {
 			column.OptionsColumn.ReadOnly = true;
 			column.OptionsColumn.AllowSort = DefaultBoolean.True;
@@ -311,11 +312,13 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
 			column.Caption = "Full Name";
 		}
+		///<summary>Allows the controller to provide a custom display text for its column.</summary>
 		protected internal override string GetDisplayText(object row, object value) {
 			var person = (Person)value;
 			if (person == null) return null;
 			return person.FullName;
 		}
+		///<summary>Allows the controller to provide a custom tooltip for the cells in the column.</summary>
 		protected internal override SuperToolTip GetCellToolTip(object row, object value) {
 			var person = (Person)value;
 			if (person == null) return null;
