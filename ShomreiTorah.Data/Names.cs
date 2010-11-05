@@ -48,7 +48,7 @@ namespace ShomreiTorah.Data {
 												"אתה הראית", "חתן תורה", "חתן בראשית" }),
 			new PledgeType("מי שברך",	
 							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
-												"מפטיר יונה", "אתה הראית", "חתן תורה", "חתן בראשית" }),
+												"מפטיר יונה", "חתן תורה", "חתן בראשית" }),
 			new PledgeType("Melave Malka Journal", AdTypes.Select(a => a.PledgeSubType).ToArray()),
 			new PledgeType("Melave Malka Raffle"),
 			new PledgeType("Shalach Manos"),
