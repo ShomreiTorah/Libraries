@@ -195,6 +195,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		///<summary>Gets the items in the dropdown list.</summary>
 		public ReadOnlyCollection<string> Items { get; private set; }
 
+		///<summary>Configures an existing RepositoryItem with this instance's settings.</summary>
 		public override void Apply(RepositoryItemComboBox item) {
 			item.Items.Clear();
 			item.Items.AddRange(Items);

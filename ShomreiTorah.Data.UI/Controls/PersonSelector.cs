@@ -55,6 +55,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			remove { Properties.PersonSelecting -= value; }
 		}
 	}
+	///<summary>Holds properties and settings for the PersonSelector control.</summary>
 	[UserRepositoryItem("Register")]
 	public class RepositoryItemPersonSelector : RepositoryItemItemSelector {
 		#region Editor Registration
@@ -73,6 +74,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 
 		const string DefaultNullValuePrompt = "Click here to select a person, or type to search";
 
+		///<summary>Creates a RepositoryItemPersonSelector.</summary>
 		[SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors", Justification = "NullValuePrompt overrides should be trivial")]
 		public RepositoryItemPersonSelector() {
 			NullValuePrompt = DefaultNullValuePrompt;

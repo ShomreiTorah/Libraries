@@ -12,7 +12,6 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 	public class DeletionBehavior : IGridBehavior {
 		#region Creation Methods
 		///<summary>Creates a DeletionBehavior that displays a simple confirmation message.</summary>
-		///<typeparam name="T">The type of rows that the behavior applies to.</typeparam>
 		///<param name="nameSingular">The name of a single element being deleted.	(e.g., "email address")</param>
 		///<param name="namePlural">The name of a multiple elements being deleted.	(e.g., "email addresses")</param>
 		public static DeletionBehavior WithMessages(string nameSingular, string namePlural) {

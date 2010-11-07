@@ -38,7 +38,9 @@ namespace ShomreiTorah.Data.UI.Grid {
 		public new SmartGridColumnCollection Columns { get { return (SmartGridColumnCollection)base.Columns; } }
 		private new MyHandler Handler { get { return (MyHandler)base.Handler; } }
 
+		///<summary>Creates a new SmartGridView.</summary>
 		public SmartGridView() : this(null) { }
+		///<summary>Creates a new SmartGridView in a SmartGridControl.</summary>
 		public SmartGridView(SmartGrid grid)
 			: base(grid) {
 			this.AddControllerHandlers();	//See ColumnController.cs

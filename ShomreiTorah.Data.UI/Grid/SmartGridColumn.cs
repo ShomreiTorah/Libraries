@@ -26,8 +26,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 			DefaultEditor = editor;	//Must be set after if statement
 		}
 
-		public bool ShouldSerializeColumnEditor() { return ColumnEdit != DefaultEditor; }
-		public void ResetColumnEditor() { ColumnEdit = DefaultEditor; }
+		bool ShouldSerializeColumnEditor() { return ColumnEdit != DefaultEditor; }
+		void ResetColumnEditor() { ColumnEdit = DefaultEditor; }
 
 		///<summary>Gets or sets the repository item specifying the editor used to edit a column's cell values.</summary>
 		[Category("Data")]
@@ -40,9 +40,12 @@ namespace ShomreiTorah.Data.UI.Grid {
 			set { base.ColumnEdit = value; }
 		}
 
-		//In order to use ShouldSerialize & Reset, there cannot be a DefaultValueAttrubite.
-		//Since attributes are inherited and cannot be removed from a base class,  I need a
-		//new property with a different name.
+		///<summary>Gets or sets the repository item specifying the editor used to edit a column's cell values.</summary>
+		///<remarks>
+		///	In order to use ShouldSerialize & Reset, there cannot be a DefaultValueAttribute.
+		/// Since attributes are inherited and cannot be removed from a base class,  I need a
+		/// new property with a different name.
+		///</remarks>
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		[Browsable(false)]
 		public new RepositoryItem ColumnEdit {
