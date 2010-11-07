@@ -44,7 +44,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the table that this instance contains rows from.</summary>
 		public Table Table { get { return untypedTable; } }
 		///<summary>Gets the rows that meet the filter.</summary>
-		public TypedReadOnlyRowCollection<TRow> Rows { get; private set; }
+		public IReadOnlyRowCollection<TRow> Rows { get; private set; }
 
 		void Dependency_RowInvalidated(object sender, RowEventArgs e) {
 			var row = (TRow)e.Row;
@@ -166,19 +166,21 @@ namespace ShomreiTorah.Singularity {
 				dependency.Unregister(untypedTable);
 			}
 		}
-
 		TableSchema ISchemaItem.Schema { get { return Table.Schema; } }
 	}
-
 	///<summary>A filtered view of an untyped table.</summary>
 	public class FilteredTable : FilteredTable<Row> {
 		///<summary>Creates a FilteredTable that wraps a table with the specified filter.</summary>
 		public FilteredTable(Table table, Expression<Func<Row, bool>> filter) : base(table, filter) { }
 	}
 
+	//TypedReadOnlyRowCollection<TRow> cannot implement both 'IEnumerable<TRow>' and 
+	//'IEnumerable<Row>' because they may unify for some type parameter substitutions
+	class IntermediateReadOnlyRowCollection<TRow> : ReadOnlyCollection<TRow>, IReadOnlyRowCollection<TRow> where TRow : Row {
+		public IntermediateReadOnlyRowCollection(IList<TRow> list) : base(list) { }
+	}
 	///<summary>A read-only collection of strongly-typed rows.</summary>
-	public sealed class TypedReadOnlyRowCollection<TRow> : ReadOnlyCollection<TRow>, IList<Row> where TRow : Row {
-		///<summary>Creates a new TypedReadOnlyRowCollection that wraps a typed list.</summary>
+	sealed class TypedReadOnlyRowCollection<TRow> : IntermediateReadOnlyRowCollection<TRow>, IList<Row> where TRow : Row {
 		public TypedReadOnlyRowCollection(IList<TRow> list) : base(list) { }
 
 		int IList<Row>.IndexOf(Row item) { return IndexOf(item as TRow); }

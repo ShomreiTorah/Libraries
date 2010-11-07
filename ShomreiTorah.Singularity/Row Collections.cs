@@ -5,6 +5,15 @@ using System.ComponentModel;
 using System.Linq;
 
 namespace ShomreiTorah.Singularity {
+	//TypedTable<TRow> and FilteredTable<TRow> expose
+	//both strongly-typed and weakly-typed lists.  If
+	//I expose a public class that implements both of
+	//the IEnumerables, all LINQ calls will require a
+	//Cast<T>() call to disambiguate the row type.
+	//Therefore, I expose a generic interface of TRow
+	//which is implemented by internal classes which 
+	//also implement IEnumerable<TRow>.
+
 	///<summary>A table containing a specific row type.</summary>
 	///<typeparam name="TRow">The type of the rows in the table.</typeparam>
 	///<remarks>This interface is implemented by both typed and untyped tables.
@@ -26,8 +35,23 @@ namespace ShomreiTorah.Singularity {
 		Table Table { get; }
 	}
 
+	///<summary>A read-only collection of typed rows.</summary>
+	public interface IReadOnlyRowCollection<TRow> : IEnumerable<TRow> where TRow : Row {
+		///<summary>Gets the row at the specified index.</summary>
+		TRow this[int index] { get; }
+
+		///<summary>Gets the number of rows in this instance.</summary>
+		int Count { get; }
+
+		///<summary>Indicates whether this collection contains a row.</summary>
+		bool Contains(TRow row);
+
+		///<summary>Determines the index of a specific row in the collection.</summary>
+		int IndexOf(TRow row);
+	}
+
 	///<summary>A collection of strongly-typed child rows.</summary>
-	public interface IChildRowCollection<TChildRow> : IEnumerable<TChildRow> where TChildRow : Row {
+	public interface IChildRowCollection<TChildRow> : IReadOnlyRowCollection<TChildRow> where TChildRow : Row {
 		///<summary>Gets the parent row for the collection's rows.</summary>
 		Row ParentRow { get; }
 		///<summary>Gets the child relation that this collection contains.</summary>
@@ -41,15 +65,6 @@ namespace ShomreiTorah.Singularity {
 		event EventHandler<RowListEventArgs> RowRemoved;
 		///<summary>Occurs when a column value is changed in one of the rows in the collection.</summary>
 		event EventHandler<ValueChangedEventArgs> ValueChanged;
-
-		///<summary>Gets the row at the specified index.</summary>
-		TChildRow this[int index] { get; }
-
-		///<summary>Gets the number of rows in this instance.</summary>
-		int Count { get; }
-
-		///<summary>Indicates whether this collection contains a row.</summary>
-		bool Contains(TChildRow row);
 	}
 
 	///<summary>Contains rows and sends change events.</summary>

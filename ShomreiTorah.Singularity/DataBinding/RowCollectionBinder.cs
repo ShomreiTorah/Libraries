@@ -275,7 +275,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		public FilteredTable<TRow> FilteredTable { get; private set; }
 
 		public FilteredTableBinder(FilteredTable<TRow> ft)
-			: base(ft.Table.Schema, ft.Rows) {
+			: base(ft.Table.Schema, (IList<Row>)ft.Rows) {
 			FilteredTable = ft;
 
 			FilteredTable.Table.LoadCompleted += Table_LoadCompleted;
