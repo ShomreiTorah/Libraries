@@ -195,7 +195,10 @@ namespace ShomreiTorah.Singularity {
 		void IList<Row>.RemoveAt(int index) { throw new NotSupportedException(); }
 		void ICollection<Row>.Clear() { throw new NotSupportedException(); }
 
-		IEnumerator<Row> IEnumerable<Row>.GetEnumerator() { return this.Cast<Row>().GetEnumerator(); }
+		IEnumerator<Row> IEnumerable<Row>.GetEnumerator() {
+			for (int i = 0; i < Count; i++)	//Avoid enumerator recursion
+				yield return this[i];
+		}
 
 		void ICollection<Row>.CopyTo(Row[] array, int arrayIndex) { CopyTo((TRow[])array, arrayIndex); }
 
