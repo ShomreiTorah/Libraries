@@ -392,4 +392,32 @@
       </DefaultValue>
     </Column>
   </Schema>
+  <Schema Name="SeatReservations" RowClassDescription="Describes a seating reservation for the Melave Malka." RowClassName="MelaveMalkaSeat" RowClassVisibility="Public" SqlName="SeatReservations" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the seat reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that reserved the seat." Expression="" ForeignRelationName="SeatReservations" ForeignRelationPropertyDescription="Gets the person's Melave Malka seats." ForeignRelationPropertyName="MelaveMalkaSeats" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="DateAdded" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date added of the seat reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DateAdded" PropertyVisibility="Public" SqlName="DateAdded">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Year" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the year of the seat reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Year" PropertyVisibility="Public" SqlName="Year">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="MensSeats" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the mens seats of the seat reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="MensSeats" PropertyVisibility="Public" SqlName="MensSeats">
+      <DefaultValue>0</DefaultValue>
+    </Column>
+    <Column Name="WomensSeats" AllowNulls="true" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the womens seats of the seat reservation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="WomensSeats" PropertyVisibility="Public" SqlName="WomensSeats">
+      <DefaultValue>0</DefaultValue>
+    </Column>
+  </Schema>
 </DataContext>

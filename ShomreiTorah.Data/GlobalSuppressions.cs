@@ -29,3 +29,5 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Scope = "member", Target = "ShomreiTorah.Data.Names.#PledgeTypes")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "oldValue", Scope = "member", Target = "ShomreiTorah.Data.EmailAddress.#OnPersonChanged(ShomreiTorah.Data.Person,ShomreiTorah.Data.Person)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Scope = "member", Target = "ShomreiTorah.Data.Names.#MelaveMalkaSources")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Mens", Scope = "member", Target = "ShomreiTorah.Data.MelaveMalkaSeat.#MensSeatsColumn")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Womens", Scope = "member", Target = "ShomreiTorah.Data.MelaveMalkaSeat.#WomensSeatsColumn")]

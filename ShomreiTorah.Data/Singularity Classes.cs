@@ -996,6 +996,8 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         ///<summary>Gets the person's Melave Malka invitations.</summary>
         public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonColumn); } }
+        ///<summary>Gets the person's Melave Malka seats.</summary>
+        public IChildRowCollection<MelaveMalkaSeat> MelaveMalkaSeats { get { return TypedChildRows<MelaveMalkaSeat>(MelaveMalkaSeat.PersonColumn); } }
         #endregion
         
         #region Partial Methods
@@ -2026,6 +2028,201 @@ namespace ShomreiTorah.Data {
             	OnGirlsSeatsChanged((Int32?)oldValue, (Int32?)newValue);
             else if (column == NotesColumn)
             	OnNotesChanged((String)oldValue, (String)newValue);
+        }
+        #endregion
+    }
+    
+    ///<summary>Describes a seating reservation for the Melave Malka.</summary>
+    public partial class MelaveMalkaSeat : Row {
+        ///<summary>Creates a new MelaveMalkaSeat instance.</summary>
+        public MelaveMalkaSeat () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed SeatReservations table.</summary>
+        public static TypedTable<MelaveMalkaSeat> CreateTable() { return new TypedTable<MelaveMalkaSeat>(Schema, () => new MelaveMalkaSeat()); }
+        
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
+        ///<summary>Gets the schema's Person column.</summary>
+        public static ForeignKeyColumn PersonColumn { get; private set; }
+        ///<summary>Gets the schema's DateAdded column.</summary>
+        public static ValueColumn DateAddedColumn { get; private set; }
+        ///<summary>Gets the schema's Year column.</summary>
+        public static ValueColumn YearColumn { get; private set; }
+        ///<summary>Gets the schema's MensSeats column.</summary>
+        public static ValueColumn MensSeatsColumn { get; private set; }
+        ///<summary>Gets the schema's WomensSeats column.</summary>
+        public static ValueColumn WomensSeatsColumn { get; private set; }
+        
+        ///<summary>Gets the SeatReservations schema instance.</summary>
+        public static new TypedSchema<MelaveMalkaSeat> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server SeatReservations table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static MelaveMalkaSeat() {
+            #region Create Schema
+            Schema = new TypedSchema<MelaveMalkaSeat>("SeatReservations");
+            
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
+            RowIdColumn.AllowNulls = false;
+            
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "SeatReservations");
+            PersonColumn.AllowNulls = false;
+            
+            DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
+            DateAddedColumn.AllowNulls = false;
+            
+            YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
+            YearColumn.AllowNulls = false;
+            
+            MensSeatsColumn = Schema.Columns.AddValueColumn("MensSeats", typeof(Int32), 0);
+            MensSeatsColumn.AllowNulls = true;
+            
+            WomensSeatsColumn = Schema.Columns.AddValueColumn("WomensSeats", typeof(Int32), 0);
+            WomensSeatsColumn.AllowNulls = true;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "SeatReservations";
+            SchemaMapping.SqlSchemaName = "MelaveMalka";
+            
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
+            SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
+            SchemaMapping.Columns.AddMapping(DateAddedColumn, "DateAdded");
+            SchemaMapping.Columns.AddMapping(YearColumn, "Year");
+            SchemaMapping.Columns.AddMapping(MensSeatsColumn, "MensSeats");
+            SchemaMapping.Columns.AddMapping(WomensSeatsColumn, "WomensSeats");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<MelaveMalkaSeat> Table { get { return (TypedTable<MelaveMalkaSeat>)base.Table; } }
+        #region Value Properties
+        ///<summary>Gets or sets the row id of the seat reservation.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the person that reserved the seat.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
+            set { base[PersonColumn] = value; }
+        }
+        ///<summary>Gets or sets the date added of the seat reservation.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime DateAdded {
+            get { return base.Field<DateTime>(DateAddedColumn); }
+            set { base[DateAddedColumn] = value; }
+        }
+        ///<summary>Gets or sets the year of the seat reservation.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 Year {
+            get { return base.Field<Int32>(YearColumn); }
+            set { base[YearColumn] = value; }
+        }
+        ///<summary>Gets or sets the mens seats of the seat reservation.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32? MensSeats {
+            get { return base.Field<Int32?>(MensSeatsColumn); }
+            set { base[MensSeatsColumn] = value; }
+        }
+        ///<summary>Gets or sets the womens seats of the seat reservation.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32? WomensSeats {
+            get { return base.Field<Int32?>(WomensSeatsColumn); }
+            set { base[WomensSeatsColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
+        
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateDateAdded(DateTime newValue, Action<string> error);
+        partial void OnDateAddedChanged(DateTime? oldValue, DateTime? newValue);
+        
+        partial void ValidateYear(Int32 newValue, Action<string> error);
+        partial void OnYearChanged(Int32? oldValue, Int32? newValue);
+        
+        partial void ValidateMensSeats(Int32? newValue, Action<string> error);
+        partial void OnMensSeatsChanged(Int32? oldValue, Int32? newValue);
+        
+        partial void ValidateWomensSeats(Int32? newValue, Action<string> error);
+        partial void OnWomensSeatsChanged(Int32? oldValue, Int32? newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == PersonColumn) {
+                ValidatePerson((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == DateAddedColumn) {
+                ValidateDateAdded((DateTime)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == YearColumn) {
+                ValidateYear((Int32)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == MensSeatsColumn) {
+                ValidateMensSeats((Int32?)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == WomensSeatsColumn) {
+                ValidateWomensSeats((Int32?)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == RowIdColumn)
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
+            else if (column == PersonColumn)
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
+            else if (column == DateAddedColumn)
+            	OnDateAddedChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == YearColumn)
+            	OnYearChanged((Int32?)oldValue, (Int32?)newValue);
+            else if (column == MensSeatsColumn)
+            	OnMensSeatsChanged((Int32?)oldValue, (Int32?)newValue);
+            else if (column == WomensSeatsColumn)
+            	OnWomensSeatsChanged((Int32?)oldValue, (Int32?)newValue);
         }
         #endregion
     }
