@@ -566,6 +566,12 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		}
 		#endregion
 
+		/////<summary>Indicate whether the NullValuePrompt will be drawn in the textbox.</summary>
+		/////<remarks>I want to show the NullValuePrompt even if the editor is focused (but empty).</remarks>
+		//protected override bool IsShowNullValuePrompt() {
+		//    return String.IsNullOrEmpty(EditValue as string);
+		//}
+
 		///<summary>Indicates whether the editor should display the selected item or a normal textbox.</summary>
 		public bool DrawSelectedItem { get; private set; }
 		///<summary>Gets the icon to draw in the editor area, if any.</summary>
