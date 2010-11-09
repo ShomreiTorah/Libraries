@@ -55,6 +55,21 @@ namespace ShomreiTorah.Data {
 				return retVal.ToString();
 			}
 		}
+
+		///<summary>Returns a string containing all of the information about the person.</summary>
+		public string ToFullString() {
+			StringBuilder retVal = new StringBuilder();
+
+			retVal.Append(VeryFullName);
+			if (!String.IsNullOrEmpty(Phone))
+				retVal.Append(", ").Append(Phone);
+
+			retVal.AppendLine().AppendLine();
+			retVal.Append(MailingAddress);
+
+			return retVal.ToString().Trim();
+		}
+
 		#endregion
 
 		#region Transaction properties
