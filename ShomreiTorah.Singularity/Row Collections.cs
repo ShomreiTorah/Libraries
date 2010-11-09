@@ -35,23 +35,26 @@ namespace ShomreiTorah.Singularity {
 		Table Table { get; }
 	}
 
-	///<summary>A read-only collection of typed rows.</summary>
-	public interface IReadOnlyRowCollection<TRow> : IEnumerable<TRow> where TRow : Row {
-		///<summary>Gets the row at the specified index.</summary>
-		TRow this[int index] { get; }
+	///<summary>A read-only collection of items.</summary>
+	public interface IReadOnlyCollection<T> : IEnumerable<T>  {
+		///<summary>Gets the item at the specified index.</summary>
+		T this[int index] { get; }
 
-		///<summary>Gets the number of rows in this instance.</summary>
+		///<summary>Gets the number of items in this instance.</summary>
 		int Count { get; }
 
-		///<summary>Indicates whether this collection contains a row.</summary>
-		bool Contains(TRow row);
+		///<summary>Indicates whether this collection contains an item.</summary>
+		bool Contains(T item);
 
-		///<summary>Determines the index of a specific row in the collection.</summary>
-		int IndexOf(TRow row);
+		///<summary>Determines the item of a specific row in the collection.</summary>
+		int IndexOf(T item);
+
+		///<summary>Copies the items in the collection to an array.</summary>
+		void CopyTo(T[] array, int index);
 	}
 
 	///<summary>A collection of strongly-typed child rows.</summary>
-	public interface IChildRowCollection<TChildRow> : IReadOnlyRowCollection<TChildRow> where TChildRow : Row {
+	public interface IChildRowCollection<TChildRow> : IReadOnlyCollection<TChildRow> where TChildRow : Row {
 		///<summary>Gets the parent row for the collection's rows.</summary>
 		Row ParentRow { get; }
 		///<summary>Gets the child relation that this collection contains.</summary>

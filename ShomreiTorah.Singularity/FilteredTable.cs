@@ -44,7 +44,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the table that this instance contains rows from.</summary>
 		public Table Table { get { return untypedTable; } }
 		///<summary>Gets the rows that meet the filter.</summary>
-		public IReadOnlyRowCollection<TRow> Rows { get; private set; }
+		public IReadOnlyCollection<TRow> Rows { get; private set; }
 
 		void Dependency_RowInvalidated(object sender, RowEventArgs e) {
 			var row = (TRow)e.Row;
@@ -176,7 +176,7 @@ namespace ShomreiTorah.Singularity {
 
 	//TypedReadOnlyRowCollection<TRow> cannot implement both 'IEnumerable<TRow>' and 
 	//'IEnumerable<Row>' because they may unify for some type parameter substitutions
-	class IntermediateReadOnlyRowCollection<TRow> : ReadOnlyCollection<TRow>, IReadOnlyRowCollection<TRow> where TRow : Row {
+	class IntermediateReadOnlyRowCollection<TRow> : ReadOnlyCollection<TRow>, IReadOnlyCollection<TRow> where TRow : Row {
 		public IntermediateReadOnlyRowCollection(IList<TRow> list) : base(list) { }
 	}
 	///<summary>A read-only collection of strongly-typed rows.</summary>

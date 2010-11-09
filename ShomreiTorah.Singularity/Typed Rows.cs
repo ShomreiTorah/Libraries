@@ -201,6 +201,7 @@ namespace ShomreiTorah.Singularity {
 			public int Count { get { return inner.Count; } }
 			public bool Contains(TChildRow row) { return inner.Contains(row); }
 			public int IndexOf(TChildRow row) { return inner.IndexOf(row); }
+			public void CopyTo(TChildRow[] array, int index) { inner.CopyTo(array, index); }
 
 			public IEnumerator<TChildRow> GetEnumerator() { return inner.Cast<TChildRow>().GetEnumerator(); }
 			IEnumerator IEnumerable.GetEnumerator() { return inner.GetEnumerator(); }
