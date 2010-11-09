@@ -44,9 +44,11 @@ namespace ShomreiTorah.Data.UI.Grid {
 			get { return base.DataSource; }
 			set { base.DataSource = value; }
 		}
+		///<summary>Creates the default view used by a new grid instance.</summary>
 		protected override BaseView CreateDefaultView() {
 			return CreateView("SmartGridView");
 		}
+		///<summary>Registers the views usable by the grid.</summary>
 		protected override void RegisterAvailableViewsCore(InfoCollection collection) {
 			base.RegisterAvailableViewsCore(collection);
 			collection.Add(SmartGridView.CreateRegistrator());

@@ -110,6 +110,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 		#endregion
 
+		///<summary>Initializes the editor's default set of buttons.</summary>
 		public override void CreateDefaultButton() {
 			Buttons.Clear();
 			base.CreateDefaultButton();

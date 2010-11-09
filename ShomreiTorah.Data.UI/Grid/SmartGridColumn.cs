@@ -10,6 +10,7 @@ using System.Windows.Forms;
 namespace ShomreiTorah.Data.UI.Grid {
 	///<summary>A grid column that automatically reads column settings from metadata.</summary>
 	public partial class SmartGridColumn : GridColumn {
+		///<summary>Copies properties from another column to this instance.</summary>
 		protected override void Assign(GridColumn column) {
 			base.Assign(column);
 			var col = column as SmartGridColumn;

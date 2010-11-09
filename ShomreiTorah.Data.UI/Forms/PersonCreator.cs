@@ -23,6 +23,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 				Phone = "973"
 			};
 		}
+		///<summary>Raises the Shown event.</summary>
 		protected override void OnShown(EventArgs e) {
 			base.OnShown(e);
 			//Set min/max regardless of skin sizing differences.

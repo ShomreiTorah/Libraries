@@ -39,6 +39,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 				captionedImage = image;
 		}
 
+		///<summary>Raises the Shown event.</summary>
 		protected override void OnShown(EventArgs e) {
 			base.OnShown(e);
 			#region Handle monitor span

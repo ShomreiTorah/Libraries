@@ -28,6 +28,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		}
 
 		internal static BaseInfoRegistrator CreateRegistrator() { return new MyRegistrator(); }
+		///<summary>Gets the view's name.</summary>
 		protected override string ViewName { get { return "SmartGridView"; } }
 		protected override GridColumnCollection CreateColumnCollection() { return new SmartGridColumnCollection(this); }
 

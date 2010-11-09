@@ -41,6 +41,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 			Text = Dialog.DefaultTitle + " Error";
 			errorDetails.Text = exception.ToString();
 		}
+		///<summary>Raises the Shown event.</summary>
 		protected override void OnShown(EventArgs e) {
 			base.OnShown(e);
 			errorDetails.DeselectAll();
@@ -96,6 +97,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 			sendStatusLabel.Show();
 		}
 
+		///<summary>Raises the KeyUp event.</summary>
 		protected override void OnKeyUp(KeyEventArgs e) {
 			base.OnKeyUp(e);
 			if (e.KeyData == Keys.Escape)
