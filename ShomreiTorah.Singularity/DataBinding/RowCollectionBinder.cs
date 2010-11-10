@@ -7,16 +7,17 @@ using System.Linq;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.DataBinding {
-	abstract class RowCollectionBinder : PhantomCollection<Row>, IBindingList, ICancelAddNew, IRaiseItemChangedEvents, ITypedList, ISchemaItem {
-		public TableSchema Schema { get; protected set; }
-		protected abstract string ListName { get; }
-		///<summary>Gets the table that contains the rows in the collection.</summary>
-		protected abstract Table SourceTable { get; }
+	abstract class RowCollectionBinder : PhantomCollection<Row>, IBindingList, ICancelAddNew, IRaiseItemChangedEvents, ITypedList, IRowEventClient, ISchemaItem {
+		public IRowEventProvider Source { get; private set; }
+		public TableSchema Schema { get { return Source.Schema; } }
+		public Table SourceTable { get { return Source.SourceTable; } }
 
-		protected RowCollectionBinder(TableSchema schema, IList<Row> wrappedList)
-			: base(wrappedList) {
-			Schema = schema;
-			Schema.SchemaChanged += Schema_SchemaChanged;
+		protected virtual string ListName { get { return Schema.Name; } }
+
+		protected RowCollectionBinder(IRowEventProvider source)
+			: base(source.Rows) {
+			Source = source;
+			new WeakEventForwarder(Source, this).ToString();	//The ctor registers the events; I never need the object again.
 		}
 
 		#region ITypedList
@@ -34,12 +35,6 @@ namespace ShomreiTorah.Singularity.DataBinding {
 				return propertyDescriptors;
 			}
 		}
-		void Schema_SchemaChanged(object sender, EventArgs e) {
-			propertyDescriptors = null;
-			//TODO: More specifc events (requires ColumnRenamed and Relation... events)
-			OnListChanged(SchemaReset);
-		}
-
 		public PropertyDescriptorCollection GetItemProperties(PropertyDescriptor[] listAccessors) {
 			return listAccessors.GetProperties(() => PropertyDescriptors);
 		}
@@ -52,30 +47,35 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		public bool RaisesItemChangedEvents { get { return true; } }
 
+		public void OnSchemaChanged() {
+			propertyDescriptors = null;
+			//TODO: More specific events (requires ColumnRenamed and Relation... events)
+			OnListChanged(SchemaReset);
+		}
 		#region Change Events
 		//If the source table is loading, don't raise any events.
 		//Once it finishes loading, only raise a reset if we saw 
 		//some actual changes.
 		bool loadChangePending;
-		protected void OnValueChanged(ValueChangedEventArgs args) {
+		public void OnValueChanged(ValueChangedEventArgs args) {
 			if (SourceTable != null && SourceTable.IsLoadingData)
 				loadChangePending = true;
 			else
 				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemChanged, IndexOf(args.Row), new ColumnPropertyDescriptor(args.Column)));
 		}
-		protected void OnRowAdded(RowListEventArgs args) {
+		public void OnRowAdded(RowListEventArgs args) {
 			if (SourceTable != null && SourceTable.IsLoadingData)
 				loadChangePending = true;
 			else
 				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemAdded, args.Index));
 		}
-		protected void OnRowRemoved(RowListEventArgs args) {
+		public void OnRowRemoved(RowListEventArgs args) {
 			if (SourceTable != null && SourceTable.IsLoadingData)
 				loadChangePending = true;
 			else
 				OnListChanged(new ListChangedEventArgs(ListChangedType.ItemDeleted, args.Index));
 		}
-		protected void OnLoadCompleted() {
+		public void OnLoadCompleted() {
 			if (loadChangePending)
 				OnListChanged(new ListChangedEventArgs(ListChangedType.Reset, -1));
 			loadChangePending = false;
@@ -89,11 +89,9 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			if (ListChanged != null)
 				ListChanged(this, e);
 		}
-
 		#endregion
 
-		//All change events are forwarded from the wrapped
-		//table or ChildRowCollection by derived classes. 
+		//All events are forwarded by WeakEventForwarder. 
 		//This works perfectly, except for phantom items. 
 		//When a phantom item is added, we explicitly fire
 		//ItemAdded.  When the phantom item cancelled, we 
@@ -199,50 +197,18 @@ namespace ShomreiTorah.Singularity.DataBinding {
 	}
 
 	sealed class TableBinder : RowCollectionBinder {
-		public TableBinder(Table table)
-			: base(table.Schema, table.Rows) {
-			Table = table;
-
-			Table.RowAdded += Table_RowAdded;
-			Table.RowRemoved += Table_RowRemoved;
-			Table.ValueChanged += Table_ValueChanged;
-			Table.LoadCompleted += Table_LoadCompleted;
-		}
-
-		void Table_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
-
-		void Table_RowRemoved(object sender, RowListEventArgs e) { OnRowRemoved(e); }
-		void Table_ValueChanged(object sender, ValueChangedEventArgs e) { OnValueChanged(e); }
-		void Table_RowAdded(object sender, RowListEventArgs e) { OnRowAdded(e); }
-
-		public Table Table { get; private set; }
-		protected override Table SourceTable { get { return Table; } }
-
-		protected override string ListName { get { return Schema.Name; } }
-
-		protected override Row CreateNewRow() { return Table.CreateRow(); }
+		public TableBinder(Table table) : base(table) { }
+		protected override Row CreateNewRow() { return SourceTable.CreateRow(); }
 	}
 	sealed class ChildRowsBinder : RowCollectionBinder {
 		public ChildRowCollection ChildRows { get; private set; }
 
 		public ChildRowsBinder(ChildRowCollection rows)
-			: base(rows.ChildTable.Schema, rows) {
+			: base(rows) {
 			ChildRows = rows;
-
-			ChildRows.ChildTable.LoadCompleted += ChildTable_LoadCompleted;
-			ChildRows.RowAdded += Rows_RowAdded;
-			ChildRows.ValueChanged += Rows_ValueChanged;
-			ChildRows.RowRemoved += Rows_RowRemoved;
 		}
 
-		void ChildTable_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
-
-		void Rows_RowAdded(object sender, RowListEventArgs e) { OnRowAdded(e); }
-		void Rows_ValueChanged(object sender, ValueChangedEventArgs e) { OnValueChanged(e); }
-		void Rows_RowRemoved(object sender, RowListEventArgs e) { OnRowRemoved(e); }
-
 		protected override string ListName { get { return ChildRows.Relation.Name; } }
-		protected override Table SourceTable { get { return ChildRows.ChildTable; } }
 
 		protected override Row CreateNewRow() {
 			var newRow = ChildRows.ChildTable.CreateRow();
@@ -252,8 +218,7 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		//PhantomCollection wraps the original ChildRowCollection,
 		//which is read-only.  I override its mutation methods and
-		//modify the child table
-
+		//modify the child table.
 		public override void Add(Row item) {
 			if (item == null) throw new ArgumentNullException("item");
 
@@ -272,43 +237,20 @@ namespace ShomreiTorah.Singularity.DataBinding {
 		}
 	}
 	sealed class FilteredTableBinder<TRow> : RowCollectionBinder where TRow : Row {
-		public FilteredTable<TRow> FilteredTable { get; private set; }
+		public FilteredTableBinder(FilteredTable<TRow> ft) : base(ft) { }
 
-		public FilteredTableBinder(FilteredTable<TRow> ft)
-			: base(ft.Table.Schema, (IList<Row>)ft.Rows) {
-			FilteredTable = ft;
-
-			FilteredTable.Table.LoadCompleted += Table_LoadCompleted;
-			FilteredTable.RowAdded += Rows_RowAdded;
-			FilteredTable.ValueChanged += Rows_ValueChanged;
-			FilteredTable.RowRemoved += Rows_RowRemoved;
-		}
-
-		void Table_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
-
-		void Rows_RowAdded(object sender, RowListEventArgs<TRow> e) { OnRowAdded(new RowListEventArgs(e.Row, e.Index)); }
-		void Rows_ValueChanged(object sender, ValueChangedEventArgs<TRow> e) { OnValueChanged(e.Inner); }
-		void Rows_RowRemoved(object sender, RowListEventArgs<TRow> e) { OnRowRemoved(new RowListEventArgs(e.Row, e.Index)); }
-
-		protected override string ListName { get { return FilteredTable.Table.Schema.Name; } }
-		protected override Table SourceTable { get { return FilteredTable.Table; } }
-
-		protected override Row CreateNewRow() {
-			var newRow = FilteredTable.Table.CreateRow();
-			return newRow;
-		}
+		protected override Row CreateNewRow() { return SourceTable.CreateRow(); }
 
 		//PhantomCollection wraps the original FilteredTable.Rows,
 		//which is read-only.  I override its mutation methods and
 		//modify the underlying table.
-
 		public override void Add(Row item) {
 			if (item == null) throw new ArgumentNullException("item");
 
 			if (HasPhantomItem)
 				CommitPhantom();
 
-			FilteredTable.Table.Rows.Add(item);
+			SourceTable.Rows.Add(item);
 		}
 		protected override bool RemoveInner(Row item) {
 			if (HasPhantomItem)

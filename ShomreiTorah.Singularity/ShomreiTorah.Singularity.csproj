@@ -66,6 +66,7 @@
     <Compile Include="DataBinding\RowCollectionBinder.cs" />
     <Compile Include="DataBinding\RowListBinder.cs" />
     <Compile Include="DataBinding\TypedListUtils.cs" />
+    <Compile Include="DataBinding\WeakEventForwarder.cs" />
     <Compile Include="DataContext.cs" />
     <Compile Include="Dependencies\Concrete Row Dependencies.cs" />
     <Compile Include="Dependencies\Dependency.cs" />

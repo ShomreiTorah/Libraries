@@ -7,12 +7,12 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ShomreiTorah.Singularity.DataBinding {
-	///<summary>Exposes a static list of rows for data-binding.</summary>
+	///<summary>Exposes a static list of rows for data-binding.  Must be disposed.</summary>
 	///<remarks>This binder does not allow rows to be added or 
 	///deleted, but does allow columns to be changed.</remarks>
-	public sealed class RowListBinder : IListSource, ISchemaItem, IDisposable {
+	public sealed class RowListBinder : IListSource, ISchemaItem, IDisposable, IRowEventProvider {
 		///<summary>Creates a new RowListBinder that exposes the given list of rows.</summary>
-		///<param name="table">The table containing the rows.</param>
+		///<param name="table">The table containing the rows.  If this is null, the rows parameter must be non-empty and no change events will fire.</param>
 		///<param name="rows">The rows to expose.</param>
 		///<remarks>The table parameter is used to obtain schema information for an empty list.</remarks>
 		public RowListBinder(Table table, IList<Row> rows) {
@@ -22,6 +22,8 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 			Table = table;
 			Rows = rows;
+			if (Table != null)
+				Table.ValueChanged += Table_ValueChanged;
 
 			binder = new Binder(this);
 		}
@@ -38,34 +40,22 @@ namespace ShomreiTorah.Singularity.DataBinding {
 			binder.OnListChanged(new ListChangedEventArgs(ListChangedType.Reset, -1));
 		}
 
+		void Table_ValueChanged(object sender, ValueChangedEventArgs e) {
+			if (Rows.Contains(e.Row))
+				OnValueChanged(e);
+		}
+		///<summary>Occurs when a row in the list changes.  This event is only fired if a table was passed to the constructor.</summary>
+		public event EventHandler<ValueChangedEventArgs> ValueChanged;
+		///<summary>Raises the ValueChanged event.</summary>
+		///<param name="e">A ValueChangedEventArgs object that provides the event data.</param>
+		void OnValueChanged(ValueChangedEventArgs e) {
+			if (ValueChanged != null)
+				ValueChanged(this, e);
+		}
+
 		readonly Binder binder;
-		sealed class Binder : RowCollectionBinder, IDisposable {
-			readonly RowListBinder owner;
-			public Binder(RowListBinder owner)
-				: base(owner.Schema, owner.Rows) {
-
-				this.owner = owner;
-				if (owner.Table != null) {
-					owner.Table.LoadCompleted += Table_LoadCompleted;
-					owner.Table.ValueChanged += Table_ValueChanged;
-				}
-			}
-
-			void Table_LoadCompleted(object sender, EventArgs e) { OnLoadCompleted(); }
-			void Table_ValueChanged(object sender, ValueChangedEventArgs e) {
-				if (owner.Rows.Contains(e.Row))
-					OnValueChanged(e);
-			}
-
-			public void Dispose() {
-				if (owner.Table != null) {
-					owner.Table.LoadCompleted -= Table_LoadCompleted;
-					owner.Table.ValueChanged -= Table_ValueChanged;
-				}
-			}
-
-			protected override string ListName { get { return Schema.Name; } }
-			protected override Table SourceTable { get { return owner.Table; } }
+		sealed class Binder : RowCollectionBinder {
+			public Binder(RowListBinder owner) : base(owner) { }
 
 			protected override Row CreateNewRow() { throw new NotSupportedException(); }
 			public override bool IsReadOnly { get { return true; } }
@@ -79,7 +69,14 @@ namespace ShomreiTorah.Singularity.DataBinding {
 
 		///<summary>Releases all resources used by the RowListBinder.</summary>
 		public void Dispose() {
-			binder.Dispose();
+			if (Table != null)
+				Table.ValueChanged -= Table_ValueChanged;
 		}
+
+		Table IRowEventProvider.SourceTable { get { return Table; } }
+
+		//We never add or remove rows
+		event EventHandler<RowListEventArgs> IRowEventProvider.RowAdded { add { } remove { } }
+		event EventHandler<RowListEventArgs> IRowEventProvider.RowRemoved { add { } remove { } }
 	}
 }

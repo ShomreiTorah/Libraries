@@ -110,7 +110,8 @@ namespace ShomreiTorah.Singularity {
 			public TableSchema Schema { get { return Table.Schema; } }
 		}
 
-		IList<Row> IRowEventProvider.Rows { get { return Rows; } }
+		IList<Row> IRowEventProvider.Rows { get { return Rows; } }		//Return base interface
+		Table IRowEventProvider.SourceTable { get { return this; } }
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		bool IListSource.ContainsListCollection { get { return false; } }
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]

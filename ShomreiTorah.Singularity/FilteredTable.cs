@@ -9,7 +9,7 @@ using ShomreiTorah.Singularity.Dependencies;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A filtered view of an existing table.</summary>
-	public class FilteredTable<TRow> : IListSource, IDisposable, ISchemaItem where TRow : Row {
+	public class FilteredTable<TRow> : IListSource, IDisposable, IRowEventProvider, ISchemaItem where TRow : Row {
 		readonly ITable<TRow> typedTable;
 		readonly Table untypedTable;
 		readonly Func<TRow, bool> filter;
@@ -122,6 +122,22 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		#region Typed Events
+		EventHandler<RowListEventArgs> untypedRowAdded;
+		EventHandler<ValueChangedEventArgs> untypedValueChanged;
+		EventHandler<RowListEventArgs> untypedRowRemoved;
+		event EventHandler<RowListEventArgs> IRowEventProvider.RowAdded {
+			add { untypedRowAdded += value; }
+			remove { untypedRowAdded -= value; }
+		}
+		event EventHandler<ValueChangedEventArgs> IRowEventProvider.ValueChanged {
+			add { untypedValueChanged += value; }
+			remove { untypedValueChanged -= value; }
+		}
+		event EventHandler<RowListEventArgs> IRowEventProvider.RowRemoved {
+			add { untypedRowRemoved += value; }
+			remove { untypedRowRemoved -= value; }
+		}
+
 		///<summary>Occurs when a row is added to the table.</summary>
 		public event EventHandler<RowListEventArgs<TRow>> RowAdded;
 		///<summary>Raises the RowAdded event.</summary>
@@ -129,14 +145,8 @@ namespace ShomreiTorah.Singularity {
 		void OnRowAdded(RowListEventArgs<TRow> e) {
 			if (RowAdded != null)
 				RowAdded(this, e);
-		}
-		///<summary>Occurs when a row is removed from the table.</summary>
-		public event EventHandler<RowListEventArgs<TRow>> RowRemoved;
-		///<summary>Raises the RowRemoved event.</summary>
-		///<param name="e">A RowEventArgs object that provides the event data.</param>
-		void OnRowRemoved(RowListEventArgs<TRow> e) {
-			if (RowRemoved != null)
-				RowRemoved(this, e);
+			if (untypedRowAdded != null)
+				untypedRowAdded(this, new RowListEventArgs(e.Row, e.Index));
 		}
 		///<summary>Occurs when a column value is changed.</summary>
 		public event EventHandler<ValueChangedEventArgs<TRow>> ValueChanged;
@@ -145,6 +155,18 @@ namespace ShomreiTorah.Singularity {
 		void OnValueChanged(ValueChangedEventArgs<TRow> e) {
 			if (ValueChanged != null)
 				ValueChanged(this, e);
+			if (untypedValueChanged != null)
+				untypedValueChanged(this, e.Inner);
+		}
+		///<summary>Occurs when a row is removed from the table.</summary>
+		public event EventHandler<RowListEventArgs<TRow>> RowRemoved;
+		///<summary>Raises the RowRemoved event.</summary>
+		///<param name="e">A RowEventArgs object that provides the event data.</param>
+		void OnRowRemoved(RowListEventArgs<TRow> e) {
+			if (RowRemoved != null)
+				RowRemoved(this, e);
+			if (untypedRowRemoved != null)
+				untypedRowRemoved(this, new RowListEventArgs(e.Row, e.Index));
 		}
 		#endregion
 
@@ -152,7 +174,6 @@ namespace ShomreiTorah.Singularity {
 		bool IListSource.ContainsListCollection { get { return false; } }
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		System.Collections.IList IListSource.GetList() { return new DataBinding.FilteredTableBinder<TRow>(this); }
-
 
 		///<summary>Releases all resources used by the FilteredTable.</summary>
 		public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
@@ -166,7 +187,11 @@ namespace ShomreiTorah.Singularity {
 				dependency.Unregister(untypedTable);
 			}
 		}
+
+		IList<Row> IRowEventProvider.Rows { get { return (IList<Row>)Rows; } }
+		TableSchema IRowEventProvider.Schema { get { return Table.Schema; } }
 		TableSchema ISchemaItem.Schema { get { return Table.Schema; } }
+		Table IRowEventProvider.SourceTable { get { return Table; } }
 	}
 	///<summary>A filtered view of an untyped table.</summary>
 	public class FilteredTable : FilteredTable<Row> {

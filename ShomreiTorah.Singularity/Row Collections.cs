@@ -36,7 +36,7 @@ namespace ShomreiTorah.Singularity {
 	}
 
 	///<summary>A read-only collection of items.</summary>
-	public interface IReadOnlyCollection<T> : IEnumerable<T>  {
+	public interface IReadOnlyCollection<T> : IEnumerable<T> {
 		///<summary>Gets the item at the specified index.</summary>
 		T this[int index] { get; }
 
@@ -70,10 +70,19 @@ namespace ShomreiTorah.Singularity {
 		event EventHandler<ValueChangedEventArgs> ValueChanged;
 	}
 
-	///<summary>Contains rows and sends change events.</summary>
+	///<summary>Contains untyped rows and sends change events.</summary>
+	///<remarks>This is used to bind to arbitrary row collections
+	///by RowCollectionBinders and RowDependencies.</remarks>
 	public interface IRowEventProvider {
 		///<summary>Gets the rows in the object.</summary>
 		IList<Row> Rows { get; }
+
+		///<summary>Gets the table that contains the underlying rows.</summary>
+		///<remarks>This is used to handle LoadCompleted.  For RowListBinders, this may be null.</remarks>
+		Table SourceTable { get; }
+
+		///<summary>Gets the schema that the rows belong to.</summary>
+		TableSchema Schema { get; }
 
 		///<summary>Occurs when a row is added to the collection.</summary>
 		event EventHandler<RowListEventArgs> RowAdded;
@@ -130,7 +139,8 @@ namespace ShomreiTorah.Singularity {
 		public System.Collections.IList GetList() { return new DataBinding.ChildRowsBinder(this); }
 
 		IList<Row> IRowEventProvider.Rows { get { return this; } }
-
+		Table IRowEventProvider.SourceTable { get { return ChildTable; } }
 		TableSchema ISchemaItem.Schema { get { return ChildTable.Schema; } }
+		TableSchema IRowEventProvider.Schema { get { return ChildTable.Schema; } }
 	}
 }
