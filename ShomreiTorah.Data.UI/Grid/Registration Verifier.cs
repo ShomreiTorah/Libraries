@@ -27,12 +27,12 @@ namespace ShomreiTorah.Data.UI.Grid {
 				if (registrationCount != 0)
 					throw new InvalidOperationException("RegistrationCount cannot be set twice");
 				registrationCount = value;
-				if (!IsDesignMode) {
-					if (value != ActualRegistrationCount)
-						Dialog.ShowError("Missing " + (value - ActualRegistrationCount) + " behavior registrations.\r\n"
-									   + "Make sure that all behaviors are registered both at design-time and at runtime.",
-										 "Shomrei Torah UI Framework");
-				}
+				//if (!IsDesignMode) {
+				//    if (value != ActualRegistrationCount)
+				//        Dialog.ShowError("Missing " + (value - ActualRegistrationCount) + " behavior registrations.\r\n"
+				//                       + "Make sure that all behaviors are registered both at design-time and at runtime.",
+				//                         "Shomrei Torah UI Framework");
+				//}
 #endif
 			}
 		}

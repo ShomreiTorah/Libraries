@@ -27,8 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>..\..\ShomreiTorah Minimal.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>true</RunCodeAnalysis>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Debug\ShomreiTorah.Data.UI.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +36,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\ShomreiTorah.Data.UI.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -62,7 +62,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppFramework.cs" />
+    <Compile Include="AppFramework.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\CheckNumberEdit.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -92,6 +94,12 @@
     </Compile>
     <Compile Include="Forms\PersonCreator.Designer.cs">
       <DependentUpon>PersonCreator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SimplePersonDetails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SimplePersonDetails.Designer.cs">
+      <DependentUpon>SimplePersonDetails.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\SplashForm.cs">
       <SubType>Form</SubType>
@@ -167,6 +175,9 @@
     <EmbeddedResource Include="Forms\PersonCreator.resx">
       <DependentUpon>PersonCreator.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SimplePersonDetails.resx">
+      <DependentUpon>SimplePersonDetails.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -190,6 +201,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\LoadingIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Edit16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

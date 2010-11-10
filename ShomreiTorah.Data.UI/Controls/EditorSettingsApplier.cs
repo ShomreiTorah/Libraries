@@ -65,9 +65,9 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<returns>True if there were any settings to apply.</returns>
 		bool ApplySettings(BaseEdit edit) {
 			Debug.Assert(edit.BindingManager != null, "How does " + edit.Name + " have a null BindingManager?");
-
 			//This will be called after normal designer serialization of previously applied settings
-			if (edit.DataBindings.Count != 1) {
+
+			if (edit.DataBindings.Count != 1 || edit.DataBindings[0].BindingManagerBase == null) { //TODO: Why/when is BindingManagerBase null?
 				if (ShouldShowErrors)
 					Dialog.ShowError(edit.Name + " is not databound");
 				return false;
@@ -138,7 +138,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			public override object GetPropertyOwner(PropertyDescriptor pd) { return owner; }
 
 			static string GetDescription(BaseEdit edit) {
-				if (edit.DataBindings.Count == 0)
+				if (edit.DataBindings.Count == 0 || edit.DataBindings[0].BindingManagerBase == null)
 					return edit.Name + " is not databound";
 				if (edit.DataBindings.Count > 1)
 					return edit.Name + " has multiple bound properties";
