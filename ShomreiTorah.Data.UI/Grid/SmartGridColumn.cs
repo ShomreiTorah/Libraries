@@ -43,7 +43,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 
 		///<summary>Gets or sets the repository item specifying the editor used to edit a column's cell values.</summary>
 		///<remarks>
-		///	In order to use ShouldSerialize & Reset, there cannot be a DefaultValueAttribute.
+		///	In order to use ShouldSerialize / Reset, there cannot be a DefaultValueAttribute.
 		/// Since attributes are inherited and cannot be removed from a base class,  I need a
 		/// new property with a different name.
 		///</remarks>

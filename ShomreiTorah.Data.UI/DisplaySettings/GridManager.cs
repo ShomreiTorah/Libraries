@@ -30,7 +30,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		static readonly LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>> behaviors = new LinkedList<KeyValuePair<Func<object, bool>, IGridBehavior>>();
 
 		///<summary>Registers an IGridBehavior for one or more Singularity schemas.</summary>
-		///<param name="schema">The schemas to apply the behavior to.</param>
+		///<param name="schemas">The schemas to apply the behavior to.</param>
 		///<param name="behavior">The IGridBehavior instance.</param>
 		public static void RegisterBehavior(IEnumerable<TableSchema> schemas, IGridBehavior behavior) {
 			if (schemas == null) throw new ArgumentNullException("schemas");
