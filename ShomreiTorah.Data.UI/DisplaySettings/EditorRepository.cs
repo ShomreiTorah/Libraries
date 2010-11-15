@@ -47,6 +47,13 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				properties.Mask.MaskType = MaskType.RegEx;
 				properties.Mask.ShowPlaceHolders = false;
 			});
+
+			OptionalSeatEditor = new EditorSettings<RepositoryItemSpinEdit>(properties => {
+				properties.AllowNullInput = DefaultBoolean.True;
+				properties.NullText = "Not sure";
+				properties.MinValue = 0;
+				properties.MaxValue = 9;
+			});
 			#endregion
 			PersonLookup = new MutableEditorSettings<RepositoryItemItemSelector>();
 			PersonOwnedLookup = new MutableEditorSettings<RepositoryItemItemSelector>();
@@ -63,6 +70,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		///<summary>Gets the EditorSettings for the Source field for the Melave Malka.</summary>
 		public static ComboBoxSettings MelaveMalkaSourceEditor { get; private set; }
+		///<summary>Gets the EditorSettings for the Melave Malka seating fields.</summary>
+		public static EditorSettings<RepositoryItemSpinEdit> OptionalSeatEditor { get; private set; }
 
 		///<summary>Gets the EditorSettings for a US State field.</summary>
 		public static ComboBoxSettings StateEditor { get; private set; }
