@@ -36,6 +36,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			EditorRepository.Register(Person.PhoneColumn, EditorRepository.PhoneEditor);
 
 			EditorRepository.Register(MelaveMalkaInvitation.SourceColumn, EditorRepository.MelaveMalkaSourceEditor);
+			EditorRepository.Register(new[] { MelaveMalkaSeat.MensSeatsColumn, MelaveMalkaSeat.WomensSeatsColumn }, EditorRepository.OptionalSeatEditor);
 
 			EditorRepository.Register(Payment.MethodColumn, EditorRepository.PaymentMethodEditor);
 			EditorRepository.Register(Payment.CheckNumberColumn, new EditorSettings<Controls.RepositoryItemCheckNumberEdit>(p => { }));
@@ -134,6 +135,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				DeletionBehavior.WithMessages(
 					"email address from the email list",
 					"email addresses from the email list"
+				)
+			);
+			GridManager.RegisterBehavior(MelaveMalkaSeat.Schema,
+				DeletionBehavior.WithMessages(
+					"seating reservation",
+					"seating reservations"
 				)
 			);
 			GridManager.RegisterBehavior(MelaveMalkaInvitation.Schema,
