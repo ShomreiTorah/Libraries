@@ -998,6 +998,8 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonColumn); } }
         ///<summary>Gets the person's Melave Malka seats.</summary>
         public IChildRowCollection<MelaveMalkaSeat> MelaveMalkaSeats { get { return TypedChildRows<MelaveMalkaSeat>(MelaveMalkaSeat.PersonColumn); } }
+        ///<summary>Gets the Melave Malka that the person has been honored by.</summary>
+        public IChildRowCollection<MelaveMalkaInfo> Honorees { get { return TypedChildRows<MelaveMalkaInfo>(MelaveMalkaInfo.HonoreeColumn); } }
         #endregion
         
         #region Partial Methods
@@ -1122,6 +1124,202 @@ namespace ShomreiTorah.Data {
             	OnPhoneChanged((String)oldValue, (String)newValue);
             else if (column == SourceColumn)
             	OnSourceChanged((String)oldValue, (String)newValue);
+        }
+        #endregion
+    }
+    
+    ///<summary>Describes a single Melave Malka.</summary>
+    public partial class MelaveMalkaInfo : Row {
+        ///<summary>Creates a new MelaveMalkaInfo instance.</summary>
+        public MelaveMalkaInfo () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed MelaveMalkaInfo table.</summary>
+        public static TypedTable<MelaveMalkaInfo> CreateTable() { return new TypedTable<MelaveMalkaInfo>(Schema, () => new MelaveMalkaInfo()); }
+        
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
+        ///<summary>Gets the schema's Year column.</summary>
+        public static ValueColumn YearColumn { get; private set; }
+        ///<summary>Gets the schema's AdDeadline column.</summary>
+        public static ValueColumn AdDeadlineColumn { get; private set; }
+        ///<summary>Gets the schema's MelaveMalkaDate column.</summary>
+        public static ValueColumn MelaveMalkaDateColumn { get; private set; }
+        ///<summary>Gets the schema's Honoree column.</summary>
+        public static ForeignKeyColumn HonoreeColumn { get; private set; }
+        ///<summary>Gets the schema's Speaker column.</summary>
+        public static ValueColumn SpeakerColumn { get; private set; }
+        
+        ///<summary>Gets the MelaveMalkaInfo schema instance.</summary>
+        public static new TypedSchema<MelaveMalkaInfo> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server MelaveMalkaInfo table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static MelaveMalkaInfo() {
+            #region Create Schema
+            Schema = new TypedSchema<MelaveMalkaInfo>("MelaveMalkaInfo");
+            
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
+            RowIdColumn.AllowNulls = false;
+            
+            YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
+            YearColumn.Unique = true;
+            YearColumn.AllowNulls = false;
+            
+            AdDeadlineColumn = Schema.Columns.AddValueColumn("AdDeadline", typeof(DateTime), null);
+            AdDeadlineColumn.AllowNulls = false;
+            
+            MelaveMalkaDateColumn = Schema.Columns.AddValueColumn("MelaveMalkaDate", typeof(DateTime), null);
+            MelaveMalkaDateColumn.AllowNulls = false;
+            
+            HonoreeColumn = Schema.Columns.AddForeignKey("Honoree", ShomreiTorah.Data.Person.Schema, "Honorees");
+            HonoreeColumn.AllowNulls = false;
+            
+            SpeakerColumn = Schema.Columns.AddValueColumn("Speaker", typeof(String), null);
+            SpeakerColumn.AllowNulls = false;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "MelaveMalkaInfo";
+            SchemaMapping.SqlSchemaName = "MelaveMalka";
+            
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
+            SchemaMapping.Columns.AddMapping(YearColumn, "Year");
+            SchemaMapping.Columns.AddMapping(AdDeadlineColumn, "AdDeadline");
+            SchemaMapping.Columns.AddMapping(MelaveMalkaDateColumn, "MelaveMalkaDate");
+            SchemaMapping.Columns.AddMapping(HonoreeColumn, "Honoree");
+            SchemaMapping.Columns.AddMapping(SpeakerColumn, "Speaker");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<MelaveMalkaInfo> Table { get { return (TypedTable<MelaveMalkaInfo>)base.Table; } }
+        #region Value Properties
+        ///<summary>Gets or sets the row id of the melave malka info.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the year of the Melave Malka.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 Year {
+            get { return base.Field<Int32>(YearColumn); }
+            set { base[YearColumn] = value; }
+        }
+        ///<summary>Gets or sets the stated deadline for receiving ads.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime AdDeadline {
+            get { return base.Field<DateTime>(AdDeadlineColumn); }
+            set { base[AdDeadlineColumn] = value; }
+        }
+        ///<summary>Gets or sets the date that the Melave Malka takes place.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime MelaveMalkaDate {
+            get { return base.Field<DateTime>(MelaveMalkaDateColumn); }
+            set { base[MelaveMalkaDateColumn] = value; }
+        }
+        ///<summary>Gets or sets the guest of honor.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person Honoree {
+            get { return base.Field<Person>(HonoreeColumn); }
+            set { base[HonoreeColumn] = value; }
+        }
+        ///<summary>Gets or sets the speaker of the melave malka info.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String Speaker {
+            get { return base.Field<String>(SpeakerColumn); }
+            set { base[SpeakerColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
+        
+        partial void ValidateYear(Int32 newValue, Action<string> error);
+        partial void OnYearChanged(Int32? oldValue, Int32? newValue);
+        
+        partial void ValidateAdDeadline(DateTime newValue, Action<string> error);
+        partial void OnAdDeadlineChanged(DateTime? oldValue, DateTime? newValue);
+        
+        partial void ValidateMelaveMalkaDate(DateTime newValue, Action<string> error);
+        partial void OnMelaveMalkaDateChanged(DateTime? oldValue, DateTime? newValue);
+        
+        partial void ValidateHonoree(Person newValue, Action<string> error);
+        partial void OnHonoreeChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateSpeaker(String newValue, Action<string> error);
+        partial void OnSpeakerChanged(String oldValue, String newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == YearColumn) {
+                ValidateYear((Int32)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == AdDeadlineColumn) {
+                ValidateAdDeadline((DateTime)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == MelaveMalkaDateColumn) {
+                ValidateMelaveMalkaDate((DateTime)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == HonoreeColumn) {
+                ValidateHonoree((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == SpeakerColumn) {
+                ValidateSpeaker((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == RowIdColumn)
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
+            else if (column == YearColumn)
+            	OnYearChanged((Int32?)oldValue, (Int32?)newValue);
+            else if (column == AdDeadlineColumn)
+            	OnAdDeadlineChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == MelaveMalkaDateColumn)
+            	OnMelaveMalkaDateChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == HonoreeColumn)
+            	OnHonoreeChanged((Person)oldValue, (Person)newValue);
+            else if (column == SpeakerColumn)
+            	OnSpeakerChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }

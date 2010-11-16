@@ -420,4 +420,36 @@
       <DefaultValue>0</DefaultValue>
     </Column>
   </Schema>
+  <Schema Name="MelaveMalkaInfo" RowClassDescription="Describes a single Melave Malka." RowClassName="MelaveMalkaInfo" RowClassVisibility="Public" SqlName="MelaveMalkaInfo" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the melave malka info." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Year" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the year of the Melave Malka." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Year" PropertyVisibility="Public" SqlName="Year">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="AdDeadline" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the stated deadline for receiving ads." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="AdDeadline" PropertyVisibility="Public" SqlName="AdDeadline">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="MelaveMalkaDate" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date that the Melave Malka takes place." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="MelaveMalkaDate" PropertyVisibility="Public" SqlName="MelaveMalkaDate">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Honoree" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the honoree of the Melave Malka." Expression="" ForeignRelationName="Honorees" ForeignRelationPropertyDescription="Gets the Melave Malka that the person has been honored by." ForeignRelationPropertyName="Honorees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree" PropertyVisibility="Public" SqlName="Honoree" ForeignSchemaName="MasterDirectory">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Speaker" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the speaker of the melave malka info." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Speaker" PropertyVisibility="Public" SqlName="Speaker">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+  </Schema>
 </DataContext>
