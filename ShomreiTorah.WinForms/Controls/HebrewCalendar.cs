@@ -19,6 +19,7 @@ using DevExpress.XtraEditors.Drawing;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.Utils;
 using DevExpress.LookAndFeel;
+using System.Diagnostics;
 
 namespace ShomreiTorah.WinForms.Controls {
 	///<summary>An interactive Hebrew calendar.</summary>
@@ -46,7 +47,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			ContentRenderer = new DefaultContentRenderer(Painter);
 			toolTipCreator = new DXToolTipCreator(this);
 
-			SetView(HebrewDate.Today);
+			SetView(HebrewDate.Today, moveSelection: false);
 
 			navigateTimer = new Timer { Interval = 500 };
 			navigateTimer.Tick += navigateTimer_Tick;
@@ -69,10 +70,10 @@ namespace ShomreiTorah.WinForms.Controls {
 			get { return mode; }
 			set {
 				mode = value;
-				if (value == CalendarType.English)
-					SetView(new DateTime(EnglishYear, EnglishMonth, 1));
+				if (value == CalendarType.English)	//TODO: If an extremity is selected, the selection may move off-screen
+					SetView(new DateTime(EnglishYear, EnglishMonth, 1), moveSelection: false);
 				else
-					SetView(new HebrewDate(HebrewYear, HebrewMonth, 1));
+					SetView(new HebrewDate(HebrewYear, HebrewMonth, 1), moveSelection: false);
 			}
 		}
 
@@ -82,7 +83,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		[RefreshProperties(RefreshProperties.All)]
 		public int HebrewYear {
 			get { return hebrewYear; }
-			set { mode = CalendarType.Hebrew; SetView(new HebrewDate(value, HebrewMonth, 1)); }
+			set { mode = CalendarType.Hebrew; SetView(new HebrewDate(value, HebrewMonth, 1), moveSelection: true); }
 		}
 		///<summary>Gets or sets the Hebrew month being displayed.</summary>
 		[Description("Gets or sets the Hebrew month being displayed.")]
@@ -90,7 +91,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		[RefreshProperties(RefreshProperties.All)]
 		public HebrewMonth HebrewMonth {
 			get { return hebrewMonth; }
-			set { mode = CalendarType.Hebrew; SetView(new HebrewDate(HebrewYear, value, 1)); }
+			set { mode = CalendarType.Hebrew; SetView(new HebrewDate(HebrewYear, value, 1), moveSelection: true); }
 		}
 		///<summary>Gets or sets the English year being displayed.</summary>
 		[Description("Gets or sets the English year being displayed.")]
@@ -98,7 +99,7 @@ namespace ShomreiTorah.WinForms.Controls {
 		[RefreshProperties(RefreshProperties.All)]
 		public int EnglishYear {
 			get { return englishYear; }
-			set { mode = CalendarType.English; SetView(new DateTime(value, EnglishMonth, 1)); }
+			set { mode = CalendarType.English; SetView(new DateTime(value, EnglishMonth, 1), moveSelection: true); }
 		}
 		///<summary>Gets or sets the English month being displayed.</summary>
 		[Description("Gets or sets the English month being displayed.")]
@@ -106,13 +107,13 @@ namespace ShomreiTorah.WinForms.Controls {
 		[RefreshProperties(RefreshProperties.All)]
 		public int EnglishMonth {
 			get { return englishMonth; }
-			set { mode = CalendarType.English; SetView(new DateTime(EnglishYear, value, 1)); }
+			set { mode = CalendarType.English; SetView(new DateTime(EnglishYear, value, 1), moveSelection: true); }
 		}
 
-		private void ResetHebrewMonth() { SetView(HebrewDate.Today); }
-		private void ResetHebrewYear() { SetView(HebrewDate.Today); }
-		private void ResetEnglishYear() { SetView(HebrewDate.Today); }
-		private void ResetEnglishMonth() { SetView(HebrewDate.Today); }
+		private void ResetHebrewMonth() { SetView(HebrewDate.Today, moveSelection: true); }
+		private void ResetHebrewYear() { SetView(HebrewDate.Today, moveSelection: true); }
+		private void ResetEnglishYear() { SetView(HebrewDate.Today, moveSelection: true); }
+		private void ResetEnglishMonth() { SetView(HebrewDate.Today, moveSelection: true); }
 
 
 		private bool ShouldSerializeHebrewYear() { return Mode == CalendarType.Hebrew && !IsSameHebrewMonth(HebrewDate.Today); }
@@ -142,7 +143,10 @@ namespace ShomreiTorah.WinForms.Controls {
 		HebrewDate firstDate;
 
 		///<summary>Displays the month containing a specific date.</summary>
-		public void SetView(HebrewDate date) {
+		///<param name="date">The date to focus on in the view.</param>
+		///<param name="moveSelection">If true, the selection will be moved to remain in its current cell (visual position).
+		///This should only be false if the currently selected date is guaranteed to remain visible in the new view.</param>
+		public void SetView(HebrewDate date, bool moveSelection) {
 			var selectionOffset = selectedDate.HasValue ? (selectedDate.Value - firstDate).Days : -1;
 			if (selectionOffset > RowCount * 7) selectionOffset = -1;
 
@@ -191,10 +195,13 @@ namespace ShomreiTorah.WinForms.Controls {
 			if (hoverItem.Item == CalendarItem.DayCell)
 				hoverItem = HitTest(PointToClient(MousePosition));
 
-			if (selectionOffset >= 0)
-				selectedDate = firstDate + selectionOffset;
-			else if (selectedDate.HasValue && (selectedDate.Value < firstDate || selectedDate.Value > (firstDate + RowCount * 7)))
-				selectedDate = null;
+			if (moveSelection) {
+				if (selectionOffset >= 0)
+					selectedDate = firstDate + selectionOffset;
+				else if (selectedDate.HasValue && (selectedDate.Value < firstDate || selectedDate.Value > (firstDate + RowCount * 7)))
+					selectedDate = null;
+			} else		//If we're not moving the selection, it ought to still be visible.
+				Debug.Assert(selectedDate == null || IsVisible(selectedDate.Value));
 
 			Invalidate();
 			OnSelectionChanged();
@@ -205,8 +212,8 @@ namespace ShomreiTorah.WinForms.Controls {
 		///<param name="setView">If true, the view will be changed even if the new selection is within the previous or next month in the current view.</param>
 		public void SetSelection(HebrewDate? date, bool setView) {
 			selectedDate = date;
-			if (date != null && (setView || date.Value < firstDate || date.Value >= firstDate + 7 * RowCount))
-				SetView(date.Value);
+			if (date != null && (setView || !IsVisible(date.Value)))
+				SetView(date.Value, moveSelection: false);
 			else {
 				Invalidate();			//SetView calls Invalidate and OnSelectionChanged; if we didn't call SetView, we have to invalidate by ourselves.
 				OnSelectionChanged();
@@ -216,16 +223,16 @@ namespace ShomreiTorah.WinForms.Controls {
 		///<summary>Moves the view by a number of months.</summary>
 		public void OffsetMonths(int months) {
 			if (Mode == CalendarType.Hebrew)
-				SetView(MonthStart.AddMonths(months));
+				SetView(MonthStart.AddMonths(months), moveSelection: true);
 			else
-				SetView(MonthStart.EnglishDate.AddMonths(months));
+				SetView(MonthStart.EnglishDate.AddMonths(months), moveSelection: true);
 		}
 		///<summary>Moves the view by a number of years.</summary>
 		public void OffsetYears(int years) {
 			if (Mode == CalendarType.Hebrew)
-				SetView(MonthStart.AddYears(years));
+				SetView(MonthStart.AddYears(years), moveSelection: true);
 			else
-				SetView(MonthStart.EnglishDate.AddYears(years));
+				SetView(MonthStart.EnglishDate.AddYears(years), moveSelection: true);
 		}
 
 		///<summary>Checks whether the current view includes the given date.</summary>
@@ -527,7 +534,7 @@ namespace ShomreiTorah.WinForms.Controls {
 					&& (lnf.ActiveSkinName.StartsWith("Office 2010", StringComparison.OrdinalIgnoreCase)
 					 || lnf.ActiveSkinName.StartsWith("Seven", StringComparison.OrdinalIgnoreCase)
 					 || lnf.ActiveSkinName == "DevExpress Style")) {
-						 using (var pen = new Pen(Utilities.GetHeaderLineColor(lnf))) {
+					using (var pen = new Pen(Utilities.GetHeaderLineColor(lnf))) {
 						g.DrawLine(pen, WeekHeaderBounds.Left, WeekHeaderBounds.Top, WeekHeaderBounds.Left, WeekHeaderBounds.Bottom);
 						g.DrawLine(pen, WeekHeaderBounds.Left, WeekHeaderBounds.Top, WeekHeaderBounds.Right, WeekHeaderBounds.Top);
 						g.DrawLine(pen, WeekHeaderBounds.Right, WeekHeaderBounds.Top, WeekHeaderBounds.Right, WeekHeaderBounds.Bottom);
@@ -912,7 +919,7 @@ namespace ShomreiTorah.WinForms.Controls {
 				var date = HitTest(e.Location).Date;
 				if (date != null) {
 					if (!IsSameMonth(date.Value))
-						SetView(date.Value);
+						SetView(date.Value, moveSelection: true);
 					OnDateDoubleClicked(new HebrewDateEventArgs(date.Value));
 				}
 			}
