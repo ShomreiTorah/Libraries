@@ -189,6 +189,17 @@ namespace ShomreiTorah.Data {
 	}
 	#endregion
 
+	partial class MelaveMalkaInfo {	//TODO: December deadline
+		partial void OnAdDeadlineChanged(DateTime? oldValue, DateTime? newValue) {
+			if (newValue != null && this["Year"] != null)
+				AdDeadline = new DateTime(Year, newValue.Value.Month, newValue.Value.Day);
+		}
+		partial void OnMelaveMalkaDateChanged(DateTime? oldValue, DateTime? newValue) {
+			if (newValue != null && this["Year"] != null)
+				MelaveMalkaDate = new DateTime(Year, newValue.Value.Month, newValue.Value.Day);
+		}
+	}
+
 	partial class Pledge {
 		partial void ValidateAmount(decimal newValue, Action<string> error) {
 			if (newValue < 0) error("Amount cannot be negative");
@@ -231,6 +242,9 @@ namespace ShomreiTorah.Data {
 	partial class MelaveMalkaSeat : IOwnedObject { }
 	partial class EmailAddress : IOwnedObject { }
 	partial class LoggedStatement : IOwnedObject { }
+	partial class MelaveMalkaInfo : IOwnedObject {
+		Person IOwnedObject.Person { get { return Honoree; } }
+	}
 
 	partial class Pledge : ITransaction {
 		///<summary>Gets the amount with the sign as reflected in the balance due.</summary>
