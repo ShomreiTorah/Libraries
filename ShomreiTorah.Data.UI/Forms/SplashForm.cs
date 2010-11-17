@@ -28,6 +28,7 @@ namespace ShomreiTorah.Data.UI.Forms {
 			this.Size = image.Size;
 			this.captionBounds = captionBounds;
 			this.captionBrush = new SolidBrush(captionColor);
+			this.FormBorderStyle = FormBorderStyle.None;
 
 			SetStyle(ControlStyles.AllPaintingInWmPaint
 				   | ControlStyles.UserPaint, true);
