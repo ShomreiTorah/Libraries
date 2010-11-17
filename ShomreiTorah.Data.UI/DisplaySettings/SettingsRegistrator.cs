@@ -143,6 +143,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					"seating reservations"
 				)
 			);
+			GridManager.RegisterBehavior(MelaveMalkaInfo.Schema,
+				DeletionBehavior.WithMessages<MelaveMalkaInfo>(
+					singular: m => "Are you sure you want to delete the info about the " + m.Year + " Melave Malka?\r\nNo other data will be deleted.",
+					plural: mms => "Are you sure you want to delete  info about " + mms.Count() + " Melave Malkas?\r\nNo other data will be deleted."
+				)
+			);
 			GridManager.RegisterBehavior(MelaveMalkaInvitation.Schema,
 				DeletionBehavior.WithMessages<MelaveMalkaInvitation>(
 					singular: mmi => "Are you sure you want to uninvite " + mmi.Person.FullName + "?",
