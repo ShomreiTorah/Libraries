@@ -189,14 +189,15 @@ namespace ShomreiTorah.Data {
 	}
 	#endregion
 
-	partial class MelaveMalkaInfo {	//TODO: December deadline
+	partial class MelaveMalkaInfo {
+		//If the date is after November, it should wrap to the previous year.
 		partial void OnAdDeadlineChanged(DateTime? oldValue, DateTime? newValue) {
 			if (newValue != null && this["Year"] != null)
-				AdDeadline = new DateTime(Year, newValue.Value.Month, newValue.Value.Day);
+				AdDeadline = new DateTime(Year - (newValue.Value.Month > 10 ? 1 : 0), newValue.Value.Month, newValue.Value.Day);
 		}
 		partial void OnMelaveMalkaDateChanged(DateTime? oldValue, DateTime? newValue) {
 			if (newValue != null && this["Year"] != null)
-				MelaveMalkaDate = new DateTime(Year, newValue.Value.Month, newValue.Value.Day);
+				MelaveMalkaDate = new DateTime(Year - (newValue.Value.Month > 10 ? 1 : 0), newValue.Value.Month, newValue.Value.Day);
 		}
 	}
 
