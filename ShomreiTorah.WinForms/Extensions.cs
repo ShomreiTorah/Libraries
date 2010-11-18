@@ -8,10 +8,28 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
+using DevExpress.XtraGrid.Views.Grid;
 
 namespace ShomreiTorah.WinForms {
 	///<summary>Contains miscellaneous extension methods.</summary>
 	public static class Extensions {
+		#region XtraGrid
+		///<summary>Sets a row as the only selected row in a grid.</summary>
+		public static void SetSelection(this GridView view, int rowHandle, bool makeVisible) {
+			if (view == null) throw new ArgumentNullException("view");
+			view.FocusedRowHandle = rowHandle;
+			if (view.IsMultiSelect) {
+				try {
+					view.BeginSelection();
+					view.ClearSelection();
+					view.SelectRow(rowHandle);
+				} finally { view.EndSelection(); }
+			}
+			if (makeVisible)
+				view.MakeRowVisible(rowHandle, false);
+		}
+		#endregion
+
 		#region Graphics
 		///<summary>Measures the exact width of a string.</summary>
 		///<param name="graphics">A Graphics object to measure the string on.</param>

@@ -30,21 +30,6 @@ namespace ShomreiTorah.Data.UI {
 		}
 		#endregion
 
-		///<summary>Sets a row as the only selected row in a grid.</summary>
-		public static void SetSelection(this GridView view, int rowHandle, bool makeVisible) {
-			if (view == null) throw new ArgumentNullException("view");
-			view.FocusedRowHandle = rowHandle;
-			if (view.IsMultiSelect) {
-				try {
-					view.BeginSelection();
-					view.ClearSelection();
-					view.SelectRow(rowHandle);
-				} finally { view.EndSelection(); }
-			}
-			if(makeVisible)
-				view.MakeRowVisible(rowHandle, false);
-		}
-
 		///<summary>Confirms that a payment does not have a duplicate check number.</summary>
 		///<returns>The duplicated Payment instance, if any.</returns>
 		public static Payment FindDuplicate(this Payment payment) { return payment.FindDuplicate(payment.CheckNumber); }
