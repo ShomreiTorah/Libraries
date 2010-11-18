@@ -201,6 +201,164 @@ namespace ShomreiTorah.Data {
         #endregion
     }
     
+    ///<summary>Describes a caller.</summary>
+    public partial class Caller : Row {
+        ///<summary>Creates a new Caller instance.</summary>
+        public Caller () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed Callers table.</summary>
+        public static TypedTable<Caller> CreateTable() { return new TypedTable<Caller>(Schema, () => new Caller()); }
+        
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
+        ///<summary>Gets the schema's Person column.</summary>
+        public static ForeignKeyColumn PersonColumn { get; private set; }
+        ///<summary>Gets the schema's DateAdded column.</summary>
+        public static ValueColumn DateAddedColumn { get; private set; }
+        ///<summary>Gets the schema's Year column.</summary>
+        public static ValueColumn YearColumn { get; private set; }
+        
+        ///<summary>Gets the Callers schema instance.</summary>
+        public static new TypedSchema<Caller> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server Callers table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static Caller() {
+            #region Create Schema
+            Schema = new TypedSchema<Caller>("Callers");
+            
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
+            RowIdColumn.AllowNulls = false;
+            
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Callers");
+            PersonColumn.AllowNulls = false;
+            
+            DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
+            DateAddedColumn.AllowNulls = false;
+            
+            YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
+            YearColumn.AllowNulls = false;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "Callers";
+            SchemaMapping.SqlSchemaName = "MelaveMalka";
+            
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
+            SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
+            SchemaMapping.Columns.AddMapping(DateAddedColumn, "DateAdded");
+            SchemaMapping.Columns.AddMapping(YearColumn, "Year");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<Caller> Table { get { return (TypedTable<Caller>)base.Table; } }
+        #region Value Properties
+        ///<summary>Gets or sets the row id of the caller.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the person.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
+            set { base[PersonColumn] = value; }
+        }
+        ///<summary>Gets or sets the date added of the caller.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime DateAdded {
+            get { return base.Field<DateTime>(DateAddedColumn); }
+            set { base[DateAddedColumn] = value; }
+        }
+        ///<summary>Gets or sets the year of the caller.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 Year {
+            get { return base.Field<Int32>(YearColumn); }
+            set { base[YearColumn] = value; }
+        }
+        #endregion
+        
+        #region ChildRows Properties
+        ///<summary>Gets the people that the caller should call.</summary>
+        public IChildRowCollection<MelaveMalkaInvitation> Callees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.CallerColumn); } }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
+        
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateDateAdded(DateTime newValue, Action<string> error);
+        partial void OnDateAddedChanged(DateTime? oldValue, DateTime? newValue);
+        
+        partial void ValidateYear(Int32 newValue, Action<string> error);
+        partial void OnYearChanged(Int32? oldValue, Int32? newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == PersonColumn) {
+                ValidatePerson((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == DateAddedColumn) {
+                ValidateDateAdded((DateTime)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == YearColumn) {
+                ValidateYear((Int32)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == RowIdColumn)
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
+            else if (column == PersonColumn)
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
+            else if (column == DateAddedColumn)
+            	OnDateAddedChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == YearColumn)
+            	OnYearChanged((Int32?)oldValue, (Int32?)newValue);
+        }
+        #endregion
+    }
+    
     ///<summary>Describes a deposit.</summary>
     public partial class Deposit : Row {
         ///<summary>Creates a new Deposit instance.</summary>
@@ -635,6 +793,12 @@ namespace ShomreiTorah.Data {
         public static ValueColumn SourceColumn { get; private set; }
         ///<summary>Gets the schema's DateAdded column.</summary>
         public static ValueColumn DateAddedColumn { get; private set; }
+        ///<summary>Gets the schema's ShouldCall column.</summary>
+        public static ValueColumn ShouldCallColumn { get; private set; }
+        ///<summary>Gets the schema's Caller column.</summary>
+        public static ForeignKeyColumn CallerColumn { get; private set; }
+        ///<summary>Gets the schema's CallerNote column.</summary>
+        public static ValueColumn CallerNoteColumn { get; private set; }
         
         ///<summary>Gets the Invitees schema instance.</summary>
         public static new TypedSchema<MelaveMalkaInvitation> Schema { get; private set; }
@@ -662,6 +826,15 @@ namespace ShomreiTorah.Data {
             
             DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
             DateAddedColumn.AllowNulls = false;
+            
+            ShouldCallColumn = Schema.Columns.AddValueColumn("ShouldCall", typeof(Boolean), false);
+            ShouldCallColumn.AllowNulls = false;
+            
+            CallerColumn = Schema.Columns.AddForeignKey("Caller", ShomreiTorah.Data.Caller.Schema, "Callees");
+            CallerColumn.AllowNulls = true;
+            
+            CallerNoteColumn = Schema.Columns.AddValueColumn("CallerNote", typeof(String), null);
+            CallerNoteColumn.AllowNulls = true;
             #endregion
             
             #region Create SchemaMapping
@@ -674,6 +847,9 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(YearColumn, "Year");
             SchemaMapping.Columns.AddMapping(SourceColumn, "Source");
             SchemaMapping.Columns.AddMapping(DateAddedColumn, "DateAdded");
+            SchemaMapping.Columns.AddMapping(ShouldCallColumn, "ShouldCall");
+            SchemaMapping.Columns.AddMapping(CallerColumn, "Caller");
+            SchemaMapping.Columns.AddMapping(CallerNoteColumn, "CallerNote");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -718,6 +894,27 @@ namespace ShomreiTorah.Data {
             get { return base.Field<DateTime>(DateAddedColumn); }
             set { base[DateAddedColumn] = value; }
         }
+        ///<summary>Gets or sets whether the person should be called to give an ad</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Boolean ShouldCall {
+            get { return base.Field<Boolean>(ShouldCallColumn); }
+            set { base[ShouldCallColumn] = value; }
+        }
+        ///<summary>Gets or sets the caller assigned to this person.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Caller Caller {
+            get { return base.Field<Caller>(CallerColumn); }
+            set { base[CallerColumn] = value; }
+        }
+        ///<summary>Gets or sets a note from the person's caller.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String CallerNote {
+            get { return base.Field<String>(CallerNoteColumn); }
+            set { base[CallerNoteColumn] = value; }
+        }
         #endregion
         
         #region Partial Methods
@@ -737,6 +934,15 @@ namespace ShomreiTorah.Data {
         
         partial void ValidateDateAdded(DateTime newValue, Action<string> error);
         partial void OnDateAddedChanged(DateTime? oldValue, DateTime? newValue);
+        
+        partial void ValidateShouldCall(Boolean newValue, Action<string> error);
+        partial void OnShouldCallChanged(Boolean? oldValue, Boolean? newValue);
+        
+        partial void ValidateCaller(Caller newValue, Action<string> error);
+        partial void OnCallerChanged(Caller oldValue, Caller newValue);
+        
+        partial void ValidateCallerNote(String newValue, Action<string> error);
+        partial void OnCallerNoteChanged(String oldValue, String newValue);
         #endregion
         
         #region Column Callbacks
@@ -767,6 +973,15 @@ namespace ShomreiTorah.Data {
             } else if (column == DateAddedColumn) {
                 ValidateDateAdded((DateTime)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == ShouldCallColumn) {
+                ValidateShouldCall((Boolean)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == CallerColumn) {
+                ValidateCaller((Caller)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == CallerNoteColumn) {
+                ValidateCallerNote((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
         }
@@ -786,6 +1001,12 @@ namespace ShomreiTorah.Data {
             	OnSourceChanged((String)oldValue, (String)newValue);
             else if (column == DateAddedColumn)
             	OnDateAddedChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == ShouldCallColumn)
+            	OnShouldCallChanged((Boolean?)oldValue, (Boolean?)newValue);
+            else if (column == CallerColumn)
+            	OnCallerChanged((Caller)oldValue, (Caller)newValue);
+            else if (column == CallerNoteColumn)
+            	OnCallerNoteChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }
@@ -1000,6 +1221,8 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<MelaveMalkaSeat> MelaveMalkaSeats { get { return TypedChildRows<MelaveMalkaSeat>(MelaveMalkaSeat.PersonColumn); } }
         ///<summary>Gets the Melave Malka that the person has been honored by.</summary>
         public IChildRowCollection<MelaveMalkaInfo> Honorees { get { return TypedChildRows<MelaveMalkaInfo>(MelaveMalkaInfo.HonoreeColumn); } }
+        ///<summary>Gets the person's caller rows.</summary>
+        public IChildRowCollection<Caller> Callers { get { return TypedChildRows<Caller>(Caller.PersonColumn); } }
         #endregion
         
         #region Partial Methods

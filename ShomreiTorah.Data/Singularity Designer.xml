@@ -333,33 +333,6 @@
       </DefaultValue>
     </Column>
   </Schema>
-  <Schema Name="Invitees" RowClassDescription="Describes a Melave Malka invitation." RowClassName="MelaveMalkaInvitation" RowClassVisibility="Public" SqlName="Invitees" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
-    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the invitee." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person invited." Expression="" ForeignRelationName="Invitees" ForeignRelationPropertyDescription="Gets the person's Melave Malka invitations." ForeignRelationPropertyName="Invitees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Year" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the year that the invitation applies to." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Year" PropertyVisibility="Public" SqlName="Year">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="Source" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the source of the invitation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Source" PropertyVisibility="Public" SqlName="Source">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-    <Column Name="DateAdded" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date that the invitation was entered." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DateAdded" PropertyVisibility="Public" SqlName="DateAdded">
-      <DefaultValue>
-        <Null />
-      </DefaultValue>
-    </Column>
-  </Schema>
   <Schema Name="Ads" RowClassDescription="Describes an ad in the journal." RowClassName="JournalAd" RowClassVisibility="Public" SqlName="Ads" SqlSchemaName="MelaveMalka" PrimaryKeyName="AdId">
     <Column Name="AdId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the ad id of the ad." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="AdId" PropertyVisibility="Public" SqlName="AdId">
       <DefaultValue>
@@ -441,12 +414,74 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Honoree" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the honoree of the Melave Malka." Expression="" ForeignRelationName="Honorees" ForeignRelationPropertyDescription="Gets the Melave Malka that the person has been honored by." ForeignRelationPropertyName="Honorees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree" PropertyVisibility="Public" SqlName="Honoree" ForeignSchemaName="MasterDirectory">
+    <Column Name="Honoree" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the guest of honor." Expression="" ForeignRelationName="Honorees" ForeignRelationPropertyDescription="Gets the Melave Malka that the person has been honored by." ForeignRelationPropertyName="Honorees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree" PropertyVisibility="Public" SqlName="Honoree" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
     </Column>
     <Column Name="Speaker" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the speaker of the melave malka info." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Speaker" PropertyVisibility="Public" SqlName="Speaker">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+  </Schema>
+  <Schema Name="Callers" RowClassDescription="Describes a caller." RowClassName="Caller" RowClassVisibility="Public" SqlName="Callers" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the caller." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person." Expression="" ForeignRelationName="Callers" ForeignRelationPropertyDescription="Gets the person's caller rows." ForeignRelationPropertyName="Callers" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="DateAdded" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date added of the caller." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DateAdded" PropertyVisibility="Public" SqlName="DateAdded">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Year" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the year of the caller." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Year" PropertyVisibility="Public" SqlName="Year">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+  </Schema>
+  <Schema Name="Invitees" RowClassDescription="Describes a Melave Malka invitation." RowClassName="MelaveMalkaInvitation" RowClassVisibility="Public" SqlName="Invitees" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the invitee." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person invited." Expression="" ForeignRelationName="Invitees" ForeignRelationPropertyDescription="Gets the person's Melave Malka invitations." ForeignRelationPropertyName="Invitees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Year" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the year that the invitation applies to." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Year" PropertyVisibility="Public" SqlName="Year">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Source" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the source of the invitation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Source" PropertyVisibility="Public" SqlName="Source">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="DateAdded" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date that the invitation was entered." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DateAdded" PropertyVisibility="Public" SqlName="DateAdded">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="ShouldCall" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets whether the person should be called to give an ad" Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ShouldCall" PropertyVisibility="Public" SqlName="ShouldCall">
+      <DefaultValue>false</DefaultValue>
+    </Column>
+    <Column Name="Caller" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the caller assigned to this person." Expression="" ForeignRelationName="Callees" ForeignRelationPropertyDescription="Gets the people that the caller should call." ForeignRelationPropertyName="Callees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Caller" PropertyVisibility="Public" SqlName="Caller" ForeignSchemaName="Callers">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="CallerNote" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets a note from the person's caller." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="CallerNote" PropertyVisibility="Public" SqlName="CallerNote">
       <DefaultValue>
         <Null />
       </DefaultValue>

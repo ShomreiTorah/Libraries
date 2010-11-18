@@ -243,6 +243,7 @@ namespace ShomreiTorah.Data {
 	partial class MelaveMalkaSeat : IOwnedObject { }
 	partial class EmailAddress : IOwnedObject { }
 	partial class LoggedStatement : IOwnedObject { }
+	partial class Caller : IOwnedObject { }
 	partial class MelaveMalkaInfo : IOwnedObject {
 		Person IOwnedObject.Person { get { return Honoree; } }
 	}
