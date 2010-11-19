@@ -36,6 +36,10 @@ namespace ShomreiTorah.Singularity {
 			Name = name;
 		}
 
+		///<summary>Creates a table for this schema.</summary>
+		///<remarks>This method is overridden to create typed tables.</remarks>
+		public virtual Table CreateTable() { return new Table(this); }
+
 		///<summary>Gets the columns in this schema.</summary>
 		public ColumnCollection Columns { get; private set; }
 		///<summary>Gets the child relations in this schema.</summary>

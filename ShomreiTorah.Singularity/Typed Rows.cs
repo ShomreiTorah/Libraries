@@ -21,6 +21,9 @@ namespace ShomreiTorah.Singularity {
 		[SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Justification = "Static instance of closed generic type.")]
 		public static TypedSchema<TRow> Instance { get; private set; }
 
+		///<summary>Creates a table for this schema.</summary>
+		public override Table CreateTable() { return new TypedTable<TRow>(Instance); }	//TODO: Fast rowCreator
+
 		internal override void AddRow(Row row) {
 			if (!(row is TRow)) throw new InvalidOperationException("Typed schemas can only have typed rows");
 			base.AddRow(row);
