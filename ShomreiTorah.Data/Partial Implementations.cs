@@ -135,7 +135,7 @@ namespace ShomreiTorah.Data {
 	partial class Deposit {
 		///<summary>Called before the row is removed from its table.</summary>
 		protected override void OnRemoving() {
-			foreach (var payment in Payments.ToArray()) {	//The loop will modify the collection
+			foreach (var payment in Payments.ToList()) {	//The loop will modify the collection
 				payment.Deposit = null;
 			}
 		}
@@ -188,6 +188,13 @@ namespace ShomreiTorah.Data {
 		}
 	}
 	#endregion
+
+	partial class Caller {
+		protected override void OnRemoving() {
+			foreach (var callee in Callees.ToList()) //The loop will modify the collection
+				callee.Caller = null;
+		}
+	}
 
 	partial class MelaveMalkaInfo {
 		//If the date is after November, it should wrap to the previous year.
