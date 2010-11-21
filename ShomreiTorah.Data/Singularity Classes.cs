@@ -201,7 +201,7 @@ namespace ShomreiTorah.Data {
         #endregion
     }
     
-    ///<summary>Describes a caller.</summary>
+    ///<summary>Describes a person who will make phone calls asking for ads.</summary>
     public partial class Caller : Row {
         ///<summary>Creates a new Caller instance.</summary>
         public Caller () : base(Schema) { Initialize(); }
@@ -218,6 +218,8 @@ namespace ShomreiTorah.Data {
         public static ValueColumn DateAddedColumn { get; private set; }
         ///<summary>Gets the schema's Year column.</summary>
         public static ValueColumn YearColumn { get; private set; }
+        ///<summary>Gets the schema's EmailAddresses column.</summary>
+        public static CalculatedColumn EmailAddressesColumn { get; private set; }
         
         ///<summary>Gets the Callers schema instance.</summary>
         public static new TypedSchema<Caller> Schema { get; private set; }
@@ -242,6 +244,8 @@ namespace ShomreiTorah.Data {
             
             YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
             YearColumn.AllowNulls = false;
+            
+            EmailAddressesColumn = Schema.Columns.AddCalculatedColumn<Caller, String>("EmailAddresses", row => String.Join(", ", row.Person.EmailAddresses.Select(e => e.Email)));
             #endregion
             
             #region Create SchemaMapping
@@ -289,6 +293,12 @@ namespace ShomreiTorah.Data {
         public Int32 Year {
             get { return base.Field<Int32>(YearColumn); }
             set { base[YearColumn] = value; }
+        }
+        ///<summary>Gets or sets the email addresses of the caller.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String EmailAddresses {
+            get { return base.Field<String>(EmailAddressesColumn); }
         }
         #endregion
         
@@ -774,7 +784,7 @@ namespace ShomreiTorah.Data {
         #endregion
     }
     
-    ///<summary>Describes a Melave Malka invitation.</summary>
+    ///<summary>Describes a person invited to the Melave Malka.</summary>
     public partial class MelaveMalkaInvitation : Row {
         ///<summary>Creates a new MelaveMalkaInvitation instance.</summary>
         public MelaveMalkaInvitation () : base(Schema) { Initialize(); }
@@ -799,6 +809,8 @@ namespace ShomreiTorah.Data {
         public static ForeignKeyColumn CallerColumn { get; private set; }
         ///<summary>Gets the schema's CallerNote column.</summary>
         public static ValueColumn CallerNoteColumn { get; private set; }
+        ///<summary>Gets the schema's AdAmount column.</summary>
+        public static CalculatedColumn AdAmountColumn { get; private set; }
         
         ///<summary>Gets the Invitees schema instance.</summary>
         public static new TypedSchema<MelaveMalkaInvitation> Schema { get; private set; }
@@ -835,6 +847,8 @@ namespace ShomreiTorah.Data {
             
             CallerNoteColumn = Schema.Columns.AddValueColumn("CallerNote", typeof(String), null);
             CallerNoteColumn.AllowNulls = true;
+            
+            AdAmountColumn = Schema.Columns.AddCalculatedColumn<MelaveMalkaInvitation, Decimal>("AdAmount", row => row.Person.Pledges.Where(p => p.ExternalSource == "Journal " + row.Year).Sum(p => p.Amount));
             #endregion
             
             #region Create SchemaMapping
@@ -914,6 +928,12 @@ namespace ShomreiTorah.Data {
         public String CallerNote {
             get { return base.Field<String>(CallerNoteColumn); }
             set { base[CallerNoteColumn] = value; }
+        }
+        ///<summary>Gets or sets the total pledge amount of the person's ads, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Decimal AdAmount {
+            get { return base.Field<Decimal>(AdAmountColumn); }
         }
         #endregion
         

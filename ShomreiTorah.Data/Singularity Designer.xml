@@ -425,7 +425,7 @@
       </DefaultValue>
     </Column>
   </Schema>
-  <Schema Name="Callers" RowClassDescription="Describes a caller." RowClassName="Caller" RowClassVisibility="Public" SqlName="Callers" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
+  <Schema Name="Callers" RowClassDescription="Describes a person who will make phone calls asking for ads." RowClassName="Caller" RowClassVisibility="Public" SqlName="Callers" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
     <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the caller." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
       <DefaultValue>
         <Null />
@@ -446,8 +446,13 @@
         <Null />
       </DefaultValue>
     </Column>
+    <Column Name="EmailAddresses" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the email addresses of the caller." Expression="String.Join(&quot;, &quot;, row.Person.EmailAddresses.Select(e =&gt; e.Email))" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="false" IsUnique="false" PropertyName="EmailAddresses" PropertyVisibility="Public" SqlName="">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
   </Schema>
-  <Schema Name="Invitees" RowClassDescription="Describes a Melave Malka invitation." RowClassName="MelaveMalkaInvitation" RowClassVisibility="Public" SqlName="Invitees" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
+  <Schema Name="Invitees" RowClassDescription="Describes a person invited to the Melave Malka." RowClassName="MelaveMalkaInvitation" RowClassVisibility="Public" SqlName="Invitees" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
     <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the invitee." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
       <DefaultValue>
         <Null />
@@ -482,6 +487,11 @@
       </DefaultValue>
     </Column>
     <Column Name="CallerNote" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets a note from the person's caller." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="CallerNote" PropertyVisibility="Public" SqlName="CallerNote">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="AdAmount" AllowNulls="false" DataType="System.Decimal, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the total pledge amount of the person's ads, if any." Expression="row.Person.Pledges.Where(p =&gt; p.ExternalSource == &quot;Journal &quot; + row.Year).Sum(p =&gt; p.Amount)" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="false" IsUnique="false" PropertyName="AdAmount" PropertyVisibility="Public" SqlName="">
       <DefaultValue>
         <Null />
       </DefaultValue>
