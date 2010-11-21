@@ -131,6 +131,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.RegisterBehavior(Person.Schema,
 				DeletionBehavior.Disallow("You cannot delete rows from the master directory.\r\nIf you really want to delete someone, call Schabse.")
 			);
+			GridManager.RegisterBehavior(Caller.Schema,
+				DeletionBehavior.WithMessages(
+					"Melave Malka caller",
+					"Melave Malka callers"
+				)
+			);
 			GridManager.RegisterBehavior(EmailAddress.Schema,
 				DeletionBehavior.WithMessages(
 					"email address from the email list",
@@ -211,6 +217,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				c.SummaryItem.DisplayFormat = "{0} People";
 				c.SummaryItem.SummaryType = SummaryItemType.Count;
 			}));
+			GridManager.RegisterColumn(MelaveMalkaInvitation.AdAmountColumn, new ColumnController(c => {
+				c.DisplayFormat.FormatType = FormatType.Numeric;
+				c.DisplayFormat.FormatString = "c";
+				c.OptionsColumn.ReadOnly = true;
+				c.OptionsColumn.AllowEdit = false;
+			}));
 
 			GridManager.RegisterColumn(
 				Pledge.AmountColumn,
@@ -233,6 +245,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				})
 			);
 
+			GridManager.RegisterColumn(
+				c => c.DataType == typeof(DateTime) && c.Name == "DateAdded",
+				new ColumnController(c => {
+					c.OptionsColumn.ReadOnly = true;
+					c.OptionsColumn.AllowEdit = false;
+				}));
 			GridManager.RegisterColumn(
 				c => {
 					var fkc = c as ForeignKeyColumn;
