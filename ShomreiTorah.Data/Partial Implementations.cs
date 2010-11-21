@@ -190,6 +190,9 @@ namespace ShomreiTorah.Data {
 	#endregion
 
 	partial class Caller {
+		///<summary>Gets the string used to represent this caller in a dropdown list.</summary>
+		public override string ToString() { return Person.HisName[0] + " " + Person.LastName; }
+
 		protected override void OnRemoving() {
 			foreach (var callee in Callees.ToList()) //The loop will modify the collection
 				callee.Caller = null;
