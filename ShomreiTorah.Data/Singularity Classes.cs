@@ -220,6 +220,8 @@ namespace ShomreiTorah.Data {
         public static ValueColumn YearColumn { get; private set; }
         ///<summary>Gets the schema's EmailAddresses column.</summary>
         public static CalculatedColumn EmailAddressesColumn { get; private set; }
+        ///<summary>Gets the schema's CalleeCount column.</summary>
+        public static CalculatedColumn CalleeCountColumn { get; private set; }
         
         ///<summary>Gets the Callers schema instance.</summary>
         public static new TypedSchema<Caller> Schema { get; private set; }
@@ -246,6 +248,8 @@ namespace ShomreiTorah.Data {
             YearColumn.AllowNulls = false;
             
             EmailAddressesColumn = Schema.Columns.AddCalculatedColumn<Caller, String>("EmailAddresses", row => String.Join(", ", row.Person.EmailAddresses.Select(e => e.Email)));
+            
+            CalleeCountColumn = Schema.Columns.AddCalculatedColumn<Caller, Int32>("CalleeCount", row => row.Callees.Count);
             #endregion
             
             #region Create SchemaMapping
@@ -299,6 +303,12 @@ namespace ShomreiTorah.Data {
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public String EmailAddresses {
             get { return base.Field<String>(EmailAddressesColumn); }
+        }
+        ///<summary>Gets or sets the number of people assigned to the caller.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 CalleeCount {
+            get { return base.Field<Int32>(CalleeCountColumn); }
         }
         #endregion
         

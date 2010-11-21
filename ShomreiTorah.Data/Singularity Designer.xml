@@ -451,6 +451,11 @@
         <Null />
       </DefaultValue>
     </Column>
+    <Column Name="CalleeCount" AllowNulls="false" DataType="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the number of people assigned to the caller." Expression="row.Callees.Count" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="false" IsUnique="false" PropertyName="CalleeCount" PropertyVisibility="Public" SqlName="">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
   </Schema>
   <Schema Name="Invitees" RowClassDescription="Describes a person invited to the Melave Malka." RowClassName="MelaveMalkaInvitation" RowClassVisibility="Public" SqlName="Invitees" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
     <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the invitee." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
