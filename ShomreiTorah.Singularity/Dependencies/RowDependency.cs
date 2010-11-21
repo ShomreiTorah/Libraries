@@ -62,7 +62,7 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		}
 
 		void NestedDependency_RowInvalidated(object sender, RowEventArgs e) {
-			foreach (var affectedRow in GetAffectedRows(e.Row, (Table)sender))
+			foreach (var affectedRow in GetAffectedRows(e.Row, e.Row.Table))
 				OnRowInvalidated(affectedRow);
 		}
 
