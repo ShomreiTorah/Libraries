@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid.Views.Grid;
-using DevExpress.XtraGrid.Views.Base;
 using System.Windows.Forms;
+using DevExpress.Utils;
+using DevExpress.XtraGrid.Columns;
+using DevExpress.XtraGrid.Views.Base;
+using DevExpress.XtraGrid.Views.Grid;
 
 namespace ShomreiTorah.WinForms {
 	///<summary>Manages a checkbox column in a grid.</summary>
@@ -38,17 +36,22 @@ namespace ShomreiTorah.WinForms {
 			View.SetRowCellValue(rowHandle, CheckColumn, !(bool)View.GetRowCellValue(rowHandle, CheckColumn));
 		}
 
-
 		void View_MouseUp(object sender, MouseEventArgs e) {
 			var hitInfo = View.CalcHitInfo(e.Location);
-			if (hitInfo.InRowCell && hitInfo.Column == CheckColumn && hitInfo.RowHandle >= 0)
+			if (hitInfo.InRowCell && hitInfo.Column == CheckColumn && hitInfo.RowHandle >= 0) {
 				Invert(hitInfo.RowHandle);
+
+				var dx = e as DXMouseEventArgs;
+				if (dx != null) dx.Handled = true;
+			}
 		}
 
 		void View_KeyDown(object sender, KeyEventArgs e) {
+			if (e.Handled) return;
 			if (e.KeyData == Keys.Space) {
 				foreach (var handle in View.GetSelectedRows())
 					Invert(handle);
+				e.Handled = true;
 			}
 		}
 
