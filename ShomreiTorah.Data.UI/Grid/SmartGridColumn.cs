@@ -16,6 +16,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			var col = column as SmartGridColumn;
 			if (col != null) {
 				ShowEditorOnMouseDown = col.ShowEditorOnMouseDown;
+				AllowKeyboardActivation = col.AllowKeyboardActivation;
 			}
 		}
 

@@ -338,6 +338,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			column.OptionsColumn.AllowGroup = DefaultBoolean.True;
 			column.ShowButtonMode = ShowButtonModeEnum.ShowAlways;
 			column.ShowEditorOnMouseDown = true;
+			column.AllowKeyboardActivation = false;
 
 			if (AppFramework.Current.CanShowDetails<Person>())
 				column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());

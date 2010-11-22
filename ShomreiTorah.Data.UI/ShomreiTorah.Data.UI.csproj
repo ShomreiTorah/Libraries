@@ -104,6 +104,9 @@
     <Compile Include="Forms\SplashForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Grid\AllowKeyboardActivation.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Grid\ColumnController.cs">
       <SubType>Component</SubType>
     </Compile>
