@@ -198,6 +198,12 @@ namespace ShomreiTorah.Data {
 				callee.Caller = null;
 		}
 	}
+	partial class MelaveMalkaInvitation {
+		partial void OnShouldCallChanged(bool? oldValue, bool? newValue) {
+			if (newValue == false)
+				Caller = null;
+		}
+	}
 
 	partial class MelaveMalkaInfo {
 		//If the date is after November, it should wrap to the previous year.
