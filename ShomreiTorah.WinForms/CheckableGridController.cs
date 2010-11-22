@@ -49,8 +49,13 @@ namespace ShomreiTorah.WinForms {
 		void View_KeyDown(object sender, KeyEventArgs e) {
 			if (e.Handled) return;
 			if (e.KeyData == Keys.Space) {
+				//Without this, checking rows will move them
+				//around if the column is sorted, messing up
+				//the row handles.
+				View.BeginDataUpdate();	
 				foreach (var handle in View.GetSelectedRows())
 					Invert(handle);
+				View.EndDataUpdate();
 				e.Handled = true;
 			}
 		}
