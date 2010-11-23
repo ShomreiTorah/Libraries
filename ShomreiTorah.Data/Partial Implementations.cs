@@ -197,6 +197,9 @@ namespace ShomreiTorah.Data {
 			foreach (var callee in Callees.ToList()) //The loop will modify the collection
 				callee.Caller = null;
 		}
+
+		///<summary>Gets the caller's name.</summary>
+		public string Name { get { return Person.HisName + " " + Person.LastName; } }
 	}
 	partial class MelaveMalkaInvitation {
 		partial void OnShouldCallChanged(bool? oldValue, bool? newValue) {
