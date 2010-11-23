@@ -4,6 +4,7 @@ using DevExpress.Utils;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid.Views.Base;
 using DevExpress.XtraGrid.Views.Grid;
+using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 
 namespace ShomreiTorah.WinForms {
 	///<summary>Manages a checkbox column in a grid.</summary>
@@ -38,7 +39,7 @@ namespace ShomreiTorah.WinForms {
 
 		void View_MouseUp(object sender, MouseEventArgs e) {
 			var hitInfo = View.CalcHitInfo(e.Location);
-			if (hitInfo.InRowCell && hitInfo.Column == CheckColumn && hitInfo.RowHandle >= 0) {
+			if (hitInfo.Column == CheckColumn && hitInfo.RowHandle >= 0 && hitInfo.HitTest == GridHitTest.RowCell) {
 				Invert(hitInfo.RowHandle);
 
 				var dx = e as DXMouseEventArgs;
@@ -52,7 +53,7 @@ namespace ShomreiTorah.WinForms {
 				//Without this, checking rows will move them
 				//around if the column is sorted, messing up
 				//the row handles.
-				View.BeginDataUpdate();	
+				View.BeginDataUpdate();
 				foreach (var handle in View.GetSelectedRows())
 					Invert(handle);
 				View.EndDataUpdate();
