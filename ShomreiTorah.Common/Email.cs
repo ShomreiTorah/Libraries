@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Mail;
-using System.Xml.Linq;
-using System.Net;
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Net;
+using System.Net.Mail;
+using System.Text;
+using System.Xml.Linq;
 
 namespace ShomreiTorah.Common {
 	///<summary>Sends emails using the Shul's mail servers from ShomreiTorahConfig.xml.</summary>
@@ -16,7 +14,7 @@ namespace ShomreiTorah.Common {
 		///<summary>A MailAddress instance used to send email to the mailing list.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
 		public static readonly MailAddress ListAddress = new MailAddress("List@ShomreiTorah.us", "Congregation Shomrei Torah");
-		///<summary>A MailAddress instance used to send generic emails.</summary>
+		///<summary>A MailAddress instance used to send miscellaneous emails.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
 		public static readonly MailAddress InfoAddress = new MailAddress("Info@ShomreiTorah.us", "Congregation Shomrei Torah");
 		///<summary>A MailAddress instance used to send administrative emails.</summary>
@@ -25,6 +23,10 @@ namespace ShomreiTorah.Common {
 		///<summary>A MailAddress instance used to send notification emails.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
 		public static readonly MailAddress AlertsAddress = new MailAddress("Alerts@ShomreiTorah.us", "Shomrei Torah Alerts");
+
+		///<summary>A MailAddress instance used to send Melave Malka-related emails.</summary>
+		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
+		public static readonly MailAddress JournalAddress = new MailAddress("Journal@ShomreiTorah.us", "Shomrei Torah Melave Malka");
 		#endregion
 
 		#region Static instances
