@@ -483,7 +483,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="ShouldCall" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets whether the person should be called to give an ad" Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ShouldCall" PropertyVisibility="Public" SqlName="ShouldCall">
+    <Column Name="ShouldCall" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets whether the person should be called to ask for an ad" Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ShouldCall" PropertyVisibility="Public" SqlName="ShouldCall">
       <DefaultValue>false</DefaultValue>
     </Column>
     <Column Name="Caller" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the caller assigned to this person." Expression="" ForeignRelationName="Callees" ForeignRelationPropertyDescription="Gets the people that the caller should call." ForeignRelationPropertyName="Callees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Caller" PropertyVisibility="Public" SqlName="Caller" ForeignSchemaName="Callers">
@@ -497,6 +497,46 @@
       </DefaultValue>
     </Column>
     <Column Name="AdAmount" AllowNulls="false" DataType="System.Decimal, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the total pledge amount of the person's ads, if any." Expression="row.Person.Pledges.Where(p =&gt; p.ExternalSource == &quot;Journal &quot; + row.Year).Sum(p =&gt; p.Amount)" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="false" IsUnique="false" PropertyName="AdAmount" PropertyVisibility="Public" SqlName="">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="ShouldEmail" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets whether the person should be emailed to ask for an ad." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ShouldEmail" PropertyVisibility="Public" SqlName="ShouldEmail">
+      <DefaultValue>false</DefaultValue>
+    </Column>
+    <Column Name="EmailSubject" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the subject of the email to send to the person to ask for an ad." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="EmailSubject" PropertyVisibility="Public" SqlName="EmailSubject">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="EmailSource" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the HTML source of the email to send to the person to ask for an ad." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="EmailSource" PropertyVisibility="Public" SqlName="EmailSource">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+  </Schema>
+  <Schema Name="ReminderEmailLog" RowClassDescription="Describes an email sent to an invitee to ask for an ad." RowClassName="AdReminderEmail" RowClassVisibility="Public" SqlName="ReminderEmailLog" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the reminder email log." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Recipient" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who received the email." Expression="" ForeignRelationName="ReminderEmailLogs" ForeignRelationPropertyDescription="Gets the emails sent to the person to ask for an ad." ForeignRelationPropertyName="ReminderEmails" GenerateSqlMapping="true" IsUnique="false" PropertyName="Recipient" PropertyVisibility="Public" SqlName="InviteId" ForeignSchemaName="Invitees">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Date" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date that the email was sent." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Date" PropertyVisibility="Public" SqlName="Date">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="EmailSubject" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the subject of the email." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="EmailSubject" PropertyVisibility="Public" SqlName="EmailSubject">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="EmailSource" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the email's HTML source." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="EmailSource" PropertyVisibility="Public" SqlName="EmailSource">
       <DefaultValue>
         <Null />
       </DefaultValue>

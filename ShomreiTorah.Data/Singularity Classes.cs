@@ -821,6 +821,12 @@ namespace ShomreiTorah.Data {
         public static ValueColumn CallerNoteColumn { get; private set; }
         ///<summary>Gets the schema's AdAmount column.</summary>
         public static CalculatedColumn AdAmountColumn { get; private set; }
+        ///<summary>Gets the schema's ShouldEmail column.</summary>
+        public static ValueColumn ShouldEmailColumn { get; private set; }
+        ///<summary>Gets the schema's EmailSubject column.</summary>
+        public static ValueColumn EmailSubjectColumn { get; private set; }
+        ///<summary>Gets the schema's EmailSource column.</summary>
+        public static ValueColumn EmailSourceColumn { get; private set; }
         
         ///<summary>Gets the Invitees schema instance.</summary>
         public static new TypedSchema<MelaveMalkaInvitation> Schema { get; private set; }
@@ -859,6 +865,15 @@ namespace ShomreiTorah.Data {
             CallerNoteColumn.AllowNulls = true;
             
             AdAmountColumn = Schema.Columns.AddCalculatedColumn<MelaveMalkaInvitation, Decimal>("AdAmount", row => row.Person.Pledges.Where(p => p.ExternalSource == "Journal " + row.Year).Sum(p => p.Amount));
+            
+            ShouldEmailColumn = Schema.Columns.AddValueColumn("ShouldEmail", typeof(Boolean), false);
+            ShouldEmailColumn.AllowNulls = false;
+            
+            EmailSubjectColumn = Schema.Columns.AddValueColumn("EmailSubject", typeof(String), null);
+            EmailSubjectColumn.AllowNulls = true;
+            
+            EmailSourceColumn = Schema.Columns.AddValueColumn("EmailSource", typeof(String), null);
+            EmailSourceColumn.AllowNulls = true;
             #endregion
             
             #region Create SchemaMapping
@@ -874,6 +889,9 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(ShouldCallColumn, "ShouldCall");
             SchemaMapping.Columns.AddMapping(CallerColumn, "Caller");
             SchemaMapping.Columns.AddMapping(CallerNoteColumn, "CallerNote");
+            SchemaMapping.Columns.AddMapping(ShouldEmailColumn, "ShouldEmail");
+            SchemaMapping.Columns.AddMapping(EmailSubjectColumn, "EmailSubject");
+            SchemaMapping.Columns.AddMapping(EmailSourceColumn, "EmailSource");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -918,7 +936,7 @@ namespace ShomreiTorah.Data {
             get { return base.Field<DateTime>(DateAddedColumn); }
             set { base[DateAddedColumn] = value; }
         }
-        ///<summary>Gets or sets whether the person should be called to give an ad</summary>
+        ///<summary>Gets or sets whether the person should be called to ask for an ad</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Boolean ShouldCall {
@@ -945,6 +963,32 @@ namespace ShomreiTorah.Data {
         public Decimal AdAmount {
             get { return base.Field<Decimal>(AdAmountColumn); }
         }
+        ///<summary>Gets or sets whether the person should be emailed to ask for an ad.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Boolean ShouldEmail {
+            get { return base.Field<Boolean>(ShouldEmailColumn); }
+            set { base[ShouldEmailColumn] = value; }
+        }
+        ///<summary>Gets or sets the subject of the email to send to the person to ask for an ad.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String EmailSubject {
+            get { return base.Field<String>(EmailSubjectColumn); }
+            set { base[EmailSubjectColumn] = value; }
+        }
+        ///<summary>Gets or sets the HTML source of the email to send to the person to ask for an ad.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String EmailSource {
+            get { return base.Field<String>(EmailSourceColumn); }
+            set { base[EmailSourceColumn] = value; }
+        }
+        #endregion
+        
+        #region ChildRows Properties
+        ///<summary>Gets the emails sent to the person to ask for an ad.</summary>
+        public IChildRowCollection<AdReminderEmail> ReminderEmails { get { return TypedChildRows<AdReminderEmail>(AdReminderEmail.RecipientColumn); } }
         #endregion
         
         #region Partial Methods
@@ -973,6 +1017,15 @@ namespace ShomreiTorah.Data {
         
         partial void ValidateCallerNote(String newValue, Action<string> error);
         partial void OnCallerNoteChanged(String oldValue, String newValue);
+        
+        partial void ValidateShouldEmail(Boolean newValue, Action<string> error);
+        partial void OnShouldEmailChanged(Boolean? oldValue, Boolean? newValue);
+        
+        partial void ValidateEmailSubject(String newValue, Action<string> error);
+        partial void OnEmailSubjectChanged(String oldValue, String newValue);
+        
+        partial void ValidateEmailSource(String newValue, Action<string> error);
+        partial void OnEmailSourceChanged(String oldValue, String newValue);
         #endregion
         
         #region Column Callbacks
@@ -1012,6 +1065,15 @@ namespace ShomreiTorah.Data {
             } else if (column == CallerNoteColumn) {
                 ValidateCallerNote((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == ShouldEmailColumn) {
+                ValidateShouldEmail((Boolean)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == EmailSubjectColumn) {
+                ValidateEmailSubject((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == EmailSourceColumn) {
+                ValidateEmailSource((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
         }
@@ -1037,6 +1099,12 @@ namespace ShomreiTorah.Data {
             	OnCallerChanged((Caller)oldValue, (Caller)newValue);
             else if (column == CallerNoteColumn)
             	OnCallerNoteChanged((String)oldValue, (String)newValue);
+            else if (column == ShouldEmailColumn)
+            	OnShouldEmailChanged((Boolean?)oldValue, (Boolean?)newValue);
+            else if (column == EmailSubjectColumn)
+            	OnEmailSubjectChanged((String)oldValue, (String)newValue);
+            else if (column == EmailSourceColumn)
+            	OnEmailSourceChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }
@@ -1245,14 +1313,14 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<EmailAddress> EmailAddresses { get { return TypedChildRows<EmailAddress>(EmailAddress.PersonColumn); } }
         ///<summary>Gets the statements sent to the person.</summary>
         public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
-        ///<summary>Gets the person's Melave Malka invitations.</summary>
-        public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonColumn); } }
         ///<summary>Gets the person's Melave Malka seats.</summary>
         public IChildRowCollection<MelaveMalkaSeat> MelaveMalkaSeats { get { return TypedChildRows<MelaveMalkaSeat>(MelaveMalkaSeat.PersonColumn); } }
         ///<summary>Gets the Melave Malka that the person has been honored by.</summary>
         public IChildRowCollection<MelaveMalkaInfo> Honorees { get { return TypedChildRows<MelaveMalkaInfo>(MelaveMalkaInfo.HonoreeColumn); } }
         ///<summary>Gets the person's caller rows.</summary>
         public IChildRowCollection<Caller> Callers { get { return TypedChildRows<Caller>(Caller.PersonColumn); } }
+        ///<summary>Gets the person's Melave Malka invitations.</summary>
+        public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonColumn); } }
         #endregion
         
         #region Partial Methods
@@ -2262,6 +2330,180 @@ namespace ShomreiTorah.Data {
             	OnExternalSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
             	OnExternalIdChanged((Int32?)oldValue, (Int32?)newValue);
+        }
+        #endregion
+    }
+    
+    ///<summary>Describes an email sent to an invitee to ask for an ad.</summary>
+    public partial class AdReminderEmail : Row {
+        ///<summary>Creates a new AdReminderEmail instance.</summary>
+        public AdReminderEmail () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed ReminderEmailLog table.</summary>
+        public static TypedTable<AdReminderEmail> CreateTable() { return new TypedTable<AdReminderEmail>(Schema, () => new AdReminderEmail()); }
+        
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
+        ///<summary>Gets the schema's Recipient column.</summary>
+        public static ForeignKeyColumn RecipientColumn { get; private set; }
+        ///<summary>Gets the schema's Date column.</summary>
+        public static ValueColumn DateColumn { get; private set; }
+        ///<summary>Gets the schema's EmailSubject column.</summary>
+        public static ValueColumn EmailSubjectColumn { get; private set; }
+        ///<summary>Gets the schema's EmailSource column.</summary>
+        public static ValueColumn EmailSourceColumn { get; private set; }
+        
+        ///<summary>Gets the ReminderEmailLog schema instance.</summary>
+        public static new TypedSchema<AdReminderEmail> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server ReminderEmailLog table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static AdReminderEmail() {
+            #region Create Schema
+            Schema = new TypedSchema<AdReminderEmail>("ReminderEmailLog");
+            
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
+            RowIdColumn.AllowNulls = false;
+            
+            RecipientColumn = Schema.Columns.AddForeignKey("Recipient", ShomreiTorah.Data.MelaveMalkaInvitation.Schema, "ReminderEmailLogs");
+            RecipientColumn.AllowNulls = false;
+            
+            DateColumn = Schema.Columns.AddValueColumn("Date", typeof(DateTime), null);
+            DateColumn.AllowNulls = false;
+            
+            EmailSubjectColumn = Schema.Columns.AddValueColumn("EmailSubject", typeof(String), null);
+            EmailSubjectColumn.AllowNulls = false;
+            
+            EmailSourceColumn = Schema.Columns.AddValueColumn("EmailSource", typeof(String), null);
+            EmailSourceColumn.AllowNulls = false;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "ReminderEmailLog";
+            SchemaMapping.SqlSchemaName = "MelaveMalka";
+            
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
+            SchemaMapping.Columns.AddMapping(RecipientColumn, "InviteId");
+            SchemaMapping.Columns.AddMapping(DateColumn, "Date");
+            SchemaMapping.Columns.AddMapping(EmailSubjectColumn, "EmailSubject");
+            SchemaMapping.Columns.AddMapping(EmailSourceColumn, "EmailSource");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<AdReminderEmail> Table { get { return (TypedTable<AdReminderEmail>)base.Table; } }
+        #region Value Properties
+        ///<summary>Gets or sets the row id of the reminder email log.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the person who received the email.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public MelaveMalkaInvitation Recipient {
+            get { return base.Field<MelaveMalkaInvitation>(RecipientColumn); }
+            set { base[RecipientColumn] = value; }
+        }
+        ///<summary>Gets or sets the date that the email was sent.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime Date {
+            get { return base.Field<DateTime>(DateColumn); }
+            set { base[DateColumn] = value; }
+        }
+        ///<summary>Gets or sets the subject of the email.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String EmailSubject {
+            get { return base.Field<String>(EmailSubjectColumn); }
+            set { base[EmailSubjectColumn] = value; }
+        }
+        ///<summary>Gets or sets the email's HTML source.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String EmailSource {
+            get { return base.Field<String>(EmailSourceColumn); }
+            set { base[EmailSourceColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
+        
+        partial void ValidateRecipient(MelaveMalkaInvitation newValue, Action<string> error);
+        partial void OnRecipientChanged(MelaveMalkaInvitation oldValue, MelaveMalkaInvitation newValue);
+        
+        partial void ValidateDate(DateTime newValue, Action<string> error);
+        partial void OnDateChanged(DateTime? oldValue, DateTime? newValue);
+        
+        partial void ValidateEmailSubject(String newValue, Action<string> error);
+        partial void OnEmailSubjectChanged(String oldValue, String newValue);
+        
+        partial void ValidateEmailSource(String newValue, Action<string> error);
+        partial void OnEmailSourceChanged(String oldValue, String newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == RecipientColumn) {
+                ValidateRecipient((MelaveMalkaInvitation)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == DateColumn) {
+                ValidateDate((DateTime)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == EmailSubjectColumn) {
+                ValidateEmailSubject((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == EmailSourceColumn) {
+                ValidateEmailSource((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == RowIdColumn)
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
+            else if (column == RecipientColumn)
+            	OnRecipientChanged((MelaveMalkaInvitation)oldValue, (MelaveMalkaInvitation)newValue);
+            else if (column == DateColumn)
+            	OnDateChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == EmailSubjectColumn)
+            	OnEmailSubjectChanged((String)oldValue, (String)newValue);
+            else if (column == EmailSourceColumn)
+            	OnEmailSourceChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }
