@@ -64,7 +64,7 @@ namespace ShomreiTorah.WinForms {
 		void View_BeforeLeaveRow(object sender, RowAllowEventArgs e) {
 			if (Control.MouseButtons == MouseButtons.Left) {	//Don't change focus when a checkbox is clicked
 				var hitInfo = View.CalcHitInfo(View.GridControl.PointToClient(Control.MousePosition));
-				if (hitInfo.Column == CheckColumn)
+				if (hitInfo.Column == CheckColumn && hitInfo.HitTest == GridHitTest.RowCell)
 					e.Allow = false;
 			}
 		}
