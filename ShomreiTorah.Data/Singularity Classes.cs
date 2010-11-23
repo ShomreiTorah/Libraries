@@ -827,6 +827,8 @@ namespace ShomreiTorah.Data {
         public static ValueColumn EmailSubjectColumn { get; private set; }
         ///<summary>Gets the schema's EmailSource column.</summary>
         public static ValueColumn EmailSourceColumn { get; private set; }
+        ///<summary>Gets the schema's EmailAddresses column.</summary>
+        public static CalculatedColumn EmailAddressesColumn { get; private set; }
         
         ///<summary>Gets the Invitees schema instance.</summary>
         public static new TypedSchema<MelaveMalkaInvitation> Schema { get; private set; }
@@ -874,6 +876,8 @@ namespace ShomreiTorah.Data {
             
             EmailSourceColumn = Schema.Columns.AddValueColumn("EmailSource", typeof(String), null);
             EmailSourceColumn.AllowNulls = true;
+            
+            EmailAddressesColumn = Schema.Columns.AddCalculatedColumn<MelaveMalkaInvitation, String>("EmailAddresses", row => String.Join(", ", row.Person.EmailAddresses.Select(e => e.Email)));
             #endregion
             
             #region Create SchemaMapping
@@ -983,6 +987,12 @@ namespace ShomreiTorah.Data {
         public String EmailSource {
             get { return base.Field<String>(EmailSourceColumn); }
             set { base[EmailSourceColumn] = value; }
+        }
+        ///<summary>Gets or sets the person's email addresses.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String EmailAddresses {
+            get { return base.Field<String>(EmailAddressesColumn); }
         }
         #endregion
         

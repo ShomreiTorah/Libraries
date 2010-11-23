@@ -514,6 +514,11 @@
         <Null />
       </DefaultValue>
     </Column>
+    <Column Name="EmailAddresses" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the person's email addresses." Expression="String.Join(&quot;, &quot;, row.Person.EmailAddresses.Select(e =&gt; e.Email))" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="false" IsUnique="false" PropertyName="EmailAddresses" PropertyVisibility="Public" SqlName="">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
   </Schema>
   <Schema Name="ReminderEmailLog" RowClassDescription="Describes an email sent to an invitee to ask for an ad." RowClassName="AdReminderEmail" RowClassVisibility="Public" SqlName="ReminderEmailLog" SqlSchemaName="MelaveMalka" PrimaryKeyName="RowId">
     <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the reminder email log." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
