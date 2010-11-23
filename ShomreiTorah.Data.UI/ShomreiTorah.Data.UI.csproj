@@ -82,6 +82,7 @@
     </Compile>
     <Compile Include="DisplaySettings\AdvancedColumnsBehavior.cs" />
     <Compile Include="DisplaySettings\RowDetailBehavior.cs" />
+    <Compile Include="DisplaySettings\ToggleRowsBehavior.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Forms\ExceptionReporter.cs">
       <SubType>Form</SubType>

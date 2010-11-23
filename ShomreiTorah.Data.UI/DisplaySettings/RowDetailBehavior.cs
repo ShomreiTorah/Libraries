@@ -6,6 +6,7 @@ using ShomreiTorah.Singularity;
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>A grid behavior that shows row detail forms when rows are double-clicked.</summary>
 	class RowDetailBehavior : IGridBehavior {
+		//This is only ever instantiated once, by RegisterSettings.
 		public void Apply(SmartGridView view) {
 			view.DoubleClick += (sender, e) => {
 				var info = view.CalcHitInfo(view.GridControl.PointToClient(Control.MousePosition));
