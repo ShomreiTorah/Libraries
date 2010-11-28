@@ -216,7 +216,8 @@ namespace ShomreiTorah.Data {
 		}
 		partial void OnMelaveMalkaDateChanged(DateTime? oldValue, DateTime? newValue) {
 			if (newValue != null && this["Year"] != null)
-				MelaveMalkaDate = new DateTime(Year - (newValue.Value.Month > 10 ? 1 : 0), newValue.Value.Month, newValue.Value.Day);
+				MelaveMalkaDate = new DateTime(Year - (newValue.Value.Month > 10 ? 1 : 0), newValue.Value.Month, newValue.Value.Day) 
+								+ newValue.Value.TimeOfDay;	//Preserve the Melave Malka's TimeOfDay when normalizing the year
 		}
 	}
 
