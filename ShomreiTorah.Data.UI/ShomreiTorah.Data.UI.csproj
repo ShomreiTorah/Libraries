@@ -80,6 +80,9 @@
     <Compile Include="Controls\PersonSelector.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\PreviewAddressEdit.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DisplaySettings\AdvancedColumnsBehavior.cs" />
     <Compile Include="DisplaySettings\RowDetailBehavior.cs" />
     <Compile Include="DisplaySettings\ToggleRowsBehavior.cs" />
