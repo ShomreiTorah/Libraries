@@ -344,7 +344,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
 			else
 				column.OptionsColumn.AllowEdit = false;	//Person fields should not be edited.  Also, the default editor would show the native ToString, which is ugly.
-			column.Caption = "Full Name";
+			if (column.Caption.StartsWith("Person", StringComparison.OrdinalIgnoreCase))
+				column.Caption = "Full Name";
 		}
 		///<summary>Allows the controller to provide a custom display text for its column.</summary>
 		protected internal override string GetDisplayText(object row, object value) {
