@@ -99,7 +99,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.SuppressColumns(Pledge.ExternalSourceColumn, Pledge.ExternalIdColumn);
 			GridManager.SuppressColumns(Payment.ExternalSourceColumn, Payment.ExternalIdColumn);
 
-			GridManager.SuppressColumns(EmailAddress.ActiveColumn, EmailAddress.RandomCodeColumn, EmailAddress.UseHtmlColumn);
+			GridManager.SuppressColumns(EmailAddress.RandomCodeColumn, EmailAddress.UseHtmlColumn);
 
 			GridManager.SuppressColumn(c => {
 				//Detail views in the designer won't have column types.
@@ -201,6 +201,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.RegisterColumn(Payment.MethodColumn, MaxWidth(70));
 
 			GridManager.RegisterColumns(new[] { Payment.AccountColumn, Pledge.AccountColumn }, MaxWidth(100));
+
+			GridManager.RegisterColumn(EmailAddress.ActiveColumn, new ColumnController(c => {
+				c.MaxWidth = 50;
+				c.ShowEditorOnMouseDown = true;
+				c.ToolTip = "Shul emails will only be sent to checked email addresses.";
+			}));
 
 			GridManager.RegisterColumns(
 				new[] { Pledge.ModifiedColumn, Payment.ModifiedColumn },

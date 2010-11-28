@@ -66,11 +66,11 @@ namespace ShomreiTorah.Administration {
 		}
 
 		///<summary>Gets the number of subscribers in the mailing list from the database.</summary>
-		public int MemberCount { get { return Database.ExecuteScalar<int>("SELECT COUNT(*) FROM tblMLMembers"); } }
-		///<summary>Gets the subscribers to the mailing list from the database.</summary>
+		public int MemberCount { get { return Database.ExecuteScalar<int>("SELECT COUNT(*) FROM tblMLMembers WHERE Active = 1"); } }
+		///<summary>Gets the active subscribers to the mailing list from the database.</summary>
 		public IEnumerable<Subscriber> Members {
 			get {
-				using (var reader = Database.ExecuteReader("SELECT Name, Email, ID_Code AS Code, Join_Date AS JoinDate FROM tblMLMembers")) {
+				using (var reader = Database.ExecuteReader("SELECT Name, Email, ID_Code AS Code, Join_Date AS JoinDate FROM tblMLMembers WHERE Active = 1")) {
 					while (reader.Read()) {
 						yield return new Subscriber(reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetDateTime(3));
 					}

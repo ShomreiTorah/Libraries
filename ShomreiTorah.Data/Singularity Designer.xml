@@ -254,7 +254,7 @@
     </Column>
   </Schema>
   <Schema Name="EmailAddresses" RowClassDescription="Describes a subscriber to the email list." RowClassName="EmailAddress" RowClassVisibility="Public" SqlName="tblMLMembers" SqlSchemaName="dbo" PrimaryKeyName="RowId">
-    <Column Name="Name" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the name of the tbl ML member." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Name" PropertyVisibility="Public" SqlName="Name">
+    <Column Name="Name" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the display name associated with the email address." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Name" PropertyVisibility="Public" SqlName="Name">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -269,7 +269,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Active" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the active of the tbl ML member." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Active" PropertyVisibility="Public" SqlName="Active">
+    <Column Name="Active" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets whether the Shul's emails will be sent to this address." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Active" PropertyVisibility="Public" SqlName="Active">
       <DefaultValue>true</DefaultValue>
     </Column>
     <Column Name="DateAdded" AllowNulls="false" DataType="System.DateTime, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the date that the subscriber joined the list." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="DateAdded" PropertyVisibility="Public" SqlName="Join_Date">

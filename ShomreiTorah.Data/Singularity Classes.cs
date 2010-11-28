@@ -642,7 +642,7 @@ namespace ShomreiTorah.Data {
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public new TypedTable<EmailAddress> Table { get { return (TypedTable<EmailAddress>)base.Table; } }
         #region Value Properties
-        ///<summary>Gets or sets the name of the tbl ML member.</summary>
+        ///<summary>Gets or sets the display name associated with the email address.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public String Name {
@@ -663,7 +663,7 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(RandomCodeColumn); }
             set { base[RandomCodeColumn] = value; }
         }
-        ///<summary>Gets or sets the active of the tbl ML member.</summary>
+        ///<summary>Gets or sets whether the Shul's emails will be sent to this address.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
         public Boolean Active {
