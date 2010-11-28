@@ -216,9 +216,12 @@ namespace ShomreiTorah.Data {
 		}
 		partial void OnMelaveMalkaDateChanged(DateTime? oldValue, DateTime? newValue) {
 			if (newValue != null && this["Year"] != null)
-				MelaveMalkaDate = new DateTime(Year - (newValue.Value.Month > 10 ? 1 : 0), newValue.Value.Month, newValue.Value.Day) 
+				MelaveMalkaDate = new DateTime(Year - (newValue.Value.Month > 10 ? 1 : 0), newValue.Value.Month, newValue.Value.Day)
 								+ newValue.Value.TimeOfDay;	//Preserve the Melave Malka's TimeOfDay when normalizing the year
 		}
+
+		///<summary>Gets the relative path to the ad blank PDF on the website.</summary>
+		public Uri AdBlankPath { get { return new Uri(String.Format("/Files/Ad-Blank-{0:yyyy}.pdf", MelaveMalkaDate), UriKind.Relative); } }
 	}
 
 	partial class Pledge {
