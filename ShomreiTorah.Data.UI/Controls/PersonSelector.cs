@@ -132,6 +132,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 				if (person != null && !RaisePersonSelecting(person, PersonSelectionReason.Created))
 					return;
 				OwnerEdit.EditValue = person;
+				OwnerEdit.IsModified = true;	//Force validation in order to commit the new value for databinding
+				OwnerEdit.DoValidate();
 			}
 		}
 		///<summary>Raises the PersonSelecting event.</summary>
