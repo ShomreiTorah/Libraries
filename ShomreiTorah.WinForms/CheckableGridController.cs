@@ -32,9 +32,13 @@ namespace ShomreiTorah.WinForms {
 			View.MouseUp += View_MouseUp;
 		}
 
-		///<summary>Inverts the checkbox of the given row handle</summary>
+		///<summary>Inverts the checkbox of the given row handle.</summary>
 		public void Invert(int rowHandle) {
-			View.SetRowCellValue(rowHandle, CheckColumn, !(bool)View.GetRowCellValue(rowHandle, CheckColumn));
+			if (View.IsGroupRow(rowHandle)) {
+				for (int i = 0; i < View.GetChildRowCount(rowHandle); i++)
+					Invert(View.GetChildRowHandle(rowHandle, i));
+			} else
+				View.SetRowCellValue(rowHandle, CheckColumn, !(bool)View.GetRowCellValue(rowHandle, CheckColumn));
 		}
 
 		void View_MouseUp(object sender, MouseEventArgs e) {
