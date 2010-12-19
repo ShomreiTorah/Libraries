@@ -74,7 +74,8 @@ namespace ShomreiTorah.WinForms {
 		///<summary>Updates the value of a data-bound editor and commits the changes to the underlying object.</summary>	
 		public static void UpdateValue(this BaseEdit edit, object value) {
 			edit.EditValue = value;
-			edit.BindingManager.EndCurrentEdit();
+			if (edit.BindingManager != null)
+				edit.BindingManager.EndCurrentEdit();
 		}
 
 		///<summary>Gets the data of a given type.</summary>
