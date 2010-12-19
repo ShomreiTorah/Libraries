@@ -598,6 +598,7 @@ namespace ShomreiTorah.Data {
             NameColumn.AllowNulls = true;
             
             EmailColumn = Schema.Columns.AddValueColumn("Email", typeof(String), null);
+            EmailColumn.Unique = true;
             EmailColumn.AllowNulls = false;
             
             RandomCodeColumn = Schema.Columns.AddValueColumn("RandomCode", typeof(String), null);

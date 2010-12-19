@@ -259,7 +259,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Email" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the email address of the subscriber." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Email" PropertyVisibility="Public" SqlName="Email">
+    <Column Name="Email" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the email address of the subscriber." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="Email" PropertyVisibility="Public" SqlName="Email">
       <DefaultValue>
         <Null />
       </DefaultValue>
