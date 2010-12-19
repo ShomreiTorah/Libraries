@@ -81,7 +81,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 		#endregion
 
-		#region FullName
+		#region FullName / Salutation
 		///<summary>Generates a default full name from the his-, her-, and last-name textboxes.</summary>
 		///<param name="valueGetter">A function to get the value of a textbox.  This can be used to get a previous FullName.</param>
 		string GenerateFullName(Func<TextEdit, String> valueGetter) {
@@ -106,6 +106,27 @@ namespace ShomreiTorah.Data.UI.Controls {
 
 			return (title + " " + first + " " + valueGetter(LastNameTextEdit)).Trim();
 		}
+		///<summary>Generates a default salutation from the his-, her-, and last-name textboxes.</summary>
+		///<param name="valueGetter">A function to get the value of a textbox.  This can be used to get a previous salutation.</param>
+		string GenerateSalutation(Func<TextEdit, String> valueGetter) {
+			Func<TextEdit, bool> isEmpty = t => String.IsNullOrWhiteSpace(valueGetter(t));
+
+			string title;
+
+			if (!isEmpty(HisNameTextEdit)) {
+				if (!isEmpty(HerNameTextEdit))
+					title = "Mr. & Mrs.";
+				else
+					title = "Mr.";
+			} else if (!isEmpty(HerNameTextEdit)) {
+				title = "Mrs.";
+			} else if (!isEmpty(LastNameTextEdit))
+				return valueGetter(LastNameTextEdit) + " Family";
+			else
+				return null;
+
+			return (title + " " + valueGetter(LastNameTextEdit)).Trim();
+		}
 		readonly Dictionary<TextEdit, string> oldTexts = new Dictionary<TextEdit, string>();
 		void UpdateFullName(TextEdit changedEdit) {
 			if (oldTexts.Count == 0) {	//This happens in an EndInit call
@@ -115,17 +136,27 @@ namespace ShomreiTorah.Data.UI.Controls {
 
 			var newFullName = GenerateFullName(e => e.Text);
 			var oldFullName = GenerateFullName(e => oldTexts[e]);
+			var newSalutation = GenerateSalutation(e => e.Text);
+			var oldSalutation = GenerateSalutation(e => oldTexts[e]);
 			UpdateOldTexts();
 
 			if (String.IsNullOrWhiteSpace(FullNameTextEdit.Text)
 			 || FullNameTextEdit.Text == oldFullName) {
 				FullNameTextEdit.UpdateValue(newFullName);
-				return;
+			} else {
+				var oldName = changedEdit.OldEditValue as string;	//Can be DBNull
+				if (!String.IsNullOrWhiteSpace(oldName))
+					FullNameTextEdit.UpdateValue(FullNameTextEdit.Text.Replace(oldName, changedEdit.Text));
 			}
 
-			var oldName = changedEdit.OldEditValue as string;	//Can be DBNull
-			if (!String.IsNullOrWhiteSpace(oldName))
-				FullNameTextEdit.UpdateValue(FullNameTextEdit.Text.Replace(oldName, changedEdit.Text));
+			if (String.IsNullOrWhiteSpace(SalutationTextEdit.Text)
+			 || SalutationTextEdit.Text == oldSalutation) {
+				 SalutationTextEdit.UpdateValue(newSalutation);
+			} else {
+				var oldName = changedEdit.OldEditValue as string;	//Can be DBNull
+				if (!String.IsNullOrWhiteSpace(oldName))
+					SalutationTextEdit.UpdateValue(SalutationTextEdit.Text.Replace(oldName, changedEdit.Text));
+			}
 		}
 
 

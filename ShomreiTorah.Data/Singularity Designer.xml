@@ -93,6 +93,11 @@
         <Null />
       </DefaultValue>
     </Column>
+    <Column Name="Salutation" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets a salutation to use for the person.   This is the full name without any first names." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Salutation" PropertyVisibility="Public" SqlName="Salutation">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
   </Schema>
   <Schema Name="Pledges" RowClassDescription="Describes a pledge." RowClassName="Pledge" RowClassVisibility="Public" SqlName="Pledges" SqlSchemaName="Billing" PrimaryKeyName="PledgeId">
     <Column Name="PledgeId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="PledgeId" PropertyVisibility="Public" SqlName="PledgeId">

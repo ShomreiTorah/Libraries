@@ -1153,6 +1153,8 @@ namespace ShomreiTorah.Data {
         public static ValueColumn PhoneColumn { get; private set; }
         ///<summary>Gets the schema's Source column.</summary>
         public static ValueColumn SourceColumn { get; private set; }
+        ///<summary>Gets the schema's Salutation column.</summary>
+        public static ValueColumn SalutationColumn { get; private set; }
         
         ///<summary>Gets the MasterDirectory schema instance.</summary>
         public static new TypedSchema<Person> Schema { get; private set; }
@@ -1201,6 +1203,9 @@ namespace ShomreiTorah.Data {
             
             SourceColumn = Schema.Columns.AddValueColumn("Source", typeof(String), null);
             SourceColumn.AllowNulls = false;
+            
+            SalutationColumn = Schema.Columns.AddValueColumn("Salutation", typeof(String), null);
+            SalutationColumn.AllowNulls = false;
             #endregion
             
             #region Create SchemaMapping
@@ -1220,6 +1225,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(ZipColumn, "Zip");
             SchemaMapping.Columns.AddMapping(PhoneColumn, "Phone");
             SchemaMapping.Columns.AddMapping(SourceColumn, "Source");
+            SchemaMapping.Columns.AddMapping(SalutationColumn, "Salutation");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -1313,6 +1319,13 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(SourceColumn); }
             set { base[SourceColumn] = value; }
         }
+        ///<summary>Gets or sets a salutation to use for the person.   This is the full name without any first names.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String Salutation {
+            get { return base.Field<String>(SalutationColumn); }
+            set { base[SalutationColumn] = value; }
+        }
         #endregion
         
         #region ChildRows Properties
@@ -1372,6 +1385,9 @@ namespace ShomreiTorah.Data {
         
         partial void ValidateSource(String newValue, Action<string> error);
         partial void OnSourceChanged(String oldValue, String newValue);
+        
+        partial void ValidateSalutation(String newValue, Action<string> error);
+        partial void OnSalutationChanged(String oldValue, String newValue);
         #endregion
         
         #region Column Callbacks
@@ -1423,6 +1439,9 @@ namespace ShomreiTorah.Data {
             } else if (column == SourceColumn) {
                 ValidateSource((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == SalutationColumn) {
+                ValidateSalutation((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
         }
@@ -1456,6 +1475,8 @@ namespace ShomreiTorah.Data {
             	OnPhoneChanged((String)oldValue, (String)newValue);
             else if (column == SourceColumn)
             	OnSourceChanged((String)oldValue, (String)newValue);
+            else if (column == SalutationColumn)
+            	OnSalutationChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }
