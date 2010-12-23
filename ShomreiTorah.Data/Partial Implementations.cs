@@ -106,6 +106,7 @@ namespace ShomreiTorah.Data {
 	partial class Person : IComparable<Person>, IComparable {
 		int IComparable.CompareTo(object obj) { return CompareTo(obj as Person); }
 		///<summary>Compares this person to another Person instance.</summary>
+		///<remarks>This method allows Person columns to be sorted in grids.</remarks>
 		public int CompareTo(Person other) {
 			if (other == null) return 1;
 			if (this == other) return 0;
@@ -115,12 +116,23 @@ namespace ShomreiTorah.Data {
 
 			return String.CompareOrdinal(LastName, other.LastName);
 		}
+	}
+	partial class Caller : IComparable, IComparable<Caller> {
+		int IComparable.CompareTo(object obj) { return CompareTo(obj as Caller); }
+		///<summary>Compares this caller to another Caller instance.</summary>
+		///<remarks>This method allows the call list grid to be sorted by caller.</remarks>
+		public int CompareTo(Caller other) {
+			if (other == null) return 1;
+			if (this == other) return 0;
 
+			return Person.CompareTo(other.Person);
+		}
 	}
 	[SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes", Justification = "Comparable for grids only")]
 	partial class Deposit : IComparable<Deposit>, IComparable {
 		int IComparable.CompareTo(object obj) { return CompareTo(obj as Deposit); }
 		///<summary>Compares this person to another Person instance.</summary>
+		///<remarks>This method allows payment grids to be sorted by Deposit.</remarks>
 		public int CompareTo(Deposit other) {
 			if (other == null) return 1;
 			if (this == other) return 0;
