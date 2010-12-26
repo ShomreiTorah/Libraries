@@ -21,6 +21,9 @@ namespace ShomreiTorah.Data {
 		}
 
 		#region String properties
+		///<summary>Gets the actual salutation to use for the person.</summary>
+		public string ActualSalutation { get { return String.IsNullOrWhiteSpace(Salutation) ? FullName : Salutation; } }
+
 		///<summary>Gets the family's full name, including both spouses.</summary>
 		public string VeryFullName {
 			get {
