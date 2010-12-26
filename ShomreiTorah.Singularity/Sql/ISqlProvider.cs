@@ -19,5 +19,9 @@ namespace ShomreiTorah.Singularity.Sql {
 		void ApplyUpdate(TransactionContext context, SchemaMapping schema, Row row);
 		///<summary>Applies a deleted row to the database.</summary>
 		void ApplyDelete(TransactionContext context, SchemaMapping schema, Row row);
+
+		///<summary>Creates a table for the given schema mapping.</summary>
+		///<remarks>In addition to the columns in the SchemaMapping, a RowVersion column will be created.</remarks>
+		void CreateTable(DbConnection connection, SchemaMapping schema, IEnumerable<SchemaMapping> parentSchemas);
 	}
 }

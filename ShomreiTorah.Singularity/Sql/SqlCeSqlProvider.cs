@@ -98,8 +98,13 @@ namespace ShomreiTorah.Singularity.Sql {
 					"SELECT RowVersion FROM " + QualifyTable(schema) + " WHERE " + schema.PrimaryKey.SqlName.EscapeSqlIdentifier() + " = @ID",
 					new { ID = row[schema.PrimaryKey.Column] }
 				)) {
-					context.SetRowVersion(row, command.ExecuteScalar());
+				context.SetRowVersion(row, command.ExecuteScalar());
 			}
 		}
+
+
+
+		///<summary>SQL CE does not support schemas; this method does nothing.</summary>
+		protected override void CreateSchema(DbConnection connection, SchemaMapping mapping) { }
 	}
 }

@@ -83,7 +83,7 @@ namespace ShomreiTorah.Singularity.Sql {
 			using (var command = context.CreateCommand(sql.ToString(), new { ID = row[schema.PrimaryKey.Column] }))
 			using (var reader = command.ExecuteReader()) {
 				if (!reader.Read()) {
-					row.RowVersion = null;	
+					row.RowVersion = null;
 					throw new RowDeletedException(row);
 				}
 
@@ -224,97 +224,116 @@ namespace ShomreiTorah.Singularity.Sql {
 
 		//TODO: Move to ListMaker
 		#region DDL
-		/////<summary>Returns a DbCommand containing a CREATE TABLE statement for the given schema mapping.</summary>
-		/////<remarks>In addition to the columns in the SchemaMapping, a RowVersion column will be created.</remarks>
-		//public DbCommand CreateTable(DbConnection connection, SchemaMapping schema) {
-		//    if (connection == null) throw new ArgumentNullException("connection");
-		//    if (schema == null) throw new ArgumentNullException("schema");
+		///<summary>Appends SQL statements to create a schema.  The SqlCommand will have a SqlSchema parameter.</summary>
+		protected virtual void CreateSchema(DbConnection connection, SchemaMapping mapping) {
+			if (connection == null) throw new ArgumentNullException("connection");
+			if (mapping == null) throw new ArgumentNullException("mapping");
 
+			connection.ExecuteNonQuery(@"
+				IF schema_id(@SqlSchemaName) IS NULL
+					EXECUTE('create schema ' + @EscapedSchemaName);",
+				new { mapping.SqlSchemaName, EscapedSchemaName = mapping.SqlSchemaName.EscapeSqlIdentifier() }
+			);
+		}
 
-		//    var sql = new StringBuilder();
+		///<summary>Creates a table for the given schema mapping.</summary>
+		///<remarks>In addition to the columns in the SchemaMapping, a RowVersion column will be created.</remarks>
+		public void CreateTable(DbConnection connection, SchemaMapping schema, IEnumerable<SchemaMapping> parentSchemas) {
+			if (connection == null) throw new ArgumentNullException("connection");
+			if (schema == null) throw new ArgumentNullException("schema");
+			CreateSchema(connection, schema);
 
-		//    //CREATE TABLE [SchemaName].[TableName] (
-		//    //	[FirstColumn]	TYPE	NOT NULL,
-		//    //	[SecondColumn]	TYPE	NULL,
-		//    //	[RowVersion]	RowVersion
-		//    //);
+			var sql = new StringBuilder();
 
-		//    sql.Append("CREATE TABLE ").Append(QualifyTable(schema)).AppendLine("(");
+			//CREATE TABLE [SchemaName].[TableName] (
+			//	[FirstColumn]	TYPE	NOT NULL,
+			//	[SecondColumn]	TYPE	NULL,
+			//	[RowVersion]	RowVersion
+			//);
 
-		//    foreach (var column in schema.Columns) {
-		//        if (column == schema.PrimaryKey)
-		//            AppendPrimaryKey(sql, column);
-		//        else if (column.Column is ForeignKeyColumn)
-		//            AppendForeignKey(sql, column);
-		//        else
-		//            AppendColumn(sql, column);
+			sql.Append("CREATE TABLE ").Append(QualifyTable(schema)).AppendLine("(");
 
-		//        sql.Append(",");	//Even the last column gets a comma, because of the RowVersion column
-		//    }
+			foreach (var column in schema.Columns) {
+				if (column == schema.PrimaryKey)
+					AppendPrimaryKey(sql, column);
+				else if (column.Column is ForeignKeyColumn)
+					AppendForeignKey(sql, column, parentSchemas);
+				else
+					AppendColumn(sql, column);
 
-		//    sql.AppendLine();
-		//    sql.AppendLine("\t[RowVersion]\t\tRowVersion");
-		//    sql.AppendLine(");");
+				sql.AppendLine(",");	//Even the last column gets a comma, because of the RowVersion column
+			}
 
-		//    return connection.CreateCommand(sql.ToString());
-		//}
+			sql.AppendLine("\t[RowVersion]\t\tRowVersion");
+			sql.AppendLine(");");
 
-		/////<summary>Appends a string to create a primary key column to a string builder.</summary>
-		//protected virtual void AppendPrimaryKey(StringBuilder sql, ColumnMapping column) {
-		//    if (sql == null) throw new ArgumentNullException("sql");
-		//    if (column == null) throw new ArgumentNullException("column");
+			connection.ExecuteNonQuery(sql.ToString());
+		}
 
-		//    sql.AppendFormat("\t{0,-30}\t{1,-20}\tNOT NULL\tROWGUIDCOL\tPRIMARY KEY DEFAULT(newid())",
-		//        column.SqlName.EscapeSqlIdentifier(),
-		//        "UNIQUEIDENTIFIER"
-		//    );
-		//}
-		/////<summary>Appends a string to create a column to a string builder.</summary>
-		//protected virtual void AppendColumn(StringBuilder sql, ColumnMapping column) {
-		//    if (sql == null) throw new ArgumentNullException("sql");
-		//    if (column == null) throw new ArgumentNullException("column");
+		///<summary>Appends a string to create a primary key column to a string builder.</summary>
+		protected virtual void AppendPrimaryKey(StringBuilder sql, ColumnMapping column) {
+			if (sql == null) throw new ArgumentNullException("sql");
+			if (column == null) throw new ArgumentNullException("column");
 
-		//    var nullable = ((ValueColumn)column.Column).AllowNulls;
+			sql.AppendFormat("\t{0,-30}\t{1,-20}\tNOT NULL\tROWGUIDCOL\tPRIMARY KEY DEFAULT(newid())",
+				column.SqlName.EscapeSqlIdentifier(),
+				"UNIQUEIDENTIFIER"
+			);
+		}
+		///<summary>Appends a string to create a column to a string builder.</summary>
+		protected virtual void AppendColumn(StringBuilder sql, ColumnMapping column) {
+			if (sql == null) throw new ArgumentNullException("sql");
+			if (column == null) throw new ArgumentNullException("column");
 
-		//    sql.AppendFormat("\t{0,-30}\t{1,-20}\t{2}",
-		//        column.SqlName.EscapeSqlIdentifier(),
-		//        GetSqlType(column.Column.DataType),
-		//        nullable ? "NULL" : "NOT NULL"
-		//    );
-		//}
-		//protected virtual void AppendForeignKey(StringBuilder sql, ColumnMapping column) {
-		//    if (sql == null) throw new ArgumentNullException("sql");
-		//    if (column == null) throw new ArgumentNullException("column");
+			var nullable = ((ValueColumn)column.Column).AllowNulls;
 
-		//    var foreignKey = (ForeignKeyColumn)column.Column;
+			sql.AppendFormat("\t{0,-30}\t{1,-20}\t{2}",
+				column.SqlName.EscapeSqlIdentifier(),
+				GetSqlType(column.Column.DataType),
+				nullable ? "NULL" : "NOT NULL"
+			);
+		}
+		protected virtual void AppendForeignKey(StringBuilder sql, ColumnMapping column, IEnumerable<SchemaMapping> parentSchemas) {
+			if (sql == null) throw new ArgumentNullException("sql");
+			if (column == null) throw new ArgumentNullException("column");
 
-		//    throw new NotImplementedException();
-		//}
-		//static readonly Dictionary<Type, string> SqlTypes = new Dictionary<Type, string> {
-		//    { typeof(DateTimeOffset),	"DATETIME" },
+			var fkc = (ForeignKeyColumn)column.Column;
+			var foreignTable = parentSchemas.First(s => s.Schema == fkc.ForeignSchema);
+			//[Caller]		UNIQUEIDENTIFIER	NULL		DEFAULT(NULL)	REFERENCES Data.MasterDirectory(Id),
 
-		//    { typeof(Guid),		"UNIQUEIDENTIFIER" },
-		//    { typeof(String),	"NVARCHAR(1024)" },
-		//    { typeof(DateTime),	"DATETIME" },
+			sql.AppendFormat(CultureInfo.InvariantCulture, "\t{0,-30}\t{1,-20}\t{2}\tREFERENCES {3}({4})",
+				column.SqlName.EscapeSqlIdentifier(),
+				GetSqlType(foreignTable.PrimaryKey.Column.DataType),
+				fkc.AllowNulls ? "NULL" : "NOT NULL",
+				QualifyTable(foreignTable),
+				foreignTable.PrimaryKey.SqlName.EscapeSqlIdentifier()
+			);
+		}
+		static readonly Dictionary<Type, string> SqlTypes = new Dictionary<Type, string> {
+		    { typeof(DateTimeOffset),	"DATETIME" },
 
-		//    { typeof(Byte),		"TINYINT" },
-		//    { typeof(Int16),	"SMALLINT" },
-		//    { typeof(Int32),	"INTEGER" },
-		//    { typeof(Int64),	"BIGINT" },
+		    { typeof(Guid),		"UNIQUEIDENTIFIER" },
+		    { typeof(String),	"NVARCHAR(1024)" },
+		    { typeof(DateTime),	"DATETIME" },
 
-		//    { typeof(Decimal),	"MONEY" },
-		//    { typeof(Double),	"FLOAT" },
-		//    { typeof(Single),	"REAL" },
-		//    { typeof(Boolean),	"BIT" },
+		    { typeof(Byte),		"TINYINT" },
+		    { typeof(Int16),	"SMALLINT" },
+		    { typeof(Int32),	"INTEGER" },
+		    { typeof(Int64),	"BIGINT" },
 
-		//};
-		/////<summary>Gets the name of the SQL Server type corresponding to a CLR type.</summary>
-		//protected virtual string GetSqlType(Type type) {
-		//    if (type == null) throw new ArgumentNullException("type");
+		    { typeof(Decimal),	"MONEY" },
+		    { typeof(Double),	"FLOAT" },
+		    { typeof(Single),	"REAL" },
+		    { typeof(Boolean),	"BIT" },
+		};
 
-		//    type = Nullable.GetUnderlyingType(type) ?? type;
-		//    return SqlTypes[type];
-		//}
+		///<summary>Gets the name of the SQL Server type corresponding to a CLR type.</summary>
+		protected virtual string GetSqlType(Type type) {
+			if (type == null) throw new ArgumentNullException("type");
+
+			type = Nullable.GetUnderlyingType(type) ?? type;
+			return SqlTypes[type];
+		}
 		#endregion
 	}
 }
