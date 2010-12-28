@@ -29,7 +29,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			if (ActiveEditor != null) {
 				ActiveEditor.MouseWheel += ActiveEditor_MouseWheel;
 				var te = ActiveEditor as TextEdit;
-				if (te != null)
+				if (te != null && te.MaskBox != null)
 					te.MaskBox.MouseWheel += ActiveEditor_MouseWheel;
 			}
 		}
@@ -38,7 +38,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			if (ActiveEditor != null) {
 				ActiveEditor.MouseWheel -= ActiveEditor_MouseWheel;
 				var te = ActiveEditor as TextEdit;
-				if (te != null)
+				if (te != null && te.MaskBox != null)
 					te.MaskBox.MouseWheel -= ActiveEditor_MouseWheel;
 			}
 			base.HideEditor();
