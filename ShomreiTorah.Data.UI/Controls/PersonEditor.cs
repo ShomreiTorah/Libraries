@@ -97,7 +97,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 					title = "Mr.";
 				first = valueGetter(HisNameTextEdit);
 			} else if (!isEmpty(HerNameTextEdit)) {
-				title = "Mrs.";
+				title = "Miss";
 				first = valueGetter(HerNameTextEdit);
 			} else if (!isEmpty(LastNameTextEdit))
 				return valueGetter(LastNameTextEdit) + " Family";
@@ -119,7 +119,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 				else
 					title = "Mr.";
 			} else if (!isEmpty(HerNameTextEdit)) {
-				title = "Mrs.";
+				title = "Miss";
 			} else if (!isEmpty(LastNameTextEdit))
 				return valueGetter(LastNameTextEdit) + " Family";
 			else
