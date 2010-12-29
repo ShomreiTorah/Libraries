@@ -1345,6 +1345,8 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<Caller> Callers { get { return TypedChildRows<Caller>(Caller.PersonColumn); } }
         ///<summary>Gets the person's Melave Malka invitations.</summary>
         public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonColumn); } }
+        ///<summary>Gets the raffle tickets that the person purchased.</summary>
+        public IChildRowCollection<RaffleTicket> RaffleTickets { get { return TypedChildRows<RaffleTicket>(RaffleTicket.PersonColumn); } }
         #endregion
         
         #region Partial Methods
@@ -2362,6 +2364,222 @@ namespace ShomreiTorah.Data {
             	OnExternalSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
             	OnExternalIdChanged((Int32?)oldValue, (Int32?)newValue);
+        }
+        #endregion
+    }
+    
+    ///<summary>Describes a raffle ticket.</summary>
+    public partial class RaffleTicket : Row {
+        ///<summary>Creates a new RaffleTicket instance.</summary>
+        public RaffleTicket () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed RaffleTickets table.</summary>
+        public static TypedTable<RaffleTicket> CreateTable() { return new TypedTable<RaffleTicket>(Schema, () => new RaffleTicket()); }
+        
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
+        ///<summary>Gets the schema's Person column.</summary>
+        public static ForeignKeyColumn PersonColumn { get; private set; }
+        ///<summary>Gets the schema's DateAdded column.</summary>
+        public static ValueColumn DateAddedColumn { get; private set; }
+        ///<summary>Gets the schema's Year column.</summary>
+        public static ValueColumn YearColumn { get; private set; }
+        ///<summary>Gets the schema's TicketId column.</summary>
+        public static ValueColumn TicketIdColumn { get; private set; }
+        ///<summary>Gets the schema's Paid column.</summary>
+        public static ValueColumn PaidColumn { get; private set; }
+        ///<summary>Gets the schema's Comments column.</summary>
+        public static ValueColumn CommentsColumn { get; private set; }
+        
+        ///<summary>Gets the RaffleTickets schema instance.</summary>
+        public static new TypedSchema<RaffleTicket> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server RaffleTickets table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static RaffleTicket() {
+            #region Create Schema
+            Schema = new TypedSchema<RaffleTicket>("RaffleTickets");
+            
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
+            RowIdColumn.AllowNulls = false;
+            
+            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "RaffleTickets");
+            PersonColumn.AllowNulls = false;
+            
+            DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
+            DateAddedColumn.AllowNulls = false;
+            
+            YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
+            YearColumn.AllowNulls = false;
+            
+            TicketIdColumn = Schema.Columns.AddValueColumn("TicketId", typeof(Int32), null);
+            TicketIdColumn.AllowNulls = false;
+            
+            PaidColumn = Schema.Columns.AddValueColumn("Paid", typeof(Boolean), null);
+            PaidColumn.AllowNulls = false;
+            
+            CommentsColumn = Schema.Columns.AddValueColumn("Comments", typeof(String), null);
+            CommentsColumn.AllowNulls = true;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "RaffleTickets";
+            SchemaMapping.SqlSchemaName = "MelaveMalka";
+            
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
+            SchemaMapping.Columns.AddMapping(PersonColumn, "PersonId");
+            SchemaMapping.Columns.AddMapping(DateAddedColumn, "DateAdded");
+            SchemaMapping.Columns.AddMapping(YearColumn, "Year");
+            SchemaMapping.Columns.AddMapping(TicketIdColumn, "TicketId");
+            SchemaMapping.Columns.AddMapping(PaidColumn, "Paid");
+            SchemaMapping.Columns.AddMapping(CommentsColumn, "Comments");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<RaffleTicket> Table { get { return (TypedTable<RaffleTicket>)base.Table; } }
+        #region Value Properties
+        ///<summary>Gets or sets the row id of the raffle ticket.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the person that bought the ticket.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person Person {
+            get { return base.Field<Person>(PersonColumn); }
+            set { base[PersonColumn] = value; }
+        }
+        ///<summary>Gets or sets the date added of the raffle ticket.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public DateTime DateAdded {
+            get { return base.Field<DateTime>(DateAddedColumn); }
+            set { base[DateAddedColumn] = value; }
+        }
+        ///<summary>Gets or sets the year of the raffle.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 Year {
+            get { return base.Field<Int32>(YearColumn); }
+            set { base[YearColumn] = value; }
+        }
+        ///<summary>Gets or sets the ticket number.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Int32 TicketId {
+            get { return base.Field<Int32>(TicketIdColumn); }
+            set { base[TicketIdColumn] = value; }
+        }
+        ///<summary>Gets or sets whether ticket has been paid for.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Boolean Paid {
+            get { return base.Field<Boolean>(PaidColumn); }
+            set { base[PaidColumn] = value; }
+        }
+        ///<summary>Gets or sets comments regarding the ticket.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String Comments {
+            get { return base.Field<String>(CommentsColumn); }
+            set { base[CommentsColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
+        
+        partial void ValidatePerson(Person newValue, Action<string> error);
+        partial void OnPersonChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateDateAdded(DateTime newValue, Action<string> error);
+        partial void OnDateAddedChanged(DateTime? oldValue, DateTime? newValue);
+        
+        partial void ValidateYear(Int32 newValue, Action<string> error);
+        partial void OnYearChanged(Int32? oldValue, Int32? newValue);
+        
+        partial void ValidateTicketId(Int32 newValue, Action<string> error);
+        partial void OnTicketIdChanged(Int32? oldValue, Int32? newValue);
+        
+        partial void ValidatePaid(Boolean newValue, Action<string> error);
+        partial void OnPaidChanged(Boolean? oldValue, Boolean? newValue);
+        
+        partial void ValidateComments(String newValue, Action<string> error);
+        partial void OnCommentsChanged(String oldValue, String newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == PersonColumn) {
+                ValidatePerson((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == DateAddedColumn) {
+                ValidateDateAdded((DateTime)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == YearColumn) {
+                ValidateYear((Int32)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == TicketIdColumn) {
+                ValidateTicketId((Int32)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == PaidColumn) {
+                ValidatePaid((Boolean)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == CommentsColumn) {
+                ValidateComments((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == RowIdColumn)
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
+            else if (column == PersonColumn)
+            	OnPersonChanged((Person)oldValue, (Person)newValue);
+            else if (column == DateAddedColumn)
+            	OnDateAddedChanged((DateTime?)oldValue, (DateTime?)newValue);
+            else if (column == YearColumn)
+            	OnYearChanged((Int32?)oldValue, (Int32?)newValue);
+            else if (column == TicketIdColumn)
+            	OnTicketIdChanged((Int32?)oldValue, (Int32?)newValue);
+            else if (column == PaidColumn)
+            	OnPaidChanged((Boolean?)oldValue, (Boolean?)newValue);
+            else if (column == CommentsColumn)
+            	OnCommentsChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }
