@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
 using ShomreiTorah.Singularity.Sql;
 using ShomreiTorah.WinForms;
@@ -208,6 +209,48 @@ namespace ShomreiTorah.Data.UI {
 				progress.Maximum = -1;
 				SyncContext.ReadData(threadContext);
 			}, cancellable: false);
+		}
+		#endregion
+
+		#region LoadTable
+		///<summary>Ensures that a table is loaded in the DataContext.</summary>
+		public static void LoadTable<TRow>() where TRow : Row { LoadTables(TypedSchema<TRow>.Instance); }
+		///<summary>Ensures that a set of tables are loaded in the DataContext.</summary>
+		public static void LoadTables(params TableSchema[] schemas) { LoadTables((IEnumerable<TableSchema>)schemas); }
+
+		///<summary>Ensures that a set of tables are loaded in the DataContext.</summary>
+		public static void LoadTables(IEnumerable<TableSchema> schemas) {
+			var allSchemas = new HashSet<TableSchema>();
+			foreach (var schema in schemas.Where(s => Current.DataContext.Tables[s] == null)) {
+				allSchemas.Add(schema);
+				allSchemas.UnionWith(schema.GetDependencies());
+			}
+
+			if (allSchemas.Count == 0) return;	//All of the tables are already loaded
+			var tables = allSchemas
+				.SortDependencies()
+				.Except(Current.DataContext.Tables.Select(t => t.Schema))	//Must be called after SortDependencies, since sorting requires all dependencies
+				.Select(ts => ts.CreateTable())
+				.ToList();
+
+			//Calculated columns can use child rows. I must add the
+			//tables in reverse order to allow the RowDependencies 
+			//to register handlers for the child tables.
+			tables.Reverse();
+			tables.ForEach(Current.DataContext.Tables.AddTable);
+
+			var syncers = tables.ConvertAll(t => new TableSynchronizer(t, SchemaMapping.GetPrimaryMapping(t.Schema), Current.SyncContext.SqlProvider));
+			syncers.ForEach(Current.SyncContext.Tables.Add);
+
+			var threadContext = SynchronizationContext.Current;
+			ProgressWorker.Execute(ui => {
+				if (Current.HasDataChanged)
+					Current.SyncContext.WriteData(ui);			//I must save before loading in case a parent row was deleted.  (The DB is expected to cascade)
+
+				ui.Maximum = -1;
+				ui.Caption = "Loading " + tables.Join(", ", t => t.Schema.Name);
+				Current.SyncContext.ReadData(threadContext);	//I must refresh everything to pick up potential changes in parent rows
+			}, false);
 		}
 		#endregion
 
