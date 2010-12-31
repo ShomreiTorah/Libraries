@@ -43,6 +43,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 			EditorRepository.Register(new[] { Pledge.AmountColumn, Payment.AmountColumn }, EditorRepository.CurrencyEditor);
 			EditorRepository.Register(new[] { Pledge.AccountColumn, Payment.AccountColumn }, EditorRepository.AccountEditor);
+
+			EditorRepository.Register(RaffleTicket.TicketIdColumn, EditorRepository.TicketIdEditor);
 		}
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "Configuration")]
 		static void ConfigureLookups() {
@@ -130,6 +132,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 			GridManager.RegisterBehavior(Person.Schema,
 				DeletionBehavior.Disallow("You cannot delete rows from the master directory.\r\nIf you really want to delete someone, call Schabse.")
+			);
+			GridManager.RegisterBehavior(RaffleTicket.Schema,
+				DeletionBehavior.WithMessages<RaffleTicket>(
+					singular: t => "Are you sure you want to delete ticket #" + t.TicketId + "?",
+					plural: set => "Are you sure you want to delete " + set.Count() + " tickets?"
+				)
 			);
 			GridManager.RegisterBehavior(Caller.Schema,
 				DeletionBehavior.WithMessages(

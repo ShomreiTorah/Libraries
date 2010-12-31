@@ -48,6 +48,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				properties.Mask.ShowPlaceHolders = false;
 			});
 
+			TicketIdEditor = new EditorSettings<RepositoryItemSpinEdit>(properties => {
+				properties.MinValue = 0;
+				properties.MaxValue = int.MaxValue / 2;
+				properties.IsFloatValue = false;
+				properties.Mask.EditMask = "N0";
+			});
 			OptionalSeatEditor = new EditorSettings<RepositoryItemSpinEdit>(properties => {
 				properties.AllowNullInput = DefaultBoolean.True;
 				properties.NullText = "Not sure";
@@ -72,6 +78,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		public static ComboBoxSettings MelaveMalkaSourceEditor { get; private set; }
 		///<summary>Gets the EditorSettings for the Melave Malka seating fields.</summary>
 		public static EditorSettings<RepositoryItemSpinEdit> OptionalSeatEditor { get; private set; }
+
+		///<summary>Gets the EditorSettings for the raffle's TicketID field.</summary>
+		public static EditorSettings<RepositoryItemSpinEdit> TicketIdEditor { get; private set; }
 
 		///<summary>Gets the EditorSettings for a US State field.</summary>
 		public static ComboBoxSettings StateEditor { get; private set; }
