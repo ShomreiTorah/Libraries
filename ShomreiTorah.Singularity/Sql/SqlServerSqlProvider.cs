@@ -293,6 +293,7 @@ namespace ShomreiTorah.Singularity.Sql {
 				nullable ? "NULL" : "NOT NULL"
 			);
 		}
+		///<summary>Appends a string to create a foreign key column to a string builder.</summary>
 		protected virtual void AppendForeignKey(StringBuilder sql, ColumnMapping column, IEnumerable<SchemaMapping> parentSchemas) {
 			if (sql == null) throw new ArgumentNullException("sql");
 			if (column == null) throw new ArgumentNullException("column");
