@@ -8,6 +8,12 @@ using System.Text;
 using ShomreiTorah.Singularity;
 
 namespace ShomreiTorah.Data {
+	partial class RaffleTicket {
+		///<summary>Calculates the standard price for a number of tickets.</summary>
+		public static decimal CalcPrice(int ticketCount) { return ticketCount == 0 ? 0 : (75 + 25 * (ticketCount - 1)); }
+	}
+
+
 	partial class Person {
 		partial void OnFullNameChanged(string oldValue, string newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
@@ -281,6 +287,7 @@ namespace ShomreiTorah.Data {
 	partial class MelaveMalkaSeat : IOwnedObject { }
 	partial class EmailAddress : IOwnedObject { }
 	partial class LoggedStatement : IOwnedObject { }
+	partial class RaffleTicket : IOwnedObject { }
 	partial class Caller : IOwnedObject { }
 	partial class MelaveMalkaInfo : IOwnedObject {
 		Person IOwnedObject.Person { get { return Honoree; } }
