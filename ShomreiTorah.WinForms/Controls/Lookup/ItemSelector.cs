@@ -126,6 +126,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			return unmetStrings.Count == 0;
 		}
 		internal static bool ValueMatches(string filterWord, string columnValue) {
+			if (String.IsNullOrEmpty(columnValue)) return false;
 			//If it ever becomes possible to match a different number of characters,
 			//the painter will need to be made aware of the difference in lengths.
 			return columnValue.Replace(' ', '-').StartsWith(filterWord, StringComparison.CurrentCultureIgnoreCase);
