@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
@@ -45,9 +46,21 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Indicates whether the table is currently being populated.</summary>
 		public bool IsLoadingData { get { return loadDataCount != 0; } }
 
-		internal IDisposable BeginLoadData() {
+		///<summary>Marks the table as loading data until the return value is disposed.
+		///When the return value is disposed, the LoadCompleted event will be raised, 
+		///unless the table is still loading data from another call.</summary>
+		///<param name="threadContext">An optional SynchronizationContext to 
+		///raise the LoadCompleted event on.</param>
+		internal IDisposable BeginLoadData(SynchronizationContext threadContext) {
 			loadDataCount++;
-			return new Disposable(() => loadDataCount--);
+			return new Disposable(delegate {
+				if (--loadDataCount == 0) {	//If no-one else is loading, raise LoadCompleted.
+					if (threadContext == null)
+						OnLoadCompleted();
+					else
+						threadContext.Post(delegate { OnLoadCompleted(); }, null);
+				}
+			});
 		}
 
 		///<summary>Gets the schema of this table.</summary>
@@ -184,10 +197,10 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Occurs after the table is populated from a datasource.</summary>
 		public event EventHandler LoadCompleted;
 		///<summary>Raises the LoadCompleted event.</summary>
-		internal protected virtual void OnLoadCompleted() { OnLoadCompleted(EventArgs.Empty); }
+		protected virtual void OnLoadCompleted() { OnLoadCompleted(EventArgs.Empty); }
 		///<summary>Raises the LoadCompleted event.</summary>
 		///<param name="e">An EventArgs object that provides the event data.</param>
-		internal protected virtual void OnLoadCompleted(EventArgs e) {
+		protected virtual void OnLoadCompleted(EventArgs e) {
 			if (LoadCompleted != null)
 				LoadCompleted(this, e);
 		}

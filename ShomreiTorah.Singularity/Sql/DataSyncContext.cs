@@ -35,9 +35,15 @@ namespace ShomreiTorah.Singularity.Sql {
 		///<param name="threadContext">An optional SynchronizationContext for the thread to raise the LoadCompleted event on.</param>
 		public void ReadData(SynchronizationContext threadContext) {
 			using (var connection = SqlProvider.OpenConnection()) {
-				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema)) {
-					table.ReadData(connection, threadContext);
-				}
+				//I mark every table as loading so that dependencies
+				//in other tables don't cause threading issues when 
+				//they're updated.
+				var endLoadings = Tables.Select(t => t.Table.BeginLoadData(threadContext)).ToList();
+				try {
+					foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
+						table.ReadData(connection, threadContext);
+
+				} finally { endLoadings.ForEach(d => d.Dispose()); }
 			}
 		}
 		///<summary>Saves changes in the tables to the database.</summary>

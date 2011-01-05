@@ -52,7 +52,7 @@ namespace ShomreiTorah.Singularity.Sql {
 		///<param name="connection">A connection to the database.</param>
 		///<param name="threadContext">An optional SynchronizationContext for the thread to raise the LoadCompleted event on.</param>
 		public void ReadData(DbConnection connection, SynchronizationContext threadContext) {
-			using (Table.BeginLoadData())
+			using (Table.BeginLoadData(threadContext))
 			using (var command = SqlProvider.CreateSelectCommand(connection, Mapping)) {
 				try {
 					isReadingDB = true;
@@ -63,10 +63,6 @@ namespace ShomreiTorah.Singularity.Sql {
 					changes.Clear();
 				} finally { isReadingDB = false; }
 			}
-			if (threadContext == null)
-				Table.OnLoadCompleted();
-			else
-				threadContext.Post(delegate { Table.OnLoadCompleted(); }, null);
 		}
 		sealed class DataReaderTablePopulator : TablePopulator<IDataRecord> {
 			readonly DbDataReader reader;
@@ -190,7 +186,7 @@ namespace ShomreiTorah.Singularity.Sql {
 			var changeCount = changes.Count();
 			if (changeCount == 0) return;
 
-			progress = progress ?? new EmptyProgressReporter();	
+			progress = progress ?? new EmptyProgressReporter();
 			progress.Caption = "Saving " + Table.Schema.Name;	//Only set caption if there are actually changes to save
 			progress.Maximum = changeCount;
 			int i = 0;
