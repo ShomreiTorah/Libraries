@@ -620,25 +620,26 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		protected override void CalcContentRect(Rectangle bounds) {
 			base.CalcContentRect(bounds);
 
+			var headerHeight = DrawColumnHeaders ? 20 : 0;
+			var rowAreaHeight = ContentRect.Height - headerHeight;
+
+			VerticalFrameHeight = (Form.Height - rowAreaHeight);
+
 			if (Rows.Count == 0) {
 				if (Form.OwnerEdit.AllItems.Count == 0)
 					Message = "The list is empty";
 				else
 					Message = "Your search has no results";
-				return;
+				Form.ScrollBar.Hide();
+				return;	//Don't process headers or the row area
 			} else
 				Message = null;
 
-			var headerHeight = DrawColumnHeaders ? 20 : 0;
-			var rowAreaHeight = ContentRect.Height - headerHeight;
+			int availableWidth = ContentRect.Width;
 
 			Form.ScrollBar.Maximum = RowHeight * Rows.Count;
 			Form.ScrollBar.LargeChange = rowAreaHeight;
 			Form.ScrollBar.Visible = Form.ScrollBar.Maximum > rowAreaHeight;
-
-			VerticalFrameHeight = (Form.Height - rowAreaHeight);
-
-			int availableWidth = ContentRect.Width;
 			if (Form.ScrollBar.Visible) {
 				availableWidth -= Form.ScrollBar.Width;
 
