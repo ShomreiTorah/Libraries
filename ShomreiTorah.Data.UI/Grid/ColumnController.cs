@@ -41,12 +41,24 @@ namespace ShomreiTorah.Data.UI.Grid {
 	}
 
 	partial class SmartGridColumn {
+		///<summary>Manually applies a controller to the column.</summary>
+		///<remarks>Call this method if the controller cannot be applied 
+		///automatically through the GridManager.</remarks>
+		public void ApplyController(ColumnController controller) {
+			if (controller == null) throw new ArgumentNullException("controller");
+
+			Controller = controller;
+			Controller.Apply(this);
+			controllerDataSource = View.DataSource;
+		}
+
 		///<summary>Gets the column controller used by the column, if any.</summary>
 		public ColumnController Controller { get; private set; }
 
 		object controllerDataSource;
 		internal void ActivateController(bool force = false) {
-			if (String.IsNullOrEmpty(FieldName)
+			if (Controller != null
+			 || String.IsNullOrEmpty(FieldName)
 			 || View == null
 			 || (!DesignMode && View.DataSource == null) || View.GridControl == null
 			 || (controllerDataSource != null && controllerDataSource == View.DataSource && !force))	//Or the datasource hasn't changed since last time
