@@ -26,7 +26,7 @@ namespace ShomreiTorah.Data {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
 			var emails = Table.Context.Table<EmailAddress>();
-			if (emails != null) return;
+			if (emails == null) return;
 			foreach (var email in emails.Rows) {
 				if (String.IsNullOrWhiteSpace(email.Name) || email.Name.Trim() == oldValue)
 					email.Name = newValue;
