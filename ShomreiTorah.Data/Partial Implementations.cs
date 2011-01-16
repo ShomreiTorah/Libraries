@@ -10,7 +10,14 @@ using ShomreiTorah.Singularity;
 namespace ShomreiTorah.Data {
 	partial class RaffleTicket {
 		///<summary>Calculates the standard price for a number of tickets.</summary>
-		public static decimal CalcPrice(int ticketCount) { return ticketCount == 0 ? 0 : (75 + 25 * (ticketCount - 1)); }
+		public static decimal CalcPrice(int ticketCount) {
+			if (ticketCount == 0)
+				return 0;
+			if (ticketCount == 1)
+				return 60;
+
+			return 50 + 25 * ticketCount;
+		}
 	}
 
 
