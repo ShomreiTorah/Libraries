@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Globalization;
 
 namespace ShomreiTorah.Common.Calendar.Zmanim {
@@ -128,8 +126,9 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			//Otherwise, the Sunday that the clock 
 			//changes gets pre-change values, since
 			//the UtcOffset only changes at 2:00 AM
-			var localOffset = TimeZoneInfo.Local.GetUtcOffset(date.Date.AddHours(3));
-			return TimeSpan.FromHours(UT) + localOffset;
+
+			var utcValue = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc).AddHours(UT);
+			return utcValue.ToLocalTime().TimeOfDay;
 		}
 
 		static double Sin(double degrees) { return Math.Sin(degrees * Math.PI / 180); }
