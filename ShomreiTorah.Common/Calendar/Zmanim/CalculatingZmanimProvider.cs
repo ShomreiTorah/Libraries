@@ -124,7 +124,11 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			var T = H + RA - (.06571 * t) - 6.622;
 			var UT = T - lngHour;
 
-			var localOffset = TimeZoneInfo.Local.GetUtcOffset(date);
+			//Get the offset after the DST change. 
+			//Otherwise, the Sunday that the clock 
+			//changes gets pre-change values, since
+			//the UtcOffset only changes at 2:00 AM
+			var localOffset = TimeZoneInfo.Local.GetUtcOffset(date.Date.AddHours(3));
 			return TimeSpan.FromHours(UT) + localOffset;
 		}
 
