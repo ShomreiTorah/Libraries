@@ -29,7 +29,11 @@ namespace ShomreiTorah.Common.Updates {
 
 		///<summary>Gets all of the changes supplied by the update since the current version.</summary>
 		public string GetChanges(Version existingVersion) {
-			return Versions.TakeWhile(v => v.Version > existingVersion).Join(Environment.NewLine, v => v.Changes.TrimEnd());
+			return Versions.TakeWhile(v => v.Version > existingVersion)
+						   .Join(Environment.NewLine,
+									v => v.Changes.TrimEnd()	//The XML gets \ns without \rs
+										  .Replace("\n", "\r\n").Replace("\r\r", "\r")
+							);
 		}
 
 		///<summary>Gets the files in the update.</summary>
