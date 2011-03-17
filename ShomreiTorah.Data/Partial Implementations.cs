@@ -237,6 +237,10 @@ namespace ShomreiTorah.Data {
 	}
 
 	partial class MelaveMalkaInfo {
+		///<summary>Gets the year of the current Melave Malka.</summary>
+		///<remarks>Melave Malka work starts in December of the previous year.</remarks>
+		public static int CurrentYear { get { return DateTime.Now.AddMonths(5).Year; } }
+
 		//If the date is after November, it should wrap to the previous year.
 		partial void OnAdDeadlineChanged(DateTime? oldValue, DateTime? newValue) {
 			if (newValue != null && this["Year"] != null)
