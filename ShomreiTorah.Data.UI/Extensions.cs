@@ -38,7 +38,11 @@ namespace ShomreiTorah.Data.UI {
 				menu.ItemLinks.Clear();
 
 				AppFramework.LoadTable<TRow>();
-				foreach (int dontUse in AppFramework.Table<TRow>().Rows.Select(yearGetter).Where(y => y.HasValue).Distinct()) {
+				foreach (int dontUse in AppFramework.Table<TRow>().Rows
+													.Select(yearGetter)
+													.Where(y => y.HasValue)
+													.Distinct()
+													.OrderByDescending(y => y)) {
 					int year = dontUse;	//Force separate variable per closure
 					var item = new BarButtonItem(button.Manager, year.ToString(CultureInfo.CurrentCulture));
 
