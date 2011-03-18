@@ -28,14 +28,14 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		///<summary>Applies the behavior to a SmartGridView.</summary>
 		public void Apply(SmartGridView view) {
-			view.ShowGridMenu += View_ShowGridMenu;
+			view.PopupMenuShowing += View_PopupMenuShowing;
 
 			foreach (var col in FieldNames.Select(view.Columns.ColumnByFieldName))
 				if (col != null)
 					col.Visible = false;
 		}
 
-		void View_ShowGridMenu(object sender, GridMenuEventArgs e) {
+		void View_PopupMenuShowing(object sender, PopupMenuShowingEventArgs e) {
 			if (e.MenuType == GridMenuType.Column) {
 				var view = (SmartGridView)sender;
 
