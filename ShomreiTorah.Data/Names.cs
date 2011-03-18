@@ -56,8 +56,8 @@ namespace ShomreiTorah.Data {
 		#endregion
 
 		#region General
-		///<summary>Gets the abbreviations of the US states.</summary>
-		public static readonly ReadOnlyCollection<string> Relatives = Strings(
+		///<summary>Gets the standard types of relatives.</summary>
+		public static readonly ReadOnlyCollection<string> RelationNames = Strings(
 			"Brother", "Brother-in-law",
 			"Father", "Father-in-law",
 			"Son", "Son-in-law",
