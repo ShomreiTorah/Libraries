@@ -131,6 +131,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		static void RegisterBehaviors() {
 			//TODO: Delete LoggedStatements?
 
+			GridManager.RegisterBehavior(RelativeLink.Schema,
+				DeletionBehavior.WithMessages(
+					"relative link",
+					"relative links"
+				)
+			);
 			GridManager.RegisterBehavior(Person.Schema,
 				DeletionBehavior.Disallow("You cannot delete rows from the master directory.\r\nIf you really want to delete someone, call Schabse.")
 			);
