@@ -1,8 +1,8 @@
-using ShomreiTorah.Singularity;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ShomreiTorah.Singularity.Tests {
 	[TestClass]
@@ -65,7 +65,7 @@ namespace ShomreiTorah.Singularity.Tests {
 			halfView.Verify();
 		}
 		static void VerifyFilteredTable<TRow>(FilteredTable<TRow> ft, Func<TRow, bool> filter) where TRow : Row {
-			CollectionAssert.AreEqual(ft.Rows, ft.Table.Rows.Where(r => filter((TRow)r)).ToArray());
+			CollectionAssert.AreEqual((ICollection)ft.Rows, ft.Table.Rows.Where(r => filter((TRow)r)).ToArray());
 		}
 		class VerifyableFilteredTable<TRow> : FilteredTable<TRow> where TRow : Row {
 			readonly Func<TRow, bool> filter;
