@@ -253,7 +253,7 @@ namespace ShomreiTorah.Data {
 		}
 
 		///<summary>Gets the relative path to the ad blank PDF on the website.</summary>
-		public Uri AdBlankPath { get { return new Uri(String.Format("/Files/Ad-Blank-{0:yyyy}.pdf", MelaveMalkaDate), UriKind.Relative); } }
+		public Uri AdBlankPath { get { return new Uri(String.Format(CultureInfo.InvariantCulture, "/Files/Ad-Blank-{0:yyyy}.pdf", MelaveMalkaDate), UriKind.Relative); } }
 	}
 
 	partial class Pledge {
