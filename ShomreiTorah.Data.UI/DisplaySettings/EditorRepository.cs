@@ -33,6 +33,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			});
 			AccountEditor = new ComboBoxSettings(Names.AccountNames);
 			PaymentMethodEditor = new ComboBoxSettings(Names.PaymentMethods);
+			RelationListEditor = new ComboBoxSettings(Names.RelationNames);
 			MelaveMalkaSourceEditor = new ComboBoxSettings(Names.MelaveMalkaSources, p => p.TextEditStyle = TextEditStyles.DisableTextEditor);
 
 			StateEditor = new ComboBoxSettings(Names.CommonStates.Concat(Names.StateAbbreviations));
@@ -73,6 +74,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		public static ComboBoxSettings AccountEditor { get; private set; }
 		///<summary>Gets the EditorSettings for the payment method field.</summary>
 		public static ComboBoxSettings PaymentMethodEditor { get; private set; }
+
+		///<summary>Gets the EditorSettings for the combobox of relative types.</summary>
+		public static ComboBoxSettings RelationListEditor { get; private set; }
 
 		///<summary>Gets the EditorSettings for the Source field for the Melave Malka.</summary>
 		public static ComboBoxSettings MelaveMalkaSourceEditor { get; private set; }

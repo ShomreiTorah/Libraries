@@ -589,4 +589,26 @@
       </DefaultValue>
     </Column>
   </Schema>
+  <Schema Name="Relatives" RowClassDescription="Describes a relation between a member and someone else." RowClassName="RelativeLink" RowClassVisibility="Public" SqlName="Relatives" SqlSchemaName="Data" PrimaryKeyName="RowId">
+    <Column Name="RowId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row id of the relative." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="RowId" PropertyVisibility="Public" SqlName="RowId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Member" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the member of the relative." Expression="" ForeignRelationName="ForeignRelatives" ForeignRelationPropertyDescription="Gets this member's known relatives." ForeignRelationPropertyName="ForeignRelatives" GenerateSqlMapping="true" IsUnique="false" PropertyName="Member" PropertyVisibility="Public" SqlName="MemberId" ForeignSchemaName="MasterDirectory">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Relative" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the relative of the relative." Expression="" ForeignRelationName="Relatives" ForeignRelationPropertyDescription="Gets the member(s) that this person is related to." ForeignRelationPropertyName="RelatedMembers" GenerateSqlMapping="true" IsUnique="false" PropertyName="Relative" PropertyVisibility="Public" SqlName="RelativeId" ForeignSchemaName="MasterDirectory">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Relation" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the type of relation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="RelationType" PropertyVisibility="Public" SqlName="Relation">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+  </Schema>
 </DataContext>

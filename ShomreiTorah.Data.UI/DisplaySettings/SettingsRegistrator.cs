@@ -34,6 +34,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			EditorRepository.Register(Person.StateColumn, EditorRepository.StateEditor);
 			EditorRepository.Register(Person.ZipColumn, EditorRepository.ZipEditor);
 			EditorRepository.Register(Person.PhoneColumn, EditorRepository.PhoneEditor);
+			EditorRepository.Register(RelativeLink.RelationTypeColumn, EditorRepository.RelationListEditor);
 
 			EditorRepository.Register(MelaveMalkaInvitation.SourceColumn, EditorRepository.MelaveMalkaSourceEditor);
 			EditorRepository.Register(new[] { MelaveMalkaSeat.MensSeatsColumn, MelaveMalkaSeat.WomensSeatsColumn }, EditorRepository.OptionalSeatEditor);

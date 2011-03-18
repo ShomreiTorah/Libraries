@@ -1347,6 +1347,10 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<MelaveMalkaInvitation> Invitees { get { return TypedChildRows<MelaveMalkaInvitation>(MelaveMalkaInvitation.PersonColumn); } }
         ///<summary>Gets the raffle tickets that the person purchased.</summary>
         public IChildRowCollection<RaffleTicket> RaffleTickets { get { return TypedChildRows<RaffleTicket>(RaffleTicket.PersonColumn); } }
+        ///<summary>Gets this member's known relatives.</summary>
+        public IChildRowCollection<RelativeLink> ForeignRelatives { get { return TypedChildRows<RelativeLink>(RelativeLink.MemberColumn); } }
+        ///<summary>Gets the member(s) that this person is related to.</summary>
+        public IChildRowCollection<RelativeLink> RelatedMembers { get { return TypedChildRows<RelativeLink>(RelativeLink.RelativeColumn); } }
         #endregion
         
         #region Partial Methods
@@ -2580,6 +2584,159 @@ namespace ShomreiTorah.Data {
             	OnPaidChanged((Boolean?)oldValue, (Boolean?)newValue);
             else if (column == CommentsColumn)
             	OnCommentsChanged((String)oldValue, (String)newValue);
+        }
+        #endregion
+    }
+    
+    ///<summary>Describes a relation between a member and someone else.</summary>
+    public partial class RelativeLink : Row {
+        ///<summary>Creates a new RelativeLink instance.</summary>
+        public RelativeLink () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed Relatives table.</summary>
+        public static TypedTable<RelativeLink> CreateTable() { return new TypedTable<RelativeLink>(Schema, () => new RelativeLink()); }
+        
+        ///<summary>Gets the schema's RowId column.</summary>
+        public static ValueColumn RowIdColumn { get; private set; }
+        ///<summary>Gets the schema's Member column.</summary>
+        public static ForeignKeyColumn MemberColumn { get; private set; }
+        ///<summary>Gets the schema's Relative column.</summary>
+        public static ForeignKeyColumn RelativeColumn { get; private set; }
+        ///<summary>Gets the schema's Relation column.</summary>
+        public static ValueColumn RelationTypeColumn { get; private set; }
+        
+        ///<summary>Gets the Relatives schema instance.</summary>
+        public static new TypedSchema<RelativeLink> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server Relatives table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static RelativeLink() {
+            #region Create Schema
+            Schema = new TypedSchema<RelativeLink>("Relatives");
+            
+            Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
+            RowIdColumn.Unique = true;
+            RowIdColumn.AllowNulls = false;
+            
+            MemberColumn = Schema.Columns.AddForeignKey("Member", ShomreiTorah.Data.Person.Schema, "ForeignRelatives");
+            MemberColumn.AllowNulls = false;
+            
+            RelativeColumn = Schema.Columns.AddForeignKey("Relative", ShomreiTorah.Data.Person.Schema, "Relatives");
+            RelativeColumn.AllowNulls = false;
+            
+            RelationTypeColumn = Schema.Columns.AddValueColumn("Relation", typeof(String), null);
+            RelationTypeColumn.AllowNulls = false;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "Relatives";
+            SchemaMapping.SqlSchemaName = "Data";
+            
+            SchemaMapping.Columns.AddMapping(RowIdColumn, "RowId");
+            SchemaMapping.Columns.AddMapping(MemberColumn, "MemberId");
+            SchemaMapping.Columns.AddMapping(RelativeColumn, "RelativeId");
+            SchemaMapping.Columns.AddMapping(RelationTypeColumn, "Relation");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<RelativeLink> Table { get { return (TypedTable<RelativeLink>)base.Table; } }
+        #region Value Properties
+        ///<summary>Gets or sets the row id of the relative.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid RowId {
+            get { return base.Field<Guid>(RowIdColumn); }
+            set { base[RowIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the member of the relative.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person Member {
+            get { return base.Field<Person>(MemberColumn); }
+            set { base[MemberColumn] = value; }
+        }
+        ///<summary>Gets or sets the relative of the relative.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person Relative {
+            get { return base.Field<Person>(RelativeColumn); }
+            set { base[RelativeColumn] = value; }
+        }
+        ///<summary>Gets or sets the type of relation.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String RelationType {
+            get { return base.Field<String>(RelationTypeColumn); }
+            set { base[RelationTypeColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateRowId(Guid newValue, Action<string> error);
+        partial void OnRowIdChanged(Guid? oldValue, Guid? newValue);
+        
+        partial void ValidateMember(Person newValue, Action<string> error);
+        partial void OnMemberChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateRelative(Person newValue, Action<string> error);
+        partial void OnRelativeChanged(Person oldValue, Person newValue);
+        
+        partial void ValidateRelationType(String newValue, Action<string> error);
+        partial void OnRelationTypeChanged(String oldValue, String newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == RowIdColumn) {
+                ValidateRowId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == MemberColumn) {
+                ValidateMember((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == RelativeColumn) {
+                ValidateRelative((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == RelationTypeColumn) {
+                ValidateRelationType((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == RowIdColumn)
+            	OnRowIdChanged((Guid?)oldValue, (Guid?)newValue);
+            else if (column == MemberColumn)
+            	OnMemberChanged((Person)oldValue, (Person)newValue);
+            else if (column == RelativeColumn)
+            	OnRelativeChanged((Person)oldValue, (Person)newValue);
+            else if (column == RelationTypeColumn)
+            	OnRelationTypeChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }
