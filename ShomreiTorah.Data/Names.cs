@@ -61,6 +61,7 @@ namespace ShomreiTorah.Data {
 			"Brother", "Brother-in-law",
 			"Father", "Father-in-law",
 			"Son", "Son-in-law",
+			"Grandfather", "Uncle",
 			"Guest"
 		);
 

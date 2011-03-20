@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AliyahNote.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Names.cs" />
     <Compile Include="Partial Implementations.cs" />
