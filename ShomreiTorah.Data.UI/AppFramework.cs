@@ -214,6 +214,7 @@ namespace ShomreiTorah.Data.UI {
 
 		#region LoadTable
 		///<summary>Ensures that a table is loaded in the DataContext.</summary>
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
 		public static void LoadTable<TRow>() where TRow : Row { LoadTables(TypedSchema<TRow>.Instance); }
 		///<summary>Ensures that a set of tables are loaded in the DataContext.</summary>
 		public static void LoadTables(params TableSchema[] schemas) { LoadTables((IEnumerable<TableSchema>)schemas); }

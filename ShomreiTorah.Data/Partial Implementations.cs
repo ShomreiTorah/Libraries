@@ -133,6 +133,7 @@ namespace ShomreiTorah.Data {
 			return String.CompareOrdinal(LastName, other.LastName);
 		}
 	}
+	[SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes", Justification = "Comparable for grids only")]
 	partial class Caller : IComparable, IComparable<Caller> {
 		int IComparable.CompareTo(object obj) { return CompareTo(obj as Caller); }
 		///<summary>Compares this caller to another Caller instance.</summary>
