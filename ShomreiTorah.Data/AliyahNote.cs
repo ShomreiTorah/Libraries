@@ -63,7 +63,7 @@ namespace ShomreiTorah.Data {
 			);
 			text.Append(@")?");
 			text.Append(@"\s*[,.;/\\]?\s*");
-			text.Append(@"(מתנה|Matanah?)?");
+			text.Append(@"(מתנה|Matanah?)?");	//TODO: Allow prefix מתנה
 			text.Append(@"\s*[,.;/\\]?\s*");
 			text.Append(@"(.*)");
 			text.Append(@"\s*$");
@@ -74,14 +74,7 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets or sets the full text of the Note field.</summary>
 		public string Text {
 			set {
-				//if (string.IsNullOrWhiteSpace(value)) {
-				//    Relative = "";
-				//    Isמתנה = false;
-				//    ExtraNote = "";
-				//    return;
-				//}
-
-				var parts = TextParser.Match(value);
+				var parts = TextParser.Match(value ?? "");
 				Relative = parts.Groups[1].Value;	//Normalized in the setter
 				Isמתנה = !String.IsNullOrEmpty(parts.Groups[2].Value);
 				ExtraNote = parts.Groups[3].Value.Trim();
