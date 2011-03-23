@@ -28,7 +28,7 @@ namespace ShomreiTorah.WinForms {
 			CheckColumn.ShowButtonMode = ShowButtonModeEnum.ShowAlways;
 
 			View.BeforeLeaveRow += View_BeforeLeaveRow;
-			View.KeyDown += View_KeyDown;
+			View.KeyPress += View_KeyPress;
 			View.MouseUp += View_MouseUp;
 		}
 
@@ -51,9 +51,9 @@ namespace ShomreiTorah.WinForms {
 			}
 		}
 
-		void View_KeyDown(object sender, KeyEventArgs e) {
+		void View_KeyPress(object sender, KeyPressEventArgs e) {
 			if (e.Handled) return;
-			if (e.KeyData == Keys.Space) {
+			if (e.KeyChar == ' ') {
 				//Without this, checking rows will move them
 				//around if the column is sorted, messing up
 				//the row handles.
@@ -61,6 +61,7 @@ namespace ShomreiTorah.WinForms {
 				foreach (var handle in View.GetSelectedRows())
 					Invert(handle);
 				View.EndDataUpdate();
+
 				e.Handled = true;
 			}
 		}
