@@ -215,6 +215,11 @@ namespace ShomreiTorah.Data {
 				Modified = DateTime.UtcNow;
 			}
 		}
+
+		///<summary>Indicates whether this payment needs to be deposited.</summary>
+		public bool NeedsDeposit {
+			get { return Amount > 0 && !Names.UndepositedPayments.Contains(Method, StringComparer.OrdinalIgnoreCase); }
+		}
 	}
 	#endregion
 
@@ -222,6 +227,7 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the string used to represent this caller in a dropdown list.</summary>
 		public override string ToString() { return Person.HisName[0] + " " + Person.LastName; }
 
+		///<summary>Called before the row is removed from its table.</summary>
 		protected override void OnRemoving() {
 			foreach (var callee in Callees.ToList()) //The loop will modify the collection
 				callee.Caller = null;

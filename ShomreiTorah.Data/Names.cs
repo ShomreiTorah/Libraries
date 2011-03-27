@@ -11,6 +11,7 @@ namespace ShomreiTorah.Data {
 	///<summary>Contains strings used by the data classes.</summary>
 	public static class Names {
 		static ReadOnlyCollection<string> Strings(params string[] values) { return new ReadOnlyCollection<string>(values); }
+		static ReadOnlyCollection<string> Strings(IEnumerable<string> firstValues, IEnumerable<string> moreValues) { return new ReadOnlyCollection<string>(firstValues.Concat(moreValues).ToList()); }
 
 		#region Melave Malka
 		///<summary>Gets the values for the Melave Malka's Source field.</summary>
@@ -27,7 +28,10 @@ namespace ShomreiTorah.Data {
 		public static string DefaultAccount { get { return AccountNames[0]; } }
 
 		///<summary>Gets the standard payment methods.</summary>
-		public static readonly ReadOnlyCollection<string> PaymentMethods = Strings("Cash", "Check");
+
+		///<summary>Gets the standard payment methods.</summary>
+		public static readonly ReadOnlyCollection<string> UndepositedPayments = Strings("Goods and/or Services");
+		public static readonly ReadOnlyCollection<string> PaymentMethods = Strings(new[] { "Cash", "Check" }, UndepositedPayments);
 		#endregion
 
 		#region Pledge Types
