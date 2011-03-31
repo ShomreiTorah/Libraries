@@ -27,10 +27,10 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the default account for payments and pledges.</summary>
 		public static string DefaultAccount { get { return AccountNames[0]; } }
 
-		///<summary>Gets the standard payment methods.</summary>
 
-		///<summary>Gets the standard payment methods.</summary>
+		///<summary>Gets the payment methods that cannot be deposited.</summary>
 		public static readonly ReadOnlyCollection<string> UndepositedPayments = Strings("Goods and/or Services");
+		///<summary>Gets the all of the standard payment methods.</summary>
 		public static readonly ReadOnlyCollection<string> PaymentMethods = Strings(new[] { "Cash", "Check" }, UndepositedPayments);
 		#endregion
 
@@ -45,11 +45,15 @@ namespace ShomreiTorah.Data {
 			new PledgeType("Building Fund"),
 			new PledgeType("ימים נוראים Seats"),
 
-			new PledgeType("Auction",	
-							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
-												"פתיחה", "הגבהה",
-												"מפטיר יונה", "פתיחה דנעילה", 
-												"אתה הראית", "חתן תורה", "חתן בראשית" }),
+			new PledgeType("Auction",		  //This is the sort order for rows in the auction grid, and for subtypes
+							subTypes: new[] { "אתה הראית", "פתיחה", 
+											  "כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", 
+
+											  "חתן תורה", "חתן בראשית",
+
+											  "מפטיר יונה", "מפטיר", "הגבהה",
+											  "פתיחה דנעילה",
+											}),
 			new PledgeType("מי שברך",	
 							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
 												"מפטיר יונה", "חתן תורה", "חתן בראשית" }),

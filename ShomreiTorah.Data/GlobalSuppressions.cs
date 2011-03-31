@@ -36,3 +36,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Scope = "member", Target = "ShomreiTorah.Data.MelaveMalkaInfo.#ShomreiTorah.Data.IOwnedObject.Person")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "oldValue", Scope = "member", Target = "ShomreiTorah.Data.MelaveMalkaInvitation.#OnShouldCallChanged(System.Nullable`1<System.Boolean>,System.Nullable`1<System.Boolean>)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Scope = "member", Target = "ShomreiTorah.Data.Names.#RelationNames")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Scope = "member", Target = "ShomreiTorah.Data.Names.#UndepositedPayments")]
