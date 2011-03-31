@@ -67,7 +67,7 @@ namespace ShomreiTorah.Data {
 			text.Append(@"\s*[,.;/\\]?\s*");
 			text.Append(@"(.*)");
 			text.Append(@"\s*$");
-			return new Regex(text.ToString(), RegexOptions.IgnoreCase);
+			return new Regex(text.ToString(), RegexOptions.IgnoreCase | RegexOptions.Compiled);
 		}
 		static readonly Regex TextParser = CreateParser();
 
