@@ -66,7 +66,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		#region Behaviors
 		void ApplyBehaviors() {
 #if DEBUG
-			if (!IsDesignMode)
+			if (!IsDesignMode && AppFramework.Current != null && !AppFramework.Current.IsDesignTime)
 				Debug.Assert(lastAppliedDataSource == null, "Two datasources applied");
 #endif
 			foreach (var behavior in DisplaySettings.GridManager.GetBehaviors(DataSource)) {
