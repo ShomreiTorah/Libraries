@@ -131,15 +131,27 @@ namespace ShomreiTorah.Data.UI.Grid {
 			if (baseInfo != null)
 				return baseInfo;
 			var ht = GetHintObjectInfo() as GridHitInfo;
-			if (ht != null && ht.InRowCell) {
+			if (ht == null) return null;
+			var args = new CustomToolTipEventArgs(ht);
+
+			if (ht.InRowCell) {
 				var column = ht.Column as SmartGridColumn;
-				if (column != null && column.Controller != null) {
-					var superTip = column.Controller.GetCellToolTip(GetRow(ht.RowHandle), GetRowCellValue(ht.RowHandle, column));
-					if (superTip != null)
-						return new ToolTipControlInfo() { SuperTip = superTip };
-				}
+				if (column != null && column.Controller != null)
+					args.SuperTip = column.Controller.GetCellToolTip(GetRow(ht.RowHandle), GetRowCellValue(ht.RowHandle, column));
 			}
+
+			OnCustomSuperTip(args);
+			if (args.SuperTip != null)
+				return new ToolTipControlInfo() { SuperTip = args.SuperTip };
 			return null;
+		}
+		///<summary>Occurs when the grid shows a tooltip for any UI element without a standard tooltip.</summary>
+		public event EventHandler<CustomToolTipEventArgs> CustomSuperTip;
+		///<summary>Raises the CustomSuperTip event.</summary>
+		///<param name="e">A CustomToolTipEventArgs object that provides the event data.</param>
+		void OnCustomSuperTip(CustomToolTipEventArgs e) {
+			if (CustomSuperTip != null)
+				CustomSuperTip(this, e);
 		}
 
 		void ApplyColumnControllers() {
@@ -147,7 +159,18 @@ namespace ShomreiTorah.Data.UI.Grid {
 				column.ActivateController();
 			}
 		}
+	}
+	///<summary>Provides data for the <see cref="SmartGridView.CustomSuperTip"/>  event.</summary>
+	public class CustomToolTipEventArgs : EventArgs {
+		public CustomToolTipEventArgs(GridHitInfo info) {
+			if (info == null) throw new ArgumentNullException("info");
+			HitInfo = info;
+		}
 
+		///<summary>Gets the hit info describing the element that needs a tool tip.</summary>
+		public GridHitInfo HitInfo { get; private set; }
+		///<summary>Gets or sets the supertip to show for the element, if any.</summary>
+		public SuperToolTip SuperTip { get; set; }
 	}
 	partial class SmartGridColumnCollection {
 		protected override void OnInsertComplete(int index, object obj) {
