@@ -30,6 +30,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		internal static BaseInfoRegistrator CreateRegistrator() { return new MyRegistrator(); }
 		///<summary>Gets the view's name.</summary>
 		protected override string ViewName { get { return "SmartGridView"; } }
+		///<summary>Creates the collection that holds the grid's columns.</summary>
 		protected override GridColumnCollection CreateColumnCollection() { return new SmartGridColumnCollection(this); }
 
 		///<summary>Gets the columns in the view.</summary>
@@ -45,6 +46,12 @@ namespace ShomreiTorah.Data.UI.Grid {
 		public SmartGridView(SmartGrid grid)
 			: base(grid) {
 			this.AddControllerHandlers();	//See ColumnController.cs
+		}
+
+		///<summary>Indicates whether the view will show tooltips.</summary>
+		///<remarks>We want tooltips even inside of cell editors.</remarks>
+		protected override bool CanShowHint {
+			get { return base.CanShowHint || IsEditing; }
 		}
 
 		object lastAppliedDataSource;
