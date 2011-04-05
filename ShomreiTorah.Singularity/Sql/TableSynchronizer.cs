@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using ShomreiTorah.Common;
+using ShomreiTorah.Common.Collections;
 
 namespace ShomreiTorah.Singularity.Sql {
 	///<summary>Synchronizes a Singularity table with a table in an SQL database.</summary>

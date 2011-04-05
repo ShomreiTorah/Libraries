@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
-using ShomreiTorah.Common;
 using System.Globalization;
+using System.Linq;
+using ShomreiTorah.Common.Collections;
 
 namespace ShomreiTorah.Data {
 	///<summary>Contains strings used by the data classes.</summary>

@@ -105,6 +105,7 @@
     <Compile Include="Calendar\Zmanim\YearlyZmanimProvider.cs" />
     <Compile Include="Calendar\Zmanim\ZmanimInfo.cs" />
     <Compile Include="Calendar\Zmanim\ZmanimProvider.cs" />
+    <Compile Include="Collections\SetDictionary.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="DB.cs" />
     <Compile Include="Disposable.cs" />
@@ -115,11 +116,12 @@
     <Compile Include="IProgressReporter.cs" />
     <Compile Include="Office.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadOnlyDictionary.cs" />
+    <Compile Include="Collections\ReadOnlyDictionary.cs" />
     <Compile Include="Updates\UpdateChecker.cs" />
     <Compile Include="Updates\UpdateFile.cs" />
     <Compile Include="Updates\UpdateInfo.cs" />
     <Compile Include="Updates\UpdateStreamer.cs" />
+    <Compile Include="Collections\ValueComparer.cs" />
     <Compile Include="WeakReference.cs" />
   </ItemGroup>
   <ItemGroup>
