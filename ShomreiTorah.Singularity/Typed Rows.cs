@@ -5,6 +5,7 @@ using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections;
 using System.ComponentModel;
+using System.Linq.Expressions;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A schema that contains strongly-typed rows.</summary>
@@ -160,6 +161,20 @@ namespace ShomreiTorah.Singularity {
 		///<remarks>Making this property available for calculated columns would require re-calculating the column
 		///after every dependency change, even if no-one needs the value yet.</remarks>
 		public object OldValue { get { return Inner.OldValue; } }
+
+		///<summary>Gets a field's value as it was before the change event.</summary>
+		public T GetOldValue<T>(Column column) {
+			if (column == this.Column)
+				return (T)OldValue;
+			return Row.Field<T>(column);
+		}
+		///<summary>Gets a field's value as it was before the change event.</summary>
+		public T GetOldValue<T>(Expression<Func<TRow, T>> property) {
+			string columnName = ((MemberExpression)property.Body).Member.Name;
+			if (columnName == this.Column.Name)
+				return (T)OldValue;
+			return Row.Field<T>(columnName);
+		}
 	}
 
 	partial class Row {
