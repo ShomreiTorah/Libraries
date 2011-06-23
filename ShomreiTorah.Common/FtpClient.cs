@@ -118,7 +118,15 @@ namespace ShomreiTorah.Common {
 		public void DeleteFile(Uri relativePath) {
 			var request = CreateRequest(relativePath);
 			request.Method = WebRequestMethods.Ftp.DeleteFile;
-			request.GetResponse().Close();
+			try {
+				request.GetResponse().Close();
+			} catch (WebException ex) {
+				var response = (FtpWebResponse)ex.Response;
+				if (response.StatusCode == FtpStatusCode.ActionNotTakenFileUnavailable)
+					return;	//File is already gone
+				else
+					throw;
+			}
 		}
 	}
 }

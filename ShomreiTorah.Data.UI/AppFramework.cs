@@ -150,7 +150,9 @@ namespace ShomreiTorah.Data.UI {
 					splashScreen.CloseSplash();
 				splashScreen = null;
 			};
-			Application.Run(MainForm);
+			try {
+				Application.Run(MainForm);
+			} catch (Exception ex) { MessageBox.Show(ex.ToString()); }
 		}
 
 		///<summary>Prompts the user to create a new person.</summary>

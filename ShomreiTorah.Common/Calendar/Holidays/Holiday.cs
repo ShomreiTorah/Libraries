@@ -75,8 +75,8 @@ namespace ShomreiTorah.Common.Calendar.Holidays {
 				#region ימים טובים
 				ראש٠השנה[1], ראש٠השנה[2],
 
-				new Holiday("צום גדליה",			new NonשבתEvent	(HebrewMonth.תשרי,	3, DayOfWeek.Sunday),	HolidayCategory.תענית),
-				new Holiday("שבת שובה",		new SpecialשבתEvent(HebrewMonth.תשרי,	3),						HolidayCategory.Specialשבת),
+				new Holiday("צום גדליה",		new NonשבתEvent	(HebrewMonth.תשרי,	3, DayOfWeek.Sunday),	HolidayCategory.תענית),
+				new Holiday("שבת שובה",		new SpecialשבתEvent(HebrewMonth.תשרי,	3),					HolidayCategory.Specialשבת),
 
 				יום٠כיפור,
 
@@ -88,33 +88,33 @@ namespace ShomreiTorah.Common.Calendar.Holidays {
 				new Holiday("ט\"ו בשבט",		HebrewMonth.שבט,	15, HolidayCategory.Minor),
 
 				new Holiday("פרשת שקלים",		new FourParshiyosEvent(0),	HolidayCategory.Fourפרשיות),
-				new Holiday("פרשת זכור",			new FourParshiyosEvent(1),	HolidayCategory.Fourפרשיות),
-				new Holiday("פרשת פרה",			new FourParshiyosEvent(2),	HolidayCategory.Fourפרשיות),
+				new Holiday("פרשת זכור",		new FourParshiyosEvent(1),	HolidayCategory.Fourפרשיות),
+				new Holiday("פרשת פרה",		new FourParshiyosEvent(2),	HolidayCategory.Fourפרשיות),
 				new Holiday("פרשת החודש",		new FourParshiyosEvent(3),	HolidayCategory.Fourפרשיות),
 
-				new Holiday("פורים קטן",			HebrewMonth.אדר1,	14, HolidayCategory.Minor),
-				new Holiday("שושן פורים קטן",		HebrewMonth.אדר1,	15, HolidayCategory.Minor),
+				new Holiday("פורים קטן",		HebrewMonth.אדר1,	14, HolidayCategory.Minor),
+				new Holiday("שושן פורים קטן",	HebrewMonth.אדר1,	15, HolidayCategory.Minor),
 				new Holiday("תענית אסתר",		new NonשבתEvent	(HebrewMonth.אדר2,	13, DayOfWeek.Thursday), HolidayCategory.תענית),
 				פורים,
-				new Holiday("שושן פורים",			HebrewMonth.אדר2,	15, HolidayCategory.Minor),
+				new Holiday("שושן פורים",		HebrewMonth.אדר2,	15, HolidayCategory.Minor),
 
 				new Holiday("שבת הגדול",		new SpecialשבתEvent(HebrewMonth.ניסן,	8),						 HolidayCategory.Specialשבת),
-				new Holiday("תענית בכורות",		new NonשבתEvent	(HebrewMonth.ניסן,	14, DayOfWeek.Thursday), HolidayCategory.Minor),
+				new Holiday("תענית בכורות",	new NonשבתEvent	(HebrewMonth.ניסן,	14, DayOfWeek.Thursday), HolidayCategory.Minor),
 
 				פסח[1], פסח[2], פסח[3], פסח[4], פסח[5], פסח[6], פסח[7], פסח[8],
 
-				new Holiday("פסח שני",			HebrewMonth.אייר,	15, HolidayCategory.Minor),
+				new Holiday("פסח שני",			HebrewMonth.אייר,	14, HolidayCategory.Minor),
 				new Holiday("ל\"ג בעומר",		HebrewMonth.אייר,	18, HolidayCategory.Minor),
 
 				שבועות[1], שבועות[2],
 
-				new Holiday("י\"ז בתמוז",			new NonשבתEvent	(HebrewMonth.תמוז,	17, DayOfWeek.Sunday),	HolidayCategory.תענית),
-				new Holiday("שבת חזון",			new SpecialשבתEvent(HebrewMonth.אב,	 2),					HolidayCategory.Specialשבת),
+				new Holiday("י\"ז בתמוז",		new NonשבתEvent	(HebrewMonth.תמוז,	17, DayOfWeek.Sunday),	HolidayCategory.תענית),
+				new Holiday("שבת חזון",		new SpecialשבתEvent(HebrewMonth.אב,	 2),					HolidayCategory.Specialשבת),
 				תשעה٠באב,
-				new Holiday("שבת נחמו",			new SpecialשבתEvent(HebrewMonth.אב,	 10),					HolidayCategory.Specialשבת),
+				new Holiday("שבת נחמו",		new SpecialשבתEvent(HebrewMonth.אב,	 10),					HolidayCategory.Specialשבת),
 
 				//Can conflict with שבת נחמו
-				//new Holiday("ט\"ו באב",			HebrewMonth.אב,		15, HolidayCategory.Minor),
+				//new Holiday("ט\"ו באב",		HebrewMonth.אב,		15, HolidayCategory.Minor),
 				#endregion
 			};
 

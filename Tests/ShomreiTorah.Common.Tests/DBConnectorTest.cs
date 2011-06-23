@@ -127,7 +127,7 @@ namespace ShomreiTorah.Common.Tests {
 		///</summary>
 		[TestMethod()]
 		public void ExecuteScalarTest() {
-			Assert.AreEqual(DateTime.Today, Connector.ExecuteScalar<DateTime>("SELECT getdate()").Date);
+			Assert.AreEqual(DateTime.UtcNow.Date, Connector.ExecuteScalar<DateTime>("SELECT getutcdate()").Date);
 			Assert.AreEqual(3, Connector.ExecuteScalar<int>("SELECT 1 + 2"));
 		}
 		/// <summary>
@@ -135,8 +135,8 @@ namespace ShomreiTorah.Common.Tests {
 		///</summary>
 		[TestMethod()]
 		public void SqlTest() {
-			Assert.AreEqual(DateTime.Now.Date, Connector.Sql<DateTime>("SELECT getdate()").Execute().Date);
-			Assert.AreEqual(DateTime.Now.Date, Connector.Sql<DateTime>("SELECT @Now").Execute(new { DateTime.Now }).Date);
+			Assert.AreEqual(DateTime.UtcNow.Date, Connector.Sql<DateTime>("SELECT getutcdate()").Execute().ToLocalTime().Date);
+			Assert.AreEqual(DateTime.UtcNow.Date, Connector.Sql<DateTime>("SELECT @Now").Execute(new { DateTime.UtcNow }).Date);
 
 			Assert.AreEqual("ABC123", Connector.Sql<string>("SELECT @Str + @Str2").Execute(new { Str = "ABC", Str2 = "123" }));
 			Assert.AreEqual(100, Connector.Sql<int>("SELECT @X + @Y").Execute(new { X = 57, Y = 43 }));

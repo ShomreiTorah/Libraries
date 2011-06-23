@@ -126,7 +126,7 @@ namespace ShomreiTorah.Common.Tests {
 		[TestMethod()]
 		public void ExecuteScalarTest() {
 			using (var connection = OpenConnection()) {
-				Assert.AreEqual(DateTime.Today, connection.ExecuteScalar<DateTime>("SELECT getdate()").Date);
+				Assert.AreEqual(DateTime.UtcNow.Date, connection.ExecuteScalar<DateTime>("SELECT getutcdate()").Date);
 				Assert.AreEqual(3, connection.ExecuteScalar<int>("SELECT 1 + 2"));
 			}
 		}

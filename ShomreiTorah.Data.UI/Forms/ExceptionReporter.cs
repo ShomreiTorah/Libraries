@@ -71,18 +71,23 @@ namespace ShomreiTorah.Data.UI.Forms {
 
 		private void emailWorker_DoWork(object sender, DoWorkEventArgs e) {
 			Thread.Sleep(6500);
-			using (var message = new MailMessage(Email.AlertsAddress, Email.AdminAddress)) {
-				//TODO: Version
-				message.Subject = Dialog.DefaultTitle + " Error from " + Environment.MachineName + "\\" + Environment.UserName;
-				message.Body = exception.ToString();
+			try {
 
-				if (AppFramework.Current != null && AppFramework.Current.DataContext != null)
-					message.Attachments.Add(new Attachment(SaveDB(), "Data.xml.gz", "application/x-gzip"));
+				using (var message = new MailMessage(Email.AlertsAddress, Email.AdminAddress)) {
+					//TODO: Version
+					message.Subject = Dialog.DefaultTitle + " Error from " + Environment.MachineName + "\\" + Environment.UserName;
+					message.Body = exception.ToString();
 
-				if (imageStream != null)
-					message.Attachments.Add(new Attachment(imageStream, "Screen.jpeg", MediaTypeNames.Image.Jpeg));
+					if (AppFramework.Current != null && AppFramework.Current.DataContext != null)
+						message.Attachments.Add(new Attachment(SaveDB(), "Data.xml.gz", "application/x-gzip"));
 
-				Email.Default.Send(message);
+					if (imageStream != null)
+						message.Attachments.Add(new Attachment(imageStream, "Screen.jpeg", MediaTypeNames.Image.Jpeg));
+
+					Email.Default.Send(message);
+				}
+			} catch (Exception ex) {
+				MessageBox.Show(ex.ToString());
 			}
 		}
 
