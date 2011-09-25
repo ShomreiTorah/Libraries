@@ -52,7 +52,7 @@ namespace ShomreiTorah.Singularity {
 			if (row.Table == null) {
 				//If the filter uses a column from this table, the dependency will fire RowInvalidated on RowRemoved.
 				//When this happens, we remove the row.
-				RemoveRow(row);
+				RemoveRow(row, mightNotExist: true);
 				return;
 			}
 
@@ -115,8 +115,9 @@ namespace ShomreiTorah.Singularity {
 			writableRows.Insert(ourIndex, row);
 			OnRowAdded(new RowListEventArgs<TRow>(row, ourIndex));
 		}
-		void RemoveRow(TRow row) {
+		void RemoveRow(TRow row, bool mightNotExist = false) {
 			var index = writableRows.IndexOf(row);
+			if (mightNotExist && index < 0) return;
 			writableRows.RemoveAt(index);
 			OnRowRemoved(new RowListEventArgs<TRow>(row, index));
 		}
