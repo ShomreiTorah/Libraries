@@ -44,13 +44,13 @@ namespace ShomreiTorah.Data {
 			new PledgeType("ימים נוראים Seats"),
 
 			new PledgeType("Auction",		  //This is the sort order for rows in the auction grid, and for subtypes
-							subTypes: new[] { "אתה הראית",  
+							subTypes: new[] { "פתיחה", "אתה הראית",  
 											  "כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", 
 
-											  "חתן תורה", "חתן בראשית",
+											  "כל הנערים", "חתן תורה", "חתן בראשית",
 
-											  "מפטיר יונה", "מפטיר", "פתיחה", "הגבהה",
-											  "פתיחה דנעילה",
+											  "מפטיר יונה", "מפטיר", "הגבהה", 
+											  "פתיחה דנעילה", "פתיחה דגשם",
 											}),
 			new PledgeType("מי שברך",	
 							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
