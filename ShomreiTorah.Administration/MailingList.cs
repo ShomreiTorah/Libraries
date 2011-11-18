@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Mail;
-using ShomreiTorah.Common;
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Mime;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Net.Mail;
+using System.Net.Mime;
+using System.Text;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Administration {
 	///<summary>Manages the Shul's email list.</summary>
@@ -58,7 +58,8 @@ namespace ShomreiTorah.Administration {
 						Email.Notify(person.DisplayName + " is already on the email list", emailBody);
 					throw new UserInputException(UserInputProblem.Duplicate);
 				} else {
-					connection.ExecuteNonQuery("INSERT INTO tblMlMembers(Name, Email, ID_Code) VALUES(@DisplayName, @Address, @ID)", new { person.DisplayName, person.Address, ID = HexValue(20) });
+					connection.ExecuteNonQuery("INSERT INTO tblMlMembers(Name, Email, ID_Code, Active, HTMLformat) VALUES(@DisplayName, @Address, @ID, 1, 1)",
+											   new { person.DisplayName, person.Address, ID = HexValue(20) });
 					if (!noNotify)
 						Email.Notify(person.DisplayName + " was added to the email list", emailBody);
 				}
@@ -213,7 +214,7 @@ namespace ShomreiTorah.Administration {
 
 			foreach (var recipient in List.Members) {
 				//Uri.EscapeDataString will escape ' ' as '%20' instead of '+'
-				//Since neither email addresses nor codes can contain spaces, 
+				//Since neither email addresses nor codes can contain spaces,
 				//this won't do any harm.
 				var unsubscribeUrl = "www.ShomreiTorah.us/?Unsubscribe=" + Uri.EscapeDataString(recipient.Address.Address) + "&code=" + Uri.EscapeDataString(recipient.Code);
 
