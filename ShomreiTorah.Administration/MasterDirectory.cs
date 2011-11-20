@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ShomreiTorah.Common;
-using System.Text.RegularExpressions;
 using System.Data;
+using System.Linq;
+using System.Net.Mail;
+using System.Text.RegularExpressions;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Administration {
 	///<summary>Manipulates the Master Directory.</summary>
@@ -62,7 +61,7 @@ namespace ShomreiTorah.Administration {
 
 			var guid = Guid.NewGuid();
 			Database.ExecuteNonQuery(@"
-INSERT INTO Data.MasterDirectory(Id, FullName, LastName, Phone, Source) 
+INSERT INTO Data.MasterDirectory(Id, FullName, LastName, Phone, Source)
 VALUES(@guid, @fullName, @lastName, Data.FormatPhone(@phone), 'Web Site')", new { guid, fullName, lastName, phone });
 			return guid;
 		}
@@ -70,6 +69,28 @@ VALUES(@guid, @fullName, @lastName, Data.FormatPhone(@phone), 'Web Site')", new 
 			return a.Replace(".", "").Replace(",", "").Replace(" ", "").Trim().Equals(
 				   b.Replace(".", "").Replace(",", "").Replace(" ", "").Trim(), StringComparison.CurrentCultureIgnoreCase
 			);
+		}
+
+		///<summary>Sends an email to the email addresses registered for a person, if any.</summary>
+		///<returns>True if an email was sent; false if the person has no associated email addresses.</returns>
+		public bool Notify(MailAddress from, Guid personId, string subject, string body) {
+			var emails = Database.ExecuteReader(@"SELECT [Name], Email FROM tblMLMembers WHERE PersonId = @personId", new { personId })
+								 .Cast<IDataRecord>()
+								 .Select(r => new MailAddress(r.GetString(1), r.GetString(0)))
+								 .ToList();
+			if (emails.Count == 0) return false;
+
+			var message = new MailMessage {
+				BodyEncoding = Email.DefaultEncoding,
+				SubjectEncoding = Email.DefaultEncoding,
+				From = from,
+				Subject = subject,
+				Body = body
+			};
+			message.To.AddRange(emails);
+
+			Email.Default.SendAsync(message);
+			return true;
 		}
 	}
 }

@@ -145,7 +145,7 @@ namespace ShomreiTorah.Common {
 		#endregion
 
 		///<summary>Adds zero or more items to a collection.</summary>
-		public static void AddRange<TItem, TElement>(this ICollection<TElement> collection, params TItem[] items) where TItem : TElement { collection.AddRange((IEnumerable<TItem>)items); }
+		public static void AddRange<TItem>(this ICollection<TItem> collection, params TItem[] items) { collection.AddRange((IEnumerable<TItem>)items); }
 		///<summary>Adds zero or more items to a collection.</summary>
 		public static void AddRange<TItem, TElement>(this ICollection<TElement> collection, IEnumerable<TItem> items)
 			where TItem : TElement {
