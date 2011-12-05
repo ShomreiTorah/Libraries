@@ -1,3 +1,8 @@
+//This uses DataContractJsonSerializer, which is
+//not compatible across client frameworks.
+//TODO: Re-instate this class once Common moves
+//to .Net 4.0.
+#if NET40
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -58,7 +63,7 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 				get { return values = values ?? new Dictionary<Zman, TimeSpan>(); }
 			}
 
-			#region Zmanim properties
+#region Zmanim properties
 			[DataMember]
 			public string sunrise {
 				get { return Values[Zman.Sunrise].ToString(); }
@@ -134,7 +139,7 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 				get { return Values[Zman.צאת850].ToString(); }
 				set { Values[Zman.צאת850] = TimeSpan.Parse(value); }
 			}
-			#endregion
+#endregion
 
 			//sunset: Zman.Sunset
 			//sof_zman_shema_ma: Zman.סוף٠זמן٠קריאת٠שמע٠מ٠א
@@ -146,12 +151,12 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			//mincha_gedola_ma: Zman.מנחה٠גדולה
 			//mincha_ketana_ma: Zman.מנחה٠קטנה
 			//plag_mincha_ma: Zman.פלג٠המנחה
-			//tzeis_595_degrees: Zman.צאת72	
-			//tzeis_850_degrees: Zman.צאת42	
-			//tzeis_72_minutes: Zman.צאת595	
-			//tzeis_42_minutes: Zman.צאת850	
+			//tzeis_595_degrees: Zman.צאת72
+			//tzeis_850_degrees: Zman.צאת42
+			//tzeis_72_minutes: Zman.צאת595
+			//tzeis_42_minutes: Zman.צאת850
 
-			//Replace 
+			//Replace
 			//{[a-z0-9_]+}"\::b+{.+}
 			//with
 			//[DataMember]\n public string \1 {\n get { return values[\2].ToString(); }\n set { values[\2] = TimeSpan.Parse(value); }\n }
@@ -184,3 +189,4 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 		public override DateTime MaxDate { get { return DateTime.MaxValue; } }
 	}
 }
+#endif

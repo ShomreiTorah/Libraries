@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
-using System.Collections;
-using System.Globalization;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
 
 namespace ShomreiTorah.Common.Calendar.Zmanim {
 	///<summary>A base class for Zmanim providers</summary>
@@ -35,7 +33,11 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 				case "Calculator": return CalculatingZmanimProvider.Default;
 				case "Fixed": return FixedZmanimProvider.Default;
 				case "FastCSV": return FastCsvZmanimProvider.Default;
+
+				//TODO: Re-instate OUZmanimProvider once Common moves to .Net 4.0.
+#if NET40
 				case "OU": return OUZmanimProvider.Default;
+#endif
 				case "XML": return XmlZmanimProvider.Default;
 				default:
 					throw new ConfigurationException("ZmanimProvider " + name + " is not supported.\r\nSupported ZmanimProviders are Calculator, FastCSV, Fixed, XML, and OU.\r\nPlease check ShomreiTorahConfig.xml");
