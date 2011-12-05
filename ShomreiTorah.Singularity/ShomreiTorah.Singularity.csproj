@@ -16,6 +16,7 @@
     <SccLocalPath>..\..</SccLocalPath>
     <SccAuxPath />
     <SccProvider>MSSCCI:Perforce SCM</SccProvider>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

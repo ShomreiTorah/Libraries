@@ -132,6 +132,12 @@ namespace ShomreiTorah.Data.UI {
 				AppDomain.CurrentDomain.UnhandledException += (sender, e) => HandleException((Exception)e.ExceptionObject);
 			}
 
+			if (!OnBeforeInit()) {
+				if (splashScreen != null)
+					splashScreen.CloseSplash();
+				return;
+			}
+
 			SetSplashCaption("Loading behaviors");
 			RegisterStandardSettings();
 			RegisterSettings();
@@ -154,6 +160,9 @@ namespace ShomreiTorah.Data.UI {
 				Application.Run(MainForm);
 			} catch (Exception ex) { MessageBox.Show(ex.ToString()); }
 		}
+		///<summary>Called immediately after showing the splash screen, before any further initialization.</summary>
+		///<returns>True to proceed with the launch; false to exit the program.</returns>
+		protected virtual bool OnBeforeInit() { return true; }
 
 		///<summary>Prompts the user to create a new person.</summary>
 		///<remarks>The new Person row, or null if the user clicked cancel.</remarks>
@@ -183,6 +192,12 @@ namespace ShomreiTorah.Data.UI {
 		protected virtual void SetSplashCaption(string message) {
 			if (splashScreen != null)
 				splashScreen.SetCaption(message);
+		}
+
+		///<summary>Invokes a method on the splash screen thread and returns the result.</summary>
+		///<remarks>This method should be used to show UI while loading.</remarks>
+		protected T InvokeSplash<T>(Func<T> func) {
+			return (T)((ISynchronizeInvoke)splashScreen).Invoke(func, null);
 		}
 		#endregion
 
@@ -237,7 +252,7 @@ namespace ShomreiTorah.Data.UI {
 				.ToList();
 
 			//Calculated columns can use child rows. I must add the
-			//tables in reverse order to allow the RowDependencies 
+			//tables in reverse order to allow the RowDependencies
 			//to register handlers for the child tables.
 			tables.Reverse();
 			tables.ForEach(Current.DataContext.Tables.AddTable);
