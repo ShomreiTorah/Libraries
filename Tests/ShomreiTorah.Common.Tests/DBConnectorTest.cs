@@ -138,7 +138,7 @@ namespace ShomreiTorah.Common.Tests {
 		[TestMethod()]
 		public void SqlTest() {
 			Assert.AreEqual(DateTime.UtcNow.Date, Connector.Sql<DateTime>("SELECT getutcdate()").Execute().ToLocalTime().Date);
-			Assert.AreEqual(DateTime.UtcNow.Date, Connector.Sql<DateTime>("SELECT @Now").Execute(new { DateTime.UtcNow }).Date);
+			Assert.AreEqual(DateTime.UtcNow.Date, Connector.Sql<DateTime>("SELECT @UtcNow").Execute(new { DateTime.UtcNow }).Date);
 
 			Assert.AreEqual("ABC123", Connector.Sql<string>("SELECT @Str + @Str2").Execute(new { Str = "ABC", Str2 = "123" }));
 			Assert.AreEqual(100, Connector.Sql<int>("SELECT @X + @Y").Execute(new { X = 57, Y = 43 }));

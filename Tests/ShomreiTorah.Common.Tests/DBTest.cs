@@ -97,7 +97,7 @@ namespace ShomreiTorah.Common.Tests {
 			command.AddParameters(new { NullIntParam = new int?(), DateParam = (DateTime?)DateTime.MinValue });
 
 			Assert.AreEqual(2, command.Parameters.Count);
-			Assert.AreEqual(null, command.Parameters["NullIntParam"].Value);
+			Assert.AreEqual(DBNull.Value, command.Parameters["NullIntParam"].Value);
 			Assert.AreEqual(DateTime.MinValue, command.Parameters["DateParam"].Value);
 		}
 
