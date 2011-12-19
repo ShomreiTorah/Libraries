@@ -1,9 +1,8 @@
-using ShomreiTorah.Common.Calendar.Zmanim;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ShomreiTorah.Common.Calendar.Zmanim;
 
 namespace ShomreiTorah.Common.Tests {
 
@@ -22,7 +21,7 @@ namespace ShomreiTorah.Common.Tests {
 		public TestContext TestContext { get; set; }
 
 		#region Additional test attributes
-		// 
+		//
 		//You can use the following additional attributes as you write your tests:
 		//
 		//Use ClassInitialize to run code before running the first test in the class
@@ -78,7 +77,7 @@ namespace ShomreiTorah.Common.Tests {
 			Assert.AreEqual(DateTime.MinValue, provider.MaxDate);
 			Assert.IsNull(provider.GetZmanim(DateTime.Now));
 
-			provider.Write(OUZmanimProvider.Default, min.Year, max.Year, true);
+			provider.Write(CalculatingZmanimProvider.Default, min.Year, max.Year, true);
 
 			Assert.AreEqual(min, provider.MinDate);
 			Assert.AreEqual(max, provider.MaxDate);
