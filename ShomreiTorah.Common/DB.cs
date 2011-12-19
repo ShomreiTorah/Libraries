@@ -1,20 +1,19 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Data;
-using System.Reflection.Emit;
 using System.Collections;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
+using System.Data.Odbc;
+using System.Data.OleDb;
 using System.Data.SqlClient;
+using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Xml.Linq;
-using System.Data.OleDb;
-using System.Data.Odbc;
 using System.IO;
-using System.Data.SqlServerCe;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Xml.Linq;
 
 namespace ShomreiTorah.Common {
 	///<summary>Manages database connections.</summary>
@@ -343,11 +342,18 @@ namespace ShomreiTorah.Common {
 							generator.EmitCall(propertyGet.IsVirtual ? OpCodes.Callvirt : OpCodes.Call,
 								 propertyGet, null);
 
-							if (property.PropertyType.IsValueType) {
+							if (property.PropertyType.IsValueType
+							 && (!property.PropertyType.IsGenericType || property.PropertyType.GetGenericTypeDefinition() != typeof(Nullable<>))) {
 								generator.Emit(OpCodes.Box, property.PropertyType);
 								generator.EmitCall(OpCodes.Callvirt, setValueMethod, null);
 							} else {
-								var propertyValue = generator.DeclareLocal(property.PropertyType);
+								LocalBuilder propertyValue;
+								if (property.PropertyType.IsValueType) {
+									propertyValue = generator.DeclareLocal(typeof(object));
+									generator.Emit(OpCodes.Box, property.PropertyType);
+								} else
+									propertyValue = generator.DeclareLocal(property.PropertyType);
+
 								generator.Emit(OpCodes.Stloc, propertyValue);
 								generator.Emit(OpCodes.Ldloc, propertyValue);
 								var dbNullLoad = generator.DefineLabel();
@@ -483,7 +489,7 @@ namespace ShomreiTorah.Common {
 
 	///<summary>Contains a SQL statement and its return type.</summary>
 	///<typeparam name="TReturn">The scalar type returned by the SQL statement.</typeparam>
-	///<remarks>This interface is returned by DBConnector.Sql and DbConnection.Sql.</remarks>	
+	///<remarks>This interface is returned by DBConnector.Sql and DbConnection.Sql.</remarks>
 	public interface ISqlStatement<TReturn> {
 		///<summary>Gets the SQL statement.</summary>
 		string Sql { get; }

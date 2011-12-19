@@ -1,8 +1,6 @@
-using ShomreiTorah.Common;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Data.Common;
-using System.Data;
 using System;
+using System.Data;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ShomreiTorah.Common.Tests {
 
@@ -21,7 +19,7 @@ namespace ShomreiTorah.Common.Tests {
 		public TestContext TestContext { get; set; }
 
 		#region Additional test attributes
-		// 
+		//
 		//You can use the following additional attributes as you write your tests:
 		//
 		//Use ClassInitialize to run code before running the first test in the class
@@ -50,8 +48,7 @@ namespace ShomreiTorah.Common.Tests {
 		//
 		#endregion
 
-		static bool test;
-		static DBConnector Connector { get { test = !test; return test ? DB.Test : DB.Default; } }
+		static DBConnector Connector { get { return DB.Default; } }
 
 		/// <summary>
 		///A test for OpenConnection
@@ -90,6 +87,11 @@ namespace ShomreiTorah.Common.Tests {
 			var date = DateTime.Now;
 			Assert.AreEqual(date.Date, Connector.CreateCommand("SELECT @date", new { date }).Execute<DateTime>().Date);
 			Assert.AreEqual("ABC123", Connector.CreateCommand("SELECT @Str + @Str2", new { Str = "ABC", Str2 = "123" }).Execute<string>());
+		}
+
+		[TestMethod]
+		public void NullPatametersTest() {
+			Assert.AreEqual(1, Connector.Sql<int>("SELECT 1 WHERE @a IS NULL").Execute(new { a = new int?() }));
 		}
 
 		/// <summary>

@@ -1,9 +1,7 @@
-using ShomreiTorah.Common;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Data;
+using System;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ShomreiTorah.Common.Tests {
 
@@ -22,7 +20,7 @@ namespace ShomreiTorah.Common.Tests {
 		public TestContext TestContext { get; set; }
 
 		#region Additional test attributes
-		// 
+		//
 		//You can use the following additional attributes as you write your tests:
 		//
 		//Use ClassInitialize to run code before running the first test in the class
@@ -93,8 +91,17 @@ namespace ShomreiTorah.Common.Tests {
 			Assert.AreEqual(0, command.Parameters.Count);
 		}
 
-		static bool test;
-		static DbConnection OpenConnection() { test = !test; return (test ? DB.Test : DB.Default).OpenConnection(); }
+		[TestMethod]
+		public void AddNullableParametersTest() {
+			var command = new SqlCommand();
+			command.AddParameters(new { NullIntParam = new int?(), DateParam = (DateTime?)DateTime.MinValue });
+
+			Assert.AreEqual(2, command.Parameters.Count);
+			Assert.AreEqual(null, command.Parameters["NullIntParam"].Value);
+			Assert.AreEqual(DateTime.MinValue, command.Parameters["DateParam"].Value);
+		}
+
+		static DbConnection OpenConnection() { return DB.Default.OpenConnection(); }
 		/// <summary>
 		///A test for Sql
 		///</summary>
