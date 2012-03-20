@@ -55,7 +55,6 @@ namespace ShomreiTorah.Data.UI {
 			};
 		}
 
-
 		#region Tooltips
 		///<summary>Creates a SuperToolTip that displays information about a person.</summary>
 		public static SuperToolTip GetSuperTip(this Person person) {
@@ -89,7 +88,9 @@ namespace ShomreiTorah.Data.UI {
 			if (String.IsNullOrWhiteSpace(newCheckNumber)) return null;
 
 			return payment.Person.Payments
-					.FirstOrDefault(p => p != payment && String.Equals(p.CheckNumber, newCheckNumber, StringComparison.CurrentCultureIgnoreCase));
+					.FirstOrDefault(p => p != payment
+									  && p.Account == payment.Account
+									  && String.Equals(p.CheckNumber, newCheckNumber, StringComparison.CurrentCultureIgnoreCase));
 		}
 	}
 }
