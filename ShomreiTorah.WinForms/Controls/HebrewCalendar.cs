@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -9,17 +10,16 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DevExpress.LookAndFeel;
 using DevExpress.Skins;
+using DevExpress.Utils;
 using DevExpress.Utils.Drawing;
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
+using DevExpress.XtraEditors.Drawing;
 using ShomreiTorah.Common;
 using ShomreiTorah.Common.Calendar;
 using ShomreiTorah.Common.Calendar.Holidays;
-using DevExpress.XtraEditors.Drawing;
-using DevExpress.XtraEditors.Controls;
-using DevExpress.Utils;
-using DevExpress.LookAndFeel;
-using System.Diagnostics;
 
 namespace ShomreiTorah.WinForms.Controls {
 	///<summary>An interactive Hebrew calendar.</summary>
@@ -373,6 +373,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			}
 
 			public virtual void Render(Graphics g, Rectangle clipRectangle) {
+				CellRenderer.OnBeginPaint();
 				DrawBackground(g);
 
 				if (clipRectangle.IntersectsWith(MonthHeaderBounds))
@@ -951,8 +952,8 @@ namespace ShomreiTorah.WinForms.Controls {
 			if (!SelectedDate.HasValue) return;
 			if (e.Control) {
 				switch (e.KeyCode) {
-					//Ctrl+Arrows navigate within the 
-					//current view.  Even if they end 
+					//Ctrl+Arrows navigate within the
+					//current view.  Even if they end
 					//up navigating outside the month,
 					//the view should not change.
 					case Keys.Up: SetSelection(firstDate + (int)SelectedDate.Value.DayOfWeek, false); break;
@@ -1158,6 +1159,9 @@ namespace ShomreiTorah.WinForms.Controls {
 
 		///<summary>Gets the font to use for the current date.</summary>
 		public Font Font { get { return Date == DateTime.Today ? Calendar.TodayFont : Calendar.Font; } }
+
+		///<summary>Called when the calendar begins painting itself.</summary>
+		protected internal virtual void OnBeginPaint() { }
 
 		///<summary>Draws a cell.</summary>
 		[SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "g")]
