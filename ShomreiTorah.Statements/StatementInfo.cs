@@ -17,6 +17,9 @@ namespace ShomreiTorah.Statements {
 
 			switch (kind) {
 				case StatementKind.Bill:
+					if (person.Pledges.Any()
+					 && !person.Pledges.Any(p => p.Date >= startDate))
+						startDate = new DateTime(person.Pledges.OrderBy(p => p.Date).Last().Date.Year, 1, 1);
 					StartDate = startDate;
 					EndDate = DateTime.Now;
 					break;
