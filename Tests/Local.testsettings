@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestSettings name="Local" id="7b8bd57b-f980-43b4-a5ab-db72ace7fb71" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run, with Code Coverage enabled</Description>
+  <Deployment enabled="false" />
   <Execution>
     <TestTypeSpecific>
       <UnitTestRunConfig testTypeId="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b">
@@ -25,7 +26,7 @@
           <Configuration>
             <CodeCoverage xmlns="">
               <Regular>
-                <CodeCoverageItem binaryFile="Libraries\ShomreiTorah.Singularity\bin\Debug\ShomreiTorah.Singularity.dll" pdbFile="Libraries\ShomreiTorah.Singularity\bin\Debug\ShomreiTorah.Singularity.pdb" />
+                <CodeCoverageItem binaryFile="Libraries\ShomreiTorah.Singularity\bin\Debug\ShomreiTorah.Singularity.dll" pdbFile="Libraries\ShomreiTorah.Singularity\bin\Debug\ShomreiTorah.Singularity.pdb" instrumentInPlace="true" />
               </Regular>
             </CodeCoverage>
           </Configuration>
