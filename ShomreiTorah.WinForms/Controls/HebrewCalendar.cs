@@ -898,8 +898,17 @@ namespace ShomreiTorah.WinForms.Controls {
 			}
 		}
 		void navigateTimer_Tick(object sender, EventArgs e) {
-			OffsetMonths(NavigateButtonDirection);
+			//If we lost focus, we'll never get a MouseUp.
+			//Stop immediately to avoid scrolling forever.
+			//This happens in the Schedulizer UI renderer,
+			//which will show a popup from the paint event
+			//when loading data.
+			if (!Focused)
+				NavigateButtonDirection = 0;
+			else
+				OffsetMonths(NavigateButtonDirection);
 		}
+
 
 		///<summary>Raises the MouseLeave event.</summary>
 		protected override void OnMouseLeave(EventArgs e) {
