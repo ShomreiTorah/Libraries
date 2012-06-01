@@ -35,7 +35,7 @@ namespace ShomreiTorah.Data {
 		#region Pledge Types
 		///<summary>Gets the standard pledge types.</summary>
 		public static readonly ReadOnlyCollection<PledgeType> PledgeTypes = new ReadOnlyCollection<PledgeType>(new[]{
-			new PledgeType("Donation"),
+			new PledgeType("Donation",		subTypes: new[]{ "R' Buxbaum" }),
 			new PledgeType("Membership"),
 			new PledgeType("סעודה שלישית"),
 			new PledgeType("Kiddush",		subTypes: new[]{ "ראש השנה", "שמחת תורה", "חתנים", "שבועות" }),
