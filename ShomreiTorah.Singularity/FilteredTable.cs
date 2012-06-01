@@ -9,7 +9,7 @@ using ShomreiTorah.Singularity.Dependencies;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>A filtered view of an existing table.</summary>
-	public class FilteredTable<TRow> : IListSource, IDisposable, IRowEventProvider, ISchemaItem where TRow : Row {
+	public partial class FilteredTable<TRow> : IListSource, IDisposable, IRowEventProvider, ISchemaItem where TRow : Row {
 		readonly ITable<TRow> typedTable;
 		readonly Table untypedTable;
 		readonly Func<TRow, bool> filter;

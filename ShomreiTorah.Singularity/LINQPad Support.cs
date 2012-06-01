@@ -11,9 +11,9 @@ namespace ShomreiTorah.Singularity {
 			return Schema.Columns.Select(c => c.Name)
 				.Concat(Schema.ChildRelations.Select(r => r.Name));
 		}
-		IEnumerable<Type> LINQPad.ICustomMemberProvider.GetTypes() { 
+		IEnumerable<Type> LINQPad.ICustomMemberProvider.GetTypes() {
 			return Schema.Columns.Select(c => c.DataType)
-				.Concat(Schema.ChildRelations.Select(r=>typeof(ICollection<Row>)));
+				.Concat(Schema.ChildRelations.Select(r => typeof(ICollection<Row>)));
 		}
 		IEnumerable<object> LINQPad.ICustomMemberProvider.GetValues() {
 			return Schema.Columns.Select(c => this[c])
@@ -21,15 +21,15 @@ namespace ShomreiTorah.Singularity {
 		}
 	}
 
-	partial class Table : ICustomMemberProvider {
-		class RowWrapper : ICustomMemberProvider {
-			public RowWrapper(Row row) { this.row = row; }
-			readonly Row row;
+	class RowWrapper : ICustomMemberProvider {
+		public RowWrapper(Row row) { this.row = row; }
+		readonly Row row;
 
-			IEnumerable<string> LINQPad.ICustomMemberProvider.GetNames() { return row.Schema.Columns.Select(c => c.Name); }
-			IEnumerable<Type> LINQPad.ICustomMemberProvider.GetTypes() { return row.Schema.Columns.Select(c => c.DataType); }
-			IEnumerable<object> LINQPad.ICustomMemberProvider.GetValues() { return row.Schema.Columns.Select(c => row[c]); }
-		}
+		IEnumerable<string> LINQPad.ICustomMemberProvider.GetNames() { return row.Schema.Columns.Select(c => c.Name); }
+		IEnumerable<Type> LINQPad.ICustomMemberProvider.GetTypes() { return row.Schema.Columns.Select(c => c.DataType); }
+		IEnumerable<object> LINQPad.ICustomMemberProvider.GetValues() { return row.Schema.Columns.Select(c => row[c]); }
+	}
+	partial class Table : ICustomMemberProvider {
 		IEnumerable<string> ICustomMemberProvider.GetNames() {
 			yield return "Rows";
 			yield return "Schema";
@@ -43,6 +43,22 @@ namespace ShomreiTorah.Singularity {
 		IEnumerable<object> ICustomMemberProvider.GetValues() {
 			yield return Rows.Select(r => new RowWrapper(r));
 			yield return Schema;
+		}
+	}
+	partial class FilteredTable<TRow> : ICustomMemberProvider {
+		IEnumerable<string> ICustomMemberProvider.GetNames() {
+			yield return "Rows";
+			yield return "Schema";
+		}
+
+		IEnumerable<Type> ICustomMemberProvider.GetTypes() {
+			yield return typeof(IEnumerable<RowWrapper>);
+			yield return typeof(TableSchema);
+		}
+
+		IEnumerable<object> ICustomMemberProvider.GetValues() {
+			yield return Rows.Select(r => new RowWrapper(r));
+			yield return Table.Schema;
 		}
 	}
 }
