@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Collections.ObjectModel;
 
 namespace ShomreiTorah.Common.Calendar {
 	public partial class HebrewDayInfo {
@@ -67,7 +67,7 @@ namespace ShomreiTorah.Common.Calendar {
 			new KeyValuePair<string, int>("תמורה",		 33),
 			new KeyValuePair<string, int>("כריתות",		 27),
 			new KeyValuePair<string, int>("מעילה",		 36),
-			new KeyValuePair<string, int>("נידה",		 72),
+			new KeyValuePair<string, int>("נדה",		 72),
 		});
 		#endregion
 		static readonly int ShasLength = Masechtos.Sum(kvp => kvp.Value);
