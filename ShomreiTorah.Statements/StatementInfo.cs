@@ -42,7 +42,10 @@ namespace ShomreiTorah.Statements {
 		public virtual bool ShouldSend { get { return Accounts.Count > 0; } }
 
 		public void Recalculate() {
-			TotalBalance = Math.Max(0, Person.Field<decimal>("BalanceDue"));
+			if (Person.Schema.Columns.Contains("BalanceDue"))
+				TotalBalance = Math.Max(0, Person.Field<decimal>("BalanceDue"));
+			else
+				TotalBalance = Person.Pledges.Concat<ITransaction>(Person.Payments).Sum(t => t.SignedAmount);
 
 			Accounts = new ReadOnlyCollection<StatementAccount>(
 				Names.AccountNames.Select(a => new StatementAccount(this, a))
