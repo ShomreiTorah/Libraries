@@ -4,6 +4,7 @@ using System.Xml.Linq;
 using System;
 using System.Reflection;
 using System.IO;
+using System.Xml;
 
 namespace ShomreiTorah.Common.Tests {
 
@@ -51,13 +52,13 @@ namespace ShomreiTorah.Common.Tests {
 		#endregion
 
 		[TestMethod]
-		[ExpectedException(typeof(InvalidOperationException))]
-		//The file should exist
-		public void ResetPathTest1() { Config.FilePath = Assembly.GetCallingAssembly().Location; }
+		[ExpectedException(typeof(XmlException))]
+		//The file should contain valid XML
+		public void ResetPathValidityTest() { Config.FilePath = Assembly.GetCallingAssembly().Location; }
 		[TestMethod]
 		[ExpectedException(typeof(FileNotFoundException))]
 		//The file should exist
-		public void ResetPathTest2() { Config.FilePath = "***"; }
+		public void ResetPathExistenceTest() { Config.FilePath = "***"; }
 
 		/// <summary>
 		///A test for Xml

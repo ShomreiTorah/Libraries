@@ -1,13 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using System.IO;
 using Microsoft.Win32;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 using SysConfig = System.Configuration;
 
 namespace ShomreiTorah.Common {
@@ -101,6 +99,13 @@ namespace ShomreiTorah.Common {
 				if (!File.Exists(value)) throw new FileNotFoundException("The file " + value + " does not exist", value);
 				if (Loaded)
 					throw new InvalidOperationException("ShomreiTorahConfig.xml has already been loaded");
+
+				var oldValue = pathOverride;
+
+				//Before setting the property, make sure the file is valid.
+				using (var reader = XmlReader.Create(value))
+					while (reader.Read()) ;
+
 				pathOverride = value;
 			}
 		}

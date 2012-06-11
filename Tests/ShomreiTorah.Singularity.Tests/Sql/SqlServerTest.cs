@@ -9,7 +9,7 @@ using ShomreiTorah.Singularity.Sql;
 
 namespace ShomreiTorah.Singularity.Tests.Sql {
 	[TestClass]
-	public class SqlServerTest :PersistenceTestBase {
+	public class SqlServerTest : PersistenceTestBase {
 		public TestContext TestContext { get; set; }
 
 		const string ConnectionString = @"Data Source=.\SQLExpress;Initial Catalog=SingularityTests;Integrated Security=True";
