@@ -69,11 +69,11 @@
     <Reference Include="DevExpress.Utils.v11.2, Version=11.2.11.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraEditors.v11.2, Version=11.2.11.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraGrid.v11.2, Version=11.2.11.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.0.0.0, Culture=neutral, PublicKeyToken=02dc3180f6753ff5, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Assemblies\Microsoft.WindowsAPICodePack.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack">
+      <HintPath>..\packages\Windows7APICodePack-Core.1.1.0.0\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.0.0.0, Culture=neutral, PublicKeyToken=02dc3180f6753ff5, processorArchitecture=MSIL">
-      <HintPath>..\..\..\Assemblies\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell">
+      <HintPath>..\packages\Windows7APICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
@@ -109,43 +109,27 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\Lookup\Columns.cs" />
-    <Compile Include="Controls\Lookup\ItemSelector.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\Lookup\ItemSelectorPopupForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Controls\Lookup\ItemSelector.cs" />
+    <Compile Include="Controls\Lookup\ItemSelectorPopupForm.cs" />
     <Compile Include="Dialog.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Controls\GoogleMapControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Controls\GoogleMapControl.cs" />
     <Compile Include="Controls\GoogleMapControl.Designer.cs">
       <DependentUpon>GoogleMapControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FadingPopup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\InfoMessage.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Forms\FadingPopup.cs" />
+    <Compile Include="Forms\InfoMessage.cs" />
     <Compile Include="Forms\InfoMessage.Designer.cs">
       <DependentUpon>InfoMessage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ProgressDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Forms\ProgressDialog.cs" />
     <Compile Include="Forms\ProgressDialog.Designer.cs">
       <DependentUpon>ProgressDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ProgressWorker.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Controls\HebrewCalendar.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\LookupControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Controls\HebrewCalendar.cs" />
+    <Compile Include="Controls\LookupControl.cs" />
     <Compile Include="Controls\LookupControl.Designer.cs">
       <DependentUpon>LookupControl.cs</DependentUpon>
     </Compile>
@@ -190,6 +174,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\AutoScroll.png" />
   </ItemGroup>
   <ItemGroup>
