@@ -55,6 +55,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		}
 
 		object lastAppliedDataSource;
+		///<summary>Handles the DataSourceChanged event for the grid view's DataController.</summary>
 		protected override void OnDataController_DataSourceChanged(object sender, EventArgs e) {
 			base.OnDataController_DataSourceChanged(sender, e);
 			if (DataSource != null || DesignMode) {
@@ -92,6 +93,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			}
 		}
 
+		///<summary>Called when a column is automatically added from the datasource.</summary>
 		protected override void OnColumnPopulate(GridColumn column, int visibleIndex) {
 			base.OnColumnPopulate(column, visibleIndex);
 			if (DisplaySettings.GridManager.IsSuppressed((SmartGridColumn)column))

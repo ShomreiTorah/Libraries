@@ -24,6 +24,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			set { allowEditorWheel = value; }
 		}
 
+		///<summary>Adds event handlers to a new editor associated with this item.</summary>
 		protected override void UpdateEditor(RepositoryItem ritem, UpdateEditorInfoArgs args) {
 			base.UpdateEditor(ritem, args);
 			if (ActiveEditor != null) {

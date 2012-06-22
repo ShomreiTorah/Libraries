@@ -100,7 +100,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 
 		///<summary>Gets the number of behavior registrations,</summary>
 		///<remarks>This property is used by the grid to verify design-time
-		///registrations.  See <see cref="SmartGrid.RegistrationCount"/>.</remarks>
+		///registrations.  See <see cref="ShomreiTorah.Data.UI.Grid.SmartGrid.RegistrationCount"/>.</remarks>
 		internal static int RegistrationCount { get { return dictionary.Count; } }
 		static readonly Dictionary<Column, IEditorSettings> dictionary = new Dictionary<Column, IEditorSettings>();
 

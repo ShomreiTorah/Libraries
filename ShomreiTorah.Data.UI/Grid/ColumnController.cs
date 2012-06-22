@@ -101,12 +101,14 @@ namespace ShomreiTorah.Data.UI.Grid {
 		void AddControllerHandlers() {
 			this.ShowFilterPopupListBox += SmartGridView_ShowFilterPopupListBox;
 		}
+		///<summary>Raises the CustomColumnSort event.</summary>
 		protected override void RaiseCustomColumnSort(CustomColumnSortEventArgs e) {
 			base.RaiseCustomColumnSort(e);
 			var column = e.Column as SmartGridColumn;
 			if (column != null && column.Controller != null)
 				column.Controller.CompareValues(e);
 		}
+		///<summary>Raises the CustomUnboundColumnData event.</summary>
 		protected override void RaiseCustomUnboundColumnData(CustomColumnDataEventArgs e) {
 			var column = e.Column as SmartGridColumn;
 			if (column != null && column.Controller != null)
@@ -118,6 +120,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 			if (column != null && column.Controller != null)
 				column.Controller.OnShowFilterPopupListBox(e);
 		}
+		///<summary>Raises the CustomColumnDisplayText event.</summary>
 		protected override void RaiseCustomColumnDisplayText(CustomColumnDisplayTextEventArgs e) {
 			base.RaiseCustomColumnDisplayText(e);
 			var column = e.Column as SmartGridColumn;
@@ -126,6 +129,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 					e.DisplayText = column.Controller.GetDisplayText(null, e.Value) ?? e.DisplayText;
 			}
 		}
+		///<summary>Gets the tooltip associated with a point in the control.</summary>
 		protected override ToolTipControlInfo GetToolTipObjectInfoCore(GraphicsCache cache, Point p) {
 			var baseInfo = base.GetToolTipObjectInfoCore(cache, p);
 			if (baseInfo != null)
@@ -162,6 +166,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 	}
 	///<summary>Provides data for the <see cref="SmartGridView.CustomSuperTip"/>  event.</summary>
 	public class CustomToolTipEventArgs : EventArgs {
+		///<summary>Creates a new CustomToolTipEventArgs instance.</summary>
 		public CustomToolTipEventArgs(GridHitInfo info) {
 			if (info == null) throw new ArgumentNullException("info");
 			HitInfo = info;
@@ -173,6 +178,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		public SuperToolTip SuperTip { get; set; }
 	}
 	partial class SmartGridColumnCollection {
+		///<summary>Called after a item is inserted into the collection.</summary>
 		protected override void OnInsertComplete(int index, object obj) {
 			base.OnInsertComplete(index, obj);
 

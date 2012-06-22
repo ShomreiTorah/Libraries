@@ -42,6 +42,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
 		public override object EditValue { get { return base.EditValue; } set { base.EditValue = value; } }
 
+		///<summary>Called when the editor is loaded.</summary>
 		protected override void OnLoaded() {
 			base.OnLoaded();
 			Text = DefaultAddress;
@@ -134,6 +135,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 			}
 			base.RaiseAddingMRUItem(e);
 		}
+		///<summary>Called when the Items collection changes.</summary>
 		protected override void OnItems_CollectionChanged(object sender, CollectionChangeEventArgs e) {
 			base.OnItems_CollectionChanged(sender, e);
 			if (Items.Count > 0 && !isInitializing)

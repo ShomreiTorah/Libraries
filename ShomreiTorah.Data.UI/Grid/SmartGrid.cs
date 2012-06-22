@@ -54,6 +54,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 			collection.Add(SmartGridView.CreateRegistrator());
 		}
 
+		///<summary>Gets the view that owns the mouse.</summary>
+		///<remarks>This property is replaced to expose it to other classes in our assembly.</remarks>
 		protected internal new BaseView MouseCaptureOwner {
 			get { return base.MouseCaptureOwner; }
 			set { base.MouseCaptureOwner = value; }

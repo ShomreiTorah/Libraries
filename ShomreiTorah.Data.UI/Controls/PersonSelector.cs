@@ -31,6 +31,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Gets the editor's type name.</summary>
 		public override string EditorTypeName { get { return "PersonSelector"; } }
 
+		///<summary>Called when the editor's value is changed.</summary>
 		protected override void OnEditValueChanged() {
 			base.OnEditValueChanged();
 			if (SelectedPerson == null)
