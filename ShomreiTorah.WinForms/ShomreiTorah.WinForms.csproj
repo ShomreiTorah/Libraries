@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,7 +13,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Shul.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <SccProjectName>Perforce Project</SccProjectName>
     <SccLocalPath>..\..</SccLocalPath>
     <SccAuxPath>
@@ -50,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <DocumentationFile>bin\Debug\ShomreiTorah.WinForms.xml</DocumentationFile>
-    <CodeAnalysisRuleSet>..\..\ShomreiTorah Minimal.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\Setup\Common\ShomreiTorah Minimal.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -160,9 +161,6 @@
     <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shul.pfx" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Images\Canvas.png" />
   </ItemGroup>
   <ItemGroup>
@@ -218,7 +216,7 @@
     <EmbeddedResource Include="Images\GoogleMaps.png" />
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="..\..\CustomDictionary.xml">
+    <CodeAnalysisDictionary Include="..\..\Setup\Common\CustomDictionary.xml">
       <Link>CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
   </ItemGroup>

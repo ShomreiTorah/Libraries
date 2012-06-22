@@ -13,7 +13,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Shul.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <SccProjectName>Perforce Project</SccProjectName>
     <SccLocalPath>..\..</SccLocalPath>
     <SccAuxPath>
@@ -53,7 +54,7 @@
     <CodeAnalysisRules>
     </CodeAnalysisRules>
     <UseVSHostingProcess>true</UseVSHostingProcess>
-    <CodeAnalysisRuleSet>..\..\ShomreiTorah Minimal.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\Setup\Common\ShomreiTorah Minimal.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -124,39 +125,18 @@
     <Compile Include="WeakReference.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shul.pfx" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Data\Access.mdb">
     </EmbeddedResource>
     <EmbeddedResource Include="Data\Access2007.accdb">
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <CodeAnalysisDictionary Include="..\..\CustomDictionary.xml">
+    <CodeAnalysisDictionary Include="..\..\Setup\Common\CustomDictionary.xml">
       <Link>CustomDictionary.xml</Link>
-      <SubType>Designer</SubType>
     </CodeAnalysisDictionary>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Updates\UpdateApplier.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
