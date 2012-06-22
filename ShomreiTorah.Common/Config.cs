@@ -100,9 +100,9 @@ namespace ShomreiTorah.Common {
 				if (Loaded)
 					throw new InvalidOperationException("ShomreiTorahConfig.xml has already been loaded");
 
-				var oldValue = pathOverride;
-
 				//Before setting the property, make sure the file is valid.
+				//Otherwise, we'll get an unfixable TypeInit exception when
+				//reading the Xml property.
 				using (var reader = XmlReader.Create(value))
 					while (reader.Read()) ;
 
