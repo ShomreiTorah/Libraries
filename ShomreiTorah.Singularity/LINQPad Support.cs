@@ -64,11 +64,15 @@ namespace ShomreiTorah.Singularity {
 }
 
 namespace LINQPad {
+	///<summary>An object that can provide custom members to LINQPad.</summary>
 	public interface ICustomMemberProvider {
-		// Each of these methods must return a sequence
-		// with the same number of elements:
+		// Each of these methods must return a sequence with the same number of elements
+
+		///<summary>Gets the names of the properties in this instance.</summary>
 		IEnumerable<string> GetNames();
+		///<summary>Gets the types of the properties in this instance.</summary>
 		IEnumerable<Type> GetTypes();
+		///<summary>Gets the values of the properties in this instance.</summary>
 		IEnumerable<object> GetValues();
 	}
 }
