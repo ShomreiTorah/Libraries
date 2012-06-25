@@ -15,11 +15,14 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
-    <SccProjectName>Perforce Project</SccProjectName>
-    <SccLocalPath>..\..</SccLocalPath>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
     <SccAuxPath>
     </SccAuxPath>
-    <SccProvider>MSSCCI:Perforce SCM</SccProvider>
+    <SccProvider>
+    </SccProvider>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -109,27 +112,43 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\Lookup\Columns.cs" />
-    <Compile Include="Controls\Lookup\ItemSelector.cs" />
-    <Compile Include="Controls\Lookup\ItemSelectorPopupForm.cs" />
+    <Compile Include="Controls\Lookup\ItemSelector.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Lookup\ItemSelectorPopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Dialog.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="Controls\GoogleMapControl.cs" />
+    <Compile Include="Controls\GoogleMapControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\GoogleMapControl.Designer.cs">
       <DependentUpon>GoogleMapControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FadingPopup.cs" />
-    <Compile Include="Forms\InfoMessage.cs" />
+    <Compile Include="Forms\FadingPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InfoMessage.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\InfoMessage.Designer.cs">
       <DependentUpon>InfoMessage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ProgressDialog.cs" />
+    <Compile Include="Forms\ProgressDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\ProgressDialog.Designer.cs">
       <DependentUpon>ProgressDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ProgressWorker.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Controls\HebrewCalendar.cs" />
-    <Compile Include="Controls\LookupControl.cs" />
+    <Compile Include="Controls\HebrewCalendar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\LookupControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Controls\LookupControl.Designer.cs">
       <DependentUpon>LookupControl.cs</DependentUpon>
     </Compile>
