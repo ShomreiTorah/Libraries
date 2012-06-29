@@ -109,7 +109,7 @@ namespace ShomreiTorah.Common.Calendar.Holidays {
 				שבועות[1], שבועות[2],
 
 				new Holiday("י\"ז בתמוז",		new NonשבתEvent	(HebrewMonth.תמוז,	17, DayOfWeek.Sunday),	HolidayCategory.תענית),
-				new Holiday("שבת חזון",		new SpecialשבתEvent(HebrewMonth.אב,	 2),					HolidayCategory.Specialשבת),
+				new Holiday("שבת חזון",		new SpecialשבתEvent(HebrewMonth.אב,	 3),					HolidayCategory.Specialשבת),
 				תשעה٠באב,
 				new Holiday("שבת נחמו",		new SpecialשבתEvent(HebrewMonth.אב,	 10),					HolidayCategory.Specialשבת),
 

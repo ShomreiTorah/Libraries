@@ -10,7 +10,7 @@ using SysConfig = System.Configuration;
 
 namespace ShomreiTorah.Common {
 	///<summary>Reads the common configuration file (ShomreiTorahConfig.xml)</summary>
-	///<remarks>This class looks for ShomreiTOrahCOnfig.xml as described below:
+	///<remarks>This class looks for ShomreiTorahConfig.xml as described below:
 	///First, it checks AppSettings for a setting named ShomreiTorahConfig.xml.
 	///
 	///If that setting does not exist or if its path was not found,
@@ -78,6 +78,13 @@ namespace ShomreiTorah.Common {
 			get {
 				if (!String.IsNullOrEmpty(pathOverride))
 					return pathOverride;
+
+				if (File.Exists("ShomreiTorahConfig.xml"))	//First, try the current directory.
+					return Path.GetFullPath("ShomreiTorahConfig.xml");
+
+#if DEBUG
+
+#endif
 
 				var appConfigPath = SysConfig.ConfigurationManager.AppSettings["ShomreiTorahConfig.xml"];
 				if (!String.IsNullOrEmpty(appConfigPath) && File.Exists(appConfigPath))
