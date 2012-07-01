@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Linq;
@@ -67,8 +69,6 @@ namespace ShomreiTorah.Common {
 			return attribute.Value;
 		}
 		#region Loader
-		///<summary>The default path for ShomreiTorahConfig.xml.</summary>
-		public const string DefaultPath = @"L:\Community\Rabbi Weinberger's Shul\ShomreiTorahConfig.xml";
 		static string pathOverride;
 		///<summary>Gets or sets the full path to the config file.</summary>
 		///<exception cref="System.IO.FileNotFoundException">The path does not exist</exception>
@@ -76,29 +76,13 @@ namespace ShomreiTorah.Common {
 		[SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
 		public static string FilePath {
 			get {
-				if (!String.IsNullOrEmpty(pathOverride))
-					return pathOverride;
+				var locations = PossibleLocations().Where(p => !String.IsNullOrEmpty(p));
 
-				if (File.Exists("ShomreiTorahConfig.xml"))	//First, try the current directory.
-					return Path.GetFullPath("ShomreiTorahConfig.xml");
+				foreach (var path in locations) 
+					if (File.Exists(path))
+						return path;
 
-#if DEBUG
-
-#endif
-
-				var appConfigPath = SysConfig.ConfigurationManager.AppSettings["ShomreiTorahConfig.xml"];
-				if (!String.IsNullOrEmpty(appConfigPath) && File.Exists(appConfigPath))
-					return appConfigPath;
-
-				var regConfigPath = (string)Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null)
-								 ?? (string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null);
-				if (!String.IsNullOrEmpty(regConfigPath) && File.Exists(regConfigPath))
-					return regConfigPath;
-
-				if (File.Exists(DefaultPath))
-					return DefaultPath;
-
-				throw new ConfigurationException("Cannot find ShomreiTorahConfig.xml.\r\n" + appConfigPath ?? regConfigPath ?? DefaultPath + " does not exist.\r\nCheck the value of SOFTWARE\\Shomrei Torah\\ShomreiTorahConfig.xml in HKEY_CURRENT_USER or HKEY_LOCAL_MACHINE.");
+				throw new ConfigurationException("Cannot find ShomreiTorahConfig.xml.\r\n" + locations.First() + " does not exist.\r\nCheck the value of SOFTWARE\\Shomrei Torah\\ShomreiTorahConfig.xml in HKEY_CURRENT_USER or HKEY_LOCAL_MACHINE.");
 			}
 			set {
 				if (pathOverride == value)
@@ -116,6 +100,21 @@ namespace ShomreiTorah.Common {
 				pathOverride = value;
 			}
 		}
+
+		///<summary>The default path for ShomreiTorahConfig.xml.</summary>
+		public const string DefaultPath = @"L:\Community\Rabbi Weinberger's Shul\ShomreiTorahConfig.xml";
+		static IEnumerable<string> PossibleLocations() {
+			yield return pathOverride;
+			yield return Path.GetFullPath("ShomreiTorahConfig.xml");		//First, try the current directory.
+
+			yield return SysConfig.ConfigurationManager.AppSettings["ShomreiTorahConfig.xml"];
+
+			yield return Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null) as string;
+			yield return Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null) as string;
+
+			yield return DefaultPath;
+		}
+
 		///<summary>Indicates whether the config file has been loaded yet.</summary>
 		public static bool Loaded { get; private set; }
 		static class FileLoader {
