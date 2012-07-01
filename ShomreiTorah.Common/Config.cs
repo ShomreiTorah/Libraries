@@ -34,6 +34,10 @@ namespace ShomreiTorah.Common {
 		///<summary>Gets the XDocument containing the config file.</summary>
 		public static XDocument Xml { get { return FileLoader.File; } }
 
+		///<summary>Eagerly loads the config file using the standard file resolution logic, if it was not loaded already.</summary>
+		///<remarks>This method should be called before checking IsDebug.</remarks>
+		public static void ForceLoad() { FileLoader.File.GetHashCode(); }
+
 		///<summary>Reads the value at an XPath expression in the config file.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Return type")]
 		public static T ReadValue<T>(string xpath) { return (T)Xml.XPathEvaluate(xpath); }
