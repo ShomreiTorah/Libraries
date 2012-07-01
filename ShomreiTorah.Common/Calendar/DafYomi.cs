@@ -18,6 +18,9 @@ namespace ShomreiTorah.Common.Calendar {
 				else
 					offset %= ShasLength;
 
+				if (offset == 0)
+					offset = ShasLength;
+
 				int i = 0;
 				while (offset > Masechtos[i].Value) {
 					offset -= Masechtos[i].Value;
