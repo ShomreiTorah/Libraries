@@ -1,3 +1,7 @@
+#Ignore generated file
+ShomreiTorah.Common/Properties/OutputPath.cs
+
+#Ignore compiled binary
 ShomreiTorah.Common/Updates/UpdateApplier.exe
 
 #################

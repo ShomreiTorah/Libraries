@@ -74,7 +74,7 @@ namespace ShomreiTorah.Common.Tests {
 		[TestMethod()]
 		public void GetElementTest() {
 			Assert.AreEqual(Config.GetElement("Schedules").Name, "Schedules");
-			Assert.AreEqual(Config.GetElement("Journal", "CallListInfo").Name, "CallListInfo");
+			Assert.AreEqual(Config.GetElement("Databases", "Default").Name, "Default");
 		}
 
 		/// <summary>

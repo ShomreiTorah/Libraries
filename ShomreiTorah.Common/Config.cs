@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Linq;
@@ -29,7 +30,7 @@ namespace ShomreiTorah.Common {
 	///This procedure can be skipped by setting Config.FilePath before the XML
 	///file is loaded.  (if Config.FileLoaded is false)
 	///</remarks>
-	public static class Config {
+	public static partial class Config {
 		///<summary>Gets the XDocument containing the config file.</summary>
 		public static XDocument Xml { get { return FileLoader.File; } }
 
@@ -78,7 +79,7 @@ namespace ShomreiTorah.Common {
 			get {
 				var locations = PossibleLocations().Where(p => !String.IsNullOrEmpty(p));
 
-				foreach (var path in locations) 
+				foreach (var path in locations)
 					if (File.Exists(path))
 						return path;
 
@@ -109,11 +110,44 @@ namespace ShomreiTorah.Common {
 
 			yield return SysConfig.ConfigurationManager.AppSettings["ShomreiTorahConfig.xml"];
 
+#if DEBUG
+			IsDebug = true;
+			foreach (var path in PossibleBuildPaths().Select(FindRoot))
+				yield return Path.Combine(path, @"Config\Debug\ShomreiTorahConfig.xml");
+			IsDebug = false;	//We will only get here if the previous yield returns were rejected (eg, we're running a debug build from outside the source tree).
+#endif
+
 			yield return Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null) as string;
 			yield return Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null) as string;
 
 			yield return DefaultPath;
 		}
+#if DEBUG
+		///<summary>Gets the paths that we may be running from.</summary>
+		static IEnumerable<string> PossibleBuildPaths() {
+			//The first two possibilities will fail in the VS designer, which copies assemblies to Temp
+			//I use a pre-build event to get the actual project directory when running in the designer.
+			var entryPoint = Assembly.GetEntryAssembly();
+			if (entryPoint != null)
+				yield return entryPoint.Location;
+			yield return typeof(Config).Assembly.Location;
+			yield return OutputPath;
+		}
+
+		static string FindRoot(string path) {
+			while (true) {
+				if (String.IsNullOrEmpty(path))
+					return null;
+				if (Directory.Exists(Path.Combine(path, @"Setup\.git")))
+					return path;
+
+				path = Path.GetDirectoryName(path);
+			}
+		}
+#endif
+		///<summary>Indicates whether the standard debug configuration from the source tree is loaded.</summary>
+		///<remarks>This is used to show a different UI theme in debug.</remarks>
+		public static bool IsDebug { get; private set; }
 
 		///<summary>Indicates whether the config file has been loaded yet.</summary>
 		public static bool Loaded { get; private set; }
