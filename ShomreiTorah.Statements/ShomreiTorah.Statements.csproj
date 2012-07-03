@@ -50,11 +50,12 @@
   <ItemGroup>
     <Reference Include="RazorEngine">
       <HintPath>..\packages\RazorEngine.3.0.8\lib\net40\RazorEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Razor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
+      <Private>False</Private>
       <HintPath>..\packages\RazorEngine.3.0.8\lib\net40\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
@@ -75,14 +76,17 @@
     <ProjectReference Include="..\ShomreiTorah.Common\ShomreiTorah.Common.csproj">
       <Project>{1308A6E1-7787-49F6-A19C-8AF327DAF9B5}</Project>
       <Name>ShomreiTorah.Common</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\ShomreiTorah.Data\ShomreiTorah.Data.csproj">
       <Project>{88D62EF0-7A6C-403E-80EF-6CEFE734DD53}</Project>
       <Name>ShomreiTorah.Data</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\ShomreiTorah.Singularity\ShomreiTorah.Singularity.csproj">
       <Project>{53C1A3A0-B443-4C28-895B-5E4DFE803A1C}</Project>
       <Name>ShomreiTorah.Singularity</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

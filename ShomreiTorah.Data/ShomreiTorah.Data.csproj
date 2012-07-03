@@ -81,10 +81,12 @@
     <ProjectReference Include="..\ShomreiTorah.Common\ShomreiTorah.Common.csproj">
       <Project>{1308A6E1-7787-49F6-A19C-8AF327DAF9B5}</Project>
       <Name>ShomreiTorah.Common</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\ShomreiTorah.Singularity\ShomreiTorah.Singularity.csproj">
       <Project>{53C1A3A0-B443-4C28-895B-5E4DFE803A1C}</Project>
       <Name>ShomreiTorah.Singularity</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
