@@ -18,54 +18,48 @@ using System.Xml.Linq;
 namespace ShomreiTorah.Common.Updates {
 	///<summary>Checks for updates.</summary>
 	public class UpdateChecker {
-		#region Read ShomreiTorahConfig
-		static SymmetricAlgorithm CreateKD() {
-			var retVal = SymmetricAlgorithm.Create(Config.ReadAttribute("Updates", "Cryptography", "FileDecryptor", "Algorithm"));
-
-			var key = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "FileDecryptor", "Key").Value);
-			var iv = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "FileDecryptor", "IV").Value);
-
-			retVal.KeySize = key.Length * 8;
-			retVal.BlockSize = iv.Length * 8;
-
-			retVal.Key = key;
-			retVal.IV = iv;
-			return retVal;
-		}
-
-		///<summary>The SymmetricAlgorithm used to encrypt update files.</summary>
-		static readonly SymmetricAlgorithm FileAlgorithm = CreateKD();
-
 		///<summary>Creates an ICryptoTransform that encrypts the update files.</summary>
-		public static ICryptoTransform CreateFileEncryptor() { return FileAlgorithm.CreateEncryptor(); }
+		public static ICryptoTransform CreateFileEncryptor() { return UpdateConfig.Standard.FileAlgorithm.CreateEncryptor(); }
 		///<summary>Creates an ICryptoTransform that decrypts the update files.</summary>
-		public static ICryptoTransform CreateFileDecryptor() { return FileAlgorithm.CreateDecryptor(); }
-
-		static RSACryptoServiceProvider CreateVerifier() {
-			var retVal = new RSACryptoServiceProvider();
-			retVal.FromXmlString(Config.GetElement("Updates", "Cryptography", "UpdateVerifier").ToString());
-			return retVal;
-		}
-		internal static readonly RSACryptoServiceProvider UpdateVerifier = CreateVerifier();
-
-		///<summary>Gets the Uri that contains updates.</summary>
-		public static readonly Uri BaseUri = new Uri(Config.ReadAttribute("Updates", "BaseUri"), UriKind.Absolute);
-		#endregion
+		public static ICryptoTransform CreateFileDecryptor() { return UpdateConfig.Standard.FileAlgorithm.CreateDecryptor(); }
 
 		///<summary>Creates an UpdateChecker from an UpdatableAttribute defined in the calling assembly.</summary>
+		///<returns>An UpdateChecker instance that for this program, or null if updates are not configured in ShomreiTorahConfig.xml.</returns>
 		[MethodImpl(MethodImplOptions.NoInlining)]
-		public UpdateChecker() : this(Assembly.GetCallingAssembly().GetCustomAttribute<UpdatableAttribute>()) { }
+		public static UpdateChecker CreateForCaller() {
+			return Create(Assembly.GetCallingAssembly().GetCustomAttribute<UpdatableAttribute>());
+		}
+
 		///<summary>Creates a new UpdateChecker for the product described by an UpdatableAttribute instance.</summary>
-		public UpdateChecker(UpdatableAttribute attribute) {
+		///<returns>An UpdateChecker instance that for the program described by the attribute, or null if updates are not configured in ShomreiTorahConfig.xml.</returns>
+		public static UpdateChecker Create(UpdatableAttribute attribute) {
 			if (attribute == null) throw new ArgumentNullException("attribute");
+
+			if (UpdateConfig.Standard == null)
+				return null;
+
+			return new UpdateChecker(attribute);
+		}
+		///<summary>Creates a new UpdateChecker for a given product.</summary>
+		///<param name="productName">The name of the product to update.</param>
+		///<param name="currentVersion">The version of the product that is currently installed.</param>
+		///<returns>An UpdateChecker instance that for the program described by the attribute, or null if updates are not configured in ShomreiTorahConfig.xml.</returns>
+		public static UpdateChecker Create(string productName, Version currentVersion) {
+			if (UpdateConfig.Standard == null)
+				return null;
+
+			return new UpdateChecker(productName, currentVersion);
+		}
+
+		private UpdateChecker(UpdatableAttribute attribute) {
 			ProductName = attribute.ProductName;
 			CurrentVersion = attribute.CurrentVersion;
 		}
 
-		///<summary>Creates a new UpdateChecker for a given product.</summary>
-		///<param name="productName">The name of the product to update.</param>
-		///<param name="currentVersion">The version of the product that is currently installed.</param>
-		public UpdateChecker(string productName, Version currentVersion) { ProductName = productName; CurrentVersion = currentVersion; }
+		private UpdateChecker(string productName, Version currentVersion) {
+			ProductName = productName;
+			CurrentVersion = currentVersion;
+		}
 
 		///<summary>Gets the name of the product to update.</summary>
 		public string ProductName { get; private set; }
@@ -77,7 +71,7 @@ namespace ShomreiTorah.Common.Updates {
 		[SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Hide errors")]
 		public UpdateInfo FindUpdate() {
 			try {
-				var document = XDocument.Load(new Uri(BaseUri, new Uri(ProductName + "/Manifest.xml", UriKind.Relative)).ToString());
+				var document = XDocument.Load(new Uri(UpdateConfig.Standard.BaseUri, new Uri(ProductName + "/Manifest.xml", UriKind.Relative)).ToString());
 				if (document == null) return null;
 				var newUpdate = new UpdateInfo(document.Root);
 				return newUpdate.NewVersion > CurrentVersion ? newUpdate : null;
@@ -129,6 +123,38 @@ namespace ShomreiTorah.Common.Updates {
 			}
 			return updaterExePath;
 		}
+	}
+	///<summary>Stores the update configuration read from ShomreiTorahConfig.xml.</summary>
+	public class UpdateConfig {
+		///<summary>Gets the update configuration info from ShomreiTorahConfig, or null if ShomreiTorahConfig.xml doesn't have an Updates element.</summary>
+		public static readonly UpdateConfig Standard = Config.Xml.Root.Element("Updates") == null ? null : new UpdateConfig();
+
+
+		///<summary>Reads settings from ShomreiTorahConfig into a new UpdateConfig instance.</summary>
+		private UpdateConfig() {
+			FileAlgorithm = SymmetricAlgorithm.Create(Config.ReadAttribute("Updates", "Cryptography", "FileDecryptor", "Algorithm"));
+
+			var key = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "FileDecryptor", "Key").Value);
+			var iv = Convert.FromBase64String(Config.GetElement("Updates", "Cryptography", "FileDecryptor", "IV").Value);
+
+			FileAlgorithm.KeySize = key.Length * 8;
+			FileAlgorithm.BlockSize = iv.Length * 8;
+
+			FileAlgorithm.Key = key;
+			FileAlgorithm.IV = iv;
+
+			UpdateVerifier = new RSACryptoServiceProvider();
+			UpdateVerifier.FromXmlString(Config.GetElement("Updates", "Cryptography", "UpdateVerifier").ToString());
+
+			BaseUri = new Uri(Config.ReadAttribute("Updates", "BaseUri"), UriKind.Absolute);
+		}
+
+		///<summary>Gets the SymmetricAlgorithm used to encrypt individual update files.</summary>
+		public SymmetricAlgorithm FileAlgorithm { get; private set; }
+		///<summary>Hodls the RSA public key used to verify file hashes.</summary>
+		public RSACryptoServiceProvider UpdateVerifier { get; private set; }
+		///<summary>Gets the Uri that contains updates.</summary>
+		public Uri BaseUri { get; private set; }
 	}
 
 	///<summary>An exception thrown when an error occurs during the update process.</summary>

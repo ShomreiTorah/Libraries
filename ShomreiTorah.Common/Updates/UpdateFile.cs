@@ -31,12 +31,12 @@ namespace ShomreiTorah.Common.Updates {
 				RelativePath = element.Attribute("RelativePath").Value,
 				Length = long.Parse(element.Attribute("Size").Value, CultureInfo.InvariantCulture),
 				DateModifiedUtc = DateTime.ParseExact(element.Attribute("Timestamp").Value, "o", CultureInfo.InvariantCulture).ToUniversalTime(),
-				RemoteUrl = new Uri(UpdateChecker.BaseUri, new Uri(element.Attribute("Url").Value, UriKind.Relative)),
+				RemoteUrl = new Uri(UpdateConfig.Standard.BaseUri, new Uri(element.Attribute("Url").Value, UriKind.Relative)),
 
 				hash = Convert.FromBase64String(element.Element("Hash").Value),
 				signature = Convert.FromBase64String(element.Element("Signature").Value)
 			};
-			if (!UpdateChecker.UpdateVerifier.VerifyHash(retVal.hash, signatureAlgorithm, retVal.signature))
+			if (!UpdateConfig.Standard.UpdateVerifier.VerifyHash(retVal.hash, signatureAlgorithm, retVal.signature))
 				throw new InvalidDataException("Bad signature for " + retVal.RelativePath);
 			return retVal;
 		}
@@ -55,7 +55,7 @@ namespace ShomreiTorah.Common.Updates {
 			var info = new FileInfo(filePath);
 
 			if (!remotePath.IsAbsoluteUri)
-				remotePath = new Uri(UpdateChecker.BaseUri, remotePath);
+				remotePath = new Uri(UpdateConfig.Standard.BaseUri, remotePath);
 			var retVal = new UpdateFile {
 				RelativePath = relativePath,
 				RemoteUrl = remotePath,
@@ -74,7 +74,7 @@ namespace ShomreiTorah.Common.Updates {
 		public XElement ToXml() {
 			return new XElement("File",
 				new XAttribute("RelativePath", RelativePath),
-				new XAttribute("Url", UpdateChecker.BaseUri.MakeRelativeUri(RemoteUrl)),
+				new XAttribute("Url", UpdateConfig.Standard.BaseUri.MakeRelativeUri(RemoteUrl)),
 				new XAttribute("Size", Length.ToString(CultureInfo.InvariantCulture)),
 				new XAttribute("Timestamp", DateModifiedUtc.ToString("o", CultureInfo.InvariantCulture)),
 
