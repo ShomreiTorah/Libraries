@@ -34,10 +34,6 @@ namespace ShomreiTorah.Common {
 		///<summary>Gets the XDocument containing the config file.</summary>
 		public static XDocument Xml { get { return FileLoader.File; } }
 
-		///<summary>Eagerly loads the config file using the standard file resolution logic, if it was not loaded already.</summary>
-		///<remarks>This method should be called before checking IsDebug.</remarks>
-		public static void ForceLoad() { FileLoader.File.GetHashCode(); }
-
 		///<summary>Reads the value at an XPath expression in the config file.</summary>
 		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Return type")]
 		public static T ReadValue<T>(string xpath) { return (T)Xml.XPathEvaluate(xpath); }
@@ -115,10 +111,10 @@ namespace ShomreiTorah.Common {
 			yield return SysConfig.ConfigurationManager.AppSettings["ShomreiTorahConfig.xml"];
 
 #if DEBUG
-			IsDebug = true;
+			FileLoader.IsDebug = true;
 			foreach (var path in PossibleBuildPaths().Select(FindRoot))
 				yield return Path.Combine(path, @"Config\Debug\ShomreiTorahConfig.xml");
-			IsDebug = false;	//We will only get here if the previous yield returns were rejected (eg, we're running a debug build from outside the source tree).
+			FileLoader.IsDebug = false;	//We will only get here if the previous yield returns were rejected (eg, we're running a debug build from outside the source tree).
 #endif
 
 			yield return Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null) as string;
@@ -151,11 +147,13 @@ namespace ShomreiTorah.Common {
 #endif
 		///<summary>Indicates whether the standard debug configuration from the source tree is loaded.</summary>
 		///<remarks>This is used to show a different UI theme in debug.</remarks>
-		public static bool IsDebug { get; private set; }
+		public static bool IsDebug { get { return FileLoader.IsDebug; } }
+		//By storing the value in FileLoader, I force the static initializer to run (& load the config file) before reading the value.
 
 		///<summary>Indicates whether the config file has been loaded yet.</summary>
 		public static bool Loaded { get; private set; }
 		static class FileLoader {
+			internal static bool IsDebug { get; set; }
 
 			[SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Justification = "Prevent beforefieldinit")]
 			static FileLoader() { }
