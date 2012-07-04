@@ -29,7 +29,7 @@ namespace ShomreiTorah.WinForms.Forms {
 			// 
 			// label
 			// 
-			this.label.Appearance.Options.UseTextOptions = true;
+			this.label.Appearance.ForeColor = System.Drawing.SystemColors.InfoText;
 			this.label.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
 			this.label.Appearance.TextOptions.HotkeyPrefix = DevExpress.Utils.HKeyPrefix.None;
 			this.label.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
@@ -43,8 +43,8 @@ namespace ShomreiTorah.WinForms.Forms {
 			this.label.Text = "Hello!";
 			this.label.UseMnemonic = false;
 			this.label.DoubleClick += new System.EventHandler(this.label_DoubleClick);
-			this.label.MouseLeave += new System.EventHandler(this.label_MouseLeave);
 			this.label.MouseEnter += new System.EventHandler(this.label_MouseEnter);
+			this.label.MouseLeave += new System.EventHandler(this.label_MouseLeave);
 			// 
 			// InfoMessage
 			// 

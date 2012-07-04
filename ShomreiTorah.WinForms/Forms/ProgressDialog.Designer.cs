@@ -34,10 +34,10 @@ namespace ShomreiTorah.WinForms.Forms {
 			// 
 			// label
 			// 
-			this.label.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-						| System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.label.Appearance.Options.UseTextOptions = true;
+			this.label.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.label.Appearance.ForeColor = System.Drawing.SystemColors.InfoText;
 			this.label.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
 			this.label.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
 			this.label.Location = new System.Drawing.Point(12, 12);
@@ -59,8 +59,8 @@ namespace ShomreiTorah.WinForms.Forms {
 			// 
 			// marqueeBar
 			// 
-			this.marqueeBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this.marqueeBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.marqueeBar.EditValue = 0;
 			this.marqueeBar.Location = new System.Drawing.Point(12, 51);
 			this.marqueeBar.Name = "marqueeBar";
@@ -69,8 +69,8 @@ namespace ShomreiTorah.WinForms.Forms {
 			// 
 			// progressBar
 			// 
-			this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
+			this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.progressBar.Location = new System.Drawing.Point(12, 51);
 			this.progressBar.Name = "progressBar";
 			this.progressBar.Size = new System.Drawing.Size(206, 18);
