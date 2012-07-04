@@ -8,25 +8,25 @@ using System.Xml.Linq;
 
 namespace ShomreiTorah.Common {
 	///<summary>Sends emails using the Shul's mail servers from ShomreiTorahConfig.xml.</summary>
-	///<remarks>Reads SMTP settings from ShomreiTorahConfig.</remarks>
+	///<remarks>Reads SMTP settings and the email domain name from ShomreiTorahConfig.</remarks>
 	public class Email {
 		#region Email addresses
 		///<summary>A MailAddress instance used to send email to the mailing list.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
-		public static readonly MailAddress ListAddress = new MailAddress("List@ShomreiTorah.us", "Congregation Shomrei Torah");
+		public static readonly MailAddress ListAddress = new MailAddress("List@" + Config.DomainName, Config.OrgName);
 		///<summary>A MailAddress instance used to send miscellaneous emails.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
-		public static readonly MailAddress InfoAddress = new MailAddress("Info@ShomreiTorah.us", "Congregation Shomrei Torah");
+		public static readonly MailAddress InfoAddress = new MailAddress("Info@" + Config.DomainName, Config.OrgName);
 		///<summary>A MailAddress instance used to send administrative emails.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
-		public static readonly MailAddress AdminAddress = new MailAddress("Admin@ShomreiTorah.us", "Shomrei Torah Administration");
+		public static readonly MailAddress AdminAddress = new MailAddress("Admin@" + Config.DomainName, Config.OrgName + " Administration");
 		///<summary>A MailAddress instance used to send notification emails.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
-		public static readonly MailAddress AlertsAddress = new MailAddress("Alerts@ShomreiTorah.us", "Shomrei Torah Alerts");
+		public static readonly MailAddress AlertsAddress = new MailAddress("Alerts@" + Config.DomainName, Config.OrgName + " Alerts");
 
 		///<summary>A MailAddress instance used to send Melave Malka-related emails.</summary>
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "MailAddress is immutable")]
-		public static readonly MailAddress JournalAddress = new MailAddress("Journal@ShomreiTorah.us", "Shomrei Torah Melave Malka");
+		public static readonly MailAddress JournalAddress = new MailAddress("Journal@" + Config.DomainName, Config.OrgName + " Melave Malka");
 		#endregion
 
 		#region Static instances
@@ -103,16 +103,17 @@ namespace ShomreiTorah.Common {
 		[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Justification = "Encoding is immutable")]
 		public static readonly Encoding DefaultEncoding = Encoding.UTF8;
 
-		///<summary>Sends a notification email from Alerts@ShomreiTorah.us to Info@ShomreiTorah.us.</summary>
+		///<summary>Sends a notification email from Alerts@ to Info@.</summary>
 		public static void Notify(string subject, string body) { Notify(subject, body, false); }
-		///<summary>Sends a notification email from Alerts@ShomreiTorah.us.</summary>
+		///<summary>Sends a notification email from Alerts@.</summary>
 		public static void Notify(MailAddress to, string subject, string body) { Notify(to, subject, body, false); }
-		///<summary>Sends a notification email from Alerts@ShomreiTorah.us to Info@ShomreiTorah.us.</summary>
+
+		///<summary>Sends a notification email from Alerts@ to Info@.</summary>
 		public static void Notify(string subject, string body, bool html) { Notify(InfoAddress, subject, body, html); }
-		///<summary>Sends a notification email from Alerts@ShomreiTorah.us.</summary>
+		///<summary>Sends a notification email from Alerts@.</summary>
 		public static void Notify(MailAddress to, string subject, string body, bool html) { Default.SendAsync(AlertsAddress, to, subject, body, html); }
 
-		///<summary>Sends a technical alert to Admin@ShomreiTorah.us.</summary>
+		///<summary>Sends a technical alert to Admin@.</summary>
 		public static void Warn(string subject, string body) { Notify(AdminAddress, subject, body); }
 
 		#region Send overloads
@@ -121,9 +122,9 @@ namespace ShomreiTorah.Common {
 			if (message == null) throw new ArgumentNullException("message");
 			CreateSmtp(message.From.Address).Send(message);
 		}
-		///<summary>Sends an email from Info@ShomreiTorah.us (or Alerts if sent to Info) synchronously.</summary>
+		///<summary>Sends an email from Info@ (or Alerts if sent to Info) synchronously.</summary>
 		public void Send(MailAddress to, string subject, string body) { Send(to, subject, body, false); }
-		///<summary>Sends an email from Info@ShomreiTorah.us (or Alerts if sent to Info) synchronously.</summary>
+		///<summary>Sends an email from Info@ (or Alerts if sent to Info) synchronously.</summary>
 		public void Send(MailAddress to, string subject, string body, bool html) { Send(InfoAddress.Equals(to) ? AlertsAddress : InfoAddress, to, subject, body, html); }
 		///<summary>Sends an email synchronously.</summary>
 		[SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "CA Bug")]
@@ -147,9 +148,9 @@ namespace ShomreiTorah.Common {
 			if (message == null) throw new ArgumentNullException("message");
 			CreateSmtp(message.From.Address).SendAsync(message, null);
 		}
-		///<summary>Sends an email from Info@ShomreiTorah.us (or Alerts if sent to Info) asynchronously.</summary>
+		///<summary>Sends an email from Info@ (or Alerts if sent to Info) asynchronously.</summary>
 		public void SendAsync(MailAddress to, string subject, string body) { SendAsync(to, subject, body, false); }
-		///<summary>Sends an email from Info@ShomreiTorah.us (or Alerts if sent to Info) asynchronously.</summary>
+		///<summary>Sends an email from Info@ (or Alerts if sent to Info) asynchronously.</summary>
 		public void SendAsync(MailAddress to, string subject, string body, bool html) { SendAsync(InfoAddress.Equals(to) ? AlertsAddress : InfoAddress, to, subject, body, html); }
 		///<summary>Sends an email asynchronously.</summary>
 		[SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "CA Bug")]

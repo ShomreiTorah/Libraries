@@ -216,7 +216,7 @@ namespace ShomreiTorah.Administration {
 				//Uri.EscapeDataString will escape ' ' as '%20' instead of '+'
 				//Since neither email addresses nor codes can contain spaces,
 				//this won't do any harm.
-				var unsubscribeUrl = "www.ShomreiTorah.us/?Unsubscribe=" + Uri.EscapeDataString(recipient.Address.Address) + "&code=" + Uri.EscapeDataString(recipient.Code);
+				var unsubscribeUrl = "http://" + Config.DomainName + "/?Unsubscribe=" + Uri.EscapeDataString(recipient.Address.Address) + "&code=" + Uri.EscapeDataString(recipient.Code);
 
 				if (!string.IsNullOrEmpty(rawBody))
 					message.Body = InsertFooter(rawBody, unsubscribeUrl, message.IsBodyHtml);

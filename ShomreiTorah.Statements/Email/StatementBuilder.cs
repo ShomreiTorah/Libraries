@@ -15,7 +15,10 @@ namespace ShomreiTorah.Statements.Email {
 		public StatementBuilder(string basePath, string imagePath) {
 			resolver = new DirectoryTemplateResolver(basePath);
 			ImagesPath = imagePath;
-			TemplateService = new TemplateService(new TemplateServiceConfiguration { Resolver = resolver });
+			TemplateService = new TemplateService(new TemplateServiceConfiguration {
+				Resolver = resolver,
+				Namespaces = new HashSet<string> { "ShomreiTorah.Common" }
+			});
 		}
 
 
@@ -23,7 +26,7 @@ namespace ShomreiTorah.Statements.Email {
 		public ITemplateService TemplateService { get; private set; }
 		public string ImagesPath { get; private set; }
 
-		static readonly MailAddress BillingAddress = new MailAddress("Billing@ShomreiTorah.us", "Shomrei Torah Billing");
+		static readonly MailAddress BillingAddress = new MailAddress("Billing@" + Config.DomainName, Config.OrgName + " Billing");
 		public StatementMessage CreateMessage(Person person, string templateName, DateTime startDate) {
 			var page = (StatementPage)TemplateService.Resolve(templateName);
 			page.SetInfo(person, startDate);

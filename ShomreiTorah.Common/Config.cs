@@ -69,6 +69,36 @@ namespace ShomreiTorah.Common {
 			if (attribute == null) throw new ConfigurationException("Config file doesn't have attribute " + attributeName + " in element " + String.Join("/", path));
 			return attribute.Value;
 		}
+
+		#region General Properties
+		//Getting these properties before setting them will cause them to read ShomreiTorahConfig through ReadAttribute.
+		static string orgName, domainName, mailingAddress, legalName;
+
+		///<summary>Gets or sets the public name of the organization using the Shomrei Torah system.  This is displayed on the website and email messages.</summary>
+		public static string OrgName {
+			get { return orgName ?? (orgName = ReadAttribute("Names", "OrgName")); }
+			set { orgName = value; }
+		}
+
+		///<summary>Gets or sets the legal name of the organization using the Shomrei Torah system.  This is displayed in statements.</summary>
+		public static string LegalName {
+			get { return legalName ?? (legalName = ReadAttribute("Names", "LegalName")); }
+			set { legalName = value; }
+		}
+
+		///<summary>Gets or sets the mailing address of the organization using the Shomrei Torah system.  This is displayed in email messages.</summary>
+		public static string MailingAddress {
+			get { return mailingAddress ?? (mailingAddress = GetElement("Names", "MailingAddress").Value); }
+			set { mailingAddress = value; }
+		}
+		
+		///<summary>Gets or sets the organization's domain name.  This is used to construct email addresses and URLs.</summary>
+		public static string DomainName {
+			get { return domainName ?? (domainName = ReadAttribute("Names", "DomainName")); }
+			set { domainName = value; }
+		}
+		#endregion
+
 		#region Loader
 		static string pathOverride;
 		///<summary>Gets or sets the full path to the config file.</summary>
