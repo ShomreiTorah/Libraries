@@ -61,7 +61,12 @@ namespace ShomreiTorah.Statements {
 			} else
 				Deductibility = "No goods or services have been provided.";
 
-			LastEnteredPayment = data.Table<Payment>().Rows.Max(p => p.Modified);
+			if (data.Table<Payment>().Rows.Any())
+				LastEnteredPayment = data.Table<Payment>().Rows.Max(p => p.Modified);
+			else if (data.Table<Pledge>().Rows.Any())
+				LastEnteredPayment = data.Table<Pledge>().Rows.Max(p => p.Modified);
+			else
+				LastEnteredPayment = new DateTime(1970, 1, 1);
 		}
 
 		///<summary>Gets the date of the most recently entered payment in the system.</summary>
