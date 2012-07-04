@@ -17,7 +17,16 @@ namespace ShomreiTorah.Statements.Email {
 			ImagesPath = imagePath;
 			TemplateService = new TemplateService(new TemplateServiceConfiguration {
 				Resolver = resolver,
-				Namespaces = new HashSet<string> { "ShomreiTorah.Common" }
+				Namespaces = new HashSet<string> {
+					"System",
+					"System.Collections.Generic",
+					"System.Linq",
+
+					//Any namespaces added here should be mirrored in Config\Email Templates\Web.config for design-time support
+					"ShomreiTorah.Common",
+					"ShomreiTorah.Statements",
+					"ShomreiTorah.Statements.Email",
+				}
 			});
 		}
 
