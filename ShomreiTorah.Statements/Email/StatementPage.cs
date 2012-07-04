@@ -42,6 +42,7 @@ namespace ShomreiTorah.Statements.Email {
 			}
 		}
 
+		#region HTML Helpers
 		protected string ImageUrl(string name) {
 			if (ImageService == null)
 				throw new InvalidOperationException("The template host must provide an ImageServiceBase implementation.");
@@ -50,6 +51,12 @@ namespace ShomreiTorah.Statements.Email {
 		protected IEncodedString Image(string name, string alt) {
 			return base.Raw("<img src=\"" + WebUtility.HtmlEncode(ImageUrl(name)) + "\" alt=\"" + WebUtility.HtmlEncode(alt) + "\" />");
 		}
+		protected IEncodedString MultiLine(string text) {
+			return base.Raw(
+				WebUtility.HtmlEncode(text).Replace("\r", "").Replace("\n", "<br />")
+			);
+		}
+		#endregion
 
 		//This property is set by the host on the primary instance.
 		//Layout pages will pick up the value from the ViewBag.
