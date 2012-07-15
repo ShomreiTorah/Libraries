@@ -91,7 +91,7 @@ namespace ShomreiTorah.Common {
 			get { return mailingAddress ?? (mailingAddress = GetElement("Names", "MailingAddress").Value); }
 			set { mailingAddress = value; }
 		}
-		
+
 		///<summary>Gets or sets the organization's domain name.  This is used to construct email addresses and URLs.</summary>
 		public static string DomainName {
 			get { return domainName ?? (domainName = ReadAttribute("Names", "DomainName")); }
@@ -143,7 +143,8 @@ namespace ShomreiTorah.Common {
 #if DEBUG
 			FileLoader.IsDebug = true;
 			foreach (var path in PossibleBuildPaths().Select(FindRoot))
-				yield return Path.Combine(path, @"Config\Debug\ShomreiTorahConfig.xml");
+				if (path != null)
+					yield return Path.Combine(path, @"Config\Debug\ShomreiTorahConfig.xml");
 			FileLoader.IsDebug = false;	//We will only get here if the previous yield returns were rejected (eg, we're running a debug build from outside the source tree).
 #endif
 
