@@ -38,7 +38,7 @@ namespace ShomreiTorah.Data {
 			new PledgeType("Donation",		subTypes: new[]{ "R' Buxbaum" }),
 			new PledgeType("Membership"),
 			new PledgeType("סעודה שלישית"),
-			new PledgeType("Kiddush",		subTypes: new[]{ "ראש השנה", "שמחת תורה", "חתנים", "שבועות" }),
+			new PledgeType("Kiddush",		subTypes: new[]{ "ראש השנה", "שמחת תורה", "חתנים", "שבועות", "Shavuos Night" }),
 			new PledgeType("Seforim"),
 			new PledgeType("Building Fund"),
 			new PledgeType("ימים נוראים Seats"),
