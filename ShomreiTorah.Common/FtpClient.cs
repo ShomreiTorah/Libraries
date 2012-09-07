@@ -53,10 +53,18 @@ namespace ShomreiTorah.Common {
 		///<summary>Gets the password that this client logs in with.</summary>
 		public string Password { get; private set; }
 
+		static void CheckrUri(Uri relativePath) {
+			if (relativePath == null)
+				throw new ArgumentNullException("relativePath");
+			if (relativePath.IsAbsoluteUri)
+				throw new ArgumentException("FTP URIs must not include a protocol or domain name");
+		}
+
 		///<summary>Creates an FtpWebRequest for the given local path.</summary>
 		///<param name="relativePath">The local path for the request.</param>
 		public FtpWebRequest CreateRequest(Uri relativePath) {
-			var retVal = WebRequest.Create(new Uri(host, relativePath)) as FtpWebRequest;
+			CheckrUri(relativePath);
+			var retVal = (FtpWebRequest)WebRequest.Create(new Uri(host, relativePath));
 			retVal.Credentials = login;
 			retVal.EnableSsl = UseSsl;
 			return retVal;
@@ -76,6 +84,7 @@ namespace ShomreiTorah.Common {
 		///<param name="localPath">The path of a file on disk to upload.</param>
 		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
 		public void UploadFile(Uri relativePath, string localPath, IProgressReporter progress) {
+			CheckrUri(relativePath);
 			using (var contents = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 				UploadFile(relativePath, contents, progress);
 		}
