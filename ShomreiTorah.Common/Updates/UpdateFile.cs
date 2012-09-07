@@ -31,7 +31,7 @@ namespace ShomreiTorah.Common.Updates {
 				RelativePath = element.Attribute("RelativePath").Value,
 				Length = long.Parse(element.Attribute("Size").Value, CultureInfo.InvariantCulture),
 				DateModifiedUtc = DateTime.ParseExact(element.Attribute("Timestamp").Value, "o", CultureInfo.InvariantCulture).ToUniversalTime(),
-				RemoteUrl = new Uri(UpdateConfig.Standard.BaseUri, new Uri(element.Attribute("Url").Value, UriKind.Relative)),
+				RemoteUrl = new Uri(element.Attribute("Url").Value, UriKind.Relative),
 
 				hash = Convert.FromBase64String(element.Element("Hash").Value),
 				signature = Convert.FromBase64String(element.Element("Signature").Value)
@@ -42,20 +42,18 @@ namespace ShomreiTorah.Common.Updates {
 		}
 
 		///<summary>Creates an UpdateFile object describing an existing file on disk.</summary>
-		///<param name="basePath">The path to the base directory containing the source files.</param>
-		///<param name="relativePath">The relative path to the source file to describe.</param>
-		///<param name="remotePath">The relative path on the server where the file will be uploaded.</param>
+		///<param name="basePath">The path to the base local directory containing the source files.</param>
+		///<param name="relativePath">The relative path to the source file on disk to describe.</param>
+		///<param name="remotePath">The path on the FTP server where the file will be uploaded, relative to the base Updates directory.</param>
 		///<param name="signer">An RSA instance containing the private key to sign the file.</param>
 		///<remarks>This method is called by the update publisher.</remarks>
 		public static UpdateFile Create(string basePath, string relativePath, Uri remotePath, RSACryptoServiceProvider signer) {
-			var filePath = Path.Combine(basePath, relativePath);
 			if (remotePath == null) throw new ArgumentNullException("remotePath");
 			if (signer == null) throw new ArgumentNullException("signer");
+			var filePath = Path.Combine(basePath, relativePath);
 
 			var info = new FileInfo(filePath);
 
-			if (!remotePath.IsAbsoluteUri)
-				remotePath = new Uri(UpdateConfig.Standard.BaseUri, remotePath);
 			var retVal = new UpdateFile {
 				RelativePath = relativePath,
 				RemoteUrl = remotePath,
@@ -74,7 +72,7 @@ namespace ShomreiTorah.Common.Updates {
 		public XElement ToXml() {
 			return new XElement("File",
 				new XAttribute("RelativePath", RelativePath),
-				new XAttribute("Url", UpdateConfig.Standard.BaseUri.MakeRelativeUri(RemoteUrl)),
+				new XAttribute("Url", RemoteUrl.ToString()),
 				new XAttribute("Size", Length.ToString(CultureInfo.InvariantCulture)),
 				new XAttribute("Timestamp", DateModifiedUtc.ToString("o", CultureInfo.InvariantCulture)),
 
@@ -84,7 +82,7 @@ namespace ShomreiTorah.Common.Updates {
 		}
 		#endregion
 
-		///<summary>Gets the relative path to the file.</summary>
+		///<summary>Gets the relative path to the file within the application directory.</summary>
 		public string RelativePath { get; private set; }
 		///<summary>Gets the URL to the encrypted file on the server, relative to the base Updates directory.</summary>
 		public Uri RemoteUrl { get; private set; }
