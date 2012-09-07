@@ -146,14 +146,21 @@ namespace ShomreiTorah.Common.Updates {
 			UpdateVerifier = new RSACryptoServiceProvider();
 			UpdateVerifier.FromXmlString(Config.GetElement("Updates", "Cryptography", "UpdateVerifier").ToString());
 
-			BaseUri = new Uri(Config.ReadAttribute("Updates", "BaseUri"), UriKind.Absolute);
+
+			Uri domain = new Uri("http://" + Config.DomainName, UriKind.Absolute);
+			RemotePath = new Uri(Config.ReadAttribute("Updates", "Path"), UriKind.Absolute);
+			BaseUri = new Uri(domain, RemotePath);
 		}
 
 		///<summary>Gets the SymmetricAlgorithm used to encrypt individual update files.</summary>
 		public SymmetricAlgorithm FileAlgorithm { get; private set; }
-		///<summary>Hodls the RSA public key used to verify file hashes.</summary>
+		///<summary>Holds the RSA public key used to verify file hashes.</summary>
 		public RSACryptoServiceProvider UpdateVerifier { get; private set; }
-		///<summary>Gets the Uri that contains updates.</summary>
+
+		///<summary>Gets the absolute path on the file server to upload and download updates.</summary>
+		public Uri RemotePath { get; private set; }
+
+		///<summary>Gets the absolute URL (including domain name) to the website directory that contains updates.</summary>
 		public Uri BaseUri { get; private set; }
 	}
 
