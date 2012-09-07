@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Win32;
 using SysConfig = System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace ShomreiTorah.Common {
 	///<summary>Reads the common configuration file (ShomreiTorahConfig.xml)</summary>
@@ -74,6 +75,8 @@ namespace ShomreiTorah.Common {
 		//Getting these properties before setting them will cause them to read ShomreiTorahConfig through ReadAttribute.
 		static string orgName, domainName, mailingAddress, legalName;
 
+		static readonly Regex newlineTrimmer = new Regex(@"\r?\n\s*");
+
 		///<summary>Gets or sets the public name of the organization using the Shomrei Torah system.  This is displayed on the website and email messages.</summary>
 		public static string OrgName {
 			get { return orgName ?? (orgName = ReadAttribute("Names", "OrgName")); }
@@ -88,7 +91,7 @@ namespace ShomreiTorah.Common {
 
 		///<summary>Gets or sets the mailing address of the organization using the Shomrei Torah system.  This is displayed in email messages.</summary>
 		public static string MailingAddress {
-			get { return mailingAddress ?? (mailingAddress = GetElement("Names", "MailingAddress").Value); }
+			get { return mailingAddress ?? (mailingAddress = newlineTrimmer.Replace(GetElement("Names", "MailingAddress").Value.Trim(), Environment.NewLine)); }
 			set { mailingAddress = value; }
 		}
 
