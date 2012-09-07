@@ -148,7 +148,7 @@ namespace ShomreiTorah.Common.Updates {
 
 
 			Uri domain = new Uri("http://" + Config.DomainName, UriKind.Absolute);
-			RemotePath = new Uri(Config.ReadAttribute("Updates", "Path"), UriKind.Absolute);
+			RemotePath = new Uri(Config.ReadAttribute("Updates", "Path"), UriKind.Relative);
 			BaseUri = new Uri(domain, RemotePath);
 		}
 
