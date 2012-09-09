@@ -66,7 +66,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the schema of this table.</summary>
 		public TableSchema Schema { get; private set; }
 		///<summary>Gets the rows in this table.</summary>
-		public ITableRowCollection<Row> Rows { get; internal set; }
+		public ITableRowCollection<Row> Rows { get; private set; }
 
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return "Table: " + Schema.Name; }
