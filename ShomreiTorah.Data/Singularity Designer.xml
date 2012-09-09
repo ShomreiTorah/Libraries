@@ -617,12 +617,12 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Pledge" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the pledge that is being paid off." Expression="" ForeignRelationName="PledgeLinks" ForeignRelationPropertyDescription="Gets the payments that pay for this pledge." ForeignRelationPropertyName="LinkedPayments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Pledge" PropertyVisibility="Public" SqlName="PledgeId" ForeignSchemaName="Pledges">
+    <Column Name="Pledge" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the pledge that is being paid off." Expression="" ForeignRelationName="LinkedPayments" ForeignRelationPropertyDescription="Gets the payments that pay for this pledge." ForeignRelationPropertyName="LinkedPayments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Pledge" PropertyVisibility="Public" SqlName="PledgeId" ForeignSchemaName="Pledges">
       <DefaultValue>
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Payment" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the payment that this instance describes." Expression="" ForeignRelationName="PledgeLinks" ForeignRelationPropertyDescription="Gets the pledges that this payment is paying for." ForeignRelationPropertyName="LinkedPledges" GenerateSqlMapping="true" IsUnique="false" PropertyName="Payment" PropertyVisibility="Public" SqlName="PaymentId" ForeignSchemaName="Payments">
+    <Column Name="Payment" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the payment that this instance describes." Expression="" ForeignRelationName="LinkedPledges" ForeignRelationPropertyDescription="Gets the pledges that this payment is paying for." ForeignRelationPropertyName="LinkedPledges" GenerateSqlMapping="true" IsUnique="false" PropertyName="Payment" PropertyVisibility="Public" SqlName="PaymentId" ForeignSchemaName="Payments">
       <DefaultValue>
         <Null />
       </DefaultValue>

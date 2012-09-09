@@ -2063,10 +2063,10 @@ namespace ShomreiTorah.Data {
             LinkIdColumn.Unique = true;
             LinkIdColumn.AllowNulls = false;
             
-            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", ShomreiTorah.Data.Pledge.Schema, "PledgeLinks");
+            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", ShomreiTorah.Data.Pledge.Schema, "LinkedPayments");
             PledgeColumn.AllowNulls = false;
             
-            PaymentColumn = Schema.Columns.AddForeignKey("Payment", ShomreiTorah.Data.Payment.Schema, "PledgeLinks");
+            PaymentColumn = Schema.Columns.AddForeignKey("Payment", ShomreiTorah.Data.Payment.Schema, "LinkedPledges");
             PaymentColumn.AllowNulls = false;
             
             AmountColumn = Schema.Columns.AddValueColumn("Amount", typeof(Decimal), null);
