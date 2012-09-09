@@ -105,7 +105,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who made the pledge." Expression="" ForeignRelationName="Pledges" ForeignRelationPropertyDescription="Gets the person's pledges." ForeignRelationPropertyName="Pledges" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person who made the pledge." Expression="" ForeignRelationName="Pledges" ForeignRelationPropertyDescription="Gets the person's pledges." ForeignRelationPropertyName="Pledges" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -170,7 +170,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who made the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the person's payments." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person who made the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the person's payments." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -200,7 +200,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Deposit" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the deposit of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments in the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Deposit" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
+    <Column Name="Deposit" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the deposit of the payment." Expression="" ForeignRelationName="Payments" ForeignRelationPropertyDescription="Gets the payments in the deposit." ForeignRelationPropertyName="Payments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Deposit" PropertyVisibility="Public" SqlName="DepositId" ForeignSchemaName="Deposits">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -237,7 +237,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Pledge" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the pledge associated with this reservation." Expression="" ForeignRelationName="SeatingReservations" ForeignRelationPropertyDescription="Gets the seating reservations associated with the pledge." ForeignRelationPropertyName="SeatingReservations" GenerateSqlMapping="true" IsUnique="true" PropertyName="Pledge" PropertyVisibility="Public" SqlName="PledgeId" ForeignSchemaName="Pledges">
+    <Column Name="Pledge" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the pledge associated with this reservation." Expression="" ForeignRelationName="SeatingReservations" ForeignRelationPropertyDescription="Gets the seating reservations associated with the pledge." ForeignRelationPropertyName="SeatingReservations" GenerateSqlMapping="true" IsUnique="true" PropertyName="Pledge" PropertyVisibility="Public" SqlName="PledgeId" ForeignSchemaName="Pledges">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -285,7 +285,7 @@
     <Column Name="UseHtml" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the whether the subscriber should receive HTML emails.  Not currently used." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="UseHtml" PropertyVisibility="Public" SqlName="HTMLformat">
       <DefaultValue>true</DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that uses the email address." Expression="" ForeignRelationName="EmailAddresses" ForeignRelationPropertyDescription="Gets the person's email addresses." ForeignRelationPropertyName="EmailAddresses" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person that uses the email address." Expression="" ForeignRelationName="EmailAddresses" ForeignRelationPropertyDescription="Gets the person's email addresses." ForeignRelationPropertyName="EmailAddresses" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -302,7 +302,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who received the statement." Expression="" ForeignRelationName="LoggedStatements" ForeignRelationPropertyDescription="Gets the statements sent to the person." ForeignRelationPropertyName="LoggedStatements" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person who received the statement." Expression="" ForeignRelationName="LoggedStatements" ForeignRelationPropertyDescription="Gets the statements sent to the person." ForeignRelationPropertyName="LoggedStatements" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -376,7 +376,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that reserved the seat." Expression="" ForeignRelationName="SeatReservations" ForeignRelationPropertyDescription="Gets the person's Melave Malka seats." ForeignRelationPropertyName="MelaveMalkaSeats" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person that reserved the seat." Expression="" ForeignRelationName="SeatReservations" ForeignRelationPropertyDescription="Gets the person's Melave Malka seats." ForeignRelationPropertyName="MelaveMalkaSeats" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -419,7 +419,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Honoree" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the guest of honor." Expression="" ForeignRelationName="Honorees" ForeignRelationPropertyDescription="Gets the Melave Malka that the person has been honored by." ForeignRelationPropertyName="Honorees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree" PropertyVisibility="Public" SqlName="Honoree" ForeignSchemaName="MasterDirectory">
+    <Column Name="Honoree" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the guest of honor." Expression="" ForeignRelationName="Honorees" ForeignRelationPropertyDescription="Gets the Melave Malka that the person has been honored by." ForeignRelationPropertyName="Honorees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree" PropertyVisibility="Public" SqlName="Honoree" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -436,7 +436,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person." Expression="" ForeignRelationName="Callers" ForeignRelationPropertyDescription="Gets the person's caller rows." ForeignRelationPropertyName="Callers" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person." Expression="" ForeignRelationName="Callers" ForeignRelationPropertyDescription="Gets the person's caller rows." ForeignRelationPropertyName="Callers" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -468,7 +468,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person invited." Expression="" ForeignRelationName="Invitees" ForeignRelationPropertyDescription="Gets the person's Melave Malka invitations." ForeignRelationPropertyName="Invitees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person invited." Expression="" ForeignRelationName="Invitees" ForeignRelationPropertyDescription="Gets the person's Melave Malka invitations." ForeignRelationPropertyName="Invitees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -491,7 +491,7 @@
     <Column Name="ShouldCall" AllowNulls="false" DataType="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets whether the person should be called to ask for an ad" Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="ShouldCall" PropertyVisibility="Public" SqlName="ShouldCall">
       <DefaultValue>false</DefaultValue>
     </Column>
-    <Column Name="Caller" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the caller assigned to this person." Expression="" ForeignRelationName="Callees" ForeignRelationPropertyDescription="Gets the people that the caller should call." ForeignRelationPropertyName="Callees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Caller" PropertyVisibility="Public" SqlName="Caller" ForeignSchemaName="Callers">
+    <Column Name="Caller" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the caller assigned to this person." Expression="" ForeignRelationName="Callees" ForeignRelationPropertyDescription="Gets the people that the caller should call." ForeignRelationPropertyName="Callees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Caller" PropertyVisibility="Public" SqlName="Caller" ForeignSchemaName="Callers">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -531,7 +531,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Recipient" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person who received the email." Expression="" ForeignRelationName="ReminderEmailLogs" ForeignRelationPropertyDescription="Gets the emails sent to the person to ask for an ad." ForeignRelationPropertyName="ReminderEmails" GenerateSqlMapping="true" IsUnique="false" PropertyName="Recipient" PropertyVisibility="Public" SqlName="InviteId" ForeignSchemaName="Invitees">
+    <Column Name="Recipient" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person who received the email." Expression="" ForeignRelationName="ReminderEmailLogs" ForeignRelationPropertyDescription="Gets the emails sent to the person to ask for an ad." ForeignRelationPropertyName="ReminderEmails" GenerateSqlMapping="true" IsUnique="false" PropertyName="Recipient" PropertyVisibility="Public" SqlName="InviteId" ForeignSchemaName="Invitees">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -558,7 +558,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the person that bought the ticket." Expression="" ForeignRelationName="RaffleTickets" ForeignRelationPropertyDescription="Gets the raffle tickets that the person purchased." ForeignRelationPropertyName="RaffleTickets" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Person" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the person that bought the ticket." Expression="" ForeignRelationName="RaffleTickets" ForeignRelationPropertyDescription="Gets the raffle tickets that the person purchased." ForeignRelationPropertyName="RaffleTickets" GenerateSqlMapping="true" IsUnique="false" PropertyName="Person" PropertyVisibility="Public" SqlName="PersonId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
@@ -595,12 +595,12 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Member" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the member of the relative." Expression="" ForeignRelationName="ForeignRelatives" ForeignRelationPropertyDescription="Gets this member's known relatives." ForeignRelationPropertyName="ForeignRelatives" GenerateSqlMapping="true" IsUnique="false" PropertyName="Member" PropertyVisibility="Public" SqlName="MemberId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Member" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the member of the relative." Expression="" ForeignRelationName="ForeignRelatives" ForeignRelationPropertyDescription="Gets this member's known relatives." ForeignRelationPropertyName="ForeignRelatives" GenerateSqlMapping="true" IsUnique="false" PropertyName="Member" PropertyVisibility="Public" SqlName="MemberId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Relative" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a618b678561bfa4a" Description="Gets or sets the relative of the relative." Expression="" ForeignRelationName="Relatives" ForeignRelationPropertyDescription="Gets the member(s) that this person is related to." ForeignRelationPropertyName="RelatedMembers" GenerateSqlMapping="true" IsUnique="false" PropertyName="Relative" PropertyVisibility="Public" SqlName="RelativeId" ForeignSchemaName="MasterDirectory">
+    <Column Name="Relative" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the relative of the relative." Expression="" ForeignRelationName="Relatives" ForeignRelationPropertyDescription="Gets the member(s) that this person is related to." ForeignRelationPropertyName="RelatedMembers" GenerateSqlMapping="true" IsUnique="false" PropertyName="Relative" PropertyVisibility="Public" SqlName="RelativeId" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
