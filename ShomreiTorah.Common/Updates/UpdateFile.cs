@@ -131,7 +131,7 @@ namespace ShomreiTorah.Common.Updates {
 
 			long actualSize;
 
-			var request = WebRequest.Create(RemoteUrl);
+			var request = WebRequest.Create(new Uri(UpdateConfig.Standard.BaseUri, RemoteUrl));
 
 			using (var hasher = hasherCreator()) {
 				using (var transform = UpdateChecker.CreateFileDecryptor())
