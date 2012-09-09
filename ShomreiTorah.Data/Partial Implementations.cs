@@ -273,6 +273,12 @@ namespace ShomreiTorah.Data {
 			if (newValue < 0) error("Amount cannot be negative");
 		}
 	}
+	partial class PledgeLink {
+		partial void ValidateAmount(decimal newValue, Action<string> error) {
+			if (newValue < 0) error("Amount cannot be negative");
+		}
+	}
+
 
 	partial class EmailAddress {
 		partial void Initialize() {
