@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using LINQPad;
@@ -69,10 +70,13 @@ namespace LINQPad {
 		// Each of these methods must return a sequence with the same number of elements
 
 		///<summary>Gets the names of the properties in this instance.</summary>
+		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Required by LINQPad")]
 		IEnumerable<string> GetNames();
 		///<summary>Gets the types of the properties in this instance.</summary>
+		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Required by LINQPad")]
 		IEnumerable<Type> GetTypes();
 		///<summary>Gets the values of the properties in this instance.</summary>
+		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Required by LINQPad")]
 		IEnumerable<object> GetValues();
 	}
 }

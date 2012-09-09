@@ -37,7 +37,7 @@ namespace ShomreiTorah.Common.Collections {
 	[DebuggerDisplay("Count = {Count}")]
 	[ComVisible(false)]
 	[DebuggerTypeProxy(typeof(ReadOnlyDictionaryDebugView<,>))]
-	public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>,
+	public sealed class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>,
 		IEnumerable<KeyValuePair<TKey, TValue>>, IDictionary, ICollection,
 		IEnumerable {
 		private readonly IDictionary<TKey, TValue> source;

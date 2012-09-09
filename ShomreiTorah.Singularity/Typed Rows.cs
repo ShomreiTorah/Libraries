@@ -169,7 +169,11 @@ namespace ShomreiTorah.Singularity {
 			return Row.Field<T>(column);
 		}
 		///<summary>Gets a field's value as it was before the change event.</summary>
+		///<returns>The OldValue property, if the property matches the changed column, or that column's current value.</returns>
+		[SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Justification = "Use generics to enforce property type.")]
 		public T GetOldValue<T>(Expression<Func<TRow, T>> property) {
+			if (property == null) throw new ArgumentNullException("property");
+
 			string columnName = ((MemberExpression)property.Body).Member.Name;
 			if (columnName == this.Column.Name)
 				return (T)OldValue;

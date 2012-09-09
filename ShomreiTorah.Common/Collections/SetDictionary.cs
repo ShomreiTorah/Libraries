@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
 namespace ShomreiTorah.Common.Collections {
 	///<summary>A dictionary mapping keys to unordered sets of items.</summary>
+	[SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "This is a dictionary that doesn't quite match the interface.")]
 	public class SetDictionary<TKey, TItem> {
 		private readonly Dictionary<TKey, HashSet<TItem>> dict;
 		private readonly IEqualityComparer<TItem> itemComparer;
