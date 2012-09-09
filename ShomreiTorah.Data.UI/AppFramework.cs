@@ -83,9 +83,14 @@ namespace ShomreiTorah.Data.UI {
 			if (Current != null)
 				return;
 			Current = instance;
+
 			RegisterStandardSettings();
-			instance.RegisterSettings();
+
+			//Call CreateDataContext() first so that RegisterSettings()
+			//can use additional columns created in CreateDataContext()
 			instance.SyncContext = instance.CreateDataContext();
+
+			instance.RegisterSettings();
 
 			try {
 				instance.SyncContext.ReadData();
@@ -140,13 +145,17 @@ namespace ShomreiTorah.Data.UI {
 
 			SetSplashCaption("Loading behaviors");
 			RegisterStandardSettings();
+
+			//TODO: Updates
+			SyncContext = CreateDataContext();
+			Debug.Assert(SyncContext.Tables.Any(), "There aren't any TableSynchronizers!");
+
+			//Call CreateDataContext() first so that RegisterSettings()
+			//can use additional columns created in CreateDataContext()
 			RegisterSettings();
 			Debug.Assert(!String.IsNullOrWhiteSpace(Dialog.DefaultTitle), "Please set a dialog title (in RegisterSettings)");
 
-			//TODO: Updates
 			SetSplashCaption("Reading database");
-			SyncContext = CreateDataContext();
-			Debug.Assert(SyncContext.Tables.Any(), "There aren't any TableSynchronizers!");
 			SyncContext.ReadData();
 
 			SetSplashCaption("Loading UI");
