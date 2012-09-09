@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <DataContext Name="ShomreiTorah" Namespace="ShomreiTorah.Data" CodePath="Singularity Classes.cs">
   <Schema Name="Deposits" RowClassDescription="Describes a deposit." RowClassName="Deposit" RowClassVisibility="Public" SqlName="Deposits" SqlSchemaName="Billing" PrimaryKeyName="DepositId">
     <Column Name="DepositId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the row's unique ID." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="DepositId" PropertyVisibility="Public" SqlName="DepositId">
@@ -606,6 +606,28 @@
       </DefaultValue>
     </Column>
     <Column Name="Relation" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the type of relation." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="RelationType" PropertyVisibility="Public" SqlName="Relation">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+  </Schema>
+  <Schema Name="PledgeLinks" RowClassDescription="Indicates that a payment was intended to pay for a specific pledge." RowClassName="PledgeLink" RowClassVisibility="Public" SqlName="PledgeLinks" SqlSchemaName="Billing" PrimaryKeyName="LinkId">
+    <Column Name="LinkId" AllowNulls="false" DataType="System.Guid, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the link id of the pledge link." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="true" PropertyName="LinkId" PropertyVisibility="Public" SqlName="LinkId">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Pledge" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the pledge that is being paid off." Expression="" ForeignRelationName="PledgeLinks" ForeignRelationPropertyDescription="Gets the payments that pay for this pledge." ForeignRelationPropertyName="LinkedPayments" GenerateSqlMapping="true" IsUnique="false" PropertyName="Pledge" PropertyVisibility="Public" SqlName="PledgeId" ForeignSchemaName="Pledges">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Payment" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the payment that this instance describes." Expression="" ForeignRelationName="PledgeLinks" ForeignRelationPropertyDescription="Gets the pledges that this payment is paying for." ForeignRelationPropertyName="LinkedPledges" GenerateSqlMapping="true" IsUnique="false" PropertyName="Payment" PropertyVisibility="Public" SqlName="PaymentId" ForeignSchemaName="Payments">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Amount" AllowNulls="false" DataType="System.Decimal, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the amount of the payment that covers this pledge." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Amount" PropertyVisibility="Public" SqlName="Amount">
       <DefaultValue>
         <Null />
       </DefaultValue>
