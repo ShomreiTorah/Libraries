@@ -268,12 +268,14 @@ namespace ShomreiTorah.Data {
 			if (newValue < 0) error("Amount cannot be negative");
 		}
 		partial void OnAccountChanged(string oldValue, string newValue) {
-			foreach (var row in LinkedPayments) 
-				row.RemoveRow();
+			if (Table != null)
+				foreach (var row in LinkedPayments)
+					row.RemoveRow();
 		}
 		partial void OnPersonChanged(Person oldValue, Person newValue) {
-			foreach (var row in LinkedPayments)
-				row.RemoveRow();
+			if (Table != null)
+				foreach (var row in LinkedPayments)
+					row.RemoveRow();
 		}
 	}
 	partial class Payment {
@@ -281,12 +283,14 @@ namespace ShomreiTorah.Data {
 			if (newValue < 0) error("Amount cannot be negative");
 		}
 		partial void OnAccountChanged(string oldValue, string newValue) {
-			foreach (var row in LinkedPledges) 
-				row.RemoveRow();
+			if (Table != null)
+				foreach (var row in LinkedPledges)
+					row.RemoveRow();
 		}
 		partial void OnPersonChanged(Person oldValue, Person newValue) {
-			foreach (var row in LinkedPledges)
-				row.RemoveRow();
+			if (Table != null)
+				foreach (var row in LinkedPledges)
+					row.RemoveRow();
 		}
 	}
 	partial class PledgeLink {
