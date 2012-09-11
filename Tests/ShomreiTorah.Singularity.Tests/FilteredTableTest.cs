@@ -73,5 +73,39 @@ namespace ShomreiTorah.Singularity.Tests {
 
 			public void Verify() { VerifyFilteredTable(this, filter); }
 		}
+
+		[TestMethod]
+		public void RescanTest() {
+			int mod = 3;
+
+			TableSchema schema = new TableSchema("SimpleTest");
+			schema.Columns.AddValueColumn("Index", typeof(int), null);
+			schema.Columns.AddCalculatedColumn("FP", row => (int)Math.Pow(row.Field<int>("Index"), 1.5));
+
+			var table = new Table(schema);
+			for (int i = 0; i < 100; i++) {
+				table.Rows.AddFromValues(i);
+			}
+
+			var view = new VerifyableFilteredTable<Row>(table, row => row.Field<int>("Index") % mod == 0);
+
+			view.Verify();
+
+			mod *= 2;
+			view.Rescan();
+			view.Verify();
+
+			mod /= 2;
+			view.Rescan();
+			view.Verify();
+
+			mod = 23;
+			view.Rescan();
+			view.Verify();
+
+			mod = 5;
+			view.Rescan();
+			view.Verify();
+		}
 	}
 }
