@@ -267,10 +267,26 @@ namespace ShomreiTorah.Data {
 		partial void ValidateAmount(decimal newValue, Action<string> error) {
 			if (newValue < 0) error("Amount cannot be negative");
 		}
+		partial void OnAccountChanged(string oldValue, string newValue) {
+			foreach (var row in LinkedPayments) 
+				row.RemoveRow();
+		}
+		partial void OnPersonChanged(Person oldValue, Person newValue) {
+			foreach (var row in LinkedPayments)
+				row.RemoveRow();
+		}
 	}
 	partial class Payment {
 		partial void ValidateAmount(decimal newValue, Action<string> error) {
 			if (newValue < 0) error("Amount cannot be negative");
+		}
+		partial void OnAccountChanged(string oldValue, string newValue) {
+			foreach (var row in LinkedPledges) 
+				row.RemoveRow();
+		}
+		partial void OnPersonChanged(Person oldValue, Person newValue) {
+			foreach (var row in LinkedPledges)
+				row.RemoveRow();
 		}
 	}
 	partial class PledgeLink {
