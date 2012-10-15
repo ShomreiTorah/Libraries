@@ -75,13 +75,13 @@ namespace ShomreiTorah.Singularity {
 			protected override IEnumerable<XElement> GetRows() { return tableElement.Elements("Row"); }
 
 			protected override IEnumerable<KeyValuePair<Column, object>> GetValues(XElement values) {
-				return Columns.Select(c => new KeyValuePair<Column, object>(c, GetValue(values.Element(XmlConvert.EncodeLocalName(c.Name)))));
+				return Columns.Where(c => !c.ReadOnly).Select(c => new KeyValuePair<Column, object>(c, GetValue(values.Element(XmlConvert.EncodeLocalName(c.Name)))));
 			}
 
 			static object GetValue(XElement valueElement) {
 				if (valueElement.Elements().Count() == 1 && valueElement.Elements().Single().Name == "Null")
 					return null;
-				return valueElement.Value;
+				return valueElement.Value.Replace("\n", Environment.NewLine);
 			}
 
 			[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
