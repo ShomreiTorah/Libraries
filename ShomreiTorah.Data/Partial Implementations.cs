@@ -159,7 +159,13 @@ namespace ShomreiTorah.Data {
 		}
 	}
 	#endregion
-
+	partial class Payment {
+		///<summary>Called before the row is removed from its table.</summary>
+		protected override void OnRemoving() {
+			OnRemoving_Deposits();
+			OnRemoving_Links();
+		}
+	}
 	#region Empty deposit cleanup
 	partial class Deposit {
 		///<summary>Clears a deposit's payments when the deposit is removed.</summary>
@@ -170,8 +176,8 @@ namespace ShomreiTorah.Data {
 		}
 	}
 	partial class Payment {
-		///<summary>Called before the row is removed from its table.</summary>
-		protected override void OnRemoving() {
+		///<summary>Deletes a deposit if its last payment is removed.</summary>
+		void OnRemoving_Deposits() {
 			if (!Table.IsLoadingData && Deposit != null && Deposit.Payments.Count == 1)
 				Deposit.RemoveRow();
 		}
@@ -273,14 +279,20 @@ namespace ShomreiTorah.Data {
 		partial void OnAccountChanged(string oldValue, string newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
-			foreach (var row in LinkedPayments)
-				row.RemoveRow();
+			foreach (var link in LinkedPayments.ToList()) //The loop will modify the collection
+				link.RemoveRow();
 		}
 		partial void OnPersonChanged(Person oldValue, Person newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
-			foreach (var row in LinkedPayments)
-				row.RemoveRow();
+			foreach (var link in LinkedPayments.ToList()) //The loop will modify the collection
+				link.RemoveRow();
+		}
+
+		///<summary>Clears a pledge's payment links when the pledge is removed.</summary>
+		protected override void OnRemoving() {
+			foreach (var link in LinkedPayments.ToList()) //The loop will modify the collection
+				link.RemoveRow();
 		}
 	}
 	partial class Payment {
@@ -290,14 +302,20 @@ namespace ShomreiTorah.Data {
 		partial void OnAccountChanged(string oldValue, string newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
-			foreach (var row in LinkedPledges)
-				row.RemoveRow();
+			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
+				link.RemoveRow();
 		}
 		partial void OnPersonChanged(Person oldValue, Person newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
-			foreach (var row in LinkedPledges)
-				row.RemoveRow();
+			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
+				link.RemoveRow();
+		}
+
+		///<summary>Clears a payment's pledge links when the payment is removed.</summary>
+		void OnRemoving_Links() {
+			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
+				link.RemoveRow();
 		}
 	}
 	partial class PledgeLink {
