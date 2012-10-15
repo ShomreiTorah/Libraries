@@ -305,7 +305,7 @@ namespace ShomreiTorah.Data {
 			if (newValue < 0) error("Amount cannot be negative");
 		}
 	}
-		#endregion
+	#endregion
 
 
 	partial class EmailAddress {
