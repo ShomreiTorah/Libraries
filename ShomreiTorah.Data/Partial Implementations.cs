@@ -162,7 +162,7 @@ namespace ShomreiTorah.Data {
 
 	#region Empty deposit cleanup
 	partial class Deposit {
-		///<summary>Called before the row is removed from its table.</summary>
+		///<summary>Clears a deposit's payments when the deposit is removed.</summary>
 		protected override void OnRemoving() {
 			foreach (var payment in Payments.ToList()) {	//The loop will modify the collection
 				payment.Deposit = null;
@@ -223,11 +223,12 @@ namespace ShomreiTorah.Data {
 	}
 	#endregion
 
+	#region Melave Malka
 	partial class Caller {
 		///<summary>Gets the string used to represent this caller in a dropdown list.</summary>
 		public override string ToString() { return Person.HisName[0] + " " + Person.LastName; }
 
-		///<summary>Called before the row is removed from its table.</summary>
+		///<summary>Clears a caller's assigned callees when the caller is deleted..</summary>
 		protected override void OnRemoving() {
 			foreach (var callee in Callees.ToList()) //The loop will modify the collection
 				callee.Caller = null;
@@ -262,7 +263,9 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the relative path to the ad blank PDF on the website.</summary>
 		public Uri AdBlankPath { get { return new Uri(String.Format(CultureInfo.InvariantCulture, "/Files/Ad-Blank-{0:yyyy}.pdf", MelaveMalkaDate), UriKind.Relative); } }
 	}
+	#endregion
 
+	#region Pledge Links
 	partial class Pledge {
 		partial void ValidateAmount(decimal newValue, Action<string> error) {
 			if (newValue < 0) error("Amount cannot be negative");
@@ -271,13 +274,13 @@ namespace ShomreiTorah.Data {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
 			foreach (var row in LinkedPayments)
-					row.RemoveRow();
+				row.RemoveRow();
 		}
 		partial void OnPersonChanged(Person oldValue, Person newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
 			foreach (var row in LinkedPayments)
-					row.RemoveRow();
+				row.RemoveRow();
 		}
 	}
 	partial class Payment {
@@ -288,13 +291,13 @@ namespace ShomreiTorah.Data {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
 			foreach (var row in LinkedPledges)
-					row.RemoveRow();
+				row.RemoveRow();
 		}
 		partial void OnPersonChanged(Person oldValue, Person newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
 			foreach (var row in LinkedPledges)
-					row.RemoveRow();
+				row.RemoveRow();
 		}
 	}
 	partial class PledgeLink {
@@ -302,6 +305,7 @@ namespace ShomreiTorah.Data {
 			if (newValue < 0) error("Amount cannot be negative");
 		}
 	}
+		#endregion
 
 
 	partial class EmailAddress {
