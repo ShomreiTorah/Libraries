@@ -13,9 +13,9 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the string that represents an empty relative.</summary>
 		public const string EmptyRelative = "(None)";
 
-		///<summary>Creates an empty </summary>
+		///<summary>Creates an empty AliyahNote instance.</summary>
 		public AliyahNote() { }
-		///<summary>Creates an AliyahNote instance from an existing pledge.</summary>
+		///<summary>Creates an AliyahNote instance from an existing note text.</summary>
 		public AliyahNote(string text) { Text = text; }
 
 		string relative;
@@ -57,10 +57,10 @@ namespace ShomreiTorah.Data {
 			text.AppendJoin(
 				RelationMatchers
 					.Select(r => r.ToString().TrimStart('^').TrimEnd('$'))	//Remove the anchors
-					.OrderByDescending(r => r.Length)
-					.Concat(new[] { Regex.Escape(EmptyRelative) }),
+					.OrderByDescending(r => r.Length),
 				"|"
-			);
+			).Append('|').Append(Regex.Escape(EmptyRelative));
+
 			text.Append(@")?");
 			text.Append(@"\s*[,.;/\\]?\s*");
 			text.Append(@"(מתנה|Matanah?)?");	//TODO: Allow prefix מתנה

@@ -129,6 +129,8 @@ namespace ShomreiTorah.Singularity {
 					row = Table.CreateRow();
 
 				foreach (var field in GetValues(rowSource)) {
+					if (field.Key.ReadOnly) continue;
+
 					var foreignKey = field.Key as ForeignKeyColumn;
 
 					if (field.Value == null || field.Value == DBNull.Value)
