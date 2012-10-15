@@ -72,6 +72,15 @@ namespace ShomreiTorah.Singularity {
 		public virtual object CoerceValue(object value, IFormatProvider provider) {
 			if (value == null || value == DBNull.Value) return null;
 			if (DataType == null) return value;
+
+			if ((Nullable.GetUnderlyingType(DataType) ?? DataType) == typeof(Guid)) {
+				var str = value as string;
+				if (str != null)
+					return new Guid(str);
+				var bytes = value as byte[];
+				if (bytes != null)
+					return new Guid(bytes);
+			}
 			return Convert.ChangeType(value, DataType, provider);
 		}
 	}
