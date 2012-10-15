@@ -159,10 +159,16 @@ namespace ShomreiTorah.Data {
 		}
 	}
 	#endregion
-
+	partial class Payment {
+		///<summary>Called before the row is removed from its table.</summary>
+		protected override void OnRemoving() {
+			OnRemoving_Deposits();
+			OnRemoving_Links();
+		}
+	}
 	#region Empty deposit cleanup
 	partial class Deposit {
-		///<summary>Called before the row is removed from its table.</summary>
+		///<summary>Clears a deposit's payments when the deposit is removed.</summary>
 		protected override void OnRemoving() {
 			foreach (var payment in Payments.ToList()) {	//The loop will modify the collection
 				payment.Deposit = null;
@@ -170,8 +176,8 @@ namespace ShomreiTorah.Data {
 		}
 	}
 	partial class Payment {
-		///<summary>Called before the row is removed from its table.</summary>
-		protected override void OnRemoving() {
+		///<summary>Deletes a deposit if its last payment is removed.</summary>
+		void OnRemoving_Deposits() {
 			if (!Table.IsLoadingData && Deposit != null && Deposit.Payments.Count == 1)
 				Deposit.RemoveRow();
 		}
@@ -223,11 +229,12 @@ namespace ShomreiTorah.Data {
 	}
 	#endregion
 
+	#region Melave Malka
 	partial class Caller {
 		///<summary>Gets the string used to represent this caller in a dropdown list.</summary>
 		public override string ToString() { return Person.HisName[0] + " " + Person.LastName; }
 
-		///<summary>Called before the row is removed from its table.</summary>
+		///<summary>Clears a caller's assigned callees when the caller is deleted..</summary>
 		protected override void OnRemoving() {
 			foreach (var callee in Callees.ToList()) //The loop will modify the collection
 				callee.Caller = null;
@@ -262,17 +269,62 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the relative path to the ad blank PDF on the website.</summary>
 		public Uri AdBlankPath { get { return new Uri(String.Format(CultureInfo.InvariantCulture, "/Files/Ad-Blank-{0:yyyy}.pdf", MelaveMalkaDate), UriKind.Relative); } }
 	}
+	#endregion
 
+	#region Pledge Links
 	partial class Pledge {
 		partial void ValidateAmount(decimal newValue, Action<string> error) {
 			if (newValue < 0) error("Amount cannot be negative");
+		}
+		partial void OnAccountChanged(string oldValue, string newValue) {
+			if (Table == null || Table.Context == null || Table.IsLoadingData)
+				return;
+			foreach (var link in LinkedPayments.ToList()) //The loop will modify the collection
+				link.RemoveRow();
+		}
+		partial void OnPersonChanged(Person oldValue, Person newValue) {
+			if (Table == null || Table.Context == null || Table.IsLoadingData)
+				return;
+			foreach (var link in LinkedPayments.ToList()) //The loop will modify the collection
+				link.RemoveRow();
+		}
+
+		///<summary>Clears a pledge's payment links when the pledge is removed.</summary>
+		protected override void OnRemoving() {
+			foreach (var link in LinkedPayments.ToList()) //The loop will modify the collection
+				link.RemoveRow();
 		}
 	}
 	partial class Payment {
 		partial void ValidateAmount(decimal newValue, Action<string> error) {
 			if (newValue < 0) error("Amount cannot be negative");
 		}
+		partial void OnAccountChanged(string oldValue, string newValue) {
+			if (Table == null || Table.Context == null || Table.IsLoadingData)
+				return;
+			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
+				link.RemoveRow();
+		}
+		partial void OnPersonChanged(Person oldValue, Person newValue) {
+			if (Table == null || Table.Context == null || Table.IsLoadingData)
+				return;
+			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
+				link.RemoveRow();
+		}
+
+		///<summary>Clears a payment's pledge links when the payment is removed.</summary>
+		void OnRemoving_Links() {
+			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
+				link.RemoveRow();
+		}
 	}
+	partial class PledgeLink {
+		partial void ValidateAmount(decimal newValue, Action<string> error) {
+			if (newValue < 0) error("Amount cannot be negative");
+		}
+	}
+	#endregion
+
 
 	partial class EmailAddress {
 		partial void Initialize() {

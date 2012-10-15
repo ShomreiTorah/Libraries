@@ -46,6 +46,31 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Gets the rows that meet the filter.</summary>
 		public IReadOnlyCollection<TRow> Rows { get; private set; }
 
+		///<summary>Re-scans the entire source table and updates the filtered view.</summary>
+		///<remarks>Call this method if external data used by the filter is changed</remarks>
+		public void Rescan() {
+			int ourIndex = 0;
+			for (int i = 0; i < Table.Rows.Count; i++) {
+				TRow row = typedTable.Rows[i];
+				bool passes = filter(row);
+
+				if (ourIndex < Rows.Count && Rows[ourIndex] == row) {	// We already have this row
+					if (passes)
+						ourIndex++;
+					else {
+						writableRows.RemoveAt(ourIndex);
+						OnRowRemoved(new RowListEventArgs<TRow>(row, ourIndex));
+					}
+				} else {						// We don't have this row
+					if (passes) {
+						writableRows.Insert(ourIndex, row);
+						OnRowAdded(new RowListEventArgs<TRow>(row, ourIndex));
+						ourIndex++;
+					}
+				}
+			}
+		}
+
 		void Dependency_RowInvalidated(object sender, RowEventArgs e) {
 			var row = (TRow)e.Row;
 

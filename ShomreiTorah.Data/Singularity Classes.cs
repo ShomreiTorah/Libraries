@@ -1891,6 +1891,11 @@ namespace ShomreiTorah.Data {
         }
         #endregion
         
+        #region ChildRows Properties
+        ///<summary>Gets the pledges that this payment is paying for.</summary>
+        public IChildRowCollection<PledgeLink> LinkedPledges { get { return TypedChildRows<PledgeLink>(PledgeLink.PaymentColumn); } }
+        #endregion
+        
         #region Partial Methods
         partial void OnColumnChanged(Column column, object oldValue, object newValue);
         
@@ -2021,6 +2026,159 @@ namespace ShomreiTorah.Data {
             	OnExternalSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
             	OnExternalIdChanged((Int32?)oldValue, (Int32?)newValue);
+        }
+        #endregion
+    }
+    
+    ///<summary>Indicates that a payment was intended to pay for a specific pledge.</summary>
+    public partial class PledgeLink : Row {
+        ///<summary>Creates a new PledgeLink instance.</summary>
+        public PledgeLink () : base(Schema) { Initialize(); }
+        partial void Initialize();
+        
+        ///<summary>Creates a strongly-typed PledgeLinks table.</summary>
+        public static TypedTable<PledgeLink> CreateTable() { return new TypedTable<PledgeLink>(Schema, () => new PledgeLink()); }
+        
+        ///<summary>Gets the schema's LinkId column.</summary>
+        public static ValueColumn LinkIdColumn { get; private set; }
+        ///<summary>Gets the schema's Pledge column.</summary>
+        public static ForeignKeyColumn PledgeColumn { get; private set; }
+        ///<summary>Gets the schema's Payment column.</summary>
+        public static ForeignKeyColumn PaymentColumn { get; private set; }
+        ///<summary>Gets the schema's Amount column.</summary>
+        public static ValueColumn AmountColumn { get; private set; }
+        
+        ///<summary>Gets the PledgeLinks schema instance.</summary>
+        public static new TypedSchema<PledgeLink> Schema { get; private set; }
+        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server PledgeLinks table.</summary>
+        public static SchemaMapping SchemaMapping { get; private set; }
+        
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        static PledgeLink() {
+            #region Create Schema
+            Schema = new TypedSchema<PledgeLink>("PledgeLinks");
+            
+            Schema.PrimaryKey = LinkIdColumn = Schema.Columns.AddValueColumn("LinkId", typeof(Guid), null);
+            LinkIdColumn.Unique = true;
+            LinkIdColumn.AllowNulls = false;
+            
+            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", ShomreiTorah.Data.Pledge.Schema, "LinkedPayments");
+            PledgeColumn.AllowNulls = false;
+            
+            PaymentColumn = Schema.Columns.AddForeignKey("Payment", ShomreiTorah.Data.Payment.Schema, "LinkedPledges");
+            PaymentColumn.AllowNulls = false;
+            
+            AmountColumn = Schema.Columns.AddValueColumn("Amount", typeof(Decimal), null);
+            AmountColumn.AllowNulls = false;
+            #endregion
+            
+            #region Create SchemaMapping
+            SchemaMapping = new SchemaMapping(Schema, false);
+            SchemaMapping.SqlName = "PledgeLinks";
+            SchemaMapping.SqlSchemaName = "Billing";
+            
+            SchemaMapping.Columns.AddMapping(LinkIdColumn, "LinkId");
+            SchemaMapping.Columns.AddMapping(PledgeColumn, "PledgeId");
+            SchemaMapping.Columns.AddMapping(PaymentColumn, "PaymentId");
+            SchemaMapping.Columns.AddMapping(AmountColumn, "Amount");
+            #endregion
+            SchemaMapping.SetPrimaryMapping(SchemaMapping);
+        }
+        
+        ///<summary>Gets the typed table that contains this row, if any.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public new TypedTable<PledgeLink> Table { get { return (TypedTable<PledgeLink>)base.Table; } }
+        #region Value Properties
+        ///<summary>Gets or sets the link id of the pledge link.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Guid LinkId {
+            get { return base.Field<Guid>(LinkIdColumn); }
+            set { base[LinkIdColumn] = value; }
+        }
+        ///<summary>Gets or sets the pledge that is being paid off.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Pledge Pledge {
+            get { return base.Field<Pledge>(PledgeColumn); }
+            set { base[PledgeColumn] = value; }
+        }
+        ///<summary>Gets or sets the payment that this instance describes.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Payment Payment {
+            get { return base.Field<Payment>(PaymentColumn); }
+            set { base[PaymentColumn] = value; }
+        }
+        ///<summary>Gets or sets the amount of the payment that covers this pledge.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Decimal Amount {
+            get { return base.Field<Decimal>(AmountColumn); }
+            set { base[AmountColumn] = value; }
+        }
+        #endregion
+        
+        #region Partial Methods
+        partial void OnColumnChanged(Column column, object oldValue, object newValue);
+        
+        partial void ValidateLinkId(Guid newValue, Action<string> error);
+        partial void OnLinkIdChanged(Guid? oldValue, Guid? newValue);
+        
+        partial void ValidatePledge(Pledge newValue, Action<string> error);
+        partial void OnPledgeChanged(Pledge oldValue, Pledge newValue);
+        
+        partial void ValidatePayment(Payment newValue, Action<string> error);
+        partial void OnPaymentChanged(Payment oldValue, Payment newValue);
+        
+        partial void ValidateAmount(Decimal newValue, Action<string> error);
+        partial void OnAmountChanged(Decimal? oldValue, Decimal? newValue);
+        #endregion
+        
+        #region Column Callbacks
+        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
+        ///<param name="column">The column containing the value.</param>
+        ///<param name="newValue">The value to validate.</param>
+        ///<returns>An error message, or null if the value is valid.</returns>
+        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public override string ValidateValue(Column column, object newValue) {
+            string error = base.ValidateValue(column, newValue);
+            if (!String.IsNullOrEmpty(error)) return error;
+            Action<string> reporter = s => error = s;
+            
+            if (column == LinkIdColumn) {
+                ValidateLinkId((Guid)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == PledgeColumn) {
+                ValidatePledge((Pledge)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == PaymentColumn) {
+                ValidatePayment((Payment)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == AmountColumn) {
+                ValidateAmount((Decimal)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            }
+            return null;
+        }
+        ///<summary>Processes an explicit change of a column value.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
+            base.OnValueChanged(column, oldValue, newValue);
+            OnColumnChanged(column, oldValue, newValue);
+            if (column == LinkIdColumn)
+            	OnLinkIdChanged((Guid?)oldValue, (Guid?)newValue);
+            else if (column == PledgeColumn)
+            	OnPledgeChanged((Pledge)oldValue, (Pledge)newValue);
+            else if (column == PaymentColumn)
+            	OnPaymentChanged((Payment)oldValue, (Payment)newValue);
+            else if (column == AmountColumn)
+            	OnAmountChanged((Decimal?)oldValue, (Decimal?)newValue);
         }
         #endregion
     }
@@ -2236,6 +2394,8 @@ namespace ShomreiTorah.Data {
         #region ChildRows Properties
         ///<summary>Gets the seating reservations associated with the pledge.</summary>
         public IChildRowCollection<SeatingReservation> SeatingReservations { get { return TypedChildRows<SeatingReservation>(SeatingReservation.PledgeColumn); } }
+        ///<summary>Gets the payments that pay for this pledge.</summary>
+        public IChildRowCollection<PledgeLink> LinkedPayments { get { return TypedChildRows<PledgeLink>(PledgeLink.PledgeColumn); } }
         #endregion
         
         #region Partial Methods
