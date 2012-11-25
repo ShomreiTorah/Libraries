@@ -132,6 +132,7 @@ namespace ShomreiTorah.Data.UI {
 			}
 
 			StartSplash();
+			AddDefaultExceptionHandlers();
 			if (!Debugger.IsAttached) {
 				Application.ThreadException += (sender, e) => HandleException(e.Exception);
 				AppDomain.CurrentDomain.UnhandledException += (sender, e) => HandleException((Exception)e.ExceptionObject);
@@ -315,14 +316,35 @@ namespace ShomreiTorah.Data.UI {
 		#endregion
 
 		#region Error Handling
-		///<summary>Handles an unhandled exception.</summary>
+		private LinkedList<Func<Exception, bool>> exceptionHandlers = new LinkedList<Func<Exception, bool>>();
+
+		///<summary>Adds a callback to handle uncaught exceptions of a specific type.</summary>
+		public void AddExceptionHandler<TException>(Action<TException> handler) where TException : Exception {
+			exceptionHandlers.AddFirst(ex => {
+				var e = ex as TException;
+				if (e != null)
+					handler(e);
+				return e != null;
+			});
+		}
+
+		///<summary>Adds the standard exception handlers built in to the framework.</summary>
+		protected virtual void AddDefaultExceptionHandlers() {
+			AddExceptionHandler<Exception>(ex => new Forms.ExceptionReporter(ex).Show(MainForm));
+		}
+
+		///<summary>Shows appropriate UI in response to an unhandled exception.</summary>
 		public virtual void HandleException(Exception ex) {
 			if (ex == null) throw new ArgumentNullException("ex");
 
-			new Forms.ExceptionReporter(ex).Show(MainForm);
+			bool handled = exceptionHandlers.Any(d => d(ex));
+			if (!handled)
+				Dialog.ShowError("A very unhandled error occurred.\r\n\r\n" + ex.ToString());
 		}
 		#endregion
 	}
+
+
 
 	///<summary>A component that automatically binds to the DataContext in the current AppFramework.</summary>
 	[Description("A component that automatically binds to the DataContext in the current AppFramework.")]
