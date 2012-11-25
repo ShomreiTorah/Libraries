@@ -57,6 +57,7 @@
     <Reference Include="DevExpress.XtraEditors.v12.1, Version=12.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraGrid.v12.1, Version=12.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="DevExpress.XtraLayout.v12.1, Version=12.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraVerticalGrid.v12.1, Version=12.1.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -93,6 +94,9 @@
     <Compile Include="DisplaySettings\RowDetailBehavior.cs" />
     <Compile Include="DisplaySettings\ToggleRowsBehavior.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Forms\ColumnValueDisplay.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\ExceptionReporter.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -104,6 +108,12 @@
     </Compile>
     <Compile Include="Forms\PersonCreator.Designer.cs">
       <DependentUpon>PersonCreator.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\RowDeletedPrompt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RowDeletedPrompt.Designer.cs">
+      <DependentUpon>RowDeletedPrompt.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\SimplePersonDetails.cs">
       <SubType>Form</SubType>
@@ -183,6 +193,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PersonCreator.resx">
       <DependentUpon>PersonCreator.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\RowDeletedPrompt.resx">
+      <DependentUpon>RowDeletedPrompt.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SimplePersonDetails.resx">
       <DependentUpon>SimplePersonDetails.cs</DependentUpon>

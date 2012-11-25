@@ -283,11 +283,16 @@ namespace ShomreiTorah.Singularity.Sql {
 	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Specialized Exception")]
 	[Serializable]
 	public class RowDeletedException : RowException {
-		///<summary>Creates a new RowModifiedException instance.</summary>
+		///<summary>Creates a new RowDeletedException instance.</summary>
 		public RowDeletedException(Row row) : base(row, "The row was deleted in the database") { }
 
 		///<summary>Serialization constructor</summary>
 		protected RowDeletedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+
+		///<summary>Marks the row as newly created, causing it to be re-added to the database during the next save.</summary>
+		public void Undelete() {
+
+		}
 	}
 
 	///<summary>Represents a changed row that will be synchronized to an SQL database.</summary>
