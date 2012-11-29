@@ -13,7 +13,7 @@ namespace ShomreiTorah.Data {
 
 		#region Melave Malka
 		///<summary>Gets the values for the Melave Malka's Source field.</summary>
-		public static readonly ReadOnlyCollection<string> MelaveMalkaSources = Strings("Shul", "Rav", "Honoree");
+		public static readonly ReadOnlyCollection<string> MelaveMalkaSources = Strings("Shul", "Rav", "Honoree 1", "Honoree 2");
 		///<summary>Gets the pre-defined ad types in the journal.</summary>
 		public static ReadOnlyCollection<AdType> AdTypes { get { return AdType.All; } }
 		#endregion

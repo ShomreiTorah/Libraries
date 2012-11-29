@@ -419,12 +419,27 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="Honoree" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the guest of honor." Expression="" ForeignRelationName="Honorees" ForeignRelationPropertyDescription="Gets the Melave Malka that the person has been honored by." ForeignRelationPropertyName="Honorees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree" PropertyVisibility="Public" SqlName="Honoree" ForeignSchemaName="MasterDirectory">
+    <Column Name="Honoree" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the guest of honor." Expression="" ForeignRelationName="Honorees" ForeignRelationPropertyDescription="Gets the Melave Malkas that the person has been honored by." ForeignRelationPropertyName="Honorees" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree" PropertyVisibility="Public" SqlName="Honoree" ForeignSchemaName="MasterDirectory">
       <DefaultValue>
         <Null />
       </DefaultValue>
     </Column>
     <Column Name="Speaker" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the speaker of the melave malka info." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Speaker" PropertyVisibility="Public" SqlName="Speaker">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="HonoreeTitle" AllowNulls="false" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the title of the primary honoree." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="HonoreeTitle" PropertyVisibility="Public" SqlName="HonoreeTitle">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Honoree2" AllowNulls="true" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the second honoree." Expression="" ForeignRelationName="MelaveMalkaInfoes" ForeignRelationPropertyDescription="Gets the Melave Malkas that the person has been secondarily honored by." ForeignRelationPropertyName="MelaveMalkaInfoes" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree2" PropertyVisibility="Public" SqlName="Honoree2" ForeignSchemaName="MasterDirectory">
+      <DefaultValue>
+        <Null />
+      </DefaultValue>
+    </Column>
+    <Column Name="Honoree2Title" AllowNulls="true" DataType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Description="Gets or sets the title of the secondary honoree." Expression="" ForeignRelationName="" ForeignRelationPropertyDescription="" ForeignRelationPropertyName="" GenerateSqlMapping="true" IsUnique="false" PropertyName="Honoree2Title" PropertyVisibility="Public" SqlName="Honoree2Title">
       <DefaultValue>
         <Null />
       </DefaultValue>

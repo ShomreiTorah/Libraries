@@ -1339,8 +1339,10 @@ namespace ShomreiTorah.Data {
         public IChildRowCollection<LoggedStatement> LoggedStatements { get { return TypedChildRows<LoggedStatement>(LoggedStatement.PersonColumn); } }
         ///<summary>Gets the person's Melave Malka seats.</summary>
         public IChildRowCollection<MelaveMalkaSeat> MelaveMalkaSeats { get { return TypedChildRows<MelaveMalkaSeat>(MelaveMalkaSeat.PersonColumn); } }
-        ///<summary>Gets the Melave Malka that the person has been honored by.</summary>
+        ///<summary>Gets the Melave Malkas that the person has been honored by.</summary>
         public IChildRowCollection<MelaveMalkaInfo> Honorees { get { return TypedChildRows<MelaveMalkaInfo>(MelaveMalkaInfo.HonoreeColumn); } }
+        ///<summary>Gets the Melave Malkas that the person has been secondarily honored by.</summary>
+        public IChildRowCollection<MelaveMalkaInfo> MelaveMalkaInfoes { get { return TypedChildRows<MelaveMalkaInfo>(MelaveMalkaInfo.Honoree2Column); } }
         ///<summary>Gets the person's caller rows.</summary>
         public IChildRowCollection<Caller> Callers { get { return TypedChildRows<Caller>(Caller.PersonColumn); } }
         ///<summary>Gets the person's Melave Malka invitations.</summary>
@@ -1508,6 +1510,12 @@ namespace ShomreiTorah.Data {
         public static ForeignKeyColumn HonoreeColumn { get; private set; }
         ///<summary>Gets the schema's Speaker column.</summary>
         public static ValueColumn SpeakerColumn { get; private set; }
+        ///<summary>Gets the schema's HonoreeTitle column.</summary>
+        public static ValueColumn HonoreeTitleColumn { get; private set; }
+        ///<summary>Gets the schema's Honoree2 column.</summary>
+        public static ForeignKeyColumn Honoree2Column { get; private set; }
+        ///<summary>Gets the schema's Honoree2Title column.</summary>
+        public static ValueColumn Honoree2TitleColumn { get; private set; }
         
         ///<summary>Gets the MelaveMalkaInfo schema instance.</summary>
         public static new TypedSchema<MelaveMalkaInfo> Schema { get; private set; }
@@ -1539,6 +1547,15 @@ namespace ShomreiTorah.Data {
             
             SpeakerColumn = Schema.Columns.AddValueColumn("Speaker", typeof(String), null);
             SpeakerColumn.AllowNulls = false;
+            
+            HonoreeTitleColumn = Schema.Columns.AddValueColumn("HonoreeTitle", typeof(String), null);
+            HonoreeTitleColumn.AllowNulls = false;
+            
+            Honoree2Column = Schema.Columns.AddForeignKey("Honoree2", ShomreiTorah.Data.Person.Schema, "MelaveMalkaInfoes");
+            Honoree2Column.AllowNulls = true;
+            
+            Honoree2TitleColumn = Schema.Columns.AddValueColumn("Honoree2Title", typeof(String), null);
+            Honoree2TitleColumn.AllowNulls = true;
             #endregion
             
             #region Create SchemaMapping
@@ -1552,6 +1569,9 @@ namespace ShomreiTorah.Data {
             SchemaMapping.Columns.AddMapping(MelaveMalkaDateColumn, "MelaveMalkaDate");
             SchemaMapping.Columns.AddMapping(HonoreeColumn, "Honoree");
             SchemaMapping.Columns.AddMapping(SpeakerColumn, "Speaker");
+            SchemaMapping.Columns.AddMapping(HonoreeTitleColumn, "HonoreeTitle");
+            SchemaMapping.Columns.AddMapping(Honoree2Column, "Honoree2");
+            SchemaMapping.Columns.AddMapping(Honoree2TitleColumn, "Honoree2Title");
             #endregion
             SchemaMapping.SetPrimaryMapping(SchemaMapping);
         }
@@ -1603,6 +1623,27 @@ namespace ShomreiTorah.Data {
             get { return base.Field<String>(SpeakerColumn); }
             set { base[SpeakerColumn] = value; }
         }
+        ///<summary>Gets or sets the title of the primary honoree.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String HonoreeTitle {
+            get { return base.Field<String>(HonoreeTitleColumn); }
+            set { base[HonoreeTitleColumn] = value; }
+        }
+        ///<summary>Gets or sets the second honoree.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public Person Honoree2 {
+            get { return base.Field<Person>(Honoree2Column); }
+            set { base[Honoree2Column] = value; }
+        }
+        ///<summary>Gets or sets the title of the secondary honoree.</summary>
+        [DebuggerNonUserCode]
+        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
+        public String Honoree2Title {
+            get { return base.Field<String>(Honoree2TitleColumn); }
+            set { base[Honoree2TitleColumn] = value; }
+        }
         #endregion
         
         #region Partial Methods
@@ -1625,6 +1666,15 @@ namespace ShomreiTorah.Data {
         
         partial void ValidateSpeaker(String newValue, Action<string> error);
         partial void OnSpeakerChanged(String oldValue, String newValue);
+        
+        partial void ValidateHonoreeTitle(String newValue, Action<string> error);
+        partial void OnHonoreeTitleChanged(String oldValue, String newValue);
+        
+        partial void ValidateHonoree2(Person newValue, Action<string> error);
+        partial void OnHonoree2Changed(Person oldValue, Person newValue);
+        
+        partial void ValidateHonoree2Title(String newValue, Action<string> error);
+        partial void OnHonoree2TitleChanged(String oldValue, String newValue);
         #endregion
         
         #region Column Callbacks
@@ -1658,6 +1708,15 @@ namespace ShomreiTorah.Data {
             } else if (column == SpeakerColumn) {
                 ValidateSpeaker((String)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == HonoreeTitleColumn) {
+                ValidateHonoreeTitle((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == Honoree2Column) {
+                ValidateHonoree2((Person)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
+            } else if (column == Honoree2TitleColumn) {
+                ValidateHonoree2Title((String)newValue, reporter);
+                if (!String.IsNullOrEmpty(error)) return error;
             }
             return null;
         }
@@ -1679,6 +1738,12 @@ namespace ShomreiTorah.Data {
             	OnHonoreeChanged((Person)oldValue, (Person)newValue);
             else if (column == SpeakerColumn)
             	OnSpeakerChanged((String)oldValue, (String)newValue);
+            else if (column == HonoreeTitleColumn)
+            	OnHonoreeTitleChanged((String)oldValue, (String)newValue);
+            else if (column == Honoree2Column)
+            	OnHonoree2Changed((Person)oldValue, (Person)newValue);
+            else if (column == Honoree2TitleColumn)
+            	OnHonoree2TitleChanged((String)oldValue, (String)newValue);
         }
         #endregion
     }
