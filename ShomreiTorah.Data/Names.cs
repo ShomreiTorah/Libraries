@@ -185,15 +185,15 @@ namespace ShomreiTorah.Data {
 		public override string ToString() { return DisplayAs; }
 		//Exposed by Names for consistency
 		internal readonly static ReadOnlyCollection<AdType> All = new ReadOnlyCollection<AdType>(new AdType[] { 
-			new AdType(1,	"Diamond",	1000,	1),
-			new AdType(2,	"Platinum",	750,	1),
-			new AdType(3,	"Gold",		500,	1),
-			new AdType(4,	"Silver",	360,	1),
-			new AdType(5,	"Bronze",	250,	1),
-			new AdType(6,	"Full",		180,	1),
-			new AdType(7,	"Half",		100,	2),
-			new AdType(8,	"Quarter",	72,		4),
-			new AdType(9,	"Greeting",	36,		10)
+			new AdType(1,	"Diamond",	1250,	1),
+			new AdType(2,	"Platinum",	1000,	1),
+			new AdType(3,	"Gold",		750,	1),
+			new AdType(4,	"Silver",	500,	1),
+			new AdType(5,	"Bronze",	360,	1),
+			new AdType(6,	"Full",		250,	1),
+			new AdType(7,	"Half",		180,	2),
+			new AdType(8,	"Quarter",	100,	4),
+			new AdType(9,	"Greeting",	50,		10)
 		});
 	}
 }
