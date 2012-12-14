@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace ShomreiTorah.Singularity.Dependencies {
 	///<summary>A dependency on a column in the same row.</summary>
@@ -38,7 +37,11 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		protected override IRowEventProvider GetRowCollection(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 
-			return table.Context.Tables[ParentColumn.ForeignSchema];
+			var retVal = table.Context.Tables[ParentColumn.ForeignSchema];
+			if (retVal == null)
+				throw new InvalidOperationException("DataContext is missing " + ParentColumn.ForeignSchema.Name
+												  + " table (needed by dependency on " + table.Schema.Name + "." + ParentColumn.Name + ")");
+			return retVal;
 		}
 
 		///<summary>Gets the row(s) affected by a change in a row.</summary>
@@ -101,7 +104,11 @@ namespace ShomreiTorah.Singularity.Dependencies {
 		protected override IRowEventProvider GetRowCollection(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 
-			return table.Context.Tables[ChildRelation.ChildSchema];	//A change in a child row affects its parent row in the parent table
+			var retVal = table.Context.Tables[ChildRelation.ChildSchema];	//A change in a child row affects its parent row in the parent table
+			if (retVal == null)
+				throw new InvalidOperationException("DataContext is missing " + ChildRelation.ChildSchema.Name
+												  + " table (needed by dependency on " + table.Schema.Name + "." + ChildRelation.Name + ")");
+			return retVal;
 		}
 
 		///<summary>Gets the row(s) affected by a change in a row.</summary>

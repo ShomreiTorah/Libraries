@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>Contains extension methods.</summary>
@@ -44,7 +45,13 @@ namespace ShomreiTorah.Singularity {
 				}
 
 				if (returnedTables.Count == 0)
-					throw new InvalidOperationException("Cyclic dependency detected");
+					throw new InvalidOperationException("Missing / cyclic dependencies detected; couldn't find dependencies for "
+						+ pendingItems.Select(schemaSelector).Join(", ", s =>
+							s.Name + " (missing " + s.Columns.OfType<ForeignKeyColumn>()
+															 .Select(fkc => fkc.ForeignSchema)
+															 .Except(processedSchemas)
+															 .Join(", ", d => d.Name)
+						  + ")"));
 				pendingItems.RemoveAll(returnedTables.Contains);
 			}
 		}
