@@ -172,7 +172,7 @@ namespace ShomreiTorah.Data {
 			get {
 				if (Name == "Greeting")
 					return "Greeting ad";
-				if (DefaultPrice > 180)
+				if (DefaultPrice > Full.DefaultPrice)
 					return Name + " ad";
 				else
 					return Name + " page ad";
@@ -190,10 +190,12 @@ namespace ShomreiTorah.Data {
 			new AdType(3,	"Gold",		750,	1),
 			new AdType(4,	"Silver",	500,	1),
 			new AdType(5,	"Bronze",	360,	1),
-			new AdType(6,	"Full",		250,	1),
+	 Full =	new AdType(6,	"Full",		250,	1),
 			new AdType(7,	"Half",		180,	2),
 			new AdType(8,	"Quarter",	100,	4),
 			new AdType(9,	"Greeting",	50,		10)
 		});
+
+		static readonly AdType Full;
 	}
 }
