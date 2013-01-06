@@ -130,6 +130,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		#region Behaviors
 		static void RegisterBehaviors() {
 			//TODO: Delete LoggedStatements?
+			GridManager.RegisterBehavior(JournalAd.Schema,
+				DeletionBehavior.WithMessages<JournalAd>(
+					singular: a => "CAUTION! Only delete an ad if its shape is gone.\r\nTo delete a healthy ad, double-click it, then click the Delete Ad button in the ribbon.\r\nEither way, any pledges, payments, or seating reservations will NOT be deleted.\r\n\r\nAre you sure you want to delete the row for ad #" + a.ExternalId + "?",
+					plural: set => "CAUTION! Only delete an ad if its shape is gone.\r\nTo delete a healthy ad, double-click it, then click the Delete Ad button in the ribbon.\r\nEither way, any pledges, payments, or seating reservations will NOT be deleted.\r\n\r\nAre you sure you want to delete the rows for ads #" + set.Join(", ", j => j.ExternalId.ToString()) + "?"
+				)
+			);
 
 			GridManager.RegisterBehavior(RelativeLink.Schema,
 				DeletionBehavior.WithMessages(
@@ -346,8 +352,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 
 		static SettingsRegistrator() {
-			try{
-			InitializeStandardSettings(); AppFramework.AutoRegisterDesigner();
+			try {
+				InitializeStandardSettings(); AppFramework.AutoRegisterDesigner();
 			} catch (Exception ex) { MessageBox.Show(ex.ToString()); }
 		}
 
