@@ -184,7 +184,31 @@ namespace ShomreiTorah.Common {
 		}
 		#endregion
 
-		#region Extension methods
+		///<summary>Executes the command, returning the first value, and closes the connection.</summary>
+		///<typeparam name="T">The type to return.</typeparam>
+		///<param name="command">The command to execute.</param>
+		///<returns>The first column of the first row returned by the query.</returns>
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Avoid casting")]
+		public static T Execute<T>(this IDbCommand command) {
+			if (command == null) throw new ArgumentNullException("command");
+
+			if (typeof(IDataReader).IsAssignableFrom(typeof(T)))
+				return (T)command.ExecuteReader(CommandBehavior.CloseConnection);
+			using (command)
+			using (command.Connection)
+				return (T)command.ExecuteScalar();
+		}
+
+		///<summary>Adds a parameter to an existing command.</summary>
+		public static IDbDataParameter AddParameter(this IDbCommand command, string name, object value) {
+			var param = command.CreateParameter();
+			param.ParameterName = name;
+			param.Value = value;
+			command.Parameters.Add(param);
+			return param;
+		}
+
+		#region Connection Extension methods
 		///<summary>Creates a DbCommand.</summary>
 		///<param name="connection">The connection to create the command for.</param>
 		///<param name="sql">The SQL of the command.</param>
@@ -214,20 +238,6 @@ namespace ShomreiTorah.Common {
 		public static void AddParameters<TParameters>(this IDbCommand command, TParameters parameters) where TParameters : class { if (parameters != null) ParamAdders<TParameters>.adder(command, parameters); }
 
 		#region Execution
-		///<summary>Executes the command, returning the first value, and closes the connection.</summary>
-		///<typeparam name="T">The type to return.</typeparam>
-		///<param name="command">The command to execute.</param>
-		///<returns>The first column of the first row returned by the query.</returns>
-		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Avoid casting")]
-		public static T Execute<T>(this IDbCommand command) {
-			if (command == null) throw new ArgumentNullException("command");
-
-			if (typeof(IDataReader).IsAssignableFrom(typeof(T)))
-				return (T)command.ExecuteReader(CommandBehavior.CloseConnection);
-			using (command)
-			using (command.Connection)
-				return (T)command.ExecuteScalar();
-		}
 
 		///<summary>Executes a SQL statement against a connection.</summary>
 		///<param name="connection">The connection to the database.  The connection is not closed.</param>
@@ -295,6 +305,98 @@ namespace ShomreiTorah.Common {
 
 			var adapter = factory.CreateDataAdapter();
 			adapter.SelectCommand = connection.CreateCommand(selectSql);
+			return adapter;
+		}
+		#endregion
+
+		#region Transaction Extension methods
+		///<summary>Creates a DbCommand.</summary>
+		///<param name="transaction">The connection to create the command for.</param>
+		///<param name="sql">The SQL of the command.</param>
+		public static DbCommand CreateCommand(this DbTransaction transaction, string sql) { return transaction.CreateCommand<object>(sql, null); }
+		///<summary>Creates a parameterized DbCommand.</summary>
+		///<typeparam name="TParameters">A type containing public properties to add as parameters.</typeparam>
+		///<param name="transaction">The transaction to create the command for.</param>
+		///<param name="sql">The SQL of the command.</param>
+		///<param name="parameters">An object containing the values of the parameters to add.</param>
+		[SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
+		public static DbCommand CreateCommand<TParameters>(this DbTransaction transaction, string sql, TParameters parameters) where TParameters : class {
+			if (transaction == null) throw new ArgumentNullException("transaction");
+
+			var retVal = transaction.Connection.CreateCommand();
+			retVal.Transaction = transaction;
+			retVal.CommandText = sql;
+			retVal.AddParameters(parameters);
+			return retVal;
+		}
+
+		#region Execution
+		///<summary>Executes a SQL statement against a connection.</summary>
+		///<param name="transaction">The transaction to the database.  The connection is not closed.</param>
+		///<param name="sql">The SQL to execute.</param>
+		///<returns>The number of rows affected by the statement.</returns>
+		public static int ExecuteNonQuery(this DbTransaction transaction, string sql) { return transaction.ExecuteNonQuery<object>(sql, null); }
+		///<summary>Executes a SQL statement against a connection.</summary>
+		///<typeparam name="TParameters">A type containing public properties to add as parameters.</typeparam>
+		///<param name="transaction">The transaction to the database.  The connection is not closed.</param>
+		///<param name="sql">The SQL to execute.</param>
+		///<param name="parameters">An object containing the values of the parameters to add.</param>
+		///<returns>The number of rows affected by the statement.</returns>
+		public static int ExecuteNonQuery<TParameters>(this DbTransaction transaction, string sql, TParameters parameters) where TParameters : class {
+			using (var command = transaction.CreateCommand(sql, parameters)) return command.ExecuteNonQuery();
+		}
+
+		///<summary>Executes a SQL statement against a connection.</summary>
+		///<param name="transaction">The transaction to the database.  The connection is not closed.</param>
+		///<param name="sql">The SQL to execute.</param>
+		///<returns>A DbDataReader object, which will close its underlying connection when disposed.</returns>
+		public static DbDataReader ExecuteReader(this DbTransaction transaction, string sql) { return transaction.ExecuteReader<object>(sql, null); }
+		///<summary>Executes a SQL statement against a connection.</summary>
+		///<typeparam name="TParameters">A type containing public properties to add as parameters.</typeparam>
+		///<param name="transaction">The transaction to the database.  The connection is not closed.</param>
+		///<param name="sql">The SQL to execute.</param>
+		///<param name="parameters">An object containing the values of the parameters to add.</param>
+		///<returns>A DbDataReader object, which will close its underlying connection when disposed.</returns>
+		[SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "The DataReader will dispose the connection")]
+		public static DbDataReader ExecuteReader<TParameters>(this DbTransaction transaction, string sql, TParameters parameters) where TParameters : class {
+			return transaction.CreateCommand(sql, parameters).ExecuteReader();
+		}
+
+		///<summary>Executes a SQL statement against a connection.</summary>
+		///<typeparam name="T">The type to return.</typeparam>
+		///<param name="transaction">The transaction to the database.  The connection is not closed.</param>
+		///<param name="sql">The SQL to execute.</param>
+		///<returns>The first column of the first row returned by the query.</returns>
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Avoid casting")]
+		public static T ExecuteScalar<T>(this DbTransaction transaction, string sql) { using (var command = transaction.CreateCommand(sql)) return (T)command.ExecuteScalar(); }
+
+		///<summary>Creates a typed SQL statement for a connection.</summary>
+		///<typeparam name="T">The scalar type returned by the query.</typeparam>
+		///<returns>A SqlStatement object with an Execute method.</returns>
+		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Avoid casting")]
+		public static ISqlStatement<T> Sql<T>(this DbTransaction transaction, string sqlText) { return new SqlTransactionStatement<T>(transaction, sqlText); }
+		class SqlTransactionStatement<TReturn> : ISqlStatement<TReturn> {
+			internal SqlTransactionStatement(DbTransaction transaction, string sql) { Transaction = transaction; Sql = sql; }
+
+			public DbTransaction Transaction { get; private set; }
+			public string Sql { get; private set; }
+
+			public TReturn Execute() { return Execute<object>(null); }
+			public TReturn Execute<TParameters>(TParameters parameters) where TParameters : class { using (var command = Transaction.CreateCommand(Sql, parameters)) return (TReturn)command.ExecuteScalar(); }
+		}
+		#endregion
+
+		///<summary>Creates a DbDataAdapter.</summary>
+		///<param name="factory">The factory used to create the DbDataAdapter.</param>
+		///<param name="transaction">The transaction for the adapter.</param>
+		///<param name="selectSql">The SQL for the adapter's select command.</param>
+		public static DbDataAdapter CreateDataAdapter(this DbProviderFactory factory, DbTransaction transaction, string selectSql) {
+			if (factory == null) throw new ArgumentNullException("factory");
+			if (transaction == null) throw new ArgumentNullException("transaction");
+			if (String.IsNullOrEmpty(selectSql)) throw new ArgumentNullException("selectSql");
+
+			var adapter = factory.CreateDataAdapter();
+			adapter.SelectCommand = transaction.CreateCommand(selectSql);
 			return adapter;
 		}
 		#endregion
