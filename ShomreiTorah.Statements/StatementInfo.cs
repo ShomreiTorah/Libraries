@@ -123,7 +123,7 @@ namespace ShomreiTorah.Statements {
 		internal bool ShouldInclude {
 			get {
 				if (Parent.Kind == StatementKind.Bill)
-					return BalanceDue > 0;
+					return Pledges.Any() || Payments.Any();
 				else
 					return Payments.Any();
 			}
