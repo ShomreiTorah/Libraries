@@ -37,13 +37,11 @@ namespace ShomreiTorah.Statements.Email {
 
 		static readonly MailAddress BillingAddress = new MailAddress("Billing@" + Config.DomainName, Config.OrgName + " Billing");
 		public StatementMessage CreateMessage(Person person, string templateName, DateTime startDate) {
-			var page = (StatementPage)TemplateService.Resolve(templateName);
+			var page = (StatementPage)TemplateService.Resolve(templateName, null);
 			page.SetInfo(person, startDate);
 
 			var images = new EmailAttachmentImageService(ImagesPath);
-			page.ImageService = images;
-
-			var content = page.RenderPage();
+			var content = page.RenderPage(images);
 			if (!page.ShouldSend) return null;
 
 			var message = new StatementMessage(page, templateName) { From = BillingAddress, SubjectEncoding = Email.DefaultEncoding };
