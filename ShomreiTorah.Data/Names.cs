@@ -33,12 +33,16 @@ namespace ShomreiTorah.Data {
 		#endregion
 
 		#region Pledge Types
+		///<summary>Gets the subtype that indicates pledges that are not tax deductible.</summary>
+		///<remarks>These pledges are subtracted from receipts.</remarks>
+		public static readonly string NonDeductibleSubType = "Non-tax-deductible";
+
 		///<summary>Gets the standard pledge types.</summary>
 		public static readonly ReadOnlyCollection<PledgeType> PledgeTypes = new ReadOnlyCollection<PledgeType>(new[]{
 			new PledgeType("Donation",		subTypes: new[]{ "R' Buxbaum" }),
 			new PledgeType("Membership"),
 			new PledgeType("סעודה שלישית"),
-			new PledgeType("Kiddush",		subTypes: new[]{ "ראש השנה", "שמחת תורה", "חתנים", "שבועות", "Shavuos Night" }),
+			new PledgeType("Kiddush",		subTypes: new[]{ NonDeductibleSubType, "ראש השנה", "שמחת תורה", "חתנים", "שבועות", "Shavuos Night" }),
 			new PledgeType("Seforim"),
 			new PledgeType("Building Fund"),
 			new PledgeType("ימים נוראים Seats"),

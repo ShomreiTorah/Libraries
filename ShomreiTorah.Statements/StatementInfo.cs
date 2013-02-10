@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using ShomreiTorah.Data;
 using ShomreiTorah.Singularity;
@@ -56,10 +58,7 @@ namespace ShomreiTorah.Statements {
 			TotalPledged = Accounts.Sum(a => a.TotalPledged);
 			TotalPaid = Accounts.Sum(a => a.TotalPaid);
 
-			if (Accounts.Any(a => a.Pledges.Any(p => p.Type.StartsWith("Melave Malka", StringComparison.CurrentCultureIgnoreCase)))) {
-				Deductibility = "No goods or services have been provided.  If you attended the Melave Malka, $25 per reservation is not tax deductible.";
-			} else
-				Deductibility = "No goods or services have been provided.";
+			Deductibility = String.Join("  ", CalcDeductibility());
 
 			if (data.Table<Payment>().Rows.Any())
 				LastEnteredPayment = data.Table<Payment>().Rows.Max(p => p.Modified);
@@ -67,6 +66,19 @@ namespace ShomreiTorah.Statements {
 				LastEnteredPayment = data.Table<Pledge>().Rows.Max(p => p.Modified);
 			else
 				LastEnteredPayment = new DateTime(1970, 1, 1);
+		}
+
+		private IEnumerable<String> CalcDeductibility() {
+			var exlcudedPledgeSum = Accounts.Sum(a => a.Pledges.Where(p => p.SubType == Names.NonDeductibleSubType).Sum(p => p.Amount));
+			if (exlcudedPledgeSum == 0) {
+				yield return "No goods or services have been provided.";
+			} else {
+				yield return String.Format(CultureInfo.CurrentCulture,
+										   "This receipt covers {0:c} of pledges for goods or services, leaving a total of {1:c} of tax-deductible contributions.",
+										   exlcudedPledgeSum, TotalBalance - exlcudedPledgeSum);
+			}
+			if (Accounts.Any(a => a.Pledges.Any(p => p.Amount > 0 && p.Type.StartsWith("Melave Malka", StringComparison.CurrentCultureIgnoreCase))))
+				yield return "If you attended the Melave Malka, " + (exlcudedPledgeSum > 0 ? "an additional " : "") + " $25 per reservation is not tax-deductible.";
 		}
 
 		///<summary>Gets the date of the most recently entered payment in the system.</summary>
