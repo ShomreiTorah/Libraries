@@ -160,6 +160,33 @@ namespace ShomreiTorah.Data {
 	}
 	#endregion
 	partial class Payment {
+		///<summary>Gets the full description of this payment, including the payment method and the appropriately-formatted details.</summary>
+		///<remarks>This string is displayed in receipts.</remarks>
+		public string MethodDescription {
+			get {
+				if (Method == "Unknown")	// Imported legacy data
+					return "?";
+
+				if (string.IsNullOrWhiteSpace(CheckNumber))
+					return Method;
+
+				switch (Method) {
+					case "Check":
+						return Method + " #" + CheckNumber;
+
+					case "Credit Card":
+						return Method + " (" + CheckNumber + ")";
+
+					case "Goods and/or Services":
+						return "Goods / services: " + CheckNumber;
+
+					case "Cash":
+					default:
+						return Method + " – " + CheckNumber;
+				}
+			}
+		}
+
 		///<summary>Called before the row is removed from its table.</summary>
 		protected override void OnRemoving() {
 			OnRemoving_Deposits();
