@@ -61,8 +61,8 @@ namespace ShomreiTorah.Administration {
 
 			var guid = Guid.NewGuid();
 			Database.ExecuteNonQuery(@"
-INSERT INTO Data.MasterDirectory(Id, FullName, LastName, Phone, Source)
-VALUES(@guid, @fullName, @lastName, Data.FormatPhone(@phone), 'Web Site')", new { guid, fullName, lastName, phone });
+INSERT INTO Data.MasterDirectory(Id, FullName, Salutation, LastName, Phone, Source)
+VALUES(@guid, @fullName, @fullName, @lastName, Data.FormatPhone(@phone), 'Web Site')", new { guid, fullName, lastName, phone });
 			return guid;
 		}
 		static bool IsFuzzyMatch(string a, string b) {
