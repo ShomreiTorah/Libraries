@@ -114,6 +114,9 @@ namespace ShomreiTorah.Common {
 			return bestItem;
 		}
 		///<summary>Finds the item with the highest property in a sequence.</summary>
+		public static T FindMax<T>(this IEnumerable<T> items, Func<T, DateTime> selector) { return items.FindAggregate(selector, (a, b) => a > b ? a : b); }
+
+		///<summary>Finds the item with the highest property in a sequence.</summary>
 		public static T FindMax<T>(this IEnumerable<T> items, Func<T, Byte> selector) { return items.FindAggregate(selector, Math.Max); }
 		///<summary>Finds the item with the highest property in a sequence.</summary>
 		public static T FindMax<T>(this IEnumerable<T> items, Func<T, Int16> selector) { return items.FindAggregate(selector, Math.Max); }
@@ -127,6 +130,9 @@ namespace ShomreiTorah.Common {
 		public static T FindMax<T>(this IEnumerable<T> items, Func<T, Double> selector) { return items.FindAggregate(selector, Math.Max); }
 		///<summary>Finds the item with the highest property in a sequence.</summary>
 		public static T FindMax<T>(this IEnumerable<T> items, Func<T, Decimal> selector) { return items.FindAggregate(selector, Math.Max); }
+
+		///<summary>Finds the item with the highest property in a sequence.</summary>
+		public static T FindMin<T>(this IEnumerable<T> items, Func<T, DateTime> selector) { return items.FindAggregate(selector, (a, b) => a < b ? a : b); }
 
 		///<summary>Finds the item with the lowest property in a sequence.</summary>
 		public static T FindMin<T>(this IEnumerable<T> items, Func<T, Byte> selector) { return items.FindAggregate(selector, Math.Min); }
