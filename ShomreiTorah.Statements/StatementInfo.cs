@@ -69,13 +69,14 @@ namespace ShomreiTorah.Statements {
 		}
 
 		private IEnumerable<String> CalcDeductibility() {
-			var exlcudedPledgeSum = Accounts.Sum(a => a.Pledges.Where(p => p.SubType == Names.NonDeductibleSubType).Sum(p => p.Amount));
+			var exlcudedPledges = Accounts.SelectMany(a => a.Pledges.Where(p => p.SubType == Names.NonDeductibleSubType)).ToList();
+			var exlcudedPledgeSum = exlcudedPledges.Sum(p => p.Amount);
 			if (exlcudedPledgeSum == 0) {
 				yield return "No goods or services have been provided.";
 			} else {
 				yield return String.Format(CultureInfo.CurrentCulture,
-										   "This receipt covers {0:c} of pledges for goods or services, leaving a total of {1:c} of tax-deductible contributions.",
-										   exlcudedPledgeSum, TotalBalance - exlcudedPledgeSum);
+										   "This receipt covers {0:c} of payments for goods or services rendered ({2}), leaving a total of {1:c} of tax-deductible contributions.",
+										   exlcudedPledgeSum, TotalBalance - exlcudedPledgeSum, String.Join(", ", exlcudedPledges.Select(p => p.Type).Distinct()));
 			}
 			if (Accounts.Any(a => a.Pledges.Any(p => p.Amount > 0 && p.Type.StartsWith("Melave Malka", StringComparison.CurrentCultureIgnoreCase))))
 				yield return "If you attended the Melave Malka, " + (exlcudedPledgeSum > 0 ? "an additional " : "") + " $25 per reservation is not tax-deductible.";
