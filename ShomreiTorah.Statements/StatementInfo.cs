@@ -136,7 +136,7 @@ namespace ShomreiTorah.Statements {
 		internal bool ShouldInclude {
 			get {
 				if (Parent.Kind == StatementKind.Bill)
-					return Pledges.Any() || Payments.Any();
+					return OutstandingBalance != 0 || Pledges.Any() || Payments.Any();
 				else
 					return Payments.Any();
 			}
