@@ -69,7 +69,10 @@ namespace ShomreiTorah.Statements {
 		}
 
 		private IEnumerable<String> CalcDeductibility() {
-			var exlcudedPledges = Accounts.SelectMany(a => a.Pledges.Where(p => p.SubType == Names.NonDeductibleSubType)).ToList();
+			var exlcudedPledges = Accounts.SelectMany(a => a.Pledges.Where(p =>
+				p.SubType.Replace("-", "").StartsWith(Names.NonDeductibleSubType.Replace("-", ""), StringComparison.OrdinalIgnoreCase))
+			).ToList();
+
 			var exlcudedPledgeSum = exlcudedPledges.Sum(p => p.Amount);
 			if (exlcudedPledgeSum == 0) {
 				yield return "No goods or services have been provided.";
