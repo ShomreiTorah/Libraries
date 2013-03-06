@@ -27,7 +27,7 @@ namespace ShomreiTorah.Data {
 
 
 		///<summary>Gets the payment methods that cannot be deposited.</summary>
-		public static readonly ReadOnlyCollection<string> UndepositedPayments = Strings("Goods and/or Services");
+		public static readonly ReadOnlyCollection<string> UndepositedPayments = Strings("Goods and/or Services", "Credit Card");
 		///<summary>Gets the all of the standard payment methods.</summary>
 		public static readonly ReadOnlyCollection<string> PaymentMethods = Strings(new[] { "Cash", "Check" }, UndepositedPayments);
 		#endregion
