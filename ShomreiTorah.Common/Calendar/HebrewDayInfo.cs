@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ShomreiTorah.Common.Calendar.Holidays;
 
 namespace ShomreiTorah.Common.Calendar {
@@ -43,11 +42,15 @@ namespace ShomreiTorah.Common.Calendar {
 		///<summary>Gets the category of the יום טוב (if any) on this day.</summary>
 		public HolidayCategory HolidayCategory { get { var h = Holiday; return h == null ? HolidayCategory.None : h.Category; } }
 
-		///<summary>Checks whether is date is part of a multi-day יום טוב.</summary>
+		///<summary>Checks whether this date is part of a multi-day יום טוב.</summary>
 		public bool Is(HolidayGroup group) { return group != null && group.Days.Any(h => h.Date.Is(Date)); }
-		///<summary>Checks whether is date is a יום טוב.</summary>
+		///<summary>Checks whether this date is a יום טוב.</summary>
 		public bool Is(Holiday holiday) { return holiday != null && holiday.Date.Is(Date); }
-		///<summary>Checks whether is date is a category of יום טוב.</summary>
+		///<summary>Checks whether this date is a category of יום טוב.</summary>
 		public bool Is(HolidayCategory category) { return Holiday.All.Any(h => h.Category == category && h.Date.Is(Date)); ; }
+		///<summary>Checks whether this date is in any of a set of categories of יום טוב.</summary>
+		public bool Is(params HolidayCategory[] categories) { return Is((IEnumerable<HolidayCategory>)categories); }
+		///<summary>Checks whether this date is in any of a set of categories of יום טוב.</summary>
+		public bool Is(IEnumerable<HolidayCategory> categories) { return Holiday.All.Any(h => categories.Contains(h.Category) && h.Date.Is(Date)); ; }
 	}
 }
