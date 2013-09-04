@@ -224,6 +224,8 @@ namespace ShomreiTorah.Singularity {
 		}
 		void RemoveFromParent(Row childRow, Row oldParent) {
 			if (oldParent == null) return;
+			// If the parent is not in a DataContext, it has no collection to trim.
+			if (oldParent.Table == null || oldParent.Table.Context == null) return;
 			var c = oldParent.ChildRows(ChildRelation, false);
 			if (c != null) c.RemoveRow(childRow);
 		}
