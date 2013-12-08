@@ -68,9 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppFramework.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="AppFramework.cs" />
     <Compile Include="Controls\CheckNumberEdit.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -117,9 +115,7 @@
     <Compile Include="Grid\AllowKeyboardActivation.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Grid\ColumnController.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Grid\ColumnController.cs" />
     <Compile Include="DisplaySettings\DeletionBehavior.cs" />
     <Compile Include="DisplaySettings\EditorRepository.cs" />
     <Compile Include="DisplaySettings\GridManager.cs" />

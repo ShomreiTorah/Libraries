@@ -157,7 +157,10 @@ namespace ShomreiTorah.Common {
 				case DatabaseFile.Access2007:
 					//OleDB can't create Access databases, so I
 					//embedded empty databases in the assembly.
-					using (var originalStream = typeof(DB).Assembly.GetManifestResourceStream("ShomreiTorah.Common.Data." + format.ToString() + format.GetExtension()))
+					//I append a dummy extension so Web Publish
+					//doesn't break.
+					//https://connect.microsoft.com/VisualStudio/feedback/details/808438/loading-an-access-accdb-database-breaks-ftp-web-publish
+					using (var originalStream = typeof(DB).Assembly.GetManifestResourceStream("ShomreiTorah.Common.Data." + format.ToString() + format.GetExtension() + ".template"))
 					using (var file = File.Create(filePath)) {
 						originalStream.CopyTo(file);
 					}

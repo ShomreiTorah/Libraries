@@ -132,10 +132,8 @@
     <Compile Include="WeakReference.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Data\Access.mdb">
-    </EmbeddedResource>
-    <EmbeddedResource Include="Data\Access2007.accdb">
-    </EmbeddedResource>
+    <EmbeddedResource Include="Data\Access.mdb.template" />
+    <EmbeddedResource Include="Data\Access2007.accdb.template" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\..\Setup\Common\CustomDictionary.xml">
