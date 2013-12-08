@@ -45,6 +45,7 @@ namespace ShomreiTorah.Data {
 			new PledgeType("Kiddush",		subTypes: new[]{ NonDeductibleSubType, "ראש השנה", "שמחת תורה", "חתנים", "שבועות", "Shavuos Night" }),
 			new PledgeType("Seforim"),
 			new PledgeType("Building Fund"),
+			new PledgeType("נר למאור"),
 			new PledgeType("ימים נוראים Seats"),
 
 			new PledgeType("Auction",		  //This is the sort order for rows in the auction grid, and for subtypes
