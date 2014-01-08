@@ -23,7 +23,7 @@ namespace ShomreiTorah.Statements {
 					 && !person.Pledges.Any(p => p.Date >= startDate))
 						startDate = new DateTime(person.Pledges.OrderBy(p => p.Date).Last().Date.Year, 1, 1);
 					StartDate = startDate;
-					EndDate = DateTime.Now;
+					EndDate = DateTime.MaxValue;
 					break;
 				case StatementKind.Receipt:
 					StartDate = new DateTime(startDate.Year, 1, 1);
