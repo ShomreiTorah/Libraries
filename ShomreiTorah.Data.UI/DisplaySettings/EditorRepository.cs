@@ -36,12 +36,9 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			RelationListEditor = new ComboBoxSettings(Names.RelationNames);
 			MelaveMalkaSourceEditor = new ComboBoxSettings(Names.MelaveMalkaSources, p => p.TextEditStyle = TextEditStyles.DisableTextEditor);
 
-			StateEditor = new ComboBoxSettings(Names.CommonStates.Concat(Names.StateAbbreviations));
+			StateEditor = new ComboBoxSettings(Names.CommonStates.Concat(new[] { "Canada", "Israel" }).Concat(Names.StateAbbreviations));
 			ZipEditor = new EditorSettings<RepositoryItemTextEdit>(properties => {
-				properties.Mask.AutoComplete = AutoCompleteType.None;
-				properties.Mask.EditMask = @"\d{5}";
-				properties.Mask.MaskType = MaskType.RegEx;
-				properties.Mask.ShowPlaceHolders = false;
+				properties.MaxLength = 10;
 			});
 			PhoneEditor = new EditorSettings<RepositoryItemTextEdit>(properties => {
 				properties.Mask.EditMask = @"\(\d\d\d\) \d\d\d - \d\d\d\d";
