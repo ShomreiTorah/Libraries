@@ -135,6 +135,8 @@ namespace ShomreiTorah.Common.Tests {
 			using (var connection = OpenConnection()) {
 				Assert.AreEqual(DateTime.UtcNow.Date, connection.ExecuteScalar<DateTime>("SELECT getutcdate()").Date);
 				Assert.AreEqual(3, connection.ExecuteScalar<int>("SELECT 1 + 2"));
+				Assert.AreEqual(null, connection.ExecuteScalar<int?>("SELECT NULL"));
+				Assert.AreEqual(null, connection.ExecuteScalar<string>("SELECT NULL"));
 			}
 		}
 

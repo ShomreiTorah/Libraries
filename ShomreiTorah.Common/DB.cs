@@ -199,7 +199,7 @@ namespace ShomreiTorah.Common {
 				return (T)command.ExecuteReader(CommandBehavior.CloseConnection);
 			using (command)
 			using (command.Connection)
-				return (T)command.ExecuteScalar();
+				return command.ExecuteScalar().NullableCast<T>();
 		}
 
 		///<summary>Adds a parameter to an existing command.</summary>
@@ -240,6 +240,14 @@ namespace ShomreiTorah.Common {
 		///</example>
 		public static void AddParameters<TParameters>(this IDbCommand command, TParameters parameters) where TParameters : class { if (parameters != null) ParamAdders<TParameters>.adder(command, parameters); }
 
+		private static T NullableCast<T>(this object o) {
+			if (o != null && o != DBNull.Value)
+				return (T)o;
+			if (typeof(T).IsValueType && Nullable.GetUnderlyingType(typeof(T)) == null)
+				throw new NullReferenceException("Cannot convert null result to " + typeof(T));
+			return default(T);
+		}
+
 		#region Execution
 
 		///<summary>Executes a SQL statement against a connection.</summary>
@@ -279,7 +287,7 @@ namespace ShomreiTorah.Common {
 		///<param name="sql">The SQL to execute.</param>
 		///<returns>The first column of the first row returned by the query.</returns>
 		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Avoid casting")]
-		public static T ExecuteScalar<T>(this DbConnection connection, string sql) { using (var command = connection.CreateCommand(sql)) return (T)command.ExecuteScalar(); }
+		public static T ExecuteScalar<T>(this DbConnection connection, string sql) { using (var command = connection.CreateCommand(sql)) return command.ExecuteScalar().NullableCast<T>(); }
 
 		///<summary>Creates a typed SQL statement for a connection.</summary>
 		///<typeparam name="T">The scalar type returned by the query.</typeparam>
@@ -293,7 +301,7 @@ namespace ShomreiTorah.Common {
 			public string Sql { get; private set; }
 
 			public TReturn Execute() { return Execute<object>(null); }
-			public TReturn Execute<TParameters>(TParameters parameters) where TParameters : class { using (var command = Connection.CreateCommand(Sql, parameters)) return (TReturn)command.ExecuteScalar(); }
+			public TReturn Execute<TParameters>(TParameters parameters) where TParameters : class { using (var command = Connection.CreateCommand(Sql, parameters)) return command.ExecuteScalar().NullableCast<TReturn>(); }
 		}
 		#endregion
 
@@ -371,7 +379,7 @@ namespace ShomreiTorah.Common {
 		///<param name="sql">The SQL to execute.</param>
 		///<returns>The first column of the first row returned by the query.</returns>
 		[SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Avoid casting")]
-		public static T ExecuteScalar<T>(this DbTransaction transaction, string sql) { using (var command = transaction.CreateCommand(sql)) return (T)command.ExecuteScalar(); }
+		public static T ExecuteScalar<T>(this DbTransaction transaction, string sql) { using (var command = transaction.CreateCommand(sql)) return command.ExecuteScalar().NullableCast<T>(); }
 
 		///<summary>Creates a typed SQL statement for a connection.</summary>
 		///<typeparam name="T">The scalar type returned by the query.</typeparam>
@@ -385,7 +393,7 @@ namespace ShomreiTorah.Common {
 			public string Sql { get; private set; }
 
 			public TReturn Execute() { return Execute<object>(null); }
-			public TReturn Execute<TParameters>(TParameters parameters) where TParameters : class { using (var command = Transaction.CreateCommand(Sql, parameters)) return (TReturn)command.ExecuteScalar(); }
+			public TReturn Execute<TParameters>(TParameters parameters) where TParameters : class { using (var command = Transaction.CreateCommand(Sql, parameters)) return command.ExecuteScalar().NullableCast<TReturn>(); }
 		}
 		#endregion
 
