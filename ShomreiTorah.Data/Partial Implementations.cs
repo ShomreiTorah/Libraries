@@ -318,6 +318,8 @@ namespace ShomreiTorah.Data {
 
 		///<summary>Clears a pledge's payment links when the pledge is removed.</summary>
 		protected override void OnRemoving() {
+			if (Table.Context.Table<PledgeLink>() == null)  // Don't choke in DirectoryManager on refresh
+				return;
 			foreach (var link in LinkedPayments.ToList()) //The loop will modify the collection
 				link.RemoveRow();
 		}
@@ -341,6 +343,8 @@ namespace ShomreiTorah.Data {
 
 		///<summary>Clears a payment's pledge links when the payment is removed.</summary>
 		void OnRemoving_Links() {
+			if (Table.Context.Table<PledgeLink>() == null)	// Don't choke in DirectoryManager on refresh
+				return;
 			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
 				link.RemoveRow();
 		}
