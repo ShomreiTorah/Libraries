@@ -10,7 +10,7 @@ using ShomreiTorah.Data;
 namespace ShomreiTorah.Statements.Email {
 	using Email = Common.Email;
 
-	public class StatementBuilder {
+	public class StatementBuilder : IDisposable {
 		readonly DirectoryTemplateResolver resolver;
 		public StatementBuilder(string basePath, string imagePath) {
 			resolver = new DirectoryTemplateResolver(basePath);
@@ -55,6 +55,17 @@ namespace ShomreiTorah.Statements.Email {
 			message.Subject = page.EmailSubject;
 
 			return message;
+		}
+
+
+		///<summary>Releases all resources used by the StatementBuilder.</summary>
+		public void Dispose() { Dispose(true); GC.SuppressFinalize(this); }
+		///<summary>Releases the unmanaged resources used by the StatementBuilder and optionally releases the managed resources.</summary>
+		///<param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing) {
+			if (disposing) {
+				TemplateService.Dispose();
+			}
 		}
 	}
 
