@@ -21,18 +21,30 @@ namespace ShomreiTorah.WinForms.Forms {
 		}
 
 		#region Windows 7
+		// Microsoft.WindowsAPICodePack.Shell can give strange loading errors.
+		// Swallow these errors so that they don't block save.  Every function
+		// that references types from that assembly can only be called through
+		// this wrapper, to swallow load failures from the JITter.
+		static void TaskBarAction(Action a) {
+			try {
+				a();
+			} catch { }
+		}
+
 		IntPtr handleForTaskbar;
 
-		///<summary>Rasiases the Shown event.</summary>
+		///<summary>Raises the Shown event.</summary>
 		protected override void OnShown(EventArgs e) {
 			base.OnShown(e);
-			UpdateTaskbar();
+			TaskBarAction(UpdateTaskbar);
 		}
-		///<summary>Rasiases the Closed event.</summary>
+		///<summary>Raises the Closed event.</summary>
 		protected override void OnClosed(EventArgs e) {
 			base.OnClosed(e);
-			if (TaskbarManager.IsPlatformSupported && handleForTaskbar != IntPtr.Zero)
-				TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, handleForTaskbar);
+			TaskBarAction(() => {
+				if (TaskbarManager.IsPlatformSupported && handleForTaskbar != IntPtr.Zero)
+					TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, handleForTaskbar);
+			});
 		}
 		void UpdateTaskbar() {
 			if (!TaskbarManager.IsPlatformSupported) return;
@@ -69,7 +81,7 @@ namespace ShomreiTorah.WinForms.Forms {
 			get { return progressBar.Position; }
 			set {
 				progressBar.Position = value;
-				UpdateTaskbar();
+				TaskBarAction(UpdateTaskbar);
 			}
 		}
 		///<summary>Gets or sets the progress bar's maximum value, or -1 to display a marquee.</summary>
@@ -85,7 +97,7 @@ namespace ShomreiTorah.WinForms.Forms {
 
 					progressBar.Properties.Maximum = value;
 				}
-				UpdateTaskbar();
+				TaskBarAction(UpdateTaskbar);
 			}
 		}
 
