@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
 
 namespace ShomreiTorah.Data {
@@ -164,7 +165,7 @@ namespace ShomreiTorah.Data {
 		///<remarks>This string is displayed in receipts.</remarks>
 		public string MethodDescription {
 			get {
-				if (Method == "Unknown")	// Imported legacy data
+				if (Method == "Unknown")    // Imported legacy data
 					return "?";
 
 				if (string.IsNullOrWhiteSpace(CheckNumber))
@@ -182,7 +183,7 @@ namespace ShomreiTorah.Data {
 
 					case "Cash":
 					default:
-						return Method + " – " + CheckNumber;
+						return Method + " â€“ " + CheckNumber;
 				}
 			}
 		}
@@ -197,7 +198,7 @@ namespace ShomreiTorah.Data {
 	partial class Deposit {
 		///<summary>Clears a deposit's payments when the deposit is removed.</summary>
 		protected override void OnRemoving() {
-			foreach (var payment in Payments.ToList()) {	//The loop will modify the collection
+			foreach (var payment in Payments.ToList()) {    //The loop will modify the collection
 				payment.Deposit = null;
 			}
 		}
@@ -226,7 +227,7 @@ namespace ShomreiTorah.Data {
 			}
 		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
-			if ((Modifier == null || (Table != null && !Table.IsLoadingData))	//Don't overwrite the values when loading the table
+			if ((Modifier == null || (Table != null && !Table.IsLoadingData))   //Don't overwrite the values when loading the table
 			 && column != ModifiedColumn && column != ModifierColumn) {
 				Modifier = Environment.UserName;
 				Modified = DateTime.UtcNow;
@@ -242,7 +243,7 @@ namespace ShomreiTorah.Data {
 			}
 		}
 		partial void OnColumnChanged(Column column, object oldValue, object newValue) {
-			if ((Modifier == null || (Table != null && !Table.IsLoadingData))	//Don't overwrite the values when loading the table
+			if ((Modifier == null || (Table != null && !Table.IsLoadingData))   //Don't overwrite the values when loading the table
 			 && column != ModifiedColumn && column != ModifierColumn && column != DepositColumn) {
 				Modifier = Environment.UserName;
 				Modified = DateTime.UtcNow;
@@ -282,6 +283,15 @@ namespace ShomreiTorah.Data {
 		///<remarks>Melave Malka work starts in December of the previous year.</remarks>
 		public static int CurrentYear { get { return DateTime.Now.AddMonths(5).Year; } }
 
+		///<summary>Gets all of the honorees of this Melave Malka.</summary>
+		public IEnumerable<Person> Honorees {
+			get {
+				yield return Honoree;
+				if (Honoree2 != null)
+					yield return Honoree2;
+			}
+		}
+
 		//If the date is after November, it should wrap to the previous year.
 		partial void OnAdDeadlineChanged(DateTime? oldValue, DateTime? newValue) {
 			if (newValue != null && this["Year"] != null)
@@ -290,7 +300,7 @@ namespace ShomreiTorah.Data {
 		partial void OnMelaveMalkaDateChanged(DateTime? oldValue, DateTime? newValue) {
 			if (newValue != null && this["Year"] != null)
 				MelaveMalkaDate = new DateTime(Year - (newValue.Value.Month > 10 ? 1 : 0), newValue.Value.Month, newValue.Value.Day)
-								+ newValue.Value.TimeOfDay;	//Preserve the Melave Malka's TimeOfDay when normalizing the year
+								+ newValue.Value.TimeOfDay; //Preserve the Melave Malka's TimeOfDay when normalizing the year
 		}
 
 		///<summary>Gets the relative path to the ad blank PDF on the website.</summary>
@@ -343,7 +353,7 @@ namespace ShomreiTorah.Data {
 
 		///<summary>Clears a payment's pledge links when the payment is removed.</summary>
 		void OnRemoving_Links() {
-			if (Table.Context.Table<PledgeLink>() == null)	// Don't choke in DirectoryManager on refresh
+			if (Table.Context.Table<PledgeLink>() == null)  // Don't choke in DirectoryManager on refresh
 				return;
 			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
 				link.RemoveRow();
@@ -448,6 +458,7 @@ namespace ShomreiTorah.Data {
 			return new Pledge {
 				Type = "Melave Malka Journal",
 				SubType = Names.AdTypes.First(t => t.Name == AdType).PledgeSubType,
+				Note = "Honoring " + Table.Context.Table<MelaveMalkaInfo>().Rows.First(m => m.Year == Year).Honorees.Select(h => h.FullName).Join(" and "),
 				Account = Names.DefaultAccount,
 				ExternalSource = "Journal " + Year,
 				ExternalId = ExternalId,
