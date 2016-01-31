@@ -441,8 +441,6 @@ namespace ShomreiTorah.Common {
 				return time;
 			return time.RoundDown(roundBy) + roundBy;
 		}
-		///<summary>Converts the value of a timespan to a particular string representation.</summary>
-		public static string ToString(this TimeSpan time, string format, IFormatProvider provider) { return (DateTime.MinValue + time).ToString(format, provider); }
 		#endregion
 
 		#region Hebrew Numbers

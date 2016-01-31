@@ -12,7 +12,7 @@ namespace ShomreiTorah.Singularity.Tests.Sql {
 	public class SqlServerTest : PersistenceTestBase {
 		public TestContext TestContext { get; set; }
 
-		const string ConnectionString = @"Data Source=.\SQLExpress;Initial Catalog=SingularityTests;Integrated Security=True";
+		const string ConnectionString = @"Data Source=(localdb)\ProjectsV12;Initial Catalog=SingularityTests;Integrated Security=True";
 		static readonly DBConnector DB = new DBConnector(SqlClientFactory.Instance, ConnectionString);
 
 		[ClassInitialize]
@@ -27,7 +27,7 @@ namespace ShomreiTorah.Singularity.Tests.Sql {
 		}
 		static void ExecWithoutDB(string sql) {
 			SqlConnection.ClearAllPools();
-			using (var connection = new SqlConnection(@"Data Source=.\SQLExpress;Integrated Security=True")) {
+			using (var connection = new SqlConnection(@"Data Source=(localdb)\ProjectsV12;Integrated Security=True")) {
 				connection.Open();
 				connection.ExecuteNonQuery(sql);
 			}

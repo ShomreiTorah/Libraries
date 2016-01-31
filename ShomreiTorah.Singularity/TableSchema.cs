@@ -96,11 +96,18 @@ namespace ShomreiTorah.Singularity {
 
 		List<WeakReference<Row>> rows = new List<WeakReference<Row>>();
 		internal virtual void AddRow(Row row) { rows.Add(new WeakReference<Row>(row)); }
-		internal void RemoveRow(Row row) { rows.RemoveAll(r => r.Target == row); }
+		internal void RemoveRow(Row row) {
+			rows.RemoveAll(w => { Row ourRow; return w.TryGetTarget(out ourRow) && ourRow == row; });
+		}
 
 		///<summary>Gets the attached rows belonging to this schema.</summary>
 		///<remarks>This will only contain rows attached to a table.  It's used to validate column changes.</remarks>
-		internal IEnumerable<Row> Rows { get { return rows.Select(w => w.Target).Where(r => r != null); } }
+		internal IEnumerable<Row> Rows {
+			get {
+				return rows.Select(w => { Row row; w.TryGetTarget(out row); return row; })
+						   .Where(r => r != null);
+			}
+		}
 
 		internal void EachRow(Action<Row> method) {
 			foreach (var row in Rows)
@@ -124,7 +131,7 @@ namespace ShomreiTorah.Singularity {
 			ChildColumn = childColumn;
 
 			ParentSchema.ValidateName(name);
-			this.name = name;			//Don't call the property setter to avoid a redundant SchemaChanged
+			this.name = name;           //Don't call the property setter to avoid a redundant SchemaChanged
 		}
 
 		///<summary>Gets the schema that contains the parent rows.</summary>
