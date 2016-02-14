@@ -84,7 +84,6 @@
     <Compile Include="Dependencies\Concrete Row Dependencies.cs" />
     <Compile Include="Dependencies\Dependency.cs" />
     <Compile Include="Dependencies\DependencyParser.cs" />
-    <Compile Include="Dependencies\ExpressionVisitor.cs" />
     <Compile Include="Dependencies\RowDependency.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="FilteredTable.cs" />
