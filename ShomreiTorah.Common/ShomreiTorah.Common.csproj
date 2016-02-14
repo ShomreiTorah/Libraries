@@ -131,7 +131,6 @@
     <Compile Include="Updates\UpdateChecker.cs" />
     <Compile Include="Updates\UpdateFile.cs" />
     <Compile Include="Updates\UpdateInfo.cs" />
-    <Compile Include="Updates\UpdateStreamer.cs" />
     <Compile Include="Collections\ValueComparer.cs" />
   </ItemGroup>
   <ItemGroup>
