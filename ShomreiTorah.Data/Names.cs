@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Xml.Linq;
+using ShomreiTorah.Common;
 using ShomreiTorah.Common.Collections;
 
 namespace ShomreiTorah.Data {
@@ -13,14 +15,25 @@ namespace ShomreiTorah.Data {
 
 		#region Melave Malka
 		///<summary>Gets the values for the Melave Malka's Source field.</summary>
-		public static readonly ReadOnlyCollection<string> MelaveMalkaSources = Strings("Shul", "Rav", "Honoree 1", "Honoree 2");
+		public static readonly ReadOnlyCollection<string> MelaveMalkaSources =
+			Config.GetElement("Journal", "Invitations")
+				  .Elements("Source")
+				  .Select(e => e.Value)
+				  .ToList()
+				  .AsReadOnly();
+
 		///<summary>Gets the pre-defined ad types in the journal.</summary>
 		public static ReadOnlyCollection<AdType> AdTypes { get { return AdType.All; } }
 		#endregion
 
 		#region Billing-related
 		///<summary>Gets the names of the standard billing accounts.</summary>
-		public static readonly ReadOnlyCollection<string> AccountNames = Strings("Operating Fund", "Building Fund");
+		public static readonly ReadOnlyCollection<string> AccountNames =
+			Config.GetElement("Billing", "Accounts")
+				  .Elements("Account")
+				  .Select(e => e.Value)
+				  .ToList()
+				  .AsReadOnly();
 
 		///<summary>Gets the default account for payments and pledges.</summary>
 		public static string DefaultAccount { get { return AccountNames[0]; } }
@@ -36,34 +49,21 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the subtype that indicates pledges that are not tax deductible.</summary>
 		///<remarks>These pledges are subtracted from receipts.</remarks>
 		public static readonly string NonDeductibleSubType = "Nondeductible";
+		///<summary>Gets the pledge type for journal ads.</summary>
+		public static PledgeType JournalPledgeType = new PledgeType(
+			Config.ReadAttribute("Journal", "PledgeType"),
+			AdTypes.Select(a => a.PledgeSubType).ToList()
+		);
+
 
 		///<summary>Gets the standard pledge types.</summary>
-		public static readonly ReadOnlyCollection<PledgeType> PledgeTypes = new ReadOnlyCollection<PledgeType>(new[]{
-			new PledgeType("Donation",		subTypes: new[]{ "R' Buxbaum" }),
-			new PledgeType("Membership"),
-			new PledgeType("סעודה שלישית"),
-			new PledgeType("Kiddush",		subTypes: new[]{ NonDeductibleSubType, "ראש השנה", "שמחת תורה", "חתנים", "שבועות", "Shavuos Night" }),
-			new PledgeType("Seforim"),
-			new PledgeType("Building Fund"),
-			new PledgeType("נר למאור"),
-			new PledgeType("ימים נוראים Seats"),
-
-			new PledgeType("Auction",		  //This is the sort order for rows in the auction grid, and for subtypes
-							subTypes: new[] { "פתיחה", "אתה הראית",  
-											  "כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", 
-
-											  "כל הנערים", "חתן תורה", "חתן בראשית",
-
-											  "מפטיר יונה", "מפטיר", "הגבהה", 
-											  "פתיחה דנעילה", "פתיחה דגשם",
-											}),
-			new PledgeType("מי שברך",	
-							subTypes: new[] {	"כהן", "לוי", "שלישי", "רביעי", "חמישי", "שישי", "שביעי", "מפטיר",
-												"מפטיר יונה", "חתן תורה", "חתן בראשית" }),
-			new PledgeType("Melave Malka Journal", AdTypes.Select(a => a.PledgeSubType).ToArray()),
-			new PledgeType("Melave Malka Raffle"),
-			new PledgeType("Shalach Manos"),
-		});
+		public static readonly ReadOnlyCollection<PledgeType> PledgeTypes =
+			Config.GetElement("Billing", "PledgeTypes")
+				  .Elements("PledgeType")
+				  .Select(PledgeType.FromXml)
+				  .Concat(new[] { JournalPledgeType })
+				  .ToList()
+				  .AsReadOnly();
 		#endregion
 
 		#region General
@@ -148,6 +148,11 @@ namespace ShomreiTorah.Data {
 			Subtypes = new ReadOnlyCollection<string>(subTypes ?? new string[0]);
 		}
 
+		internal static PledgeType FromXml(XElement element) {
+			return new PledgeType(element.Attribute("Name").Value,
+				element.Elements("SubType").Attributes("Name").Select(a => a.Value).ToList());
+		}
+
 		///<summary>Gets the name of the pledge type.</summary>
 		public string Name { get; private set; }
 		///<summary>Gets the standard subtypes of this pledge type, if any.</summary>
@@ -164,7 +169,7 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the name of the ad type.</summary>
 		public string Name { get; private set; }
 		///<summary>Gets the price of the ad type.</summary>
-		public int DefaultPrice { get; private set; }
+		public decimal DefaultPrice { get; private set; }
 		///<summary>Gets the price of the ad type.</summary>
 		public int AdsPerPage { get; private set; }
 
@@ -173,33 +178,29 @@ namespace ShomreiTorah.Data {
 		public string DisplayAs { get { return Name + " (" + DefaultPrice.ToString("c0", CultureInfo.CurrentCulture) + ")"; } }
 
 		///<summary>Gets the subtype used for a pledge of this ad type.</summary>
-		public string PledgeSubType {
-			get {
-				if (Name == "Greeting")
-					return "Greeting ad";
-				if (DefaultPrice > Full.DefaultPrice)
-					return Name + " ad";
-				else
-					return Name + " page ad";
-			}
-		}
+		public string PledgeSubType { get; private set; }
 
-		private AdType(int id, string name, int defaultPrice, int adsPerPage) { Index = id; Name = name; DefaultPrice = defaultPrice; AdsPerPage = adsPerPage; }
+		private AdType(int index, string name, decimal defaultPrice, int adsPerPage, string displayName) {
+			Index = index;
+			Name = name;
+			DefaultPrice = defaultPrice;
+			AdsPerPage = adsPerPage;
+			PledgeSubType = displayName ?? (name + " ad");
+		}
 
 		///<summary>Returns a string representation of this ad type.</summary>
 		public override string ToString() { return DisplayAs; }
 		//Exposed by Names for consistency
-		internal readonly static ReadOnlyCollection<AdType> All = new ReadOnlyCollection<AdType>(new AdType[] { 
-			new AdType(1,	"Diamond",	1800,	1),
-			new AdType(2,	"Platinum",	1250,	1),
-			new AdType(3,	"Gold",		1000,	1),
-			new AdType(4,	"Silver",	750,	1),
-			new AdType(5,	"Bronze",	500,	1),
-	 Full =	new AdType(6,	"Full",		360,	1),
-			new AdType(7,	"Half",		180,	2),
-			new AdType(8,	"Quarter",	100,	4)
-		});
-
-		static readonly AdType Full;
+		internal readonly static ReadOnlyCollection<AdType> All =
+			Config.GetElement("Journal")
+				.Elements("AdType")
+				.Select((elem, index) => new AdType(index,
+					elem.Attribute("Name").Value,
+					decimal.Parse(elem.Attribute("DefaultPrice").Value, NumberStyles.Currency, CultureInfo.CurrentCulture),
+					(int)elem.Attribute("AdsPerPage"),
+					(string)elem.Attribute("DisplayName")	// Optional
+				))
+				.ToList()
+				.AsReadOnly();
 	}
 }
