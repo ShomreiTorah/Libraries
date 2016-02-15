@@ -159,8 +159,8 @@ namespace ShomreiTorah.Data {
 
 	///<summary>Represents a type of ad in the journal.</summary>
 	public class AdType {
-		///<summary>Gets the ID of the ad type.</summary>
-		public int Id { get; private set; }
+		///<summary>Gets the ordinal position of this ad type, used for the default ordering of ads within the journal.</summary>
+		public int Index { get; private set; }
 		///<summary>Gets the name of the ad type.</summary>
 		public string Name { get; private set; }
 		///<summary>Gets the price of the ad type.</summary>
@@ -184,7 +184,7 @@ namespace ShomreiTorah.Data {
 			}
 		}
 
-		private AdType(int id, string name, int defaultPrice, int adsPerPage) { Id = id; Name = name; DefaultPrice = defaultPrice; AdsPerPage = adsPerPage; }
+		private AdType(int id, string name, int defaultPrice, int adsPerPage) { Index = id; Name = name; DefaultPrice = defaultPrice; AdsPerPage = adsPerPage; }
 
 		///<summary>Returns a string representation of this ad type.</summary>
 		public override string ToString() { return DisplayAs; }
