@@ -10,7 +10,7 @@ using System.Text;
 using System.Xml.Linq;
 
 namespace ShomreiTorah.Common.Updates {
-	///<summary>Describes a single (non-downloaded) file in an update.</summary>
+	///<summary>Describes a single (non-downloaded) file in an update.  This class is immutable.</summary>
 	public class UpdateFile {
 		static readonly string signatureAlgorithm = CryptoConfig.MapNameToOID("SHA512");
 
@@ -90,6 +90,20 @@ namespace ShomreiTorah.Common.Updates {
 		public long Length { get; private set; }
 		///<summary>Gets the file's timestamp in UTC.</summary>
 		public DateTime DateModifiedUtc { get; private set; }
+
+		///<summary>Returns a new UpdateFile instance with the specified prefix removed, if this file starts with the prefix.  If not, returns this.</summary>
+		public UpdateFile StripPrefix(string prefix) {
+			if (!RelativePath.StartsWith(prefix))
+				return this;
+			return new UpdateFile {
+				RelativePath = RelativePath.Substring(prefix.Length),
+				DateModifiedUtc = DateModifiedUtc,
+				hash = hash,
+				Length = Length,
+				RemoteUrl = RemoteUrl,
+				signature = signature
+			};
+		}
 
 		///<summary>Checks whether an existing file is identical to this update file.</summary>
 		///<param name="basePath">The base directory expected to match the update.</param>

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace ShomreiTorah.Common.Updates {
@@ -31,7 +32,7 @@ namespace ShomreiTorah.Common.Updates {
 		public string GetChanges(Version existingVersion) {
 			return Versions.TakeWhile(v => v.Version > existingVersion)
 						   .Join(Environment.NewLine,
-									v => v.Changes.TrimEnd()	//The XML gets \ns without \rs
+									v => v.Changes.TrimEnd()    //The XML gets \ns without \rs
 										  .Replace("\n", "\r\n").Replace("\r\r", "\r")
 							);
 		}
@@ -41,12 +42,22 @@ namespace ShomreiTorah.Common.Updates {
 		///<summary>Gets the versions contained and subsumed by the update.</summary>
 		public ReadOnlyCollection<UpdateVersion> Versions { get; private set; }
 
+		///<summary>A prefix for organization-specific folders.</summary>
+		///<remarks>
+		/// The contents of the directory (if any) with this prefix that matches
+		/// the OrganizationId value from config will be copied to the root dir.
+		/// Any other prefixed directories will be ignored.
+		///</remarks>
+		const string OrganizationPrefix = "Organization-";
+		static readonly Regex OrganizationDirectoryPattern = new Regex(@"^" + OrganizationPrefix + @".*\\");
+
 		///<summary>Downloads the update and extracts its files to a temporary directory.</summary>
-		///<param name="existingFiles">The path to the existing files that should be updated. 
+		///<param name="existingFiles">The path to the existing files that should be updated.
 		/// Any files in this directory that match files in the update will not be re-downloaded.</param>
+		///<param name="organizationId">The organization ID to match organization-specific directories (see <see cref="OrganizationDirectoryPattern"/>).</param>
 		///<param name="ui">An optional IProgressReporter implementation to report the progress of the download.</param>
 		///<returns>The path to the extracted files.</returns>
-		public string DownloadFiles(string existingFiles, IProgressReporter ui) {
+		public string DownloadFiles(string existingFiles, string organizationId, IProgressReporter ui) {
 			if (!Directory.Exists(existingFiles)) throw new DirectoryNotFoundException(existingFiles + " does not exist");
 			ui = ui ?? new EmptyProgressReporter();
 			ui.CanCancel = true;
@@ -56,7 +67,14 @@ namespace ShomreiTorah.Common.Updates {
 			Directory.CreateDirectory(path);
 
 			try {
-				var newFiles = Files.Where(f => !f.Matches(existingFiles)).ToArray();
+
+				var newFiles = Files
+					// Extract files from this organization to the root
+					.Select(f => organizationId == null ? f : f.StripPrefix(OrganizationPrefix + organizationId + "\\"))
+					// Skip other organization directories
+					.Where(f => !OrganizationDirectoryPattern.IsMatch(f.RelativePath))
+					.Where(f => !f.Matches(existingFiles))
+					.ToList();
 
 				ui.Maximum = newFiles.Sum(f => f.Length);
 
@@ -72,7 +90,7 @@ namespace ShomreiTorah.Common.Updates {
 			} catch (Exception ex) {
 				Directory.Delete(path, true);
 
-				if (ui.WasCanceled) return null;	//If it was canceled, we'll get a CryptoException because the CryptoStream was closed 
+				if (ui.WasCanceled) return null;    //If it was canceled, we'll get a CryptoException because the CryptoStream was closed
 				throw new UpdateErrorException(ex);
 			}
 			return path;
