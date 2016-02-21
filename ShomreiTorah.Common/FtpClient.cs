@@ -53,7 +53,7 @@ namespace ShomreiTorah.Common {
 		///<summary>Gets the password that this client logs in with.</summary>
 		public string Password { get; private set; }
 
-		static void CheckrUri(Uri relativePath) {
+		static void CheckUri(Uri relativePath) {
 			if (relativePath == null)
 				throw new ArgumentNullException("relativePath");
 			if (relativePath.IsAbsoluteUri)
@@ -63,7 +63,7 @@ namespace ShomreiTorah.Common {
 		///<summary>Creates an FtpWebRequest for the given local path.</summary>
 		///<param name="relativePath">The local path for the request.</param>
 		public FtpWebRequest CreateRequest(Uri relativePath) {
-			CheckrUri(relativePath);
+			CheckUri(relativePath);
 			var retVal = (FtpWebRequest)WebRequest.Create(new Uri(host, relativePath));
 			retVal.Credentials = login;
 			retVal.EnableSsl = UseSsl;
@@ -84,7 +84,7 @@ namespace ShomreiTorah.Common {
 		///<param name="localPath">The path of a file on disk to upload.</param>
 		///<param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
 		public void UploadFile(Uri relativePath, string localPath, IProgressReporter progress) {
-			CheckrUri(relativePath);
+			CheckUri(relativePath);
 			using (var contents = new FileStream(localPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 				UploadFile(relativePath, contents, progress);
 		}
@@ -110,6 +110,10 @@ namespace ShomreiTorah.Common {
 		///<summary>Creates a new directory on the server.</summary>
 		///<param name="relativePath">The relative path on the server of the new directory.</param>
 		public void CreateDirectory(Uri relativePath) {
+			CheckUri(relativePath);
+			var parent = Path.GetDirectoryName(relativePath.ToString().TrimEnd('/', '\\')).Replace('\\', '/');
+			if (!string.IsNullOrEmpty(parent))
+				CreateDirectory(new Uri(parent, UriKind.Relative));
 			var request = CreateRequest(relativePath);
 			request.Method = WebRequestMethods.Ftp.MakeDirectory;
 			try {
@@ -117,7 +121,7 @@ namespace ShomreiTorah.Common {
 			} catch (WebException ex) {
 				var response = (FtpWebResponse)ex.Response;
 				if (response.StatusCode == FtpStatusCode.ActionNotTakenFileUnavailable)
-					return;	//Directory already exists
+					return; //Directory already exists
 				else
 					throw;
 			}
@@ -132,7 +136,7 @@ namespace ShomreiTorah.Common {
 			} catch (WebException ex) {
 				var response = (FtpWebResponse)ex.Response;
 				if (response.StatusCode == FtpStatusCode.ActionNotTakenFileUnavailable)
-					return;	//File is already gone
+					return; //File is already gone
 				else
 					throw;
 			}
