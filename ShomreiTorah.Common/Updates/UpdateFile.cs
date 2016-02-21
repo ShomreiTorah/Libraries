@@ -17,7 +17,8 @@ namespace ShomreiTorah.Common.Updates {
 		//HashAlgorithm uses shared state and cannot be re-used
 		static readonly Func<HashAlgorithm> hasherCreator = () => new SHA512Managed();
 
-		byte[] hash, signature;
+		byte[] hash;
+		IReadOnlyCollection<byte[]> signatures;
 
 		#region Creation
 		private UpdateFile() { }
@@ -34,9 +35,9 @@ namespace ShomreiTorah.Common.Updates {
 				RemoteUrl = new Uri(element.Attribute("Url").Value, UriKind.Relative),
 
 				hash = Convert.FromBase64String(element.Element("Hash").Value),
-				signature = Convert.FromBase64String(element.Element("Signature").Value)
+				signatures = element.Elements("Signature").Select(e => Convert.FromBase64String(e.Value)).ToList().AsReadOnly()
 			};
-			if (!UpdateConfig.Standard.UpdateVerifier.VerifyHash(retVal.hash, signatureAlgorithm, retVal.signature))
+			if (!retVal.signatures.Any(s => UpdateConfig.Standard.UpdateVerifier.VerifyHash(retVal.hash, signatureAlgorithm, s)))
 				throw new InvalidDataException("Bad signature for " + retVal.RelativePath);
 			return retVal;
 		}
@@ -45,11 +46,11 @@ namespace ShomreiTorah.Common.Updates {
 		///<param name="basePath">The path to the base local directory containing the source files.</param>
 		///<param name="relativePath">The relative path to the source file on disk to describe.</param>
 		///<param name="remotePath">The path on the FTP server where the file will be uploaded, relative to the base Updates directory.</param>
-		///<param name="signer">An RSA instance containing the private key to sign the file.</param>
+		///<param name="signer">A collection of RSA instances containing the private key(s) to sign the file.</param>
 		///<remarks>This method is called by the update publisher.</remarks>
-		public static UpdateFile Create(string basePath, string relativePath, Uri remotePath, RSACryptoServiceProvider signer) {
+		public static UpdateFile Create(string basePath, string relativePath, Uri remotePath, IEnumerable<RSACryptoServiceProvider> signers) {
 			if (remotePath == null) throw new ArgumentNullException("remotePath");
-			if (signer == null) throw new ArgumentNullException("signer");
+			if (signers == null || !signers.Any()) throw new ArgumentNullException("signer");
 			var filePath = Path.Combine(basePath, relativePath);
 
 			var info = new FileInfo(filePath);
@@ -63,7 +64,7 @@ namespace ShomreiTorah.Common.Updates {
 			using (var hasher = hasherCreator())
 			using (var stream = File.OpenRead(filePath))
 				retVal.hash = hasher.ComputeHash(stream);
-			retVal.signature = signer.SignHash(retVal.hash, signatureAlgorithm);
+			retVal.signatures = signers.Select(s => s.SignHash(retVal.hash, signatureAlgorithm)).ToList().AsReadOnly();
 
 			return retVal;
 		}
@@ -77,7 +78,7 @@ namespace ShomreiTorah.Common.Updates {
 				new XAttribute("Timestamp", DateModifiedUtc.ToString("o", CultureInfo.InvariantCulture)),
 
 				new XElement("Hash", Convert.ToBase64String(hash)),
-				new XElement("Signature", Convert.ToBase64String(signature))
+				signatures.Select(s => new XElement("Signature", Convert.ToBase64String(s)))
 			);
 		}
 		#endregion
@@ -101,7 +102,7 @@ namespace ShomreiTorah.Common.Updates {
 				hash = hash,
 				Length = Length,
 				RemoteUrl = RemoteUrl,
-				signature = signature
+				signatures = signatures
 			};
 		}
 
@@ -139,7 +140,7 @@ namespace ShomreiTorah.Common.Updates {
 			var filePath = Path.Combine(basePath, RelativePath);
 			if (File.Exists(filePath)) throw new InvalidOperationException(filePath + " already exists");
 
-			Directory.CreateDirectory(Path.GetDirectoryName(filePath));	//Won't throw
+			Directory.CreateDirectory(Path.GetDirectoryName(filePath)); //Won't throw
 
 			ui = ui ?? new EmptyProgressReporter();
 

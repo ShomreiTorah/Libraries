@@ -116,6 +116,7 @@
     <Compile Include="Calendar\Zmanim\YearlyZmanimProvider.cs" />
     <Compile Include="Calendar\Zmanim\ZmanimInfo.cs" />
     <Compile Include="Calendar\Zmanim\ZmanimProvider.cs" />
+    <Compile Include="Collections\DisposableCollection.cs" />
     <Compile Include="Collections\SetDictionary.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="DB.cs" />
