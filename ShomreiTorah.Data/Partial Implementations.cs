@@ -461,10 +461,12 @@ namespace ShomreiTorah.Data {
 
 		///<summary>Creates a pledge for this ad.</summary>
 		public Pledge CreatePledge() {
+			var mmi = Table.Context.Table<MelaveMalkaInfo>().Rows.First(m => m.Year == Year);
+			var honorees = mmi.Honorees.Select(h => h.FullName).Join(" and ");
 			return new Pledge {
 				Type = "Melave Malka Journal",
 				SubType = Names.AdTypes.First(t => t.Name == AdType).PledgeSubType,
-				Note = "Honoring " + Table.Context.Table<MelaveMalkaInfo>().Rows.First(m => m.Year == Year).Honorees.Select(h => h.FullName).Join(" and "),
+				Note = String.Format(Config.ReadAttribute("Journal", "PledgeNoteFormat"), honorees),
 				Account = Names.DefaultAccount,
 				ExternalSource = "Journal " + Year,
 				ExternalId = ExternalId,

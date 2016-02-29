@@ -46,7 +46,7 @@ namespace ShomreiTorah.Common.Updates {
 		///<param name="basePath">The path to the base local directory containing the source files.</param>
 		///<param name="relativePath">The relative path to the source file on disk to describe.</param>
 		///<param name="remotePath">The path on the FTP server where the file will be uploaded, relative to the base Updates directory.</param>
-		///<param name="signer">A collection of RSA instances containing the private key(s) to sign the file.</param>
+		///<param name="signers">A collection of RSA instances containing the private key(s) to sign the file.</param>
 		///<remarks>This method is called by the update publisher.</remarks>
 		public static UpdateFile Create(string basePath, string relativePath, Uri remotePath, IEnumerable<RSACryptoServiceProvider> signers) {
 			if (remotePath == null) throw new ArgumentNullException("remotePath");
