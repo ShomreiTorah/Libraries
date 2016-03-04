@@ -111,9 +111,11 @@ namespace ShomreiTorah.Common {
 		///<param name="relativePath">The relative path on the server of the new directory.</param>
 		public void CreateDirectory(Uri relativePath) {
 			CheckUri(relativePath);
-			var parent = Path.GetDirectoryName(relativePath.ToString().TrimEnd('/', '\\')).Replace('\\', '/');
-			if (!string.IsNullOrEmpty(parent))
-				CreateDirectory(new Uri(parent, UriKind.Relative));
+			var pathString = relativePath.ToString().TrimEnd('/', '\\');
+			if (string.IsNullOrEmpty(pathString))
+				return;
+			CreateDirectory(new Uri(Path.GetDirectoryName(pathString).Replace('\\', '/'), UriKind.Relative));
+
 			var request = CreateRequest(relativePath);
 			request.Method = WebRequestMethods.Ftp.MakeDirectory;
 			try {
