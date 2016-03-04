@@ -392,6 +392,12 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets a MailAddress object for this email address.</summary>
 		public MailAddress MailAddress { get { return new MailAddress(Email, Name); } }
 	}
+	partial class MelaveMalkaSeat {
+		///<summary>Gets the organization-specific caption for the Mens' Seats column.</summary>
+		public static string MensSeatsCaption => Config.ReadAttribute("Journal", "Seats", "MensSeatsCaption");
+		///<summary>Gets the organization-specific caption for the Womens' Seats column.</summary>
+		public static string WomensSeatsCaption => Config.ReadAttribute("Journal", "Seats", "WomensSeatsCaption");
+	}
 
 	#region Interfaces
 	partial class MelaveMalkaInvitation : IOwnedObject { }

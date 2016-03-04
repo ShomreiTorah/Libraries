@@ -287,6 +287,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			);
 			GridManager.RegisterColumn(Payment.DepositColumn, new DepositColumnController());
 			GridManager.RegisterColumn(Pledge.SubTypeColumn, new SubTypeColumnController());
+
+			GridManager.RegisterColumn(MelaveMalkaSeat.MensSeatsColumn,
+				new ColumnController(c => c.Caption = MelaveMalkaSeat.MensSeatsCaption));
+			GridManager.RegisterColumn(MelaveMalkaSeat.WomensSeatsColumn,
+				new ColumnController(c => c.Caption = MelaveMalkaSeat.WomensSeatsCaption));
+
 		}
 		#endregion
 
@@ -395,7 +401,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			public static readonly PersonEditSettings Instance = new PersonEditSettings();
 
 			//I need to set e.Handled to true to prevent the editor
-			//from sending the event to the grid's EditorContainer 
+			//from sending the event to the grid's EditorContainer
 			//handlers, which would double the effect.
 			static void HandleKeyEvent(object sender, KeyEventArgs e, Action<SmartGridView> handler) {
 				var view = (SmartGridView)((GridControl)((BaseEdit)sender).Parent).FocusedView;
