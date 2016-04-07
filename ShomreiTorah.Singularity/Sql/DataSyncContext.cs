@@ -8,7 +8,7 @@ using System.Threading;
 using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity.Sql {
-	///<summary>Synchronizes a Singularity database with an SQL database.</summary>	
+	///<summary>Synchronizes a Singularity database with an SQL database.</summary>
 	public class DataSyncContext {
 		///<summary>Creates a new DataSyncContext for the given DataContext.</summary>
 		public DataSyncContext(DataContext context, ISqlProvider sqlProvider) {
@@ -36,7 +36,7 @@ namespace ShomreiTorah.Singularity.Sql {
 		public void ReadData(SynchronizationContext threadContext) {
 			using (var connection = SqlProvider.OpenConnection()) {
 				//I mark every table as loading so that dependencies
-				//in other tables don't cause threading issues when 
+				//in other tables don't cause threading issues when
 				//they're updated.
 				var endLoadings = Tables.Select(t => t.Table.BeginLoadData(threadContext)).ToList();
 				try {
@@ -62,15 +62,19 @@ namespace ShomreiTorah.Singularity.Sql {
 			progress.Maximum = Tables.Sum(t => t.Changes.Count);
 
 			using (var transactionContext = new TransactionContext(connection)) {
-				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema)) {
+					if (progress.WasCanceled) return;
 					table.WriteChanges(transactionContext, RowChangeType.Added, progress.ChildOperation());
-
-				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema))
+				}
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema)) {
+					if (progress.WasCanceled) return;
 					table.WriteChanges(transactionContext, RowChangeType.Changed, progress.ChildOperation());
-
-				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema).Reverse())
+				}
+				foreach (var table in Tables.SortDependencies(ts => ts.Table.Schema).Reverse()) {
+					if (progress.WasCanceled) return;
 					table.WriteChanges(transactionContext, RowChangeType.Removed, progress.ChildOperation());
-
+				}
+				if (progress.WasCanceled) return;
 				transactionContext.Commit();
 			}
 			//If we didn't get an exception, clear the changes.

@@ -112,19 +112,19 @@ namespace ShomreiTorah.Singularity.Sql {
 			if (changeIndex >= 0) {
 				Debug.Assert(changes[changeIndex].ChangeType == RowChangeType.Removed, "Detached row was " + changes[changeIndex].ChangeType);
 				changes.RemoveAt(changeIndex);
-				changes.Add(new RowChange(e.Row, RowChangeType.Changed));	//Assume that the row was changed while it was detached
+				changes.Add(new RowChange(e.Row, RowChangeType.Changed));   //Assume that the row was changed while it was detached
 			} else
 				changes.Add(new RowChange(e.Row, RowChangeType.Added));
 		}
 
 		void Table_ValueChanged(object sender, ValueChangedEventArgs e) {
 			if (isReadingDB) return;
-			if (Mapping.Columns[e.Column] == null) return;	//Ignore changes to unmapped columns.
+			if (Mapping.Columns[e.Column] == null) return;  //Ignore changes to unmapped columns.
 
 			var changeIndex = GetChangeIndex(e.Row);
 
 			if (changeIndex >= 0)
-				Debug.Assert(changes[changeIndex].ChangeType != RowChangeType.Removed);	//If it wasn't added to the DB yet, or if it's already been changed, we don't need to track value changes
+				Debug.Assert(changes[changeIndex].ChangeType != RowChangeType.Removed); //If it wasn't added to the DB yet, or if it's already been changed, we don't need to track value changes
 			else
 				changes.Add(new RowChange(e.Row, RowChangeType.Changed));
 		}
@@ -188,10 +188,11 @@ namespace ShomreiTorah.Singularity.Sql {
 			if (changeCount == 0) return;
 
 			progress = progress ?? new EmptyProgressReporter();
-			progress.Caption = "Saving " + Table.Schema.Name;	//Only set caption if there are actually changes to save
+			progress.Caption = "Saving " + Table.Schema.Name;   //Only set caption if there are actually changes to save
 			progress.Maximum = changeCount;
 			int i = 0;
 			foreach (var change in relevantChanges) {
+				if (progress.WasCanceled) return;
 				progress.Progress = i++;
 				try {
 					switch (change.ChangeType) {
@@ -209,7 +210,7 @@ namespace ShomreiTorah.Singularity.Sql {
 					}
 				} catch (RowDeletedException) {
 					if (change.ChangeType == RowChangeType.Removed)
-						continue;	//If two users delete the same row, don't complain
+						continue;   //If two users delete the same row, don't complain
 
 					//If the row was previously deleted, we
 					//need to convert the change to an Add 

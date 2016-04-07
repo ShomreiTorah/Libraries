@@ -221,7 +221,7 @@ namespace ShomreiTorah.Data.UI {
 		public void SaveDatabase() {
 			Debug.Assert(SyncContext.Tables.Any(), "There aren't any TableSynchronizers!");
 			if (!HasDataChanged) return;
-			ProgressWorker.Execute(SyncContext.WriteData, cancellable: false);
+			ProgressWorker.Execute(SyncContext.WriteData, cancellable: true);
 		}
 
 		///<summary>Reads any changes from the database server.</summary>
