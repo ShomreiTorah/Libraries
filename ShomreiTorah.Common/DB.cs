@@ -66,6 +66,11 @@ namespace ShomreiTorah.Common {
 			return DbProviderFactories.GetFactory(name);
 		}
 
+		///<summary>Adds a factory to the lookup table.</summary>
+		public static void RegisterFactory(string name, DbProviderFactory factory) {
+			FactoryNames[name] = factory;
+		}
+
 		#region OleDB Files
 		static string CreateSqlCeConnectionString(string filePath) {
 			var builder = new DbConnectionStringBuilder();
