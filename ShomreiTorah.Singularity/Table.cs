@@ -47,14 +47,14 @@ namespace ShomreiTorah.Singularity {
 		public bool IsLoadingData { get { return loadDataCount != 0; } }
 
 		///<summary>Marks the table as loading data until the return value is disposed.
-		///When the return value is disposed, the LoadCompleted event will be raised, 
+		///When the return value is disposed, the LoadCompleted event will be raised,
 		///unless the table is still loading data from another call.</summary>
-		///<param name="threadContext">An optional SynchronizationContext to 
+		///<param name="threadContext">An optional SynchronizationContext to
 		///raise the LoadCompleted event on.</param>
 		internal IDisposable BeginLoadData(SynchronizationContext threadContext) {
 			loadDataCount++;
 			return new Disposable(delegate {
-				if (--loadDataCount == 0) {	//If no-one else is loading, raise LoadCompleted.
+				if (--loadDataCount == 0) { //If no-one else is loading, raise LoadCompleted.
 					if (threadContext == null)
 						OnLoadCompleted();
 					else
@@ -103,7 +103,7 @@ namespace ShomreiTorah.Singularity {
 			protected override void RemoveItem(int index) {
 				var row = this[index];
 				row.OnRemoving();
-				if (!Contains(row)) return;	//The row was deleted by its OnRemoving handler (this happens when a deposit clears its payments)
+				if (!Contains(row)) return; //The row was deleted by its OnRemoving handler (this happens when a deposit clears its payments)
 				base.RemoveItem(index);
 				Table.ProcessRowRemoved(row, index);
 			}
@@ -123,7 +123,7 @@ namespace ShomreiTorah.Singularity {
 			public TableSchema Schema { get { return Table.Schema; } }
 		}
 
-		IList<Row> IRowEventProvider.Rows { get { return Rows; } }		//Return base interface
+		IList<Row> IRowEventProvider.Rows { get { return Rows; } }      //Return base interface
 		Table IRowEventProvider.SourceTable { get { return this; } }
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
 		bool IListSource.ContainsListCollection { get { return false; } }
@@ -148,21 +148,21 @@ namespace ShomreiTorah.Singularity {
 		void ProcessRowAdded(Row row, int index) {
 			row.Table = this;
 			foreach (var column in Schema.Columns)
-				column.OnRowAdded(row);		//Adds the row to parent relations, and handles calculated columns
+				column.OnRowAdded(row);     //Adds the row to parent relations, and handles calculated columns
 			OnRowAdded(new RowListEventArgs(row, index));
-			row.OnAdded();		//Workaround: TableSynchronizer cannot handle ValueChanges before RowAdded; overrides will change values
+			row.OnAdded();      //Workaround: TableSynchronizer cannot handle ValueChanges before RowAdded; overrides will change values
 		}
 		void ProcessRowRemoved(Row row, int index) {
 			row.Table = null;
 			Schema.RemoveRow(row);
 			foreach (var column in Schema.Columns)
-				column.OnRowRemoved(row);	//Removes the row from parent relations, and handles calculated columns
+				column.OnRowRemoved(row);   //Removes the row from parent relations, and handles calculated columns
 
 			OnRowRemoved(new RowListEventArgs(row, index));
 		}
 		internal void ProcessValueChanged(Row row, Column column, object oldValue) {
 			if (column is CalculatedColumn)
-				OnValueChanged(new ValueChangedEventArgs(row, column));	//Calculated columns don't have an old value
+				OnValueChanged(new ValueChangedEventArgs(row, column)); //Calculated columns don't have an old value
 			else
 				OnValueChanged(new ValueChangedEventArgs(row, column, oldValue));
 
@@ -256,16 +256,32 @@ namespace ShomreiTorah.Singularity {
 		public void AddTable(Table table) {
 			if (table == null) throw new ArgumentNullException("table");
 
-			//If we allow duplicate tables for the same schema, we get 
+			//If we allow duplicate tables for the same schema, we get
 			//sticky situations for child relations. (What if there are
-			//multiple tables with the child schema?)  Also, it breaks 
+			//multiple tables with the child schema?)  Also, it breaks
 			//XML persistence.
 			if (this[table.Schema.Name] != null)
 				throw new ArgumentException("This DataContext already has a " + table.Schema.Name + " table", "table");
 
 			table.Context = Context;
 			Items.Add(table);
+			OnTableAdded(new TableEventArgs(table));
 		}
 		void ICollection<Table>.Add(Table table) { AddTable(table); }
+
+		///<summary>Occurs when a new table is added to the collection.</summary>
+		public event EventHandler<TableEventArgs> TableAdded;
+		///<summary>Raises the TableAdded event.</summary>
+		///<param name="e">A TableEventArgs object that provides the event data.</param>
+		void OnTableAdded(TableEventArgs e) => TableAdded?.Invoke(this, e);
+	}
+
+	///<summary>Provides data for Table events.</summary>
+	public class TableEventArgs : EventArgs {
+		///<summary>Creates a new TableEventArgs instance.</summary>
+		public TableEventArgs(Table table) { Table = table; }
+
+		///<summary>Gets the table.</summary>
+		public Table Table { get; }
 	}
 }
