@@ -310,9 +310,6 @@ namespace ShomreiTorah.Data {
 
 	#region Pledge Links
 	partial class Pledge {
-		partial void ValidateAmount(decimal newValue, Action<string> error) {
-			if (newValue < 0) error("Amount cannot be negative");
-		}
 		partial void OnAccountChanged(string oldValue, string newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
