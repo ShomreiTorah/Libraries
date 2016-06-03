@@ -29,7 +29,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 		///<summary>Sets the value of the DefaultSettingsMode property for an editor.</summary>
 		public void SetDefaultSettingsMode(BaseEdit editor, DefaultSettingsMode value) {
-			//If we're still initializing, apply the settings 
+			//If we're still initializing, apply the settings
 			//(and update the property value) after we finish.
 			//If we're not initializing, apply immediately.
 			if (initializing)
@@ -64,10 +64,9 @@ namespace ShomreiTorah.Data.UI.Controls {
 		///<summary>Applies any registered EditorSettings to an editor.</summary>
 		///<returns>True if there were any settings to apply.</returns>
 		bool ApplySettings(BaseEdit edit) {
-			Debug.Assert(edit.BindingManager != null, "How does " + edit.Name + " have a null BindingManager?");
 			//This will be called after normal designer serialization of previously applied settings
 
-			if (edit.DataBindings.Count != 1 || edit.DataBindings[0].BindingManagerBase == null) { //TODO: Why/when is BindingManagerBase null?
+			if (edit.DataBindings.Count != 1) {
 				if (ShouldShowErrors)
 					Dialog.ShowError(edit.Name + " is not databound");
 				return false;
@@ -100,7 +99,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 		}
 
 		static Column GetColumn(Binding binding) {
-			var schema = TableSchema.GetSchema(binding.BindingManagerBase.GetItemProperties()[0]);
+			var schema = TableSchema.GetSchema(binding.DataSource);
 			if (schema == null) return null;
 			return schema.Columns[binding.BindingMemberInfo.BindingField];
 		}
@@ -193,8 +192,8 @@ namespace ShomreiTorah.Data.UI.Controls {
 			if (component == null) throw new ArgumentNullException("component");
 			Component = (EditorSettingsApplier)component;
 
-			Verbs = new DesignerVerbCollection { 
-				new DesignerVerb("Apply to all editors", delegate { DoDefaultAction(); }) 
+			Verbs = new DesignerVerbCollection {
+				new DesignerVerb("Apply to all editors", delegate { DoDefaultAction(); })
 			};
 		}
 		IComponent IDesigner.Component { get { return Component; } }
