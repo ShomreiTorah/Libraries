@@ -23,7 +23,7 @@ namespace ShomreiTorah.Singularity {
 		public static TypedSchema<TRow> Instance { get; private set; }
 
 		///<summary>Creates a table for this schema.</summary>
-		public override Table CreateTable() { return new TypedTable<TRow>(Instance); }	//TODO: Fast rowCreator
+		public override Table CreateTable() { return new TypedTable<TRow>(Instance); }  //TODO: Fast rowCreator
 
 		internal override void AddRow(Row row) {
 			if (!(row is TRow)) throw new InvalidOperationException("Typed schemas can only have typed rows");
@@ -95,7 +95,7 @@ namespace ShomreiTorah.Singularity {
 			public TableSchema Schema { get { return Table.Schema; } }
 		}
 
-		//This class maintains separate backing fields for typed events, 
+		//This class maintains separate backing fields for typed events,
 		//and overrides the base class' raiser methods to raise the typed
 		//events as well.  (Events do not support covariance)
 		#region Typed Events
@@ -106,8 +106,7 @@ namespace ShomreiTorah.Singularity {
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnRowAdded(RowListEventArgs e) {
 			base.OnRowAdded(e);
-			if (RowAdded != null)
-				RowAdded(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index));
+			eventSequence.Execute(() => RowAdded?.Invoke(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index)));
 		}
 		///<summary>Occurs when a row is removed from the table.</summary>
 		public new event EventHandler<RowListEventArgs<TRow>> RowRemoved;
@@ -116,8 +115,7 @@ namespace ShomreiTorah.Singularity {
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnRowRemoved(RowListEventArgs e) {
 			base.OnRowRemoved(e);
-			if (RowRemoved != null)
-				RowRemoved(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index));
+			eventSequence.Execute(() => RowRemoved?.Invoke(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index)));
 		}
 		///<summary>Occurs when a column value is changed.</summary>
 		public new event EventHandler<ValueChangedEventArgs<TRow>> ValueChanged;
@@ -126,8 +124,7 @@ namespace ShomreiTorah.Singularity {
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnValueChanged(ValueChangedEventArgs e) {
 			base.OnValueChanged(e);
-			if (ValueChanged != null)
-				ValueChanged(this, new ValueChangedEventArgs<TRow>(e));
+			eventSequence.Execute(() => ValueChanged?.Invoke(this, new ValueChangedEventArgs<TRow>(e)));
 		}
 		#endregion
 	}

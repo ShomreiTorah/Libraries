@@ -90,6 +90,7 @@
     <Compile Include="HebrewDayInfoTest.cs" />
     <Compile Include="HebrewDayOfYearTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SequentializerTests.cs" />
     <Compile Include="XmlZmanimProviderTest.cs" />
     <Compile Include="YearlyZmanimDictionaryTest.cs" />
   </ItemGroup>

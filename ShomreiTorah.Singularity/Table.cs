@@ -169,29 +169,28 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		#region Events
+		protected readonly Sequentializer eventSequence = new Sequentializer();
+
 		///<summary>Occurs when a row is added to the table.</summary>
 		public event EventHandler<RowListEventArgs> RowAdded;
 		///<summary>Raises the RowAdded event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
 		protected virtual void OnRowAdded(RowListEventArgs e) {
-			if (RowAdded != null)
-				RowAdded(this, e);
+			eventSequence.Execute(() => RowAdded?.Invoke(this, e));
 		}
 		///<summary>Occurs when a row is removed from the table.</summary>
 		public event EventHandler<RowListEventArgs> RowRemoved;
 		///<summary>Raises the RowRemoved event.</summary>
 		///<param name="e">A RowEventArgs object that provides the event data.</param>
 		protected virtual void OnRowRemoved(RowListEventArgs e) {
-			if (RowRemoved != null)
-				RowRemoved(this, e);
+			eventSequence.Execute(() => RowRemoved?.Invoke(this, e));
 		}
 		///<summary>Occurs when a column value is changed.</summary>
 		public event EventHandler<ValueChangedEventArgs> ValueChanged;
 		///<summary>Raises the ValueChanged event.</summary>
 		///<param name="e">A ValueChangedEventArgs object that provides the event data.</param>
 		protected virtual void OnValueChanged(ValueChangedEventArgs e) {
-			if (ValueChanged != null)
-				ValueChanged(this, e);
+			eventSequence.Execute(() => ValueChanged?.Invoke(this, e));
 		}
 
 		///<summary>Occurs after the table is populated from a datasource.</summary>
@@ -201,8 +200,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Raises the LoadCompleted event.</summary>
 		///<param name="e">An EventArgs object that provides the event data.</param>
 		protected virtual void OnLoadCompleted(EventArgs e) {
-			if (LoadCompleted != null)
-				LoadCompleted(this, e);
+			eventSequence.Execute(() => LoadCompleted?.Invoke(this, e));
 		}
 		#endregion
 	}
