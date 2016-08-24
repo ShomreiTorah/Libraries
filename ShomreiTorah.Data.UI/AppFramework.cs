@@ -42,7 +42,8 @@ namespace ShomreiTorah.Data.UI {
 
 			//if (rootType.Assembly.EntryPoint == null) return;	//Type is in a DLL
 
-			var appFrameworkType = rootType.Assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(AppFramework)));
+			var appFrameworkType = rootType.Assembly.GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(AppFramework)))
+								?? FindParentProjects(rootType.Assembly.GetName().Name);
 
 			if (appFrameworkType == null) {
 				MessageBox.Show("Cannot find an AppFramework type in " + rootType.Assembly + ".\r\nTry rebuilding the project.",
@@ -51,6 +52,14 @@ namespace ShomreiTorah.Data.UI {
 			}
 
 			CheckDesignTime((AppFramework)Activator.CreateInstance(appFrameworkType));
+		}
+		///<summary>Looks for AppFramework subclasses in assemblies that are prefixes of the specified assembly.  Useful for plugin projects.</summary>
+		static Type FindParentProjects(string assemblyName) {
+			return AppDomain.CurrentDomain.GetAssemblies()
+				.Where(a => assemblyName.StartsWith(a.GetName().Name))
+				.OrderByDescending(a => a.GetName().Name.Length)
+				.SelectMany(a => a.GetTypes())
+				.FirstOrDefault(t => t.IsSubclassOf(typeof(AppFramework)));
 		}
 
 		static string GetTargetNamespace(IDesignerHost dh) {
@@ -94,7 +103,7 @@ namespace ShomreiTorah.Data.UI {
 
 			try {
 				instance.SyncContext.ReadData();
-			} catch { instance.SyncContext = instance.CreateDataContext(); }	//Ignore SQL errors at design time
+			} catch { instance.SyncContext = instance.CreateDataContext(); }    //Ignore SQL errors at design time
 		}
 
 		///<summary>Gets the application's main form.</summary>
@@ -254,10 +263,10 @@ namespace ShomreiTorah.Data.UI {
 				allSchemas.UnionWith(schema.GetDependencies());
 			}
 
-			if (allSchemas.Count == 0) return;	//All of the tables are already loaded
+			if (allSchemas.Count == 0) return;  //All of the tables are already loaded
 			var tables = allSchemas
 				.SortDependencies()
-				.Except(Current.DataContext.Tables.Select(t => t.Schema))	//Must be called after SortDependencies, since sorting requires all dependencies
+				.Except(Current.DataContext.Tables.Select(t => t.Schema))   //Must be called after SortDependencies, since sorting requires all dependencies
 				.Select(ts => ts.CreateTable())
 				.ToList();
 
@@ -273,11 +282,11 @@ namespace ShomreiTorah.Data.UI {
 			var threadContext = SynchronizationContext.Current;
 			ProgressWorker.Execute(ui => {
 				if (Current.HasDataChanged)
-					Current.SyncContext.WriteData(ui);			//I must save before loading in case a parent row was deleted.  (The DB is expected to cascade)
+					Current.SyncContext.WriteData(ui);          //I must save before loading in case a parent row was deleted.  (The DB is expected to cascade)
 
 				ui.Maximum = -1;
 				ui.Caption = "Loading " + tables.Join(", ", t => t.Schema.Name);
-				Current.SyncContext.ReadData(threadContext);	//I must refresh everything to pick up potential changes in parent rows
+				Current.SyncContext.ReadData(threadContext);    //I must refresh everything to pick up potential changes in parent rows
 			}, false);
 		}
 		#endregion
