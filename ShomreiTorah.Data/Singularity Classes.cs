@@ -806,8 +806,8 @@ namespace ShomreiTorah.Data {
         
         ///<summary>Gets the schema's ImportedPaymentId column.</summary>
         public static ValueColumn ImportedPaymentIdColumn { get; private set; }
-        ///<summary>Gets the schema's PaymentId column.</summary>
-        public static ForeignKeyColumn PaymentIdColumn { get; private set; }
+        ///<summary>Gets the schema's Payment column.</summary>
+        public static ForeignKeyColumn PaymentColumn { get; private set; }
         ///<summary>Gets the schema's Source column.</summary>
         public static ValueColumn SourceColumn { get; private set; }
         ///<summary>Gets the schema's ExternalId column.</summary>
@@ -832,9 +832,9 @@ namespace ShomreiTorah.Data {
             ImportedPaymentIdColumn.Unique = true;
             ImportedPaymentIdColumn.AllowNulls = false;
             
-            PaymentIdColumn = Schema.Columns.AddForeignKey("PaymentId", ShomreiTorah.Data.Payment.Schema, "ImportedPayments");
-            PaymentIdColumn.Unique = true;
-            PaymentIdColumn.AllowNulls = false;
+            PaymentColumn = Schema.Columns.AddForeignKey("Payment", ShomreiTorah.Data.Payment.Schema, "ImportedPayments");
+            PaymentColumn.Unique = true;
+            PaymentColumn.AllowNulls = false;
             
             SourceColumn = Schema.Columns.AddValueColumn("Source", typeof(String), null);
             SourceColumn.AllowNulls = false;
@@ -855,7 +855,7 @@ namespace ShomreiTorah.Data {
             SchemaMapping.SqlSchemaName = "Billing";
             
             SchemaMapping.Columns.AddMapping(ImportedPaymentIdColumn, "ImportedPaymentId");
-            SchemaMapping.Columns.AddMapping(PaymentIdColumn, "PaymentId");
+            SchemaMapping.Columns.AddMapping(PaymentColumn, "PaymentId");
             SchemaMapping.Columns.AddMapping(SourceColumn, "Source");
             SchemaMapping.Columns.AddMapping(ExternalIdColumn, "ExternalId");
             SchemaMapping.Columns.AddMapping(DateImportedColumn, "DateImported");
@@ -879,9 +879,9 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets or sets the payment that was imported.</summary>
         [DebuggerNonUserCode]
         [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Payment PaymentId {
-            get { return base.Field<Payment>(PaymentIdColumn); }
-            set { base[PaymentIdColumn] = value; }
+        public Payment Payment {
+            get { return base.Field<Payment>(PaymentColumn); }
+            set { base[PaymentColumn] = value; }
         }
         ///<summary>Gets or sets the source that the payment was imported from.</summary>
         [DebuggerNonUserCode]
@@ -919,8 +919,8 @@ namespace ShomreiTorah.Data {
         partial void ValidateImportedPaymentId(Guid newValue, Action<string> error);
         partial void OnImportedPaymentIdChanged(Guid? oldValue, Guid? newValue);
         
-        partial void ValidatePaymentId(Payment newValue, Action<string> error);
-        partial void OnPaymentIdChanged(Payment oldValue, Payment newValue);
+        partial void ValidatePayment(Payment newValue, Action<string> error);
+        partial void OnPaymentChanged(Payment oldValue, Payment newValue);
         
         partial void ValidateSource(String newValue, Action<string> error);
         partial void OnSourceChanged(String oldValue, String newValue);
@@ -951,8 +951,8 @@ namespace ShomreiTorah.Data {
             if (column == ImportedPaymentIdColumn) {
                 ValidateImportedPaymentId((Guid)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == PaymentIdColumn) {
-                ValidatePaymentId((Payment)newValue, reporter);
+            } else if (column == PaymentColumn) {
+                ValidatePayment((Payment)newValue, reporter);
                 if (!String.IsNullOrEmpty(error)) return error;
             } else if (column == SourceColumn) {
                 ValidateSource((String)newValue, reporter);
@@ -977,8 +977,8 @@ namespace ShomreiTorah.Data {
             OnColumnChanged(column, oldValue, newValue);
             if (column == ImportedPaymentIdColumn)
             	OnImportedPaymentIdChanged((Guid?)oldValue, (Guid?)newValue);
-            else if (column == PaymentIdColumn)
-            	OnPaymentIdChanged((Payment)oldValue, (Payment)newValue);
+            else if (column == PaymentColumn)
+            	OnPaymentChanged((Payment)oldValue, (Payment)newValue);
             else if (column == SourceColumn)
             	OnSourceChanged((String)oldValue, (String)newValue);
             else if (column == ExternalIdColumn)
@@ -2156,7 +2156,7 @@ namespace ShomreiTorah.Data {
         ///<summary>Gets the pledges that this payment is paying for.</summary>
         public IChildRowCollection<PledgeLink> LinkedPledges { get { return TypedChildRows<PledgeLink>(PledgeLink.PaymentColumn); } }
         ///<summary>Gets the source that this payment was imported from, if any.</summary>
-        public IChildRowCollection<ImportedPayment> ImportedPayments { get { return TypedChildRows<ImportedPayment>(ImportedPayment.PaymentIdColumn); } }
+        public IChildRowCollection<ImportedPayment> ImportedPayments { get { return TypedChildRows<ImportedPayment>(ImportedPayment.PaymentColumn); } }
         #endregion
         
         #region Partial Methods

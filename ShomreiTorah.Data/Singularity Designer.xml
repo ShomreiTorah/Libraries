@@ -654,7 +654,7 @@
         <Null />
       </DefaultValue>
     </Column>
-    <Column Name="PaymentId" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the payment that was imported." Expression="" ForeignRelationName="ImportedPayments" ForeignRelationPropertyDescription="Gets the source that this payment was imported from, if any." ForeignRelationPropertyName="ImportedPayments" GenerateSqlMapping="true" IsUnique="true" PropertyName="PaymentId" PropertyVisibility="Public" SqlName="PaymentId" ForeignSchemaName="Payments">
+    <Column Name="Payment" AllowNulls="false" DataType="ShomreiTorah.Singularity.Row, ShomreiTorah.Singularity, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" Description="Gets or sets the payment that was imported." Expression="" ForeignRelationName="ImportedPayments" ForeignRelationPropertyDescription="Gets the source that this payment was imported from, if any." ForeignRelationPropertyName="ImportedPayments" GenerateSqlMapping="true" IsUnique="true" PropertyName="Payment" PropertyVisibility="Public" SqlName="PaymentId" ForeignSchemaName="Payments">
       <DefaultValue>
         <Null />
       </DefaultValue>
