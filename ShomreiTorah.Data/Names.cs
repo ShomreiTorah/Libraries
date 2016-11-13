@@ -50,7 +50,7 @@ namespace ShomreiTorah.Data {
 		///<remarks>These pledges are subtracted from receipts.</remarks>
 		public static readonly string NonDeductibleSubType = "Nondeductible";
 		///<summary>Gets the pledge type for journal ads.</summary>
-		public static PledgeType JournalPledgeType = new PledgeType(
+		public static PledgeType JournalPledgeType { get; } = new PledgeType(
 			Config.ReadAttribute("Journal", "PledgeType"),
 			AdTypes.Select(a => a.PledgeSubType).ToList()
 		);

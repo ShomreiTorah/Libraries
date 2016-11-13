@@ -106,7 +106,7 @@ namespace ShomreiTorah.Singularity {
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnRowAdded(RowListEventArgs e) {
 			base.OnRowAdded(e);
-			eventSequence.Execute(() => RowAdded?.Invoke(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index)));
+			EventSequence.Execute(() => RowAdded?.Invoke(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index)));
 		}
 		///<summary>Occurs when a row is removed from the table.</summary>
 		public new event EventHandler<RowListEventArgs<TRow>> RowRemoved;
@@ -115,7 +115,7 @@ namespace ShomreiTorah.Singularity {
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnRowRemoved(RowListEventArgs e) {
 			base.OnRowRemoved(e);
-			eventSequence.Execute(() => RowRemoved?.Invoke(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index)));
+			EventSequence.Execute(() => RowRemoved?.Invoke(this, new RowListEventArgs<TRow>((TRow)e.Row, e.Index)));
 		}
 		///<summary>Occurs when a column value is changed.</summary>
 		public new event EventHandler<ValueChangedEventArgs<TRow>> ValueChanged;
@@ -124,7 +124,7 @@ namespace ShomreiTorah.Singularity {
 		[SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods")]
 		protected override void OnValueChanged(ValueChangedEventArgs e) {
 			base.OnValueChanged(e);
-			eventSequence.Execute(() => ValueChanged?.Invoke(this, new ValueChangedEventArgs<TRow>(e)));
+			EventSequence.Execute(() => ValueChanged?.Invoke(this, new ValueChangedEventArgs<TRow>(e)));
 		}
 		#endregion
 	}

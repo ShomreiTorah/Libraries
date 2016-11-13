@@ -50,7 +50,7 @@ namespace ShomreiTorah.Common.Updates {
 		///<remarks>This method is called by the update publisher.</remarks>
 		public static UpdateFile Create(string basePath, string relativePath, Uri remotePath, IEnumerable<RSACryptoServiceProvider> signers) {
 			if (remotePath == null) throw new ArgumentNullException("remotePath");
-			if (signers == null || !signers.Any()) throw new ArgumentNullException("signer");
+			if (signers == null || !signers.Any()) throw new ArgumentNullException("signers");
 			var filePath = Path.Combine(basePath, relativePath);
 
 			var info = new FileInfo(filePath);
@@ -94,7 +94,7 @@ namespace ShomreiTorah.Common.Updates {
 
 		///<summary>Returns a new UpdateFile instance with the specified prefix removed, if this file starts with the prefix.  If not, returns this.</summary>
 		public UpdateFile StripPrefix(string prefix) {
-			if (!RelativePath.StartsWith(prefix))
+			if (!RelativePath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
 				return this;
 			return new UpdateFile {
 				RelativePath = RelativePath.Substring(prefix.Length),

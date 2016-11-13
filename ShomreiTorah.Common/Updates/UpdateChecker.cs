@@ -127,7 +127,7 @@ namespace ShomreiTorah.Common.Updates {
 	///<summary>Stores the update configuration read from ShomreiTorahConfig.xml.</summary>
 	public class UpdateConfig {
 		///<summary>Gets the update configuration info from ShomreiTorahConfig, or null if ShomreiTorahConfig.xml doesn't have an Updates element.</summary>
-		public static readonly UpdateConfig Standard = Config.Xml.Root.Element("Updates") == null ? null : new UpdateConfig();
+		public static UpdateConfig Standard { get; } = Config.Xml.Root.Element("Updates") == null ? null : new UpdateConfig();
 
 
 		///<summary>Reads settings from ShomreiTorahConfig into a new UpdateConfig instance.</summary>

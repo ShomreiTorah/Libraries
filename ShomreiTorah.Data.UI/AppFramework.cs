@@ -56,7 +56,7 @@ namespace ShomreiTorah.Data.UI {
 		///<summary>Looks for AppFramework subclasses in assemblies that are prefixes of the specified assembly.  Useful for plugin projects.</summary>
 		static Type FindParentProjects(string assemblyName) {
 			return AppDomain.CurrentDomain.GetAssemblies()
-				.Where(a => assemblyName.StartsWith(a.GetName().Name))
+				.Where(a => assemblyName.StartsWith(a.GetName().Name, StringComparison.OrdinalIgnoreCase))
 				.OrderByDescending(a => a.GetName().Name.Length)
 				.SelectMany(a => a.GetTypes())
 				.FirstOrDefault(t => t.IsSubclassOf(typeof(AppFramework)));
