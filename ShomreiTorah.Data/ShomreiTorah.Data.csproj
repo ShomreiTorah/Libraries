@@ -71,6 +71,7 @@
     <Compile Include="Partial Implementations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Singularity Classes.cs" />
+    <Compile Include="UsStates.cs" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\..\Setup\Common\CustomDictionary.xml">
