@@ -15,7 +15,7 @@ namespace ShomreiTorah.Singularity {
 		internal Column(TableSchema schema, string name) {
 			Schema = schema;
 			Schema.ValidateName(name);
-			this.name = name;	//Don't call the property setter to avoid a redundant SchemaChanged
+			this.name = name;   //Don't call the property setter to avoid a redundant SchemaChanged
 			CanValidate = true;
 		}
 
@@ -100,7 +100,7 @@ namespace ShomreiTorah.Singularity {
 			DataType = dataType;
 			DefaultValue = defaultValue;
 
-			allowNulls = DataType == null || !DataType.IsValueType;		//Don't set the property so as not to trigger validation
+			allowNulls = DataType == null || !DataType.IsValueType;     //Don't set the property so as not to trigger validation
 			if (!allowNulls && DataType.IsNullable()) {
 				allowNulls = true;
 				DataType = Nullable.GetUnderlyingType(DataType);
@@ -183,7 +183,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
 		public override string ValidateValue(Row row, object value) {
-			var error = ValidateValueType(value);	//Validate the schema.  Everything else is handled correctly by the base class.
+			var error = ValidateValueType(value);   //Validate the schema.  Everything else is handled correctly by the base class.
 			if (error != null)
 				return error;
 
@@ -217,7 +217,7 @@ namespace ShomreiTorah.Singularity {
 
 		void AddToParent(Row childRow) {
 			var newParent = (Row)childRow[this];
-			if (newParent != null) {
+			if (newParent != null && newParent.Table != null) {
 				var c = newParent.ChildRows(ChildRelation, false);
 				if (c != null) c.AddRow(childRow);
 			}
@@ -279,9 +279,9 @@ namespace ShomreiTorah.Singularity {
 			if (column.Schema != Schema) throw new ArgumentException("Cannot remove column from different schema", "column");
 
 			Items.Remove(column);
-			Schema.EachRow(r => r.OnColumnRemoved(column));	//Will not raise events
+			Schema.EachRow(r => r.OnColumnRemoved(column)); //Will not raise events
 
-			column.OnRemove();	//This will raise an event for ForeignKeyColumn, so we must be in a consistent state.
+			column.OnRemove();  //This will raise an event for ForeignKeyColumn, so we must be in a consistent state.
 			Schema.OnColumnRemoved(new ColumnEventArgs(column));
 			Schema.OnSchemaChanged();
 		}
