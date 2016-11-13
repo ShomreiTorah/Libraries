@@ -19,9 +19,17 @@ namespace ShomreiTorah.Data.UI.Grid {
 	public sealed partial class SmartGridView : GridView {
 		sealed class MyRegistrator : GridInfoRegistrator {
 			public override string ViewName { get { return "SmartGridView"; } }
-			public override BaseViewHandler CreateHandler(BaseView view) { return new MyHandler((SmartGridView)view); }
+			public override BaseViewHandler CreateHandler(BaseView view) {
+				SmartGridView smartView = (SmartGridView)view;
+				if (smartView == null)
+					return base.CreateHandler(view);
+				return new MyHandler(smartView);
+			}
 			public override BaseView CreateView(GridControl grid) {
-				var view = new SmartGridView((SmartGrid)grid);
+				var smartGrid = grid as SmartGrid;
+				if (smartGrid == null)
+					return base.CreateView(grid);
+				var view = new SmartGridView(smartGrid);
 				view.SetGridControl(grid);
 				return view;
 			}
@@ -45,7 +53,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 		///<summary>Creates a new SmartGridView in a SmartGridControl.</summary>
 		public SmartGridView(SmartGrid grid)
 			: base(grid) {
-			this.AddControllerHandlers();	//See ColumnController.cs
+			this.AddControllerHandlers();   //See ColumnController.cs
 		}
 
 		///<summary>Indicates whether the view will show tooltips.</summary>
@@ -63,7 +71,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 				if (lastAppliedDataSource != null && lastAppliedDataSource == DataSource)
 					return;
 				if (DataController.Columns.Cast<DataColumnInfo>().All(dci => dci.Unbound))
-					return;	//Ignore fake datasources such as DataContexts that have no real columns.
+					return; //Ignore fake datasources such as DataContexts that have no real columns.
 
 				ApplyBehaviors();
 				ApplyColumnControllers();
@@ -130,7 +138,7 @@ namespace ShomreiTorah.Data.UI.Grid {
 
 		///<summary>Gets an enumerator that returns the items in the collection.</summary>
 		public new IEnumerator<SmartGridColumn> GetEnumerator() {
-			for (int i = 0; i < Count; i++)		//Avoid recursion
+			for (int i = 0; i < Count; i++)     //Avoid recursion
 				yield return this[i];
 		}
 		///<summary>Copies the contents of the collection to an array.</summary>
