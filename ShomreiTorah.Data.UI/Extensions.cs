@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using DevExpress.Utils;
 using DevExpress.XtraBars;
 using ShomreiTorah.Singularity;
@@ -10,6 +11,17 @@ using ShomreiTorah.WinForms;
 namespace ShomreiTorah.Data.UI {
 	///<summary>Contains extension methods for data UIs.</summary>
 	public static class Extensions {
+		static readonly Regex phoneParser = new Regex(@"^\(?(\d{3})\)?\s*-?\s*(\d{3})\s*-?\s*(\d{4})$", RegexOptions.Compiled);
+		///<summary>Formats a standard US phone number.</summary>
+		public static string FormatPhoneNumber(this string phone) {
+			if (phone == null) return null;
+			var match = phoneParser.Match(phone);
+
+			if (!match.Success)
+				return phone;
+			return match.Result("($1) $2 - $3");
+		}
+
 		///<summary>Sets up a button that can use data for a range of years.</summary>
 		///<typeparam name="TRow">The strongly-typed Singularity row that the feature uses.  These rows are used to populate the years dropdown.</typeparam>
 		///<param name="button">The button that initiates the action.</param>
