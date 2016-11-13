@@ -89,6 +89,9 @@
     <Compile Include="Controls\PersonSelector.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\PledgeTypeTree.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\PreviewAddressEdit.cs">
       <SubType>Component</SubType>
     </Compile>
