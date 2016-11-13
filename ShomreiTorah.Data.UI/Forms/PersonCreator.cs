@@ -13,9 +13,9 @@ using ShomreiTorah.Common;
 namespace ShomreiTorah.Data.UI.Forms {
 	///<summary>A form that allows the user to create a person.</summary>
 	public partial class PersonCreator : XtraForm {
-		PersonCreator() {
+		PersonCreator(Person template = null) {
 			InitializeComponent();
-			personEditor.Person = new Person {
+			personEditor.Person = template ?? new Person {
 				Source = "Manually Added",
 				City = "Passaic",
 				State = "NJ",
@@ -60,8 +60,8 @@ namespace ShomreiTorah.Data.UI.Forms {
 
 		///<summary>Prompts the user to create a new person.</summary>
 		///<remarks>The new Person row, or null if the user clicked cancel.</remarks>
-		public static Person Prompt() {
-			using (var form = new PersonCreator()) {
+		public static Person Prompt(Person template = null) {
+			using (var form = new PersonCreator(template)) {
 				if (form.ShowDialog() == DialogResult.Cancel)
 					return null;
 				return form.personEditor.Person;

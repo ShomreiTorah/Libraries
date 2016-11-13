@@ -185,8 +185,8 @@ namespace ShomreiTorah.Data.UI {
 
 		///<summary>Prompts the user to create a new person.</summary>
 		///<remarks>The new Person row, or null if the user clicked cancel.</remarks>
-		public virtual Person PromptPerson() {
-			return Forms.PersonCreator.Prompt();
+		public virtual Person PromptPerson(Person template = null) {
+			return Forms.PersonCreator.Prompt(template);
 		}
 
 		///<summary>Registers the standard settings in Data.UI.dll.</summary>

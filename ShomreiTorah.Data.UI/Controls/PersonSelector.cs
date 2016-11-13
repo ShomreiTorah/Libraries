@@ -40,7 +40,9 @@ namespace ShomreiTorah.Data.UI.Controls {
 				SuperTip = SelectedPerson.GetSuperTip();
 		}
 		///<summary>Prompts the user to create a new person.</summary>
-		protected internal virtual Person PromptNew() { return AppFramework.Current.PromptPerson(); }
+		protected internal virtual Person PromptNew() {
+			return AppFramework.Current.PromptPerson(Properties.NewPersonTemplate?.Invoke(this));
+		}
 
 		///<summary>Gets settings specific to the PersonSelector.</summary>
 		[Category("Properties")]
@@ -91,6 +93,9 @@ namespace ShomreiTorah.Data.UI.Controls {
 			DisplaySettings.EditorRepository.PersonLookup.Apply(this);
 		}
 
+		///<summary>Gets or sets an optional delegate to provide a template when the user clicks New Person.</summary>
+		public Func<PersonSelector, Person> NewPersonTemplate { get; set; }
+
 		#region Property overrides
 		///<summary>Gets or sets the text displayed grayed out when the editor doesn't have focus, and its edit value is not set to a valid value.</summary>
 		[Description("Gets or sets the text displayed grayed out when the editor doesn't have focus, and its edit value is not set to a valid value.")]
@@ -133,7 +138,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 				if (person != null && !RaisePersonSelecting(person, PersonSelectionReason.Created))
 					return;
 				OwnerEdit.EditValue = person;
-				OwnerEdit.IsModified = true;	//Force validation in order to commit the new value for databinding
+				OwnerEdit.IsModified = true;    //Force validation in order to commit the new value for databinding
 				OwnerEdit.DoValidate();
 			}
 		}
