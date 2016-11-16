@@ -65,8 +65,9 @@ namespace ShomreiTorah.WinForms.Forms {
 				try {
 					var task = method(dialog, dialog.CancellationSource.Token);
 					await Task.WhenAny(task, Task.Delay(5));    // If it finishes quickly, don't bother showing the dialog.
-					if (!task.IsCompleted)
-						dialog.ShowDialog(parent);
+					if (task.IsCompleted)
+						return;
+					SynchronizationContext.Current.Post(_ => dialog.ShowDialog(parent), null);
 					await task;
 				} finally {
 					dialog.Finished = true;
