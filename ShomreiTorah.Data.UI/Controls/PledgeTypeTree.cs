@@ -13,12 +13,26 @@ namespace ShomreiTorah.Data.UI.Controls {
 	public class PledgeTypeTree : TreeView {
 		///<summary>Creates a <see cref="PledgeTypeTree"/> bound to the <see cref="PledgeType"/>s from <see cref="Config"/>.</summary>
 		public PledgeTypeTree() {
-			foreach (var type in Names.PledgeTypes) {
-				var node = Nodes.Add(type.Name);
-				foreach (var subtype in type.Subtypes)
-					node.Nodes.Add(subtype);
+			PledgeTypes = Names.PledgeTypes;
+			HideSelection = false;
+		}
+
+		IReadOnlyCollection<PledgeType> pledgeTypes;
+		///<summary>Gets or sets the list of pledge types to display in the tree.  Defaults to <see cref="Names.PledgeTypes"/>.</summary>
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+		public IReadOnlyCollection<PledgeType> PledgeTypes {
+			get { return pledgeTypes; }
+			set {
+				if (value == null) throw new ArgumentNullException(nameof(value));
+				pledgeTypes = value;
+
+				Nodes.Clear();
+				foreach (var type in value) {
+					var node = Nodes.Add(type.Name);
+					foreach (var subtype in type.Subtypes)
+						node.Nodes.Add(subtype);
+				}
 			}
-			this.HideSelection = false;
 		}
 
 		// Don't serialize nodes from the designer's config.
