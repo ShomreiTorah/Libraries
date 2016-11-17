@@ -52,7 +52,8 @@ namespace ShomreiTorah.Data {
 		///<summary>Gets the pledge type for journal ads.</summary>
 		public static PledgeType JournalPledgeType { get; } = new PledgeType(
 			Config.ReadAttribute("Journal", "PledgeType"),
-			AdTypes.Select(a => a.PledgeSubType).ToList()
+			null,
+			AdTypes.Select(a => new PledgeSubType(a.PledgeSubType, a.DefaultPrice)).ToList()
 		);
 
 
@@ -142,21 +143,49 @@ namespace ShomreiTorah.Data {
 	///<summary>Contains information about a standard pledge type.</summary>
 	public sealed class PledgeType {
 		///<summary>Creates a PledgeType instance.</summary>
-		internal PledgeType(string name, IList<string> subTypes = null) {
+		internal PledgeType(string name, decimal? defaultPrice = null, IList<PledgeSubType> subTypes = null) {
 			if (name == null) throw new ArgumentNullException("name");
 			Name = name;
-			Subtypes = new ReadOnlyCollection<string>(subTypes ?? new string[0]);
+			DefaultPrice = defaultPrice;
+			Subtypes = new ReadOnlyCollection<PledgeSubType>(subTypes ?? new PledgeSubType[0]);
 		}
 
 		internal static PledgeType FromXml(XElement element) {
 			return new PledgeType(element.Attribute("Name").Value,
-				element.Elements("SubType").Attributes("Name").Select(a => a.Value).ToList());
+				(decimal?)element.Attribute("DefaultPrice"),
+				element.Elements("SubType").Select(PledgeSubType.FromXml).ToList());
 		}
+
+		///<summary>Gets the default price for pledges of this type with no subtype, if any.</summary>
+		public decimal? DefaultPrice { get; private set; }
 
 		///<summary>Gets the name of the pledge type.</summary>
 		public string Name { get; private set; }
 		///<summary>Gets the standard subtypes of this pledge type, if any.</summary>
-		public ReadOnlyCollection<String> Subtypes { get; private set; }
+		public ReadOnlyCollection<PledgeSubType> Subtypes { get; private set; }
+
+		///<summary>Returns the name of the pledge type.</summary>
+		public override string ToString() { return Name; }
+	}
+	///<summary>Contains information about a standard pledge subtype.</summary>
+	public sealed class PledgeSubType {
+		///<summary>Creates a PledgeType instance.</summary>
+		internal PledgeSubType(string name, decimal? defaultPrice = null) {
+			if (name == null) throw new ArgumentNullException("name");
+			Name = name;
+			DefaultPrice = defaultPrice;
+		}
+
+		internal static PledgeSubType FromXml(XElement element) {
+			return new PledgeSubType(element.Attribute("Name").Value,
+				(decimal?)element.Attribute("DefaultPrice"));
+		}
+
+		///<summary>Gets the default price for pledges of this type with no subtype, if any.</summary>
+		public decimal? DefaultPrice { get; private set; }
+
+		///<summary>Gets the name of the pledge type.</summary>
+		public string Name { get; private set; }
 
 		///<summary>Returns the name of the pledge type.</summary>
 		public override string ToString() { return Name; }
@@ -198,7 +227,7 @@ namespace ShomreiTorah.Data {
 					elem.Attribute("Name").Value,
 					decimal.Parse(elem.Attribute("DefaultPrice").Value, NumberStyles.Currency, CultureInfo.CurrentCulture),
 					(int)elem.Attribute("AdsPerPage"),
-					(string)elem.Attribute("DisplayName")	// Optional
+					(string)elem.Attribute("DisplayName")   // Optional
 				))
 				.ToList()
 				.AsReadOnly();

@@ -30,7 +30,7 @@ namespace ShomreiTorah.Data.UI.Controls {
 				foreach (var type in value) {
 					var node = Nodes.Add(type.Name);
 					foreach (var subtype in type.Subtypes)
-						node.Nodes.Add(subtype);
+						node.Nodes.Add(subtype.Name);
 				}
 			}
 		}

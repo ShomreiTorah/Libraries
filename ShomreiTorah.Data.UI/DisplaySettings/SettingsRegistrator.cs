@@ -347,7 +347,12 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			//No settings to apply
 			protected internal override void Apply(SmartGridColumn column) { }
 
-			static readonly ReadOnlyCollection<string> SortedOrder = Names.PledgeTypes.SelectMany(p => p.Subtypes).Distinct().ReadOnlyCopy();
+			static readonly ReadOnlyCollection<string> SortedOrder = Names
+				.PledgeTypes
+				.SelectMany(p => p.Subtypes)
+				.Select(s=>s.Name)
+				.Distinct()
+				.ReadOnlyCopy();
 			protected internal override void CompareValues(CustomColumnSortEventArgs e) {
 				var index1 = SortedOrder.IndexOf(e.Value1 as string);
 				var index2 = SortedOrder.IndexOf(e.Value2 as string);
