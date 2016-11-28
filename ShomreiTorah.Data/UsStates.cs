@@ -10,7 +10,7 @@ namespace ShomreiTorah.Data {
 		///<summary>Returns a state abbreviation, if a string is a state.  If not, returns the original string.</summary>
 		public static string Abbreviate(string name) {
 			string retVal;
-			if (Values.TryGetValue(name, out retVal))
+			if (name != null && Values.TryGetValue(name, out retVal))
 				return retVal;
 			return name;
 		}
