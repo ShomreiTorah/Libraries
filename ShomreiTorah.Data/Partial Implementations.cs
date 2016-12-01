@@ -442,6 +442,10 @@ namespace ShomreiTorah.Data {
 	#endregion
 
 	partial class JournalAd {
+		///<summary>Infers the journal year most likely for a specific date.</summary>
+		///<remarks>Since journals start around January, any date after September is inferred as the following year.</remarks>
+		public static int InferYear(DateTime date) => date.AddMonths(4).Year;
+
 		partial void OnAdTypeChanged(string oldValue, string newValue) {
 			if (String.IsNullOrEmpty(oldValue) || String.IsNullOrEmpty(newValue)) return;
 			if (Table == null) return;
