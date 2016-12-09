@@ -238,7 +238,7 @@ namespace ShomreiTorah.Data {
             RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Callers");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "Callers");
             PersonColumn.AllowNulls = false;
             
             DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
@@ -613,7 +613,7 @@ namespace ShomreiTorah.Data {
             UseHtmlColumn = Schema.Columns.AddValueColumn("UseHtml", typeof(Boolean), true);
             UseHtmlColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "EmailAddresses");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "EmailAddresses");
             PersonColumn.AllowNulls = true;
             
             Schema.PrimaryKey = RowIdColumn = Schema.Columns.AddValueColumn("RowId", typeof(Guid), null);
@@ -795,202 +795,6 @@ namespace ShomreiTorah.Data {
         #endregion
     }
     
-    ///<summary>Links a payment imported from an external source.</summary>
-    public partial class ImportedPayment : Row {
-        ///<summary>Creates a new ImportedPayment instance.</summary>
-        public ImportedPayment () : base(Schema) { Initialize(); }
-        partial void Initialize();
-        
-        ///<summary>Creates a strongly-typed ImportedPayments table.</summary>
-        public static TypedTable<ImportedPayment> CreateTable() { return new TypedTable<ImportedPayment>(Schema, () => new ImportedPayment()); }
-        
-        ///<summary>Gets the schema's ImportedPaymentId column.</summary>
-        public static ValueColumn ImportedPaymentIdColumn { get; private set; }
-        ///<summary>Gets the schema's Payment column.</summary>
-        public static ForeignKeyColumn PaymentColumn { get; private set; }
-        ///<summary>Gets the schema's Source column.</summary>
-        public static ValueColumn SourceColumn { get; private set; }
-        ///<summary>Gets the schema's ExternalId column.</summary>
-        public static ValueColumn ExternalIdColumn { get; private set; }
-        ///<summary>Gets the schema's DateImported column.</summary>
-        public static ValueColumn DateImportedColumn { get; private set; }
-        ///<summary>Gets the schema's ImportingUser column.</summary>
-        public static ValueColumn ImportingUserColumn { get; private set; }
-        
-        ///<summary>Gets the ImportedPayments schema instance.</summary>
-        public static new TypedSchema<ImportedPayment> Schema { get; private set; }
-        ///<summary>Gets the SchemaMapping that maps this schema to the SQL Server ImportedPayments table.</summary>
-        public static SchemaMapping SchemaMapping { get; private set; }
-        
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        static ImportedPayment() {
-            #region Create Schema
-            Schema = new TypedSchema<ImportedPayment>("ImportedPayments");
-            
-            Schema.PrimaryKey = ImportedPaymentIdColumn = Schema.Columns.AddValueColumn("ImportedPaymentId", typeof(Guid), null);
-            ImportedPaymentIdColumn.Unique = true;
-            ImportedPaymentIdColumn.AllowNulls = false;
-            
-            PaymentColumn = Schema.Columns.AddForeignKey("Payment", ShomreiTorah.Data.Payment.Schema, "ImportedPayments");
-            PaymentColumn.Unique = true;
-            PaymentColumn.AllowNulls = false;
-            
-            SourceColumn = Schema.Columns.AddValueColumn("Source", typeof(String), null);
-            SourceColumn.AllowNulls = false;
-            
-            ExternalIdColumn = Schema.Columns.AddValueColumn("ExternalId", typeof(String), null);
-            ExternalIdColumn.AllowNulls = false;
-            
-            DateImportedColumn = Schema.Columns.AddValueColumn("DateImported", typeof(DateTime), null);
-            DateImportedColumn.AllowNulls = false;
-            
-            ImportingUserColumn = Schema.Columns.AddValueColumn("ImportingUser", typeof(String), null);
-            ImportingUserColumn.AllowNulls = false;
-            #endregion
-            
-            #region Create SchemaMapping
-            SchemaMapping = new SchemaMapping(Schema, false);
-            SchemaMapping.SqlName = "ImportedPayments";
-            SchemaMapping.SqlSchemaName = "Billing";
-            
-            SchemaMapping.Columns.AddMapping(ImportedPaymentIdColumn, "ImportedPaymentId");
-            SchemaMapping.Columns.AddMapping(PaymentColumn, "PaymentId");
-            SchemaMapping.Columns.AddMapping(SourceColumn, "Source");
-            SchemaMapping.Columns.AddMapping(ExternalIdColumn, "ExternalId");
-            SchemaMapping.Columns.AddMapping(DateImportedColumn, "DateImported");
-            SchemaMapping.Columns.AddMapping(ImportingUserColumn, "ImportingUser");
-            #endregion
-            SchemaMapping.SetPrimaryMapping(SchemaMapping);
-        }
-        
-        ///<summary>Gets the typed table that contains this row, if any.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public new TypedTable<ImportedPayment> Table { get { return (TypedTable<ImportedPayment>)base.Table; } }
-        #region Value Properties
-        ///<summary>Gets or sets a unique ID for this row.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Guid ImportedPaymentId {
-            get { return base.Field<Guid>(ImportedPaymentIdColumn); }
-            set { base[ImportedPaymentIdColumn] = value; }
-        }
-        ///<summary>Gets or sets the payment that was imported.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public Payment Payment {
-            get { return base.Field<Payment>(PaymentColumn); }
-            set { base[PaymentColumn] = value; }
-        }
-        ///<summary>Gets or sets the source that the payment was imported from.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public String Source {
-            get { return base.Field<String>(SourceColumn); }
-            set { base[SourceColumn] = value; }
-        }
-        ///<summary>Gets or sets the payment's ID within the external source.  This is an opaque value, and must be unique within the source.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public String ExternalId {
-            get { return base.Field<String>(ExternalIdColumn); }
-            set { base[ExternalIdColumn] = value; }
-        }
-        ///<summary>Gets or sets the date that the payment was imported on.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public DateTime DateImported {
-            get { return base.Field<DateTime>(DateImportedColumn); }
-            set { base[DateImportedColumn] = value; }
-        }
-        ///<summary>Gets or sets the user that imported the payment.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public String ImportingUser {
-            get { return base.Field<String>(ImportingUserColumn); }
-            set { base[ImportingUserColumn] = value; }
-        }
-        #endregion
-        
-        #region Partial Methods
-        partial void OnColumnChanged(Column column, object oldValue, object newValue);
-        
-        partial void ValidateImportedPaymentId(Guid newValue, Action<string> error);
-        partial void OnImportedPaymentIdChanged(Guid? oldValue, Guid? newValue);
-        
-        partial void ValidatePayment(Payment newValue, Action<string> error);
-        partial void OnPaymentChanged(Payment oldValue, Payment newValue);
-        
-        partial void ValidateSource(String newValue, Action<string> error);
-        partial void OnSourceChanged(String oldValue, String newValue);
-        
-        partial void ValidateExternalId(String newValue, Action<string> error);
-        partial void OnExternalIdChanged(String oldValue, String newValue);
-        
-        partial void ValidateDateImported(DateTime newValue, Action<string> error);
-        partial void OnDateImportedChanged(DateTime? oldValue, DateTime? newValue);
-        
-        partial void ValidateImportingUser(String newValue, Action<string> error);
-        partial void OnImportingUserChanged(String oldValue, String newValue);
-        #endregion
-        
-        #region Column Callbacks
-        ///<summary>Checks whether a value would be valid for a given column in an attached row.</summary>
-        ///<param name="column">The column containing the value.</param>
-        ///<param name="newValue">The value to validate.</param>
-        ///<returns>An error message, or null if the value is valid.</returns>
-        ///<remarks>This method is overridden by typed rows to perform custom validation logic.</remarks>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        public override string ValidateValue(Column column, object newValue) {
-            string error = base.ValidateValue(column, newValue);
-            if (!String.IsNullOrEmpty(error)) return error;
-            Action<string> reporter = s => error = s;
-            
-            if (column == ImportedPaymentIdColumn) {
-                ValidateImportedPaymentId((Guid)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == PaymentColumn) {
-                ValidatePayment((Payment)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == SourceColumn) {
-                ValidateSource((String)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == ExternalIdColumn) {
-                ValidateExternalId((String)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == DateImportedColumn) {
-                ValidateDateImported((DateTime)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            } else if (column == ImportingUserColumn) {
-                ValidateImportingUser((String)newValue, reporter);
-                if (!String.IsNullOrEmpty(error)) return error;
-            }
-            return null;
-        }
-        ///<summary>Processes an explicit change of a column value.</summary>
-        [DebuggerNonUserCode]
-        [GeneratedCode("ShomreiTorah.Singularity.Designer", "1.0")]
-        protected override void OnValueChanged(Column column, object oldValue, object newValue) {
-            base.OnValueChanged(column, oldValue, newValue);
-            OnColumnChanged(column, oldValue, newValue);
-            if (column == ImportedPaymentIdColumn)
-            	OnImportedPaymentIdChanged((Guid?)oldValue, (Guid?)newValue);
-            else if (column == PaymentColumn)
-            	OnPaymentChanged((Payment)oldValue, (Payment)newValue);
-            else if (column == SourceColumn)
-            	OnSourceChanged((String)oldValue, (String)newValue);
-            else if (column == ExternalIdColumn)
-            	OnExternalIdChanged((String)oldValue, (String)newValue);
-            else if (column == DateImportedColumn)
-            	OnDateImportedChanged((DateTime?)oldValue, (DateTime?)newValue);
-            else if (column == ImportingUserColumn)
-            	OnImportingUserChanged((String)oldValue, (String)newValue);
-        }
-        #endregion
-    }
-    
     ///<summary>Describes a person invited to the Melave Malka.</summary>
     public partial class MelaveMalkaInvitation : Row {
         ///<summary>Creates a new MelaveMalkaInvitation instance.</summary>
@@ -1042,7 +846,7 @@ namespace ShomreiTorah.Data {
             RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Invitees");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "Invitees");
             PersonColumn.AllowNulls = false;
             
             YearColumn = Schema.Columns.AddValueColumn("Year", typeof(Int32), null);
@@ -1057,7 +861,7 @@ namespace ShomreiTorah.Data {
             ShouldCallColumn = Schema.Columns.AddValueColumn("ShouldCall", typeof(Boolean), false);
             ShouldCallColumn.AllowNulls = false;
             
-            CallerColumn = Schema.Columns.AddForeignKey("Caller", ShomreiTorah.Data.Caller.Schema, "Callees");
+            CallerColumn = Schema.Columns.AddForeignKey("Caller", Caller.Schema, "Callees");
             CallerColumn.AllowNulls = true;
             
             CallerNoteColumn = Schema.Columns.AddValueColumn("CallerNote", typeof(String), null);
@@ -1738,7 +1542,7 @@ namespace ShomreiTorah.Data {
             MelaveMalkaDateColumn = Schema.Columns.AddValueColumn("MelaveMalkaDate", typeof(DateTime), null);
             MelaveMalkaDateColumn.AllowNulls = false;
             
-            HonoreeColumn = Schema.Columns.AddForeignKey("Honoree", ShomreiTorah.Data.Person.Schema, "Honorees");
+            HonoreeColumn = Schema.Columns.AddForeignKey("Honoree", Person.Schema, "Honorees");
             HonoreeColumn.AllowNulls = false;
             
             SpeakerColumn = Schema.Columns.AddValueColumn("Speaker", typeof(String), null);
@@ -1747,7 +1551,7 @@ namespace ShomreiTorah.Data {
             HonoreeTitleColumn = Schema.Columns.AddValueColumn("HonoreeTitle", typeof(String), null);
             HonoreeTitleColumn.AllowNulls = false;
             
-            Honoree2Column = Schema.Columns.AddForeignKey("Honoree2", ShomreiTorah.Data.Person.Schema, "MelaveMalkaInfoes");
+            Honoree2Column = Schema.Columns.AddForeignKey("Honoree2", Person.Schema, "MelaveMalkaInfoes");
             Honoree2Column.AllowNulls = true;
             
             Honoree2TitleColumn = Schema.Columns.AddValueColumn("Honoree2Title", typeof(String), null);
@@ -1995,7 +1799,7 @@ namespace ShomreiTorah.Data {
             PaymentIdColumn.Unique = true;
             PaymentIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Payments");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "Payments");
             PersonColumn.AllowNulls = false;
             
             DateColumn = Schema.Columns.AddValueColumn("Date", typeof(DateTime), null);
@@ -2013,7 +1817,7 @@ namespace ShomreiTorah.Data {
             AmountColumn = Schema.Columns.AddValueColumn("Amount", typeof(Decimal), null);
             AmountColumn.AllowNulls = false;
             
-            DepositColumn = Schema.Columns.AddForeignKey("Deposit", ShomreiTorah.Data.Deposit.Schema, "Payments");
+            DepositColumn = Schema.Columns.AddForeignKey("Deposit", Deposit.Schema, "Payments");
             DepositColumn.AllowNulls = true;
             
             CommentsColumn = Schema.Columns.AddValueColumn("Comments", typeof(String), null);
@@ -2155,8 +1959,6 @@ namespace ShomreiTorah.Data {
         #region ChildRows Properties
         ///<summary>Gets the pledges that this payment is paying for.</summary>
         public IChildRowCollection<PledgeLink> LinkedPledges { get { return TypedChildRows<PledgeLink>(PledgeLink.PaymentColumn); } }
-        ///<summary>Gets the source that this payment was imported from, if any.</summary>
-        public IChildRowCollection<ImportedPayment> ImportedPayments { get { return TypedChildRows<ImportedPayment>(ImportedPayment.PaymentColumn); } }
         #endregion
         
         #region Partial Methods
@@ -2326,10 +2128,10 @@ namespace ShomreiTorah.Data {
             LinkIdColumn.Unique = true;
             LinkIdColumn.AllowNulls = false;
             
-            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", ShomreiTorah.Data.Pledge.Schema, "LinkedPayments");
+            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", Pledge.Schema, "LinkedPayments");
             PledgeColumn.AllowNulls = false;
             
-            PaymentColumn = Schema.Columns.AddForeignKey("Payment", ShomreiTorah.Data.Payment.Schema, "LinkedPledges");
+            PaymentColumn = Schema.Columns.AddForeignKey("Payment", Payment.Schema, "LinkedPledges");
             PaymentColumn.AllowNulls = false;
             
             AmountColumn = Schema.Columns.AddValueColumn("Amount", typeof(Decimal), null);
@@ -2497,7 +2299,7 @@ namespace ShomreiTorah.Data {
             PledgeIdColumn.Unique = true;
             PledgeIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "Pledges");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "Pledges");
             PersonColumn.AllowNulls = false;
             
             DateColumn = Schema.Columns.AddValueColumn("Date", typeof(DateTime), null);
@@ -2834,7 +2636,7 @@ namespace ShomreiTorah.Data {
             RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "RaffleTickets");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "RaffleTickets");
             PersonColumn.AllowNulls = false;
             
             DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
@@ -3044,10 +2846,10 @@ namespace ShomreiTorah.Data {
             RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             
-            MemberColumn = Schema.Columns.AddForeignKey("Member", ShomreiTorah.Data.Person.Schema, "ForeignRelatives");
+            MemberColumn = Schema.Columns.AddForeignKey("Member", Person.Schema, "ForeignRelatives");
             MemberColumn.AllowNulls = false;
             
-            RelativeColumn = Schema.Columns.AddForeignKey("Relative", ShomreiTorah.Data.Person.Schema, "Relatives");
+            RelativeColumn = Schema.Columns.AddForeignKey("Relative", Person.Schema, "Relatives");
             RelativeColumn.AllowNulls = false;
             
             RelationTypeColumn = Schema.Columns.AddValueColumn("Relation", typeof(String), null);
@@ -3199,7 +3001,7 @@ namespace ShomreiTorah.Data {
             RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             
-            RecipientColumn = Schema.Columns.AddForeignKey("Recipient", ShomreiTorah.Data.MelaveMalkaInvitation.Schema, "ReminderEmailLogs");
+            RecipientColumn = Schema.Columns.AddForeignKey("Recipient", MelaveMalkaInvitation.Schema, "ReminderEmailLogs");
             RecipientColumn.AllowNulls = false;
             
             DateColumn = Schema.Columns.AddValueColumn("Date", typeof(DateTime), null);
@@ -3377,7 +3179,7 @@ namespace ShomreiTorah.Data {
             IdColumn.Unique = true;
             IdColumn.AllowNulls = false;
             
-            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", ShomreiTorah.Data.Pledge.Schema, "SeatingReservations");
+            PledgeColumn = Schema.Columns.AddForeignKey("Pledge", Pledge.Schema, "SeatingReservations");
             PledgeColumn.Unique = true;
             PledgeColumn.AllowNulls = false;
             
@@ -3592,7 +3394,7 @@ namespace ShomreiTorah.Data {
             RowIdColumn.Unique = true;
             RowIdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "SeatReservations");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "SeatReservations");
             PersonColumn.AllowNulls = false;
             
             DateAddedColumn = Schema.Columns.AddValueColumn("DateAdded", typeof(DateTime), null);
@@ -3791,7 +3593,7 @@ namespace ShomreiTorah.Data {
             IdColumn.Unique = true;
             IdColumn.AllowNulls = false;
             
-            PersonColumn = Schema.Columns.AddForeignKey("Person", ShomreiTorah.Data.Person.Schema, "LoggedStatements");
+            PersonColumn = Schema.Columns.AddForeignKey("Person", Person.Schema, "LoggedStatements");
             PersonColumn.AllowNulls = false;
             
             DateGeneratedColumn = Schema.Columns.AddValueColumn("DateGenerated", typeof(DateTime), null);
