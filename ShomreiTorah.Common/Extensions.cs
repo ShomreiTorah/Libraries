@@ -21,6 +21,12 @@ namespace ShomreiTorah.Common {
 		///<param name="items">The items to copy into the collection.  Changes to the items will be ignored.</param>
 		public static ReadOnlyCollection<T> ReadOnlyCopy<T>(this IEnumerable<T> items) { return new ReadOnlyCollection<T>(items.ToArray()); }
 
+
+		///<summary>Gets a value from a dictionary, or null if it isn't present.</summary>
+		public static TValue GetOrNull<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) {
+			return dictionary.TryGetValue(key, out var value) ? value : default(TValue);
+		}
+
 		///<summary>Determines whether a sequence has at least a certain number of elements.</summary>
 		///<param name="items">The enumerable to check.</param>
 		///<param name="minCount">The minimum number of elements</param>
@@ -106,7 +112,7 @@ namespace ShomreiTorah.Common {
 
 				var stat = propertySelector(item);
 				var betterStat = comparer(stat, bestStat);
-				if (Equals(stat, betterStat)) {	//If our item is better
+				if (Equals(stat, betterStat)) { //If our item is better
 					bestItem = item;
 					bestStat = stat;
 				}
@@ -243,7 +249,7 @@ namespace ShomreiTorah.Common {
 			byte[] buffer2 = new byte[4096];
 			while (true) {
 				int bytesRead = first.ReadFill(buffer1);
-				if (second.ReadFill(buffer2) != bytesRead) return false;	//Stream lengths are unequal.
+				if (second.ReadFill(buffer2) != bytesRead) return false;    //Stream lengths are unequal.
 
 				if (!buffer1.SequenceEqual(buffer2)) return false;
 
@@ -326,7 +332,7 @@ namespace ShomreiTorah.Common {
 		///<param name="source">The stream to read from.</param>
 		public static string ReadString(this Stream source) {
 			var byteCount = source.Read<int>();
-			if (byteCount == 0) return String.Empty;					//WCF can't handle Read(*,*,0) and closes the stream
+			if (byteCount == 0) return String.Empty;                    //WCF can't handle Read(*,*,0) and closes the stream
 			var bytes = new byte[byteCount];
 			source.Read(bytes, 0, byteCount);
 			return stringEncoding.GetString(bytes);
@@ -462,7 +468,7 @@ namespace ShomreiTorah.Common {
 					#region Letter
 					var retVal = new StringBuilder(5);
 					char tensChar = '\0', unitsChar;               // tens and units chars
-					int hundreds, tens;							   // hundreds and tens values
+					int hundreds, tens;                            // hundreds and tens values
 
 					hundreds = number / 100;
 
@@ -508,7 +514,7 @@ namespace ShomreiTorah.Common {
 							retVal.Append('\'');
 					}
 					return retVal.ToString();
-					#endregion
+				#endregion
 				case HebrewNumberFormat.Fullזכר:
 				case HebrewNumberFormat.Fullנקבה:
 					return number.ToFullHebrewString(format == HebrewNumberFormat.Fullזכר);
@@ -688,7 +694,7 @@ namespace ShomreiTorah.Common {
 		//static class נקודStripper { public static readonly Regex Regex = new Regex(@"[ְֱֲֳִֵֶַָֹֻּֽֿׁׂ]");		}
 		//static class נקודStripper { public static readonly Regex Regex = new Regex("[\05b0-\05bd\05bf\05c1\05c2]");		}
 		//Includes Trup (0591 - 05af; see Ezra SIL; see also page 49 of the Unicode 5.1 standard at http://www.unicode.org/Public/5.1.0/charts/CodeCharts.pdf)
-		static class נקודStripper { public static readonly Regex Regex = new Regex("[\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5]");		}
+		static class נקודStripper { public static readonly Regex Regex = new Regex("[\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5]"); }
 		///<summary>Strips all נקודות from a string.</summary>
 		///<param name="original">The string to remove נקודות from.</param>
 		///<returns>A copy of original with all נקודות removed.</returns>
