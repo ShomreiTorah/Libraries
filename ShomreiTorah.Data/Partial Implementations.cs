@@ -21,8 +21,17 @@ namespace ShomreiTorah.Data {
 		}
 	}
 
+	///<summary>Contains the core fields of a person in the master directory.</summary>
+	public interface IPerson {
+		///<summary>Gets or sets the husband's name.</summary>
+		string HisName { get; set; }
+		///<summary>Gets or sets the wife's name.</summary>
+		string HerName { get; set; }
+		///<summary>Gets or sets the family name.</summary>
+		string LastName { get; set; }
+	}
 
-	partial class Person {
+	partial class Person : IPerson {
 		partial void OnFullNameChanged(string oldValue, string newValue) {
 			if (Table == null || Table.Context == null || Table.IsLoadingData)
 				return;
