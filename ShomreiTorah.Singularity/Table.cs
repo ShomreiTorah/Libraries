@@ -51,7 +51,7 @@ namespace ShomreiTorah.Singularity {
 		///unless the table is still loading data from another call.</summary>
 		///<param name="threadContext">An optional SynchronizationContext to
 		///raise the LoadCompleted event on.</param>
-		internal IDisposable BeginLoadData(SynchronizationContext threadContext) {
+		public IDisposable BeginLoadData(SynchronizationContext threadContext) {
 			loadDataCount++;
 			return new Disposable(delegate {
 				if (--loadDataCount == 0) { //If no-one else is loading, raise LoadCompleted.
