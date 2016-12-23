@@ -96,9 +96,10 @@ namespace ShomreiTorah.WinForms.Forms {
 				get { return base.Maximum; }
 				set { MyInvoke(() => base.Maximum = (int)value); }
 			}
+			long value;
 			public long Progress {
-				get { return base.Value; }
-				set { MyInvoke(() => base.Value = (int)value); }
+				get { return value; }
+				set { this.value = value; MyInvoke(() => base.Value = (int)value); }
 			}
 			void MyInvoke(Action method) {
 				if (IsHandleCreated && InvokeRequired)
