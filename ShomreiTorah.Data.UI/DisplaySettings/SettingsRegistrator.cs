@@ -21,7 +21,7 @@ using ShomreiTorah.WinForms.Controls.Lookup;
 
 namespace ShomreiTorah.Data.UI.DisplaySettings {
 	///<summary>Registers grid and column behaviors.</summary>
-	static class SettingsRegistrator {
+	public static class SettingsRegistrator {
 		static void InitializeStandardSettings() {
 			//This method will only be called once
 			RegisterEditors();
@@ -214,7 +214,8 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 		}
 		#endregion
 		#region Column Controllers
-		static ColumnController MaxWidth(int width) { return new ColumnController(c => c.MaxWidth = width); }
+		///<summary>Creates a <see cref="ColumnController"/> that sets the column's maximum width.</summary>
+		public static ColumnController MaxWidth(int width) { return new ColumnController(c => c.MaxWidth = width); }
 		static void RegisterColumnControllers() {
 			GridManager.RegisterColumn(Person.StateColumn, MaxWidth(50));
 			GridManager.RegisterColumn(Person.ZipColumn, MaxWidth(40));
@@ -254,7 +255,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.RegisterColumn(
 				Pledge.AmountColumn,
 				new ColumnController(c => {
-					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);	//Copy currency format
+					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);  //Copy currency format
 
 					c.MaxWidth = 85;
 					c.SummaryItem.DisplayFormat = "{0:c} Total Pledged";
@@ -264,7 +265,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			GridManager.RegisterColumn(
 				Payment.AmountColumn,
 				new ColumnController(c => {
-					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);	//Copy currency format
+					c.DisplayFormat.Assign(c.DefaultEditor.DisplayFormat);  //Copy currency format
 
 					c.MaxWidth = 85;
 					c.SummaryItem.DisplayFormat = "{0:c} Total Paid";
@@ -332,10 +333,13 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 				return deposit.GetSuperTip();
 			}
 		}
-		class CommentsColumnController : ColumnController {
+		///<summary>A <see cref="ColumnController"/> for a comments column, which may have multiple lines.</summary>
+		public class CommentsColumnController : ColumnController {
+			///<summary>Applies this controller to a column.  This method should set the column's properties.</summary>
 			protected internal override void Apply(SmartGridColumn column) {
 				column.SetDefaultEditor(EditorRepository.CommentsPopupEditor.CreateItem());
 			}
+			///<summary>Allows the controller to provide a custom tooltip for the cells in the column.</summary>
 			protected internal override SuperToolTip GetCellToolTip(object row, object value) {
 				string str = (value ?? "").ToString();
 				if (String.IsNullOrWhiteSpace(str) || !str.Contains('\n'))
@@ -350,7 +354,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			static readonly ReadOnlyCollection<string> SortedOrder = Names
 				.PledgeTypes
 				.SelectMany(p => p.Subtypes)
-				.Select(s=>s.Name)
+				.Select(s => s.Name)
 				.Distinct()
 				.ReadOnlyCopy();
 			protected internal override void CompareValues(CustomColumnSortEventArgs e) {
@@ -385,7 +389,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 			if (AppFramework.Current.CanShowDetails<Person>())
 				column.SetDefaultEditor(PersonEditSettings.Instance.CreateItem());
 			else
-				column.OptionsColumn.AllowEdit = false;	//Person fields should not be edited.  Also, the default editor would show the native ToString, which is ugly.
+				column.OptionsColumn.AllowEdit = false; //Person fields should not be edited.  Also, the default editor would show the native ToString, which is ugly.
 			if (column.Caption.StartsWith("Person", StringComparison.OrdinalIgnoreCase))
 				column.Caption = "Full Name";
 		}
@@ -443,7 +447,7 @@ namespace ShomreiTorah.Data.UI.DisplaySettings {
 					var edit = sender as BaseEdit;
 					var grid = (GridControl)edit.Parent;
 					var view = (SmartGridView)grid.FocusedView;
-					var row = view.GetFocusedRow() as Row;	//In the designer, there might not be actual rows.
+					var row = view.GetFocusedRow() as Row;  //In the designer, there might not be actual rows.
 
 					if (row != null && AppFramework.Current.CanShowDetails(row.Schema))
 						AppFramework.Current.ShowDetails(row);
