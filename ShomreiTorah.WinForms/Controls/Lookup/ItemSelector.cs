@@ -90,7 +90,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			if (String.IsNullOrEmpty(Text)) {
 				FilterWords = EmptyStrings;
 				if (Properties.SortComparer == null)
-					CurrentItems = AllItems;	//If there is no sort and no filter, I can just use the original list.
+					CurrentItems = AllItems;    //If there is no sort and no filter, I can just use the original list.
 				else
 					unsortedItems = new ArrayList(AllItems);
 			} else {
@@ -109,7 +109,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			}
 
 			lastFilterText = Text;
-			if (PopupForm != null)	//This function is called just before the popup is shown
+			if (PopupForm != null)  //This function is called just before the popup is shown
 				PopupForm.RefreshItems();
 		}
 		bool MeetsFilter(object item) {
@@ -172,7 +172,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//and accept a null value.  I don't want that.
 			if (val != null) {
 				base.AcceptPopupValue(val);
-				IsModified = true;	//Force validation to commit the new value for databinding
+				IsModified = true;  //Force validation to commit the new value for databinding
 				DoValidate();
 			}
 		}
@@ -217,7 +217,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 					repositoryType,
 					typeof(ItemSelectorViewInfo),
 					new ItemSelectorPainter(),
-					true, EditImageIndexes.ButtonEdit,	//TODO: Icon
+					true, EditImageIndexes.ButtonEdit,  //TODO: Icon
 					typeof(PopupEditAccessible)
 				)
 			);
@@ -277,7 +277,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var source = (RepositoryItemItemSelector)item;
 
 			Columns.Clear();
-			Columns.AddRange(source.Columns.Select(c => c.Copy()));	//The InsertItem overload will set the source.
+			Columns.AddRange(source.Columns.Select(c => c.Copy())); //The InsertItem overload will set the source.
 
 			if (source.SortColumn == null)
 				SortColumn = null;
@@ -399,7 +399,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			set {
 				if (AllowResize == value) return;
 				allowResize = value;
-				OnPropertiesChanged();	//Force a new ViewInfo, since I read this property in the constructor.
+				OnPropertiesChanged();  //Force a new ViewInfo, since I read this property in the constructor.
 			}
 		}
 
@@ -516,7 +516,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 		internal bool RaiseItemSelecting(object newVal) {
 			var args = new ItemSelectingEventArgs(newVal);
 
-			try {	//Wrap OnItemSelecting overrides 
+			try {   //Wrap OnItemSelecting overrides 
 				OwnerEdit.PreventClose = true;
 				OnItemSelecting(args);
 			} finally { OwnerEdit.PreventClose = false; }
@@ -562,7 +562,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			base.UpdatePaintAppearance();
 
 			//Update skin-dependant properties here.
-			AppearanceResult.ForeColor = OwnerEdit.ForeColor;
+			AppearanceResult.ForeColor = OwnerEdit?.ForeColor ?? AppearanceResult.ForeColor;
 			AppearanceResultInfo.ForeColor = base.NullValuePromptForeColor;
 		}
 		#endregion
@@ -594,7 +594,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 			SelectionBackgroundElement = CommonSkins.GetSkin(LookAndFeel)[CommonSkins.SkinLayoutItemBackground];
 
-			if (OwnerEdit.EditValue == null || OwnerEdit.EditValue == DBNull.Value || Item.SelectionIcon == null) {
+			if (OwnerEdit?.EditValue == null || OwnerEdit.EditValue == DBNull.Value || Item.SelectionIcon == null) {
 				Image = null;
 				ImageBounds = new Rectangle(ContentRect.Location, Size.Empty);
 				DrawSelectedItem = false;
@@ -617,7 +617,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			//of the MaskBox.  Instead of hiding the maskbox, I shrink
 			//to not occupy any space, while leaving it focused.  This
 			//allows the user to start typing to re-show the popup.
-			if (OwnerEdit.EditValue != null && OwnerEdit.EditValue != DBNull.Value && !OwnerEdit.IsPopupOpen) {
+			if (OwnerEdit?.EditValue != null && OwnerEdit.EditValue != DBNull.Value && !OwnerEdit.IsPopupOpen) {
 				DrawSelectedItem = true;
 				SelectionBounds = Rectangle.Inflate(base.MaskBoxRect, 0, 1);
 				fMaskBoxRect = Rectangle.Empty;
@@ -637,7 +637,7 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 			var vi = (ItemSelectorViewInfo)info.ViewInfo;
 
 			if (vi.DrawSelectedItem)
-				vi.PaintAppearance.FillRectangle(info.Cache, vi.ContentRect);	//The native painter won't paint any background in the middle, since it expects the MaskBox to be there
+				vi.PaintAppearance.FillRectangle(info.Cache, vi.ContentRect);   //The native painter won't paint any background in the middle, since it expects the MaskBox to be there
 			else
 				base.DrawTextBoxArea(info);
 		}
