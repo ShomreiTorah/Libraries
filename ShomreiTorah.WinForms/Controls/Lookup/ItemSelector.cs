@@ -66,6 +66,9 @@ namespace ShomreiTorah.WinForms.Controls.Lookup {
 
 		internal IList AllItems { get; set; }
 
+		///<summary>Exposes a <see cref="BindingContext"/> even for detached editors owned by a grid.</summary>
+		public override BindingContext BindingContext => base.BindingContext ?? (EditorContainer as Control)?.BindingContext;
+
 		#region Filter
 		protected override void OnEditorKeyDown(KeyEventArgs e) {
 			base.OnEditorKeyDown(e);
