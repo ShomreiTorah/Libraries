@@ -5,6 +5,8 @@ using System.Text;
 using System.ComponentModel;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
+using ShomreiTorah.Common;
 
 namespace ShomreiTorah.Singularity {
 	///<summary>Contains tables in a Singularity database.</summary>
@@ -21,6 +23,16 @@ namespace ShomreiTorah.Singularity {
 		public TypedTable<TRow> Table<TRow>() where TRow : Row {
 			if (TypedSchema<TRow>.Instance == null) return null;
 			return (TypedTable<TRow>)Tables[TypedSchema<TRow>.Instance];
+		}
+
+		///<summary>Marks the table as loading data until the return value is disposed.
+		///When the return value is disposed, the LoadCompleted event will be raised,
+		///unless the table is still loading data from another call.</summary>
+		///<param name="threadContext">An optional SynchronizationContext to
+		///raise the LoadCompleted event on.</param>
+		public IDisposable BeginLoadData(SynchronizationContext threadContext = null) {
+			var tables = Tables.Select(t => t.BeginLoadData(threadContext)).ToList();
+			return new Disposable(() => tables.ForEach(t => t.Dispose()));
 		}
 
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Data-binding support")]
