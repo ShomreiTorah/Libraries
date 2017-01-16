@@ -12,19 +12,19 @@ namespace ShomreiTorah.Singularity {
 	public sealed partial class CalculatedColumn : Column {
 		///<summary>An instance used when a calculated column's value has not been calculated.</summary>
 		///<remarks>Calculated columns are lazy, and will only run the delegate if the column's
-		///value equals this object.  The dependency manager will set the column's value to this 
+		///value equals this object.  The dependency manager will set the column's value to this
 		///object whenever a dependency changes, triggering a recalc when the value is next fetched.
 		///
-		///Calculated columns are not supported in detached rows; any calculated column in a 
+		///Calculated columns are not supported in detached rows; any calculated column in a
 		///detached row will equal the column's DefaultValue property.</remarks>
 		internal static readonly object UncalculatedValue = new object();
 
 		readonly Func<Row, object> func;
 
-		//The dependency is only created when first needed to 
+		//The dependency is only created when first needed to
 		//allow for cyclic dependencies during schema creation
 		//This is required for typed rows that have calculated
-		//columns which use child rows, since the columns are 
+		//columns which use child rows, since the columns are
 		//added by the static ctor.
 		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Func<Dependency> dependencyGenerator)
 			: base(schema, name) {
@@ -42,8 +42,9 @@ namespace ShomreiTorah.Singularity {
 			}
 
 			if (dataType.IsValueType)
-				DefaultValue = Activator.CreateInstance(dataType);
-			//Otherwise, keep it null.
+				base.DefaultValue = Activator.CreateInstance(dataType);
+			// Otherwise, keep it null.  Either way, don't run our
+			// setter, since the column hasn't been added yet.
 		}
 
 		Func<Dependency> dependencyGenerator;
@@ -86,9 +87,9 @@ namespace ShomreiTorah.Singularity {
 		public override string ValidateValueType(object value) { throw new NotSupportedException(); }
 
 	}
-	//The public AddCalculatedColumn take strongly-typed 
+	//The public AddCalculatedColumn take strongly-typed
 	//expression trees with actual types of the value and
-	//the row.  The column needs a weakly-typed delegate 
+	//the row.  The column needs a weakly-typed delegate
 	//to calculate the values, so the generic Add methods
 	//generate weakly-typed delegates.  Variance will not
 	//help for typed rows.
