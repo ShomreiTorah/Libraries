@@ -9,6 +9,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using DevExpress.Utils;
+using DevExpress.XtraEditors;
 using ShomreiTorah.Common;
 using ShomreiTorah.Singularity;
 using ShomreiTorah.Singularity.Sql;
@@ -191,6 +193,8 @@ namespace ShomreiTorah.Data.UI {
 
 		///<summary>Registers the standard settings in Data.UI.dll.</summary>
 		protected static void RegisterStandardSettings() {
+			WindowsFormsSettings.AllowPixelScrolling = DefaultBoolean.True;
+			WindowsFormsSettings.ColumnFilterPopupMode = ColumnFilterPopupMode.Excel;
 			DisplaySettings.SettingsRegistrator.EnsureRegistered();
 		}
 
