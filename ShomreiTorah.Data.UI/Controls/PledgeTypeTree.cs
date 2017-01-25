@@ -86,16 +86,24 @@ namespace ShomreiTorah.Data.UI.Controls {
 				return;
 			if (e.Node == null)
 				return;
+			SelectNode(e.Node);
+		}
 
-			if (e.Node.Parent == null) {
-				TypeField.Text = e.Node.Text;
+		void SelectNode(TreeNode node) {
+			if (node.Parent == null) {
+				TypeField.Text = node.Text;
 				SubTypeField.Text = "";
 			} else {
-				TypeField.Text = e.Node.Parent.Text;
-				SubTypeField.Text = e.Node.Text;
+				TypeField.Text = node.Parent.Text;
+				SubTypeField.Text = node.Text;
 			}
 
-			e.Node.Expand();
+			node.Expand();
+		}
+		///<summary>Raises the NodeMouseClick event.</summary>
+		protected override void OnNodeMouseClick(TreeNodeMouseClickEventArgs e) {
+			base.OnNodeMouseClick(e);
+			SelectNode(e.Node);
 		}
 	}
 }
