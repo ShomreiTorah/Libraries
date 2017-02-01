@@ -15,6 +15,7 @@ ShomreiTorah.Common/Updates/UpdateApplier.exe
 *.suo
 *.user
 *.sln.docstates
+.vs/
 
 # Build results
 [Dd]ebug/

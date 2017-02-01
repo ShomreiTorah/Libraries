@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26020.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShomreiTorah.Common", "ShomreiTorah.Common\ShomreiTorah.Common.csproj", "{1308A6E1-7787-49F6-A19C-8AF327DAF9B5}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -31,13 +31,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateApplier", "UpdateApplier\UpdateApplier.csproj", "{41C40D5C-71C9-4A0F-89F0-BA29AB044E3D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShomreiTorah.Data.Tests", "Tests\ShomreiTorah.Data.Tests\ShomreiTorah.Data.Tests.csproj", "{BFC3AD35-36FF-4986-A560-0EBC7F60BC51}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B9214227-7EFF-4EAA-8441-8D93AF467550}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
