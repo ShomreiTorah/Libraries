@@ -1185,6 +1185,7 @@ namespace ShomreiTorah.WinForms.Controls {
 			else
 				TextColor = Color.DarkGray;
 			DrawContent();
+			Graphics = null;
 		}
 		///<summary>Draws the content of the current cell.</summary>
 		protected abstract void DrawContent();
