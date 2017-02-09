@@ -474,7 +474,7 @@ namespace ShomreiTorah.Data {
 			var mmi = Table.Context.Table<MelaveMalkaInfo>().Rows.FirstOrDefault(m => m.Year == Year);
 			var honorees = mmi?.Honorees?.Select(h => h.FullName)?.Join(" and ");
 			return new Pledge {
-				Type = "Melave Malka Journal",
+				Type = Names.JournalPledgeType.Name,
 				SubType = Names.AdTypes.First(t => t.Name == AdType).PledgeSubType,
 				Note = string.IsNullOrEmpty(honorees) ? null : String.Format(Config.ReadAttribute("Journal", "PledgeNoteFormat"), honorees),
 				Account = Names.DefaultAccount,
