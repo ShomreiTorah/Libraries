@@ -359,10 +359,11 @@ namespace ShomreiTorah.Data {
 
 		///<summary>Clears a payment's pledge links when the payment is removed.</summary>
 		void OnRemoving_Links() {
-			if (Table.Context.Table<PledgeLink>() == null)  // Don't choke in DirectoryManager on refresh
-				return;
-			foreach (var link in LinkedPledges.ToList()) //The loop will modify the collection
-				link.RemoveRow();
+			// Also clear ImportedPayments if loaded.
+			foreach (var childRelation in Schema.ChildRelations) 
+			if (Table.Context.Tables[childRelation.ChildSchema] != null)
+				foreach (var child in ChildRows(childRelation).ToList()) //The loop will modify the collection
+					child.RemoveRow();
 		}
 	}
 	partial class PledgeLink {
