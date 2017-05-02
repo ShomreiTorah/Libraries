@@ -17,6 +17,9 @@ namespace ShomreiTorah.Statements.Email {
 			ImagesPath = imagePath;
 			TemplateService = new TemplateService(new TemplateServiceConfiguration {
 				Resolver = resolver,
+#if DEBUG
+				Debug = true,
+#endif
 				Namespaces = new HashSet<string> {
 					"System",
 					"System.Collections.Generic",
@@ -34,6 +37,11 @@ namespace ShomreiTorah.Statements.Email {
 		public IEnumerable<string> Templates { get { return resolver.Templates; } }
 		public ITemplateService TemplateService { get; private set; }
 		public string ImagesPath { get; private set; }
+
+		public void Prepare(string templateName, DateTime startDate) {
+			var page = (StatementPage)TemplateService.Resolve(templateName, null);
+			page.Prepare(startDate);
+		}
 
 		static readonly MailAddress BillingAddress = new MailAddress("Billing@" + Config.DomainName, Config.OrgName + " Billing");
 		public StatementMessage CreateMessage(Person person, string templateName, DateTime startDate) {

@@ -81,6 +81,9 @@ namespace ShomreiTorah.Statements.Email {
 			this.startDate = startDate;
 		}
 
+		///<summary>Called by the host, on the UI thread, before rendering any statements.  This must be idempotent.</summary>
+		public virtual void Prepare(DateTime startDate) { }
+
 		private DateTime startDate;
 		private Person person;
 
