@@ -137,9 +137,14 @@ namespace ShomreiTorah.Common {
 
 		///<summary>The default path for ShomreiTorahConfig.xml.</summary>
 		public const string DefaultPath = @"L:\Community\Rabbi Weinberger's Shul\ShomreiTorahConfig.xml";
+		///<summary>The per-user registry key that locates ShomreiTorahConfig.xml (in <see cref="RegistryValue"/>).</summary>
+		public const string RegistryKey = @"HKEY_CURRENT_USER\SOFTWARE\Shomrei Torah\";
+		///<summary>The per-user registry value that locates ShomreiTorahConfig.xml (in <see cref="RegistryKey"/>).</summary>
+		public const string RegistryValue = "ShomreiTorahConfig.xml";
+
 		static IEnumerable<string> PossibleLocations() {
 			yield return pathOverride;
-			yield return Path.GetFullPath("ShomreiTorahConfig.xml");		//First, try the current directory.
+			yield return Path.GetFullPath("ShomreiTorahConfig.xml");        //First, try the current directory.
 
 			yield return SysConfig.ConfigurationManager.AppSettings["ShomreiTorahConfig.xml"];
 
@@ -148,11 +153,11 @@ namespace ShomreiTorah.Common {
 			foreach (var path in PossibleBuildPaths().Select(FindRoot))
 				if (path != null)
 					yield return Path.Combine(path, @"Config\Debug\ShomreiTorahConfig.xml");
-			FileLoader.IsDebug = false;	//We will only get here if the previous yield returns were rejected (eg, we're running a debug build from outside the source tree).
+			FileLoader.IsDebug = false; //We will only get here if the previous yield returns were rejected (eg, we're running a debug build from outside the source tree).
 #endif
 
-			yield return Registry.GetValue(@"HKEY_CURRENT_USER\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null) as string;
-			yield return Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Shomrei Torah\", "ShomreiTorahConfig.xml", null) as string;
+			yield return Registry.GetValue(RegistryKey, RegistryValue, null) as string;
+			yield return Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Shomrei Torah\", RegistryValue, null) as string;
 
 			yield return DefaultPath;
 		}
