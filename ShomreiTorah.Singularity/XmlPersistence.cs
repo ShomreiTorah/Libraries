@@ -102,9 +102,7 @@ namespace ShomreiTorah.Singularity {
 				.OfType<ForeignKeyColumn>()
 				.ToDictionary(
 					col => col,
-					col => Table.Context.Tables[col.ForeignSchema].Rows.ToDictionary(
-						foreignRow => foreignRow[foreignRow.Table.Schema.PrimaryKey]
-					)
+					col => Table.Context.Tables[col.ForeignSchema].GetIndex(col.ForeignSchema.PrimaryKey)
 				);
 
 			//Maps primary-key values to existing 
@@ -114,7 +112,9 @@ namespace ShomreiTorah.Singularity {
 			//the table will be removed.
 			Dictionary<object, Row> keyMap = null;
 			if (Table.Schema.PrimaryKey != null) {
-				keyMap = Table.Rows.ToDictionary(row => row[Table.Schema.PrimaryKey]);
+				keyMap = Table.GetIndex(Table.Schema.PrimaryKey)
+							  .Where(kvp => kvp.Value.Any())
+							  .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Single());
 			}
 
 			foreach (var rowSource in GetRows()) {
@@ -138,11 +138,14 @@ namespace ShomreiTorah.Singularity {
 					else if (foreignKey == null)
 						row[field.Key] = field.Key.CoerceValue(field.Value, CultureInfo.InvariantCulture);
 					else
-						row[field.Key] = foreignKeyMap[foreignKey][foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture)];
+						row[field.Key] = foreignKeyMap
+							[foreignKey]
+							[foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture)]
+							.Single();
 				}
 				OnRowPopulated(row, rowSource);
 
-				if (row.Table == null)		//If we created this row, as opposed to getting it out of the keyMap
+				if (row.Table == null)      //If we created this row, as opposed to getting it out of the keyMap
 					Table.Rows.Add(row);
 			}
 
