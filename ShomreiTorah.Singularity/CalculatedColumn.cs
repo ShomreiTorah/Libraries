@@ -28,7 +28,6 @@ namespace ShomreiTorah.Singularity {
 		//added by the static ctor.
 		internal CalculatedColumn(TableSchema schema, string name, Type dataType, Func<Row, object> func, Func<Dependency> dependencyGenerator)
 			: base(schema, name) {
-			CanValidate = false;
 			this.func = func;
 			DataType = dataType;
 			ReadOnly = true;
@@ -46,6 +45,8 @@ namespace ShomreiTorah.Singularity {
 			// Otherwise, keep it null.  Either way, don't run our
 			// setter, since the column hasn't been added yet.
 		}
+
+		internal override bool CanValidate => false;
 
 		Func<Dependency> dependencyGenerator;
 		Dependency dependency;
@@ -79,7 +80,7 @@ namespace ShomreiTorah.Singularity {
 		}
 
 		internal override void OnRowAdded(Row row) { row.ToggleCalcColDefault(this); }
-		internal override void OnRowRemoved(Row row) { row.ToggleCalcColDefault(this); }
+		internal override void OnRowRemoved(Row row, Table table) { row.ToggleCalcColDefault(this); }
 
 		///<summary>This method is not supported.</summary>
 		public override string ValidateValue(Row row, object value) { throw new NotSupportedException(); }

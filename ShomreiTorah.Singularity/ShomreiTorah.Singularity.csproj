@@ -88,6 +88,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="FilteredTable.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IndexDictionaries.cs" />
     <Compile Include="LINQPad Support.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Row Collections.cs" />

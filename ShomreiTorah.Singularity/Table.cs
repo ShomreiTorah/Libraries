@@ -22,6 +22,26 @@ namespace ShomreiTorah.Singularity {
 				cc.Dependency.Register(this);
 
 		}
+
+		readonly Dictionary<Column, IDictionary<object, ICollection<Row>>> indexes = new Dictionary<Column, IDictionary<object, ICollection<Row>>>();
+
+		internal IDictionary<object, ICollection<Row>> GetIndex(Column column) {
+			if (!column.HasIndex) throw new ArgumentException($"{Schema.Name}.{column.Name} is not indexed.", nameof(column));
+			if (indexes.TryGetValue(column, out var index)) return index;
+			// TODO: SingletonDictionary for unique columns.
+			var newIndex = new NullableDictionary<object, ICollection<Row>>();
+			indexes.Add(column, newIndex);
+			return newIndex;
+		}
+		internal void AddToIndex(Row row, Column column) {
+			var index = GetIndex(column);
+			var value = row[column];
+			if (index.TryGetValue(value, out var collection))
+				collection.Add(row);
+			else
+				index.Add(value, new List<Row> { row });
+		}
+
 		///<summary>Creates a detached row for this table.</summary>
 		///<remarks>Overridden by typed tables.</remarks>
 		public virtual Row CreateRow() { return new Row(Schema); }
@@ -156,7 +176,7 @@ namespace ShomreiTorah.Singularity {
 			row.Table = null;
 			Schema.RemoveRow(row);
 			foreach (var column in Schema.Columns)
-				column.OnRowRemoved(row);   //Removes the row from parent relations, and handles calculated columns
+				column.OnRowRemoved(row, this);   //Removes the row from parent relations / indexes, and handles calculated columns
 
 			OnRowRemoved(new RowListEventArgs(row, index));
 		}

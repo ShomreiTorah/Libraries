@@ -16,7 +16,6 @@ namespace ShomreiTorah.Singularity {
 			Schema = schema;
 			Schema.ValidateName(name);
 			this.name = name;   //Don't call the property setter to avoid a redundant SchemaChanged
-			CanValidate = true;
 		}
 
 		///<summary>Gets the schema containing this column.</summary>
@@ -34,10 +33,12 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Returns a string representation of this instance.</summary>
 		public override string ToString() { return Name; }
 
+		///<summary>Indicates whether this column's values are indexed for O(1) lookup.  Not supported for calculated columns.</summary>
+		public bool HasIndex { get; protected set; }
 
 		internal virtual void OnRemove() { Schema = null; }
 		internal virtual void OnRowAdded(Row row) { }
-		internal virtual void OnRowRemoved(Row row) { }
+		internal virtual void OnRowRemoved(Row row, Table table) { }
 
 		///<summary>Checks whether a value is valid for this column.</summary>
 		///<returns>An error message, or null if the value is valid.</returns>
@@ -48,7 +49,7 @@ namespace ShomreiTorah.Singularity {
 
 		internal virtual void OnValueChanged(Row row, object oldValue, object newValue) { }
 
-		internal bool CanValidate { get; set; }
+		internal virtual bool CanValidate => true;
 
 		///<summary>Gets or sets the default value of the column.</summary>
 		public virtual object DefaultValue {
@@ -108,6 +109,30 @@ namespace ShomreiTorah.Singularity {
 		}
 
 
+		///<summary>Creates an index for this column's values in all tables.  Unique columns are automatically indexed.</summary>
+		public void AddIndex() {
+			if (HasIndex) throw new InvalidOperationException($"Column {Schema.Name}.{Name} already has an index.");
+			HasIndex = true;
+			Schema.EachRow(row => row.Table.AddToIndex(row, this));
+		}
+		internal override void OnValueChanged(Row row, object oldValue, object newValue) {
+			base.OnValueChanged(row, oldValue, newValue);
+
+			if (!HasIndex || row.Table == null) return;
+
+			row.Table.GetIndex(this)[oldValue].Remove(row);
+			row.Table.AddToIndex(row, this);
+		}
+		internal override void OnRowAdded(Row row) {
+			base.OnRowAdded(row);
+			if (HasIndex) row.Table.AddToIndex(row, this);
+		}
+
+		internal override void OnRowRemoved(Row row, Table table) {
+			base.OnRowRemoved(row, table);
+			if (HasIndex) table.GetIndex(this)[row[this]].Remove(row);
+		}
+
 		bool allowNulls, unique;
 
 		///<summary>Gets or sets value indicating whether the column can contain null values.</summary>
@@ -127,13 +152,18 @@ namespace ShomreiTorah.Singularity {
 			get { return unique; }
 			set {
 				if (unique == value) return;
+				if (!value) // This would create horrible messes for index-backed ChildRowCollections.
+					throw new InvalidOperationException("Cannot set Unique back to false.");
 
 				if (value) {
+					// This is not expected to run when there are many rows, so
+					// I don't bother trying to use the index.
 					if (Schema.Rows.GroupBy(r => new { r.Table, Val = r[this] }).Any(g => g.Has(2)))
 						throw new InvalidOperationException("The " + Name + " column contains duplicate values, and cannot enforce uniqueness.");
 				}
 
 				unique = value;
+				if (!HasIndex) AddIndex();
 			}
 		}
 
@@ -148,7 +178,8 @@ namespace ShomreiTorah.Singularity {
 				return "The " + Name + " column cannot hold a " + value.GetType().Name + " value.";
 
 			if (Unique) {
-				if (row.Table.Rows.Any(r => r != row && Equals(value, r[this])))
+				if (row.Table.GetIndex(this).TryGetValue(value, out var collection)
+				 && collection.Count > 0 && collection.First() != row)
 					return "The " + Name + " column cannot contain duplicate values";
 			}
 
@@ -212,8 +243,14 @@ namespace ShomreiTorah.Singularity {
 			RemoveFromParent(row, (Row)oldValue);
 			AddToParent(row);
 		}
-		internal override void OnRowAdded(Row row) { AddToParent(row); }
-		internal override void OnRowRemoved(Row row) { RemoveFromParent(row, (Row)row[this]); }
+		internal override void OnRowAdded(Row row) {
+			base.OnRowAdded(row);
+			AddToParent(row);
+		}
+		internal override void OnRowRemoved(Row row, Table table) {
+			base.OnRowRemoved(row, table);
+			RemoveFromParent(row, (Row)row[this]);
+		}
 
 		void AddToParent(Row childRow) {
 			var newParent = (Row)childRow[this];

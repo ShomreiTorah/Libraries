@@ -82,7 +82,10 @@ namespace ShomreiTorah.Singularity.Tests {
 		}
 		//TODO: int?
 		[TestMethod]
-		public void RelationTest() {
+		public void RelationTest_NoIndex() => RunRelationTest(false);
+		[TestMethod]
+		public void RelationTest_Index() => RunRelationTest(true);
+		private static void RunRelationTest(bool addIndex) {
 			var context = new DataContext();
 			var numbersTable = new Table("Numbers");
 			var powersTable = new Table("Powers");
@@ -97,6 +100,8 @@ namespace ShomreiTorah.Singularity.Tests {
 
 			for (int i = 0; i < 10; i++) {
 				var row = numbersTable.Rows.AddFromValues(i);
+
+				if (i == 5 && addIndex) powersKeyColumn.AddIndex();
 
 				if (i % 3 == 0) {
 					var children = row.ChildRows("Powers");
