@@ -118,19 +118,28 @@ namespace ShomreiTorah.Singularity {
 		internal override void OnValueChanged(Row row, object oldValue, object newValue) {
 			base.OnValueChanged(row, oldValue, newValue);
 
-			if (!HasIndex || row.Table == null) return;
-
-			row.Table.GetIndex(this)[oldValue].Remove(row);
-			row.Table.AddToIndex(row, this);
+			if (row.Table == null) return;
+			ExtroduceValue(row, row.Table, oldValue);
+			IntroduceValue(row);
 		}
+
+
 		internal override void OnRowAdded(Row row) {
 			base.OnRowAdded(row);
+			IntroduceValue(row);
+		}
+		///<summary>Called when a row is added or a row's value is changed.</summary>
+		protected virtual void IntroduceValue(Row row) {
 			if (HasIndex) row.Table.AddToIndex(row, this);
+		}
+		///<summary>Called when a row is removed or a row's value is changed.</summary>
+		protected virtual void ExtroduceValue(Row row, Table table, object oldValue) {
+			if (HasIndex) table.GetIndex(this)[oldValue].Remove(row);
 		}
 
 		internal override void OnRowRemoved(Row row, Table table) {
 			base.OnRowRemoved(row, table);
-			if (HasIndex) table.GetIndex(this)[row[this]].Remove(row);
+			ExtroduceValue(row, table, row[this]);
 		}
 
 		bool allowNulls, unique;
@@ -233,38 +242,20 @@ namespace ShomreiTorah.Singularity {
 
 			return null;
 		}
-
-		internal override void OnValueChanged(Row row, object oldValue, object newValue) {
-			base.OnValueChanged(row, oldValue, newValue);
-
-			if (row.Table == null) return;
-			if (row.Table.Context == null) return;
-
-			RemoveFromParent(row, (Row)oldValue);
-			AddToParent(row);
+		///<summary>Adds a row to this column's child row collections.</summary>
+		protected override void IntroduceValue(Row row) {
+			base.IntroduceValue(row);
+			var newParent = (Row)row[this];
+			if (row.Table.Context != null && newParent?.Table?.Context != null)
+				newParent.ChildRows(ChildRelation, false)?.AddRow(row);
 		}
-		internal override void OnRowAdded(Row row) {
-			base.OnRowAdded(row);
-			AddToParent(row);
-		}
-		internal override void OnRowRemoved(Row row, Table table) {
-			base.OnRowRemoved(row, table);
-			RemoveFromParent(row, (Row)row[this]);
-		}
-
-		void AddToParent(Row childRow) {
-			var newParent = (Row)childRow[this];
-			if (newParent != null && newParent.Table != null) {
-				var c = newParent.ChildRows(ChildRelation, false);
-				if (c != null) c.AddRow(childRow);
-			}
-		}
-		void RemoveFromParent(Row childRow, Row oldParent) {
-			if (oldParent == null) return;
-			// If the parent is not in a DataContext, it has no collection to trim.
-			if (oldParent.Table == null || oldParent.Table.Context == null) return;
-			var c = oldParent.ChildRows(ChildRelation, false);
-			if (c != null) c.RemoveRow(childRow);
+		///<summary>Removes a row from this column's child row collections.</summary>
+		protected override void ExtroduceValue(Row row, Table table, object oldValue) {
+			base.ExtroduceValue(row, table, oldValue);
+			var oldParent = (Row)oldValue;
+			// If the parent is not in a DataContext, it has no collection to update.
+			if (oldParent?.Table?.Context != null)
+				oldParent.ChildRows(ChildRelation, false)?.RemoveRow(row);
 		}
 
 		internal override void OnRemove() {
