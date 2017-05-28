@@ -101,17 +101,21 @@ namespace ShomreiTorah.Singularity.Tests {
 			for (int i = 0; i < 10; i++) {
 				var row = numbersTable.Rows.AddFromValues(i);
 
-				if (i == 5 && addIndex) powersKeyColumn.AddIndex();
 
+				int rowCount = 0;
 				if (i % 3 == 0) {
 					var children = row.ChildRows("Powers");
 
-					int rowCount = 0;
 					children.RowAdded += (s, e) => {
 						Assert.AreEqual(e.Row, children[e.Index]);
 						rowCount++;
 						Assert.AreEqual(rowCount, children.Count);
 					};
+
+					// Make sure that adding the index doesn't disconnect existing child events.
+					if (i == 6 && addIndex) powersKeyColumn.AddIndex();
+					children = row.ChildRows("Powers");
+
 					children.RowRemoved += (s, e) => {
 						Assert.IsFalse(children.Contains(e.Row));
 						rowCount--;
@@ -122,8 +126,10 @@ namespace ShomreiTorah.Singularity.Tests {
 				for (int j = 0; j < 11; j++) {
 					powersTable.Rows.AddFromValues(row, j, (int)Math.Pow(i, j));
 				}
+				if (i % 3 == 0) Assert.AreEqual(11, rowCount);  // Make sure ChildRows events are raised.
 				powersTable.Rows.Remove(powersTable.Rows.Last());
 				row.ChildRows(powersKeyColumn.ChildRelation).Last().RemoveRow();
+				if (i % 3 == 0) Assert.AreEqual(9, rowCount);  // Make sure ChildRows events are raised.
 
 				var powerRow = new Row(powersTable.Schema);
 				powersTable.Rows.Add(powerRow);
