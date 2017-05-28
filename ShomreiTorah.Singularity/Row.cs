@@ -17,7 +17,7 @@ namespace ShomreiTorah.Singularity {
 			values = schema.Columns.ToDictionary(c => c, c => c.DefaultValue);
 			Schema.AddRow(this);
 			if (Schema.PrimaryKey != null && schema.PrimaryKey.DataType == typeof(Guid) && schema.PrimaryKey.DefaultValue == null)
-				values[Schema.PrimaryKey] = Guid.NewGuid();	//Bypass the indexer to ignore child validation (Virtual method calls from ctor)
+				values[Schema.PrimaryKey] = Guid.NewGuid(); //Bypass the indexer to ignore child validation (Virtual method calls from ctor)
 		}
 
 		readonly Dictionary<Column, object> values;
@@ -124,7 +124,7 @@ namespace ShomreiTorah.Singularity {
 					var childRow = Field<Row>(fkc);
 					if (childRow == null) continue;
 					var parentCollection = childRow.ChildRows(fkc.ChildRelation, false);
-					if (parentCollection != null)	//If the ChildRowCollection for this parent row has been created,
+					if (parentCollection != null)   //If the ChildRowCollection for this parent row has been created,
 						parentCollection.OnValueChanged(new ValueChangedEventArgs(this, column));
 				}
 			}
@@ -140,7 +140,7 @@ namespace ShomreiTorah.Singularity {
 		///<summary>Clears the current value from a calculated column, causing it to be recalculated next time the value is retrieved.</summary>
 		internal void InvalidateCalculatedValue(CalculatedColumn column) {
 			values[column] = CalculatedColumn.UncalculatedValue;
-			RaiseValueChanged(column, oldValue: DBNull.Value);	//Passing the old value would force unnecessary recalcs
+			RaiseValueChanged(column, oldValue: DBNull.Value);  //Passing the old value would force unnecessary recalcs
 		}
 		///<summary>Toggles the value of a calculated column between the default value (if the row is detached) and the uncalculated value (if the row is attached).</summary>
 		///<remarks>This is called by each CalculatedColumn when the row is added to or removed from the table.</remarks>
@@ -153,7 +153,7 @@ namespace ShomreiTorah.Singularity {
 		//After it's created, it gets maintained by ForeignKeyColumn.OnValueChanged.
 
 		readonly Dictionary<ChildRelation, ChildRowCollection> childRelations = new Dictionary<ChildRelation, ChildRowCollection>();
-		internal void OnRelationRemoved(ChildRelation relation) { childRelations.Remove(relation); typedChildRelations.Remove(relation); }	//Won't throw if not found
+		internal void OnRelationRemoved(ChildRelation relation) { childRelations.Remove(relation); typedChildRelations.Remove(relation); }  //Won't throw if not found
 
 		///<summary>Gets the child rows in the specified child relation.</summary>
 		///<returns>A ChildRowCollection containing a live view of the child rows.</returns>
@@ -180,7 +180,11 @@ namespace ShomreiTorah.Singularity {
 				if (childTable == null)
 					throw new InvalidOperationException("Cannot find " + relation.ChildSchema.Name + " table");
 
-				retVal = new ChildRowCollection(this, relation, childTable, childTable.Rows.Where(r => r[relation.ChildColumn] == this));
+				retVal = new ChildRowCollection(
+					this, relation, childTable,
+					relation.ChildColumn.HasIndex
+						? childTable.GetIndex(relation.ChildColumn).GetOrNull(this) ?? Enumerable.Empty<Row>()
+						: childTable.Rows.Where(r => r[relation.ChildColumn] == this));
 				childRelations.Add(relation, retVal);
 			}
 			return retVal;
