@@ -23,10 +23,6 @@ namespace ShomreiTorah.Common {
 
 
 		///<summary>Gets a value from a dictionary, or null if it isn't present.</summary>
-		public static TValue GetOrNull<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) {
-			return dictionary.TryGetValue(key, out var value) ? value : default(TValue);
-		}
-		///<summary>Gets a value from a dictionary, or null if it isn't present.</summary>
 		public static TValue GetOrNull<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) {
 			return dictionary.TryGetValue(key, out var value) ? value : default(TValue);
 		}
