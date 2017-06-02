@@ -54,6 +54,8 @@ namespace ShomreiTorah.Data.UI.Grid {
 		public SmartGridView(SmartGrid grid)
 			: base(grid) {
 			this.AddControllerHandlers();   //See ColumnController.cs
+
+			OptionsView.BestFitMaxRowCount = 50;
 		}
 
 		///<summary>Indicates whether the view will show tooltips.</summary>
