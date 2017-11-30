@@ -116,7 +116,6 @@ namespace ShomreiTorah.Common.Updates {
 			var info = new FileInfo(filePath);
 			if (!info.Exists) return false;
 			if (info.Length != Length) return false;
-			if (!AreClose(info.LastWriteTimeUtc, DateModifiedUtc)) return false;
 
 			using (var hasher = hasherCreator())
 			using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -124,11 +123,6 @@ namespace ShomreiTorah.Common.Updates {
 					return false;
 
 			return true;
-		}
-
-		static bool AreClose(DateTime a, DateTime b) {
-			//TODO: Allow for DST issues?
-			return Math.Abs((a - b).TotalSeconds) <= 2;
 		}
 
 		///<summary>Downloads the file from the server.</summary>
