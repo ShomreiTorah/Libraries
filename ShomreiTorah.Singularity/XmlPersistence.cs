@@ -96,7 +96,7 @@ namespace ShomreiTorah.Singularity {
 		public Table Table { get; private set; }
 
 		public void FillTable() {
-			//Maps each of this table's foreign keys to 
+			//Maps each of this table's foreign keys to
 			//a dictionary mapping primary keys to rows.
 			var foreignKeyMap = Columns
 				.OfType<ForeignKeyColumn>()
@@ -105,10 +105,10 @@ namespace ShomreiTorah.Singularity {
 					col => Table.Context.Tables[col.ForeignSchema].GetIndex(col.ForeignSchema.PrimaryKey)
 				);
 
-			//Maps primary-key values to existing 
+			//Maps primary-key values to existing
 			//rows in the table that have not been
 			//processed yet.  Any rows that remain
-			//in this dictionary after populating 
+			//in this dictionary after populating
 			//the table will be removed.
 			Dictionary<object, Row> keyMap = null;
 			if (Table.Schema.PrimaryKey != null) {
@@ -137,11 +137,13 @@ namespace ShomreiTorah.Singularity {
 						row[field.Key] = null;
 					else if (foreignKey == null)
 						row[field.Key] = field.Key.CoerceValue(field.Value, CultureInfo.InvariantCulture);
-					else
-						row[field.Key] = foreignKeyMap
-							[foreignKey]
-							[foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture)]
-							.Single();
+					else {
+						var keyValue = foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture);
+						var index = foreignKeyMap[foreignKey];
+						if (!index.TryGetValue(keyValue, out var rows))
+							throw new InvalidOperationException($"Row {row} has foreign key {keyValue} in column {field.Key} which was not found in parent table {foreignKey.ForeignSchema.Name}");
+						row[field.Key] = rows.Single();
+					}
 				}
 				OnRowPopulated(row, rowSource);
 
