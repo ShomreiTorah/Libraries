@@ -16,9 +16,9 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 		static CalculatingZmanimProvider defaultInstance;
 		///<summary>Gets the CalculatingZmanimProvider instance for the location specified in ShomreiTorahConfig.</summary>
 		///<remarks>Since CalculatingZmanimProvider is not thread-safe, this will create a different instance for each thread.</remarks>
-		public new static CalculatingZmanimProvider Default {
+		public static new CalculatingZmanimProvider Default {
 			get {
-				if (defaultInstance == null) defaultInstance = new CalculatingZmanimProvider();	//Since it's ThreadStatic, I don't need to lock
+				if (defaultInstance == null) defaultInstance = new CalculatingZmanimProvider(); //Since it's ThreadStatic, I don't need to lock
 				return defaultInstance;
 			}
 		}
@@ -43,30 +43,6 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 
 		Dictionary<Zman, TimeSpan> CalculateZmanim(DateTime date) {
 			var retVal = new Dictionary<Zman, TimeSpan>(16);
-
-			//todaysZmanim.mySunrise = calculateSunriseSunset(myDate, myMonth, myYear, myLat, myLong, 545 / 6, true);
-			//todaysZmanim.mySunset = calculateSunriseSunset(myDate, myMonth, myYear, myLat, myLong, 545 / 6, false);
-			//todaysZmanim.shaosZmanios1 = (todaysZmanim.mySunset - todaysZmanim.mySunrise) / 12;
-			//todaysZmanim.alosHashachar1 = todaysZmanim.mySunrise - 1.2;
-			//todaysZmanim.alosHashachar2 = convertToTime(calculateSunriseSunset(myDate, myMonth, myYear, myLat, myLong, 90 + 16.1, true));
-			//todaysZmanim.tzeisRYona = convertToTime(calculateSunriseSunset(myDate, myMonth, myYear, myLat, myLong, 90 + 8.5, false));
-			//todaysZmanim.tzeisRTam = todaysZmanim.mySunset + 1.2;
-			//todaysZmanim.shaosZmanios2 = (todaysZmanim.tzeisRTam - todaysZmanim.alosHashachar1) / 12;
-			//todaysZmanim.misheyakir1 = convertToTime(todaysZmanim.mySunrise - .75);
-			//todaysZmanim.misheyakir2 = convertToTime(calculateSunriseSunset(myDate, myMonth, myYear, myLat, myLong, 90 + 11, true));
-			//todaysZmanim.szkGra = convertToTime(todaysZmanim.mySunrise + (todaysZmanim.shaosZmanios1 * 3));
-			//todaysZmanim.sztGra = convertToTime(todaysZmanim.mySunrise + (todaysZmanim.shaosZmanios1 * 4));
-			//todaysZmanim.szkMA = convertToTime(todaysZmanim.alosHashachar1 + (todaysZmanim.shaosZmanios2 * 3));
-			//todaysZmanim.sztMA = convertToTime(todaysZmanim.alosHashachar1 + (todaysZmanim.shaosZmanios2 * 4));
-			//todaysZmanim.chatzos = convertToTime(todaysZmanim.mySunrise + (todaysZmanim.shaosZmanios1 * 6));
-			//todaysZmanim.minchaGedola1 = convertToTime(todaysZmanim.mySunrise + (todaysZmanim.shaosZmanios1 * 6.5));
-			//todaysZmanim.minchaGedola2 = convertToTime(todaysZmanim.alosHashachar1 + (todaysZmanim.shaosZmanios2 * 6.5));
-			//todaysZmanim.szMussaf1 = convertToTime(todaysZmanim.mySunrise + (todaysZmanim.shaosZmanios1 * 7));
-			//todaysZmanim.szMussaf2 = convertToTime(todaysZmanim.alosHashachar1 + (todaysZmanim.shaosZmanios2 * 7));
-			//todaysZmanim.minchaKetana1 = convertToTime(todaysZmanim.mySunrise + (todaysZmanim.shaosZmanios1 * 9.5));
-			//todaysZmanim.minchaKetana2 = convertToTime(todaysZmanim.alosHashachar1 + (todaysZmanim.shaosZmanios2 * 9.5));
-			//todaysZmanim.plagMincha1 = convertToTime(todaysZmanim.mySunrise + (todaysZmanim.shaosZmanios1 * 10.75));
-			//todaysZmanim.plagMincha2 = convertToTime(todaysZmanim.alosHashachar1 + (todaysZmanim.shaosZmanios2 * 10.75));
 
 			retVal.Add(Zman.Sunrise, CalcSunTime(date, 545 / 6.0, true));
 			retVal.Add(Zman.Sunset, CalcSunTime(date, 545 / 6.0, false));
@@ -122,13 +98,15 @@ namespace ShomreiTorah.Common.Calendar.Zmanim {
 			var T = H + RA - (.06571 * t) - 6.622;
 			var UT = T - lngHour;
 
-			//Get the offset after the DST change. 
-			//Otherwise, the Sunday that the clock 
+			//Get the offset after the DST change.
+			//Otherwise, the Sunday that the clock
 			//changes gets pre-change values, since
 			//the UtcOffset only changes at 2:00 AM
 
 			var utcValue = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc).AddHours(UT);
-			return utcValue.ToLocalTime().TimeOfDay;
+			var timeZone = (string)Config.GetElement("Zmanim").Attribute("TimeZone") ?? TimeZoneInfo.Local.Id;
+
+			return TimeZoneInfo.ConvertTimeFromUtc(utcValue, TimeZoneInfo.FindSystemTimeZoneById(timeZone)).TimeOfDay;
 		}
 
 		static double Sin(double degrees) { return Math.Sin(degrees * Math.PI / 180); }
