@@ -140,7 +140,7 @@ namespace ShomreiTorah.Singularity {
 					else {
 						var keyValue = foreignKey.ForeignSchema.PrimaryKey.CoerceValue(field.Value, CultureInfo.InvariantCulture);
 						var index = foreignKeyMap[foreignKey];
-						if (!index.TryGetValue(keyValue, out var rows))
+						if (!index.TryGetValue(keyValue, out var rows) || !rows.Any())
 							throw new InvalidOperationException($"Row {row} has foreign key {keyValue} in column {field.Key} which was not found in parent table {foreignKey.ForeignSchema.Name}");
 						row[field.Key] = rows.Single();
 					}
