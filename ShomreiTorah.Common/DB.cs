@@ -181,14 +181,20 @@ namespace ShomreiTorah.Common {
 					File.Delete(filePath);
 					break;
 				case DatabaseFile.SqlCe:
-					using (var engine = new SqlCeEngine(CreateSqlCeConnectionString(filePath)))
-						engine.CreateDatabase();
+					CreateSqlCeDatabase(filePath);
 					break;
 				default:
 					break;
 			}
 
 			return DB.OpenFile(filePath, format);
+		}
+
+
+		// This is a separate method so that non-SQL-CE callers of CreateFile() don't need this DLL (for JIT).
+		private static void CreateSqlCeDatabase(string filePath) {
+			using (var engine = new SqlCeEngine(CreateSqlCeConnectionString(filePath)))
+				engine.CreateDatabase();
 		}
 		#endregion
 
