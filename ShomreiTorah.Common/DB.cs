@@ -118,7 +118,7 @@ namespace ShomreiTorah.Common {
 			const string ExcelProperties = "IMEX=0;HDR=YES";
 			switch (format) {
 				case DatabaseFile.SqlCe:
-					return new DBConnector(SqlCeProviderFactory.Instance, CreateSqlCeConnectionString(filePath));
+					return OpenSqlCeDatabase(filePath);
 
 				case DatabaseFile.Access:
 					csBuilder.Provider = "Microsoft.Jet.OLEDB.4.0";
@@ -146,6 +146,11 @@ namespace ShomreiTorah.Common {
 			}
 
 			return new DBConnector(OleDbFactory.Instance, csBuilder.ToString());
+		}
+
+		// This is a separate method so that non-SQL-CE callers of CreateFile() don't need this DLL (for JIT).
+		private static DBConnector OpenSqlCeDatabase(string filePath) {
+			return new DBConnector(SqlCeProviderFactory.Instance, CreateSqlCeConnectionString(filePath));
 		}
 
 		///<summary>Creates an empty database file.</summary>
