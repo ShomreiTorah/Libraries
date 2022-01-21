@@ -147,7 +147,7 @@ namespace ShomreiTorah.Common.Updates {
 			UpdateVerifier.FromXmlString(Config.GetElement("Updates", "Cryptography", "UpdateVerifier").ToString());
 
 
-			Uri domain = new Uri("http://" + Config.DomainName, UriKind.Absolute);
+			Uri domain = new Uri("https://" + Config.DomainName, UriKind.Absolute);
 			RemotePath = new Uri(Config.ReadAttribute("Updates", "Path"), UriKind.RelativeOrAbsolute);
 			BaseUri = new Uri(domain, RemotePath);
 		}
