@@ -131,6 +131,12 @@ namespace ShomreiTorah.Singularity {
 				foreach (var field in GetValues(rowSource)) {
 					if (field.Key.ReadOnly) continue;
 
+					// Ignore string columns that only changed line endings.
+					if (field.Key.DataType == typeof(string) 
+							&& (field.Value as string)?.Replace("\r", "") 
+							== ((string)row[field.Key])?.Replace("\r", ""))
+						continue;
+
 					var foreignKey = field.Key as ForeignKeyColumn;
 
 					if (field.Value == null || field.Value == DBNull.Value)
