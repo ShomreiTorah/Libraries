@@ -69,15 +69,18 @@ namespace ShomreiTorah.Common {
 			: this((configElement.Attribute("Server") ?? configElement.Attribute("Host")).Value,
 					int.Parse(configElement.Attribute("Port").Value, CultureInfo.InvariantCulture),
 					bool.Parse(configElement.Attribute("SSL").Value),
-					configElement.Attribute("Password").Value) { }
+					configElement.Attribute("Password").Value,
+					// This cast returns null if the attribute isn't present.
+					(string) configElement.Attribute("UserName")) { }
 
 
 		///<summary>Creates an Email instance.</summary>
-		public Email(string host, int port, bool ssl, string password) {
+		public Email(string host, int port, bool ssl, string password, string userName) {
 			SmtpServer = host;
 			Port = port;
 			EnableSsl = ssl;
 			Password = password;
+			UserName = userName;
 		}
 
 		///<summary>To be used by derived classes, if any.</summary>
@@ -92,11 +95,13 @@ namespace ShomreiTorah.Common {
 		public bool EnableSsl { get; protected set; }
 		///<summary>Gets the password for the email accounts on this instance.</summary>
 		public string Password { get; protected set; }
+		///<summary>Gets the SMTP username to use for all email addresses.  If null, will use the sender address instead.</summary>
+		public string UserName { get; protected set; }
 
 		///<summary>Creates an SMTP client for the given username.</summary>
 		///<param name="userName">The username to login as.</param>
 		public virtual SmtpClient CreateSmtp(string userName) {
-			return new SmtpClient { Credentials = new NetworkCredential(userName, Password), EnableSsl = EnableSsl, Host = SmtpServer, Port = Port };
+			return new SmtpClient { Credentials = new NetworkCredential(UserName ?? userName, Password), EnableSsl = EnableSsl, Host = SmtpServer, Port = Port };
 		}
 		#endregion
 		///<summary>The encoding to be used for MailMessages.</summary>
@@ -111,7 +116,7 @@ namespace ShomreiTorah.Common {
 		///<summary>Sends a notification email from Alerts@ to Info@.</summary>
 		public static void Notify(string subject, string body, bool html) { Notify(InfoAddress, subject, body, html); }
 		///<summary>Sends a notification email from Alerts@.</summary>
-		public static void Notify(MailAddress to, string subject, string body, bool html) { Default.SendAsync(AlertsAddress, to, subject, body, html); }
+		public static void Notify(MailAddress to, string subject, string body, bool html) { Default.Send(AlertsAddress, to, subject, body, html); }
 
 		///<summary>Sends a technical alert to Admin@.</summary>
 		public static void Warn(string subject, string body) { Notify(AdminAddress, subject, body); }
