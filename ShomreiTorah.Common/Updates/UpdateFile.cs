@@ -157,11 +157,11 @@ namespace ShomreiTorah.Common.Updates {
 
 				if (Length != actualSize) {
 					File.Delete(filePath);
-					throw new InvalidDataException("Bad length");
+					throw new InvalidDataException($"{RelativePath}: Bad length");
 				}
 				if (!hasher.Hash.SequenceEqual(hash)) {
 					File.Delete(filePath);
-					throw new InvalidDataException("Bad hash");
+					throw new InvalidDataException($"{RelativePath}Bad hash");
 				}
 				File.SetLastWriteTimeUtc(filePath, DateModifiedUtc);
 			}
