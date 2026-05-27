@@ -51,13 +51,6 @@ namespace ShomreiTorah.Common.Updates {
 		const string OrganizationPrefix = "Organization-";
 		static readonly Regex OrganizationDirectoryPattern = new Regex(@"^" + OrganizationPrefix + @".*\\");
 
-		///<summary>Gets only files that are specific to this organization.</summary>
-		private List<UpdateFile> GetThisOrganizationFiles(string organizationId) {
-			if (organizationId == null) return new List<UpdateFile>();
-			var prefix = OrganizationPrefix + organizationId + "\\";
-			return Files.Where(f => f.RelativePath.StartsWith(prefix)).Select(f => f.StripPrefix(prefix)).ToList();
-		}
-
 		///<summary>Downloads the update and extracts its files to a temporary directory.</summary>
 		///<param name="existingFiles">The path to the existing files that should be updated.
 		/// Any files in this directory that match files in the update will not be re-downloaded.</param>
@@ -74,14 +67,12 @@ namespace ShomreiTorah.Common.Updates {
 			Directory.CreateDirectory(path);
 
 			try {
-				var thisOrganizationFiles = GetThisOrganizationFiles(organizationId);
+
 				var newFiles = Files
-					.Where(f =>
-							// Skip other organization directories
-							!OrganizationDirectoryPattern.IsMatch(f.RelativePath)
-							// Skip files that are overridden by our organization
-						&& !thisOrganizationFiles.Any(myF => myF.RelativePath == f.RelativePath))
-					.Concat(thisOrganizationFiles)
+					// Extract files from this organization to the root
+					.Select(f => organizationId == null ? f : f.StripPrefix(OrganizationPrefix + organizationId + "\\"))
+					// Skip other organization directories
+					.Where(f => !OrganizationDirectoryPattern.IsMatch(f.RelativePath))
 					.Where(f => !f.Matches(existingFiles))
 					.ToList();
 
